@@ -1,26 +1,160 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
-import starlight from '@astrojs/starlight';
+import { defineConfig } from "astro/config";
+import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
-	integrations: [
-		starlight({
-			title: 'My Docs',
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
-			sidebar: [
-				{
-					label: 'Guides',
-					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
-					],
-				},
-				{
-					label: 'Reference',
-					autogenerate: { directory: 'reference' },
-				},
-			],
-		}),
-	],
+  integrations: [
+    starlight({
+      title: "Sentrie",
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/sentrie-sh/sentrie",
+        },
+      ],
+      sidebar: [
+        {
+          label: "Getting Started",
+          items: [
+            {
+              label: "What is Policy as Code?",
+              slug: "getting-started/what-is-policy-as-code",
+            },
+            {
+              label: "What is Sentrie?",
+              slug: "getting-started/what-is-sentrie",
+            },
+            {
+              label: "Why Sentrie?",
+              slug: "getting-started/why-sentrie",
+            },
+            {
+              label: "Installation",
+              slug: "getting-started/installation",
+            },
+            {
+              label: "Writing your first Policy",
+              slug: "getting-started/writing-your-first-policy",
+            },
+            {
+              label: "Running your Policy",
+              slug: "getting-started/running-your-policy",
+            },
+          ],
+        },
+        {
+          label: "Structure of a Policy Pack",
+          items: [
+            {
+              label: "Overview",
+              slug: "structure-of-a-policy-pack/overview",
+            },
+            {
+              label: "Pack File",
+              slug: "structure-of-a-policy-pack/packfile",
+            },
+            {
+              label: "Program File",
+              slug: "structure-of-a-policy-pack/program-file",
+            },
+            {
+              label: "TypeScript File",
+              slug: "structure-of-a-policy-pack/typescript-file",
+            },
+            {
+              label: "Example Pack",
+              slug: "structure-of-a-policy-pack/example-pack",
+            },
+          ],
+        },
+        {
+          label: "Reference",
+          items: [
+            {
+              label: "Namespaces",
+              slug: "reference/namespaces",
+            },
+            {
+              label: "Types and Constraints",
+              slug: "reference/types-and-constraints",
+            },
+            {
+              label: "Shapes",
+              slug: "reference/shapes",
+            },
+            {
+              label: "Policies",
+              slug: "reference/policies",
+            },
+            {
+              label: "Facts",
+              slug: "reference/facts",
+            },
+            {
+              label: "Rules",
+              slug: "reference/rules",
+            },
+            {
+              label: "Collection Operations",
+              slug: "reference/collection-operations",
+            },
+            {
+              label: "Arithmetic Operations",
+              slug: "reference/arithmetic-operations",
+            },
+            {
+              label: "Boolean Operations",
+              slug: "reference/boolean-operations",
+            },
+            {
+              label: "Precedence",
+              slug: "reference/precedence",
+            },
+            {
+              label: "Using TypeScript",
+              slug: "reference/using-typescript",
+            },
+            {
+              label: "Security and Permissions",
+              slug: "reference/security-and-permissions",
+            },
+          ],
+        },
+        {
+          label: "Language Reference",
+          slug: "reference",
+        },
+        {
+          label: "Typescript Modules",
+          slug: "typescript-modules",
+        },
+        {
+          label: "CLI Reference",
+          items: [
+            {
+              label: "Overview",
+              slug: "cli-reference",
+            },
+            {
+              label: "init",
+              slug: "cli-reference/init",
+            },
+            {
+              label: "exec",
+              slug: "cli-reference/exec",
+            },
+            {
+              label: "serve",
+              slug: "cli-reference/serve",
+            },
+          ],
+        },
+      ],
+      expressiveCode: {
+        themes: ["github-dark", "github-light"],
+      },
+    }),
+  ],
 });

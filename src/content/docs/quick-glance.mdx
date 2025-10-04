@@ -1,0 +1,126 @@
+---
+title: "Sentrie - Policy Enforcement Engine"
+description: "A powerful, flexible policy enforcement engine with a rich expression language for authorization, access control, and business rules."
+---
+
+# Sentrie
+
+**The policy enforcement engine that scales with your needs**
+
+Sentrie is a powerful, flexible policy enforcement engine designed for modern applications. With its rich expression language, comprehensive type system, and JavaScript module integration, Sentrie makes it easy to implement complex authorization, access control, and business rules.
+
+## Why Sentrie?
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
+  <div class="border rounded-lg p-6">
+    <h3 class="text-lg font-semibold mb-2">Rich Expression Language</h3>
+    <p class="text-sm text-gray-600">
+      Powerful expressions with arithmetic, logical, comparison, and collection operations. 
+      Support for quantifiers, pattern matching, and conditional expressions.
+    </p>
+  </div>
+
+{" "}
+
+<div class="border rounded-lg p-6">
+  <h3 class="text-lg font-semibold mb-2">Type-Safe Policies</h3>
+  <p class="text-sm text-gray-600">
+    Comprehensive type system with shapes, constraints, and validation. Catch
+    errors at policy definition time, not runtime.
+  </p>
+</div>
+
+  <div class="border rounded-lg p-6">
+    <h3 class="text-lg font-semibold mb-2">JavaScript Integration</h3>
+    <p class="text-sm text-gray-600">
+      Seamlessly integrate JavaScript modules for complex logic. 
+      Built-in modules for UUID generation, crypto operations, and more.
+    </p>
+  </div>
+</div>
+
+## Key Features
+
+- **🎯 Policy-First Design**: Define policies as code with clear, readable syntax
+- **🔒 Authorization & Access Control**: Implement fine-grained permissions and business rules
+- **📦 Pack System**: Organize policies into reusable, versioned packages
+- **🌐 HTTP API**: RESTful API for policy evaluation with comprehensive tracing
+- **⚡ High Performance**: Built-in caching and optimization for production workloads
+- **🔧 Developer Experience**: Rich tooling, comprehensive error messages, and debugging support
+
+## Quick Start
+
+Get up and running with Sentrie in minutes:
+
+```bash
+# Install Sentrie
+go install github.com/sentrie-sh/sentrie@latest
+
+# Create your first policy
+mkdir my-policy && cd my-policy
+echo 'namespace com/example/auth
+
+policy user {
+  rule allow = default false when user.role == "admin" {
+    yield true
+  }
+
+  export decision of allow
+}' > auth.sentrie
+
+# Start the server
+sentrie serve --pack-location .
+```
+
+## Language Highlights
+
+Sentrie's expression language is designed for clarity and power:
+
+```text
+namespace com/example/pricing
+
+policy pricing {
+  let discount = 0.1
+  let premiumUsers = ["alice", "bob"]
+
+  rule calculatePrice = default 0 {
+    let basePrice = product.price
+    let userDiscount = user.name in premiumUsers ? discount : 0
+    let finalPrice = basePrice * (1 - userDiscount)
+
+    yield finalPrice
+  }
+
+  export decision of calculatePrice
+}
+```
+
+## What's Next?
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
+  <div class="border rounded-lg p-6">
+    <h3 class="text-lg font-semibold mb-2">Get Started</h3>
+    <p class="text-sm text-gray-600 mb-4">Learn the basics and write your first policy</p>
+    <a href="/docs/getting-started" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full text-center">
+      Start Building →
+    </a>
+  </div>
+
+  <div class="border rounded-lg p-6">
+    <h3 class="text-lg font-semibold mb-2">Language Reference</h3>
+    <p class="text-sm text-gray-600 mb-4">Explore the full language specification</p>
+    <a href="/docs/reference" class="inline-block border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-50 w-full text-center">
+      View Reference →
+    </a>
+  </div>
+</div>
+
+## Community & Support
+
+- **GitHub**: [github.com/sentrie-sh/sentrie](https://github.com/sentrie-sh/sentrie)
+- **Issues**: Report bugs and request features
+- **Discussions**: Ask questions and share ideas
+
+<span class="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded mt-4">
+  Version 0.1.0 - Early Access
+</span>
