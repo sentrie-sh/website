@@ -68,7 +68,7 @@ Map keys must be strings.
 :::
 
 :::note
-The type is optional for `let` statements. The type will be inferred from the value.
+The type is optional for `let` statements. When undeclared, the value is not validated against any type constraints.
 However, it is recommended to declare the type for better readability and to avoid surprises where the type is not what you expect.
 :::
 
@@ -106,6 +106,18 @@ shape Permission string @one_of("read", "write", "delete")
 
 let permissions: list[Permission] = ["read", "write"]
 ```
+
+:::tip
+Use contraints for runtime validation of data.
+
+```sentrie
+shape Positive100 int @min(0) @max(100)
+let y = 50
+let c:Positive100 = y
+```
+
+In the above example, the value of `y` is validated against the constraints before being assigned to `c`.
+:::
 
 ## Available Constraints
 
@@ -166,3 +178,23 @@ let permissions: list[Permission] = ["read", "write"]
 | Constraint     | Description            |
 | -------------- | ---------------------- |
 | `@not_empty()` | List must not be empty |
+
+## Converting Types
+
+You can convert between types using the `cast .. as` construct. The result is validated against the new type constraints before returning the result.
+
+```text
+let u: int = cast "50" as int
+```
+
+```text
+let u: string = cast 50 as string
+```
+
+```text
+let u: bool = cast "true" as bool
+```
+
+```text
+let u: document = cast { "name": "John", "age": 30 } as document
+```

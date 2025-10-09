@@ -15,13 +15,13 @@ Policies are the fundamental building blocks of Sentrie policy packs. They encap
 
 ### Core Components
 
-- **Facts**: Input data declarations with types and defaults
+- **Facts**: Declare input data declarations with types and defaults with `fact` statements
 - **Variables**: Intermediate calculations using `let` statements
-- **Rules**: Decision logic with conditions and outcomes
-- **Extendible**: External TypeScript functions via `use` statements
-- **Exports**: Rule outcomes for external consumption
+- **Rules**: Decision logic with conditions and outcomes with `rule` statements
+- **Use**: External TypeScript functions via `use` statements
+- **Exports**: Rule outcomes for external consumption with `export` statements
 
-## Policy Declaration
+## Declaring Policies
 
 ### Basic Syntax
 
@@ -80,7 +80,7 @@ policy userAccess {
 ### Use Statements
 
 ```sentrie
--- Import TypeScript functions
+-- Using TypeScript functions
 use { function1, function2 } from "./utils.ts" as utils
 use { validateEmail } from "./validation.ts" as validators
 ```
@@ -90,7 +90,6 @@ use { validateEmail } from "./validation.ts" as validators
 ```sentrie
 -- Required facts with defaults
 fact user!: User as user default { "id": "", "role": "guest" }
-fact resource!: Resource as resource default { "id": "", "type": "document" }
 
 -- Optional facts
 fact context: Context as context default { "key": "value" }
@@ -202,10 +201,10 @@ export decision of canWrite
 ```sentrie
 -- Import rule with attachments
 rule importedRule = import decision of ruleName
-  from com/example/policy
-  with factName as expr
+                           from com/example/policy
+                           with factName as expr
 
--- Access attachments using field accessor
+-- Access attachments using field accessors
 let attachmentValue = importedRule.attachmentName
 
 -- Example
@@ -236,20 +235,28 @@ export decision of canDelete attach auditReason as "Data retention policy" attac
 
 ```sentrie
 -- Good: Clear, descriptive attachment names
-export decision of canAccess attach accessReason as "User has admin role" attach accessLevel as user.role
+export decision of canAccess
+  attach accessReason as "User has admin role"
+  attach accessLevel as user.role
 
 -- Avoid: Generic or unclear names
-export decision of canAccess attach info as "ok" attach data as user.role
+export decision of canAccess
+  attach info as "ok"
+  attach data as user.role
 ```
 
 ### Keep Attachments Relevant
 
 ```sentrie
 -- Good: Only include necessary metadata
-export decision of canApprove attach approverLevel as user.role attach approvalLimit as user.maxAmount
+export decision of canApprove
+  attach approverLevel as user.role
+  attach approvalLimit as user.maxAmount
 
 -- Avoid: Including unnecessary or sensitive data
-export decision of canApprove attach approverLevel as user.role attach userPassword as user.password
+export decision of canApprove
+  attach approverLevel as user.role
+  attach userPassword as user.password
 ```
 
 ### Use Consistent Naming Conventions
@@ -286,10 +293,13 @@ let level = authResult.level is defined ? authResult.level : "unknown"
 
 ```sentrie
 -- Include debugging information in development
-export decision of canAccess attach debugInfo as "User verified: " + user.id attach timestamp as currentTime()
+export decision of canAccess
+  attach debugInfo as "User verified: " + user.id
+  attach timestamp as currentTime()
 
 -- In production, you might remove or simplify debug attachments
-export decision of canAccess attach timestamp as currentTime()
+export decision of canAccess
+  attach timestamp as currentTime()
 ```
 
 ### Document Attachment Usage

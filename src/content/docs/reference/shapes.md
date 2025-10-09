@@ -5,16 +5,16 @@ description: Shapes are a way to define type aliases and data models in sentrie.
 
 Shapes are Sentrie's primary mechanism for defining custom data models and type aliases. They provide a powerful way to create reusable, validated types that can be composed together to build complex data models.
 
-Shapes help in providing clear contracts for data, making policies more readable and maintainable.
+Shapes help in providing clear contracts for data, thus providing a built in validation layer for data that flows through your policies.
 
 ## What are Shapes?
 
 Shapes serve two main purposes in Sentrie:
 
-1. **Data Models**: Define structured objects with named fields and constraints
-2. **Type Aliases**: Create custom names for existing types with additional constraints
+- **Data Models**: Define structured objects with named fields and constraints
+- **Type Aliases**: Create custom names for existing types with additional constraints
 
-## Shape Definition
+## Defining Shapes
 
 ### Type Aliases
 
@@ -120,12 +120,12 @@ let user: User = {
   email: "alice@example.com"
 }
 
--- Check if optional fields exist using ternary operator
-let phone_message: string = user.phone is defined ? "Phone: " + user.phone : "No phone number provided"
-
 -- You can also use this in boolean expressions
 let has_phone: bool = user.phone is defined
 let contact_info: string = user.phone is defined ? user.phone : "No phone available"
+
+-- Check if optional fields exist using ternary operator
+let phone_message: string = user.phone is defined ? "Phone: " + user.phone : "No phone number provided"
 ```
 
 :::
@@ -163,9 +163,9 @@ let admin: AdminUser = {
 
 - **Inheritance**: Child shapes inherit all fields from parent shapes
 - **No Circular Dependencies**: Shapes cannot reference themselves directly or indirectly
-- **No Duplicate Fields**: Shapes cannot have duplicate fields
+- **No Duplicate Fields**: Shapes cannot have duplicate fields directly or indirectly
 - **Type Safety**: Values must match the exact shape they're assigned to
-- **Data Model Requirement**: Shapes cannot be composed with shapes which do not resolve to a data model
+- **Data Model Requirement**: Shapes cannot be composed with alias shapes
 
 ```sentrie
 -- This will cause a validation error
@@ -176,7 +176,7 @@ let user: User = {
 }
 ```
 
-## Constraints
+## Applying Constraints
 
 Shape properties can have constraints applied to them, providing runtime validation:
 
