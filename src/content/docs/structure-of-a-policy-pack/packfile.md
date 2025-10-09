@@ -3,11 +3,11 @@ title: "sentrie.pack.toml"
 description: "The pack file is the manifest and metadata configuration for the whole policy pack."
 ---
 
-The `sentrie.pack.toml` file serves as the manifest and metadata configuration for the whole policy pack. This TOML file is essential for defining how your policy pack is structured, versioned and distributed.
+The `sentrie.pack.toml` file serves as the manifest and metadata configuration for the whole policy pack. This TOML file is essential for defining how your policy pack is loaded and used by Sentrie.
 
 ## Purpose
 
-The pack file acts as the central configuration hub that:
+The PackFile acts as the central configuration hub that:
 
 - Defines the root directory of your policy pack
 - Specifies metadata
@@ -18,17 +18,24 @@ The pack file acts as the central configuration hub that:
 
 **Key points:**
 
-- Must be located at the root of your policy pack
+- Must be located at the root of your policy pack (refer to [Overview](/structure-of-a-policy-pack/overview/))
 - Defines the base directory for all absolute paths
 - Required for Sentrie to recognize the directory as a policy pack
-- Only one pack file per policy pack
+- Only one PackFile per policy pack
 
 ## Configuration Sections
+
+**System fields:** (required)
+
+- `schema_version` - The version of the schema used to parse the pack file
 
 **Basic metadata:** (required)
 
 - `name` - The name of your policy pack
 - `version` - Semantic versioning (e.g., "1.0.0")
+
+**Other metadata:** (optional)
+
 - `description` - Brief description of the pack's purpose
 - `license` - The license of the pack
 - `repository` - The repository of the pack
@@ -36,16 +43,13 @@ The pack file acts as the central configuration hub that:
 
 **Dependencies:** (optional)
 
-- `engines` - Required Sentrie runtime versions
+- `engine` - Required runtime versions
+  - `sentrie` - Required Sentrie runtime version constraint (adheres to [Semantic Version Comparison Specification](https://semver.org/#spec-item-11))
 - `permissions` - Security permissions and capabilities (refer to [Security and Permissions](/reference/security-and-permissions/))
 
 **Advanced settings:** (optional)
 
 - `metadata` - Additional arbitrary custom metadata
-
-**System fields:** (must be present)
-
-- `schema_version` - The version of the schema used to parse the pack file
 
 ## Path Resolution
 

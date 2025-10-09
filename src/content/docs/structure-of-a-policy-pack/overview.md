@@ -27,9 +27,9 @@ A policy pack does not have a prescribed filesystem structure. It can be organiz
     ├── *.ts
 ```
 
-### `sentrie.pack.toml`
+### PackFile
 
-The `sentrie.pack.toml` file serves as the manifest and metadata configuration for the whole policy pack. The location of this file defines the root of the pack.
+The PackFile (`sentrie.pack.toml`) file serves as the manifest and metadata configuration for the whole policy pack. The location of this file defines the root of the pack.
 
 **What it contains:**
 
@@ -43,9 +43,9 @@ The `sentrie.pack.toml` file serves as the manifest and metadata configuration f
 - All absolute paths are resolved relative to this file's location
 - `@local` prefix in `use` statements resolves to this file's location (refer to [`use` statements](/reference/use-statements/))
 
-### `*.sentrie`
+### ProgramFile
 
-The `*.sentrie` files contain the core policy definitions written in the Sentrie policy language.
+A ProgramFile (`*.sentrie`) file contains the core policy definitions written in the Sentrie policy language.
 
 **File organization:**
 
@@ -55,12 +55,11 @@ The `*.sentrie` files contain the core policy definitions written in the Sentrie
 
 ### `*.ts`
 
-TypeScript files (`*.ts`) provide Typescript module functionality within policy packs. Policies can refer to these modules using the `use` statement (refer to [`use` statements](/reference/use-statements/)).
+TypeScript files (`*.ts`) provide Typescript module functionality within policy packs. Policies can refer to and execute functions defined in these modules using the `use` statement (refer to [`use` statements](/reference/use-statements/)).
 
 **What they can contain:**
 
 - Helper functions
-- Data transformation logic
 - External integrations
 - Complex data processing
 
@@ -68,10 +67,10 @@ TypeScript files (`*.ts`) provide Typescript module functionality within policy 
 
 - Available to Sentrie policies on demand
 - Located anywhere in the policy pack
-- Compiled to JavaScript using a built-in TypeScript compiler
+- Compiled to JavaScript using a built-in opinionated TypeScript compiler
 - Leverage full TypeScript power while keeping policies declarative
 
-For more information, see the [TypeScript Integration](/reference/typescript-integration/) reference. For a list of built-in modules, see the [TypeScript Integration](/reference/typescript-integration/) reference.
+For more information, see the [TypeScript Integration](/reference/using-typescript/) reference. For a list of built-in modules, see the [TypeScript Integration](/reference/typescript-integration/) reference.
 
 ## Organization
 

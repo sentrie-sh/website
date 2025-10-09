@@ -40,6 +40,7 @@ shape Invoice {
   -- shape definition
 }
 
+-- export shapes to allow visibility to other namespaces
 export shape User
 export shape Invoice
 
@@ -69,7 +70,7 @@ A `policy` statement is a container for related:
 - shape declarations
 
 ```hcl
-namespace com/example/myapp
+namespace com/example/myauth
 
 shape User {
   -- shape definition
@@ -114,11 +115,10 @@ policy auth {
 - Keep individual policies focused on specific domains or features
 - Consider using consistent naming patterns across your team
 
-## Content Types
+## Declaration Types
 
 **Policy declarations:**
 
-- Business rules and permissions
 - Business logic for different resources
 - Conditional policies based on user attributes
 - Time-based or context-aware rules
@@ -136,12 +136,6 @@ policy auth {
 - Scoping and isolation of policy logic
 - Import/export management
 
-**Import statements:**
-
-- References to other policy rules
-- Cross-policy composition
-- Reusable policy components
-
 ## Language Features
 
 **Declarative syntax:**
@@ -149,10 +143,10 @@ policy auth {
 - Clean, readable policy definitions
 - Focus on **what**, not _how_ - business rules, not implementation details
 - Easy to review and audit
-- Natural language-like expressions
+- Natural language-like expressions (`user.role is "admin"`)
 
 **Integration capabilities:**
 
 - Reference TypeScript modules for complex logic
-- Call external functions and APIs
+- Call external functions and APIs (using `use` statements)
 - Access runtime data and context
