@@ -43,11 +43,11 @@ Extend policies with TypeScript modules for complex business logic while keeping
 
 **Open Source First**: Sentrie is built by developers, for developers. The code is open, the design decisions are transparent, and contributions are welcome.
 
-**Language-Focused**: Rather than being a library or framework, Sentrie provides a complete language for expressing policies along with a runtime for the language. This makes policies portable and independent of your application's implementation language.
+**Business-Focused**: Sentrie provides a complete language for expressing policies along with a runtime for the language. This makes policies portable and independent of your application's implementation language. This is a conscious departure from the library / framework mindset, where the execution details are abstracted away from policy implementers.
 
-**Performance-Conscious**: Built with performance in mind from the ground up. The evaluation engine is designed to handle high-throughput scenarios without sacrificing correctness.
+**Performance-Conscious**: Built with performance in mind from the ground up. The evaluation engine is designed to handle high-throughput scenarios without sacrificing correctness. Sentrie only evaluates the data that is relevant to the policy rule and skips the rest.
 
-**Community-Driven**: Policy as Code is still evolving. Sentrie grows with the community's needs and feedback. This makes it easier to get started and use.
+**Community-Driven**: Policy as Code is still evolving. Sentrie grows with the community's needs and feedback. This makes everyone a stake holder and voice in the success of the project.
 
 ## When Sentrie Makes Sense
 
@@ -57,6 +57,7 @@ Consider Sentrie when you have:
 - **Compliance requirements** that need clear audit trails.
 - **Performance requirements** where policy evaluation can't be a bottleneck.
 - **Team collaboration** where non-developers need to understand or modify policies.
+- **Policy as Code** is important to you.
 
 ## Next Steps
 
