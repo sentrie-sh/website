@@ -1,9 +1,12 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import { sentrieGrammar } from "./src/sentrie-grammar.ts";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://sentrie.sh",
+  trailingSlash: "always",
   integrations: [
     starlight({
       title: "Sentrie",
@@ -19,12 +22,12 @@ export default defineConfig({
           label: "Getting Started",
           items: [
             {
-              label: "What is Policy as Code?",
-              slug: "getting-started/what-is-policy-as-code",
-            },
-            {
               label: "What is Sentrie?",
               slug: "getting-started/what-is-sentrie",
+            },
+            {
+              label: "What is Policy as Code?",
+              slug: "getting-started/what-is-policy-as-code",
             },
             {
               label: "Why Sentrie?",
@@ -154,6 +157,9 @@ export default defineConfig({
       ],
       expressiveCode: {
         themes: ["github-dark", "github-light"],
+        shiki: {
+          langs: [sentrieGrammar],
+        },
       },
     }),
   ],
