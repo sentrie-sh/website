@@ -198,11 +198,11 @@ Rules become powerful when composed across policies. Here's how to export a deci
 namespace com/example/auth
 
 shape Account {
-  balance!: int
+  balance!: number
 }
 
 shape Invoice {
-  total!: int
+  total!: number
 }
 ```
 

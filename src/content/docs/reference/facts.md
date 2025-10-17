@@ -30,8 +30,8 @@ fact context: Context as context default { "key": "value" }
 ```sentrie
 fact userId: string as id default "anonymous"
 fact isActive: bool as active default true
-fact score: int as points default 0
-fact price: float as cost default 0.0
+fact score: number as points default 0
+fact price: number as cost default 0.0
 ```
 
 ### Collection Types
@@ -39,7 +39,7 @@ fact price: float as cost default 0.0
 ```sentrie
 fact permissions: list[string] as userPermissions default []
 fact metadata: map[string] as userMetadata default {}
-fact coordinates: record[float, float] as location default [ 0.0, 0.0 ]
+fact coordinates: record[number, number] as location default [ 0.0, 0.0 ]
 ```
 
 ### Shape Types
@@ -75,8 +75,8 @@ fact user!: User as user default { "id": "", "role": "guest", "permissions": [] 
 fact name: string as userName default "anonymous"
 
 -- Numeric defaults
-fact count: int as itemCount default 0
-fact rate: float as interestRate default 0.05
+fact count: number as itemCount default 0
+fact rate: number as interestRate default 0.05
 
 -- Boolean defaults
 fact enabled: bool as isEnabled default true
@@ -92,7 +92,7 @@ fact config: map[string] as settings default {}
 shape Product {
   id!: string
   name!: string
-  price!: float
+  price!: number
 }
 
 fact product: Product as currentProduct default {
@@ -130,7 +130,7 @@ rule result = import decision of processOrder
 
 ```sentrie
 -- This will cause a type error
-fact user: User as user default { "id": 123 }  -- Error: string expected, got int
+fact user: User as user default { "id": 123 }  -- Error: string expected, got number
 
 -- Correct usage
 fact user: User as user default { "id": "123" }

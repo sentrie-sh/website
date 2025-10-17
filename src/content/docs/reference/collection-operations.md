@@ -24,22 +24,22 @@ The `yield` statement returns a `bool` value. Only elements for which the predic
 ### Basic Examples
 
 ```sentrie
-let numbers: list[int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+let numbers: list[number] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 -- Filter even numbers
-let evens: list[int] = filter numbers as num, idx {
+let evens: list[number] = filter numbers as num, idx {
   yield num % 2 == 0
 }
 -- Result: [2, 4, 6, 8, 10]
 
 -- Filter numbers greater than 5
-let large_numbers: list[int] = filter numbers as num, idx {
+let large_numbers: list[number] = filter numbers as num, idx {
   yield num > 5
 }
 -- Result: [6, 7, 8, 9, 10]
 
 -- Filter numbers at even indices
-let even_indexed: list[int] = filter numbers as num, idx {
+let even_indexed: list[number] = filter numbers as num, idx {
   yield idx % 2 == 0
 }
 -- Result: [1, 3, 5, 7, 9]
@@ -48,22 +48,22 @@ let even_indexed: list[int] = filter numbers as num, idx {
 ### Complex Filtering Conditions
 
 ```sentrie
-let scores: list[int] = [85, 92, 78, 96, 85, 88, 91, 77, 94, 89]
+let scores: list[number] = [85, 92, 78, 96, 85, 88, 91, 77, 94, 89]
 
 -- Filter passing scores (>= 80)
-let passing_scores: list[int] = filter scores as score, idx {
+let passing_scores: list[number] = filter scores as score, idx {
   yield score >= 80
 }
 -- Result: [85, 92, 96, 85, 88, 91, 94, 89]
 
 -- Filter scores in top 20%
-let top_scores: list[int] = filter scores as score, idx {
+let top_scores: list[number] = filter scores as score, idx {
   yield score >= 90
 }
 -- Result: [92, 96, 91, 94]
 
 -- Filter scores that are above average
-let above_average: list[int] = filter scores as score, idx {
+let above_average: list[number] = filter scores as score, idx {
   -- Calculate average (simplified for example)
   yield score > 87
 }
@@ -76,8 +76,8 @@ let above_average: list[int] = filter scores as score, idx {
 shape Employee {
   name!: string
   department!: string
-  salary!: float
-  years_experience: int
+  salary!: number
+  years_experience: number
 }
 
 let employees: list[Employee] = [
@@ -152,28 +152,28 @@ The `yield` statement returns a `bool` value. The operation returns the first el
 ### Basic Examples
 
 ```sentrie
-let numbers: list[int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+let numbers: list[number] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 -- Find first even number
-let first_even: int = first numbers as num, idx {
+let first_even: number = first numbers as num, idx {
   yield num % 2 == 0
 }
 -- Result: 2
 
 -- Find first number greater than 5
-let first_large: int = first numbers as num, idx {
+let first_large: number = first numbers as num, idx {
   yield num > 5
 }
 -- Result: 6
 
 -- Find first number at even index
-let first_even_indexed: int = first numbers as num, idx {
+let first_even_indexed: number = first numbers as num, idx {
   yield idx % 2 == 0
 }
 -- Result: 1 (first element at index 0)
 
 -- Find first negative number (none exist)
-let first_negative: int = first numbers as num, idx {
+let first_negative: number = first numbers as num, idx {
   yield num < 0
 }
 -- Result: undefined
@@ -185,8 +185,8 @@ let first_negative: int = first numbers as num, idx {
 shape Employee {
   name!: string
   department!: string
-  salary!: float
-  years_experience: int
+  salary!: number
+  years_experience: number
 }
 
 let employees: list[Employee] = [
@@ -258,7 +258,7 @@ let first_z_word: string = first words as word, idx {
 shape Product {
   id!: string
   name!: string
-  price!: float
+  price!: number
   category!: string
   in_stock: bool
 }
@@ -341,7 +341,7 @@ let first_gmail_user: User = first users as user, idx {
 ### Comparison with Other Operations
 
 ```sentrie
-let numbers: list[int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+let numbers: list[number] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 -- any: returns boolean
 let has_even: bool = any numbers as num, idx {
@@ -350,19 +350,19 @@ let has_even: bool = any numbers as num, idx {
 -- Result: true
 
 -- first: returns the actual value
-let first_even: int = first numbers as num, idx {
+let first_even: number = first numbers as num, idx {
   yield num % 2 == 0
 }
 -- Result: 2
 
 -- filter: returns all matching elements
-let all_even: list[int] = filter numbers as num, idx {
+let all_even: list[number] = filter numbers as num, idx {
   yield num % 2 == 0
 }
 -- Result: [2, 4, 6, 8, 10]
 
 -- Using first with undefined check
-let first_large: int = first numbers as num, idx {
+let first_large: number = first numbers as num, idx {
   yield num > 15
 }
 let has_large: bool = first_large is defined
@@ -384,16 +384,16 @@ The `yield` statement returns the new element value for the resulting collection
 ### Basic Examples
 
 ```sentrie
-let numbers: list[int] = [1, 2, 3, 4, 5]
+let numbers: list[number] = [1, 2, 3, 4, 5]
 
 -- Double each number
-let doubled: list[int] = map numbers as num, idx {
+let doubled: list[number] = map numbers as num, idx {
   yield num * 2
 }
 -- Result: [2, 4, 6, 8, 10]
 
 -- Square each number
-let squared: list[int] = map numbers as num, idx {
+let squared: list[number] = map numbers as num, idx {
   yield num * num
 }
 -- Result: [1, 4, 9, 16, 25]
@@ -428,7 +428,7 @@ let pairs: list[string] = map fruits as fruit, idx {
 ```sentrie
 shape User {
   name!: string
-  age: int
+  age: number
   email?: string
 }
 
@@ -452,7 +452,7 @@ let summaries: list[string] = map users as user, idx {
 -- Result: ["Alice, age 25 (alice@example.com)", "Bob, age 30 (no email)", "Charlie, age 35 (charlie@example.com)"]
 
 -- Calculate birth years (assuming current year is 2024)
-let birth_years: list[int] = map users as user, idx {
+let birth_years: list[number] = map users as user, idx {
   yield 2024 - user.age
 }
 -- Result: [1999, 1994, 1989]
@@ -464,7 +464,7 @@ let birth_years: list[int] = map users as user, idx {
 shape Product {
   id!: string
   name!: string
-  price!: float
+  price!: number
   category!: string
 }
 
@@ -476,7 +476,7 @@ let products: list[Product] = [
 
 -- Apply discount and format prices
 let discounted_products: list[string] = map products as product, idx {
-  let discounted_price: float = product.price * 0.9  -- 10% discount
+  let discounted_price: number = product.price * 0.9  -- 10% discount
   yield product.name + " - $" + discounted_price.toString() + " (was $" + product.price.toString() + ")"
 }
 -- Result: ["Laptop - $899.991 (was $999.99)", "Book - $17.991 (was $19.99)", "Mouse - $26.991 (was $29.99)"]
@@ -504,28 +504,28 @@ The `yield` statement evaluates the new `accumulator` value. The `index` paramet
 ### Basic Examples
 
 ```sentrie
-let numbers: list[int] = [1, 2, 3, 4, 5]
+let numbers: list[number] = [1, 2, 3, 4, 5]
 
 -- Sum all numbers
-let sum: int = reduce numbers from 0 as acc, num, idx {
+let sum: number = reduce numbers from 0 as acc, num, idx {
   yield acc + num
 }
 -- Result: 15
 
 -- Find the maximum number
-let max: int = reduce numbers from numbers[0] as acc, num, idx {
+let max: number = reduce numbers from numbers[0] as acc, num, idx {
   yield num > acc ? num : acc
 }
 -- Result: 5
 
 -- Find the minimum number
-let min: int = reduce numbers from numbers[0] as acc, num, idx {
+let min: number = reduce numbers from numbers[0] as acc, num, idx {
   yield num < acc ? num : acc
 }
 -- Result: 1
 
 -- Count elements
-let count: int = reduce numbers from 0 as acc, num, idx {
+let count: number = reduce numbers from 0 as acc, num, idx {
   yield acc + 1
 }
 -- Result: 5
@@ -549,7 +549,7 @@ let longest: string = reduce words from words[0] as acc, word, idx {
 -- Result: "Sentrie"
 
 -- Count total characters
-let total_chars: int = reduce words from 0 as acc, word, idx {
+let total_chars: number = reduce words from 0 as acc, word, idx {
   yield acc + count(word)
 }
 -- Result: 16
@@ -560,8 +560,8 @@ let total_chars: int = reduce words from 0 as acc, word, idx {
 ```sentrie
 shape Sale {
   product!: string
-  quantity!: int
-  price!: float
+  quantity!: number
+  price!: number
 }
 
 let sales: list[Sale] = [
@@ -572,20 +572,20 @@ let sales: list[Sale] = [
 ]
 
 -- Calculate total revenue
-let total_revenue: float = reduce sales from 0.0 as total_sale, sale, idx {
+let total_revenue: number = reduce sales from 0.0 as total_sale, sale, idx {
   yield total_sale + (sale.quantity * sale.price)
 }
 -- Result: 2 * 999.99 + 5 * 29.99 + 3 * 79.99 + 1 * 999.99 = 3399.89
 
 -- Count total items sold
-let total_items: int = reduce sales from 0 as total_sale, sale, idx {
+let total_items: number = reduce sales from 0 as total_sale, sale, idx {
   yield total_sale + sale.quantity
 }
 -- Result: 2 + 5 + 3 + 1 = 11
 
 -- Find most expensive sale
-let max_sale_value: float = reduce sales from 0.0 as sale, idx {
-  let sale_value: float = sale.quantity * sale.price
+let max_sale_value: number = reduce sales from 0.0 as sale, idx {
+  let sale_value: number = sale.quantity * sale.price
   yield sale_value > sale_value ? sale_value : sale_value
 }
 -- Result: 1999.98 (2 * 999.99)
@@ -606,10 +606,10 @@ The `yield` statement returns a `bool` value. If the predicate is truthy, the le
 ### Basic Examples
 
 ```sentrie
-let numbers: list[int] = [1, 2, 2, 3, 3, 3, 4, 5]
+let numbers: list[number] = [1, 2, 2, 3, 3, 3, 4, 5]
 
 -- Remove duplicates (default behavior)
-let unique_numbers: list[int] = distinct numbers as left, right {
+let unique_numbers: list[number] = distinct numbers as left, right {
   yield left == right
 }
 -- Result: [1, 2, 3, 4, 5]
@@ -628,7 +628,7 @@ let unique_colors: list[string] = distinct colors as left, right {
 ```sentrie
 shape Person {
   name!: string
-  age: int
+  age: number
 }
 
 let people: list[Person] = [
@@ -658,7 +658,7 @@ let unique_by_age: list[Person] = distinct people as left, right {
 shape Product {
   id!: string
   name!: string
-  price!: float
+  price!: number
   category!: string
 }
 
@@ -696,49 +696,49 @@ count collection
 ### Basic Examples
 
 ```sentrie
-let numbers: list[int] = [1, 2, 3, 4, 5]
-let total: int = count numbers
+let numbers: list[number] = [1, 2, 3, 4, 5]
+let total: number = count numbers
 -- Result: 5
 
 let empty_list: list[string] = []
-let empty_count: int = count empty_list
+let empty_count: number = count empty_list
 -- Result: 0
 
-let single_item: list[int] = [42]
-let single_count: int = count single_item
+let single_item: list[number] = [42]
+let single_count: number = count single_item
 -- Result: 1
 ```
 
 ### Counting with Conditions
 
 ```sentrie
-let scores: list[int] = [85, 92, 78, 96, 85, 88]
+let scores: list[number] = [85, 92, 78, 96, 85, 88]
 
 -- Count passing scores (>= 80)
-let passing_scores: list[int] = filter scores as score, idx {
+let passing_scores: list[number] = filter scores as score, idx {
   yield score >= 80
 }
-let passing_count: int = count passing_scores
+let passing_count: number = count passing_scores
 -- Result: 5
 
 -- Count failing scores (< 80)
-let failing_scores: list[int] = filter scores as score, idx {
+let failing_scores: list[number] = filter scores as score, idx {
   yield score < 80
 }
-let failing_count: int = count failing_scores
+let failing_count: number = count failing_scores
 -- Result: 1
 
 -- Count scores in different ranges
-let excellent_scores: list[int] = filter scores as score, idx {
+let excellent_scores: list[number] = filter scores as score, idx {
   yield score >= 90
 }
-let excellent_count: int = count excellent_scores
+let excellent_count: number = count excellent_scores
 -- Result: 2
 
-let good_scores: list[int] = filter scores as score, idx {
+let good_scores: list[number] = filter scores as score, idx {
   yield score >= 80 and score < 90
 }
-let good_count: int = count good_scores
+let good_count: number = count good_scores
 -- Result: 3
 ```
 
@@ -747,7 +747,7 @@ let good_count: int = count good_scores
 ```sentrie
 shape User {
   name!: string
-  age: int
+  age: number
   department!: string
   active: bool
 }
@@ -761,34 +761,34 @@ let users: list[User] = [
 ]
 
 -- Count total users
-let total_users: int = count users
+let total_users: number = count users
 -- Result: 5
 
 -- Count active users
 let active_users_list: list[User] = filter users as user, idx {
   yield user.active
 }
-let active_users: int = count active_users_list
+let active_users: number = count active_users_list
 -- Result: 3
 
 -- Count users by department
 let engineering_users: list[User] = filter users as user, idx {
   yield user.department == "Engineering"
 }
-let engineering_count: int = count engineering_users
+let engineering_count: number = count engineering_users
 -- Result: 3
 
 let marketing_users: list[User] = filter users as user, idx {
   yield user.department == "Marketing"
 }
-let marketing_count: int = count marketing_users
+let marketing_count: number = count marketing_users
 -- Result: 2
 
 -- Count adult users
 let adult_users: list[User] = filter users as user, idx {
   yield user.age >= 18
 }
-let adult_count: int = count adult_users
+let adult_count: number = count adult_users
 -- Result: 3
 ```
 
@@ -799,10 +799,10 @@ Collection operations can be chained together to create complex data transformat
 ```sentrie
 shape Employee {
   name!: string
-  age: int
+  age: number
   department!: string
-  salary!: float
-  years_experience: int
+  salary!: number
+  years_experience: number
 }
 
 let employees: list[Employee] = [
@@ -830,11 +830,11 @@ let experienced_employees: list[Employee] = filter employees as emp, idx {
   yield emp.years_experience >= 5
 }
 
-let total_salary: float = reduce experienced_employees from 0.0 as emp, idx {
+let total_salary: number = reduce experienced_employees from 0.0 as emp, idx {
   yield emp.salary
 }
 
-let avg_salary: float = total_salary / count experienced_employees
+let avg_salary: number = total_salary / count experienced_employees
 -- Result: (95000.0 + 110000.0) / 2 = 102500.0
 
 -- Get unique departments
@@ -894,7 +894,7 @@ let result: list[string] = map filter filter users as user, idx { yield user.age
 let adult_users: list[User] = filter users as user, idx {
   yield user.age >= 18
 }
-let adult_count: int = count adult_users
+let adult_count: number = count adult_users
 
 -- Use distinct for deduplication
 let unique_names: list[string] = distinct names as left, right {
@@ -906,7 +906,7 @@ let unique_names: list[string] = distinct names as left, right {
 
 ```sentrie
 -- Check for empty collections
-let safe_count: int = count users
+let safe_count: number = count users
 let has_users: bool = safe_count > 0
 
 -- Handle optional fields safely

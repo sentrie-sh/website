@@ -96,7 +96,7 @@ A policy can contain:
 
 ```text
 policy user {
-  fact maxLoginAttempts: int as limit default 3
+  fact maxLoginAttempts: number as limit default 3
 
   let adminRoles = ["admin", "super_admin"]
 
@@ -211,8 +211,7 @@ Sentrie has a comprehensive type system with primitive types, collections, and u
 
 ### Primitive Types
 
-- `int` - Integer numbers
-- `float` - Floating-point numbers
+- `number` - Numeric values (backed by float64)
 - `string` - Text strings
 - `bool` - Boolean values (true/false)
 - `document` - JSON-like objects
@@ -232,7 +231,7 @@ shape User {
   id!: string           -- Required field
   name!: string         -- Required field
   email?: string        -- Optional field
-  age?: int             -- Optional field
+  age?: number          -- Optional field
   roles: list[string]   -- List field
   metadata: document    -- Document field
 }
@@ -240,9 +239,9 @@ shape User {
 shape Product {
   id!: string
   name!: string
-  price!: float
+  price!: number
   tags?: list[string]
-  dimensions: record[float, float, float]  -- width, height, depth
+  dimensions: record[number, number, number]  -- width, height, depth
 }
 ```
 
@@ -269,7 +268,7 @@ Types can have constraints applied:
 ```text
 shape User {
   name: string @length(1, 100)
-  age: int @min(0) @max(150)
+  age: number @min(0) @max(150)
   email: string @email
   tags: list[string] @maxlength(10)
 }
@@ -295,10 +294,10 @@ EOF
 ### Numeric Literals
 
 ```text
-42          -- Integer
--42         -- Negative integer
-3.14        -- Float
--3.14       -- Negative float
+42          -- Number
+-42         -- Negative number
+3.14        -- Number
+-3.14       -- Negative number
 1e5         -- Scientific notation
 1.5e-3      -- Scientific notation with negative exponent
 ```
@@ -470,7 +469,7 @@ use func from "@company/utils" as utils
 Facts are named values that can be injected into policy evaluation:
 
 ```text
-fact maxRetries: int as limit default 3
+fact maxRetries: number as limit default 3
 fact apiKey: string as key default ""
 fact config: document as settings default {}
 ```
@@ -525,7 +524,7 @@ Sentrie provides comprehensive error handling and validation:
 ```text
 -- This will cause a type error
 rule invalid = default false {
-  yield "string" + 42  -- Cannot add string and int
+  yield "string" + 42  -- Cannot add string and number
 }
 ```
 
@@ -574,8 +573,8 @@ namespace com/example/analytics
 ### 3. Use Facts for Configuration
 
 ```text
-fact maxLoginAttempts: int as limit default 3
-fact sessionTimeout: int as timeout default 3600
+fact maxLoginAttempts: number as limit default 3
+fact sessionTimeout: number as timeout default 3600
 ```
 
 ### 4. Validate Inputs
@@ -651,8 +650,8 @@ policy document {
 namespace com/example/billing
 
 policy pricing {
-  fact basePrice: float as price default 0
-  fact discountRate: float as rate default 0.1
+  fact basePrice: number as price default 0
+  fact discountRate: number as rate default 0.1
 
   rule calculatePrice = default 0 {
     let base = price

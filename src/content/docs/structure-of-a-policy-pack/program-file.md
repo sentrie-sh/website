@@ -82,7 +82,7 @@ policy auth {
 
   fact user!: User
   fact passwordInput!: string
-  fact userAge!: int
+  fact userAge!: number
 
   let isPasswordValid = crypto.md5(passwordInput) == user.passwordHash
   let calculatedUserAge = utils.calculateAge(user.birthDate)

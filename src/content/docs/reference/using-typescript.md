@@ -22,7 +22,7 @@ policy mypolicy {
 
   fact user!: User
   fact passwordInput!: string
-  fact userAge!: int
+  fact userAge!: number
 
   rule myrule = default false {
     yield

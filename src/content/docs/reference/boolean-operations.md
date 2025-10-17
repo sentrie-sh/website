@@ -31,11 +31,11 @@ condition ? trueValue : falseValue
 #### Examples
 
 ```sentrie
-let age: int = 25
+let age: number = 25
 let status: string = age >= 18 ? "adult" : "minor"
 -- Result: "adult"
 
-let score: int = 85
+let score: number = 85
 let grade: string = score >= 90 ? "A" : score >= 80 ? "B" : score >= 70 ? "C" : "F"
 -- Result: "B"
 
@@ -49,7 +49,7 @@ let can_access: bool = user_role == "admin" ? true : false
 ```sentrie
 shape Product {
   name!: string
-  price!: float
+  price!: number
   category!: string
   in_stock: bool
 }
@@ -57,7 +57,7 @@ shape Product {
 fact product: Product
 
 -- Complex pricing logic
-let final_price: float = product.in_stock ?
+let final_price: number = product.in_stock ?
   (product.category == "Electronics" ? product.price * 0.9 : product.price) :
   0.0
 -- Result: 899.991 (10% discount for electronics)
@@ -84,13 +84,13 @@ condition1 and condition2
 #### Basic Examples
 
 ```sentrie
-let age: int = 25
+let age: number = 25
 let has_license: bool = true
 let can_drive: bool = age >= 18 and has_license
 -- Result: true
 
-let score: int = 85
-let attendance: float = 0.95
+let score: number = 85
+let attendance: number = 0.95
 let passes_course: bool = score >= 80 and attendance >= 0.9
 -- Result: true
 
@@ -117,7 +117,7 @@ let user_role: string = "user"
 let is_admin: bool = user_role == "admin" or user_role == "superuser"
 -- Result: false
 
-let age: int = 16
+let age: number = 16
 let has_parental_consent: bool = true
 let can_register: bool = age >= 18 or has_parental_consent
 -- Result: true
@@ -191,7 +191,7 @@ value1 is value2
 #### Basic Examples
 
 ```sentrie
-let age: int = 25
+let age: number = 25
 let is_adult: bool = age == 18
 -- Result: false
 
@@ -199,9 +199,9 @@ let name: string = "Alice"
 let is_alice: bool = name is "Alice"
 -- Result: true
 
-let score1: float = 85.5
-let score2: float = 85.5
-let scores_equal: bool = score1 == score2
+let score1: number = 85.5
+let score2: number = 85.5
+let scores_equal = score1 == score2
 -- Result: true
 ```
 
@@ -219,16 +219,16 @@ value1 is not value2
 #### Examples
 
 ```sentrie
-let age: int = 25
+let age: number = 25
 let is_minor: bool = age != 18
 -- Result: true
 
 let status: string = "active"
-let is_inactive: bool = status is not "inactive"
+let is_inactive = status is not "inactive"
 -- Result: true
 
-let score: float = 85.5
-let is_perfect: bool = score != 100.0
+let score: number = 85.5
+let is_perfect = score != 100.0
 -- Result: true
 ```
 
@@ -245,15 +245,15 @@ value1 > value2
 #### Examples
 
 ```sentrie
-let age: int = 25
+let age: number = 25
 let is_adult: bool = age > 17
 -- Result: true
 
-let score: float = 85.5
+let score: number = 85.5
 let is_passing: bool = score > 80.0
 -- Result: true
 
-let price: float = 99.99
+let price: number = 99.99
 let is_expensive: bool = price > 50.0
 -- Result: true
 ```
@@ -271,15 +271,15 @@ value1 >= value2
 #### Examples
 
 ```sentrie
-let age: int = 18
+let age: number = 18
 let can_vote: bool = age >= 18
 -- Result: true
 
-let score: float = 80.0
+let score: number = 80.0
 let is_passing: bool = score >= 80.0
 -- Result: true
 
-let temperature: float = 32.0
+let temperature: number = 32.0
 let is_freezing: bool = temperature >= 32.0
 -- Result: true
 ```
@@ -297,15 +297,15 @@ value1 < value2
 #### Examples
 
 ```sentrie
-let age: int = 16
+let age: number = 16
 let is_minor: bool = age < 18
 -- Result: true
 
-let score: float = 75.0
+let score: number = 75.0
 let is_failing: bool = score < 80.0
 -- Result: true
 
-let price: float = 25.0
+let price: number = 25.0
 let is_cheap: bool = price < 50.0
 -- Result: true
 ```
@@ -323,15 +323,15 @@ value1 <= value2
 #### Examples
 
 ```sentrie
-let age: int = 18
+let age: number = 18
 let is_minor: bool = age <= 17
 -- Result: false
 
-let score: float = 80.0
+let score: number = 80.0
 let is_passing: bool = score <= 100.0
 -- Result: true
 
-let quantity: int = 10
+let quantity: number = 10
 let is_limited: bool = quantity <= 10
 -- Result: true
 ```
@@ -379,13 +379,13 @@ any collection as element, index { yield expression }
 #### Examples
 
 ```sentrie
-let numbers: list[int] = [1, 2, 3, 4, 5]
+let numbers: list[number] = [1, 2, 3, 4, 5]
 let has_even: bool = any numbers as num, idx {
   yield num % 2 == 0
 }
 -- Result: true
 
-let scores: list[int] = [85, 92, 78, 96, 85]
+let scores: list[number] = [85, 92, 78, 96, 85]
 let has_perfect_score: bool = any scores as score, idx {
   yield score == 100
 }
@@ -403,7 +403,7 @@ let has_long_word: bool = any words as word, idx {
 ```sentrie
 shape User {
   name!: string
-  age: int
+  age: number
   role!: string
 }
 
@@ -445,13 +445,13 @@ all collection as element, index { yield expression }
 #### Examples
 
 ```sentrie
-let numbers: list[int] = [2, 4, 6, 8, 10]
+let numbers: list[number] = [2, 4, 6, 8, 10]
 let all_even: bool = all numbers as num, idx {
   yield num % 2 == 0
 }
 -- Result: true
 
-let scores: list[int] = [85, 92, 78, 96, 85]
+let scores: list[number] = [85, 92, 78, 96, 85]
 let all_passing: bool = all scores as score, idx {
   yield score >= 80
 }
@@ -469,7 +469,7 @@ let all_short: bool = all words as word, idx {
 ```sentrie
 shape Product {
   name!: string
-  price!: float
+  price!: number
   in_stock: bool
 }
 
@@ -519,7 +519,7 @@ collection contains value
 #### Examples
 
 ```sentrie
-let numbers: list[int] = [1, 2, 3, 4, 5]
+let numbers: list[number] = [1, 2, 3, 4, 5]
 let has_three: bool = 3 in numbers
 -- Result: true
 
@@ -585,11 +585,11 @@ let non_empty_string: string = "hello"
 let is_not_empty: bool = non_empty_string is not empty
 -- Result: true
 
-let empty_list: list[int] = []
+let empty_list: list[number] = []
 let list_is_empty: bool = empty_list is empty
 -- Result: true
 
-let non_empty_list: list[int] = [1, 2, 3]
+let non_empty_list: list[number] = [1, 2, 3]
 let list_is_not_empty: bool = non_empty_list is not empty
 -- Result: true
 ```
@@ -699,7 +699,7 @@ shape User {
   id!: string
   username!: string
   role!: string
-  age: int
+  age: number
   email?: string
   active: bool
   permissions: list[string]
@@ -709,7 +709,7 @@ shape Resource {
   id!: string
   name!: string
   required_role: string
-  min_age: int
+  min_age: number
   required_permissions: list[string]
 }
 
@@ -749,7 +749,7 @@ shape RegistrationData {
   username!: string
   email?: string
   password!: string
-  age: int
+  age: number
   terms_accepted: bool
 }
 

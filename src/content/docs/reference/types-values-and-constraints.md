@@ -11,8 +11,7 @@ Sentrie supports five fundamental primitive types:
 
 | Type       | Description                 |
 | ---------- | --------------------------- |
-| `int`      | Integer numbers             |
-| `float`    | Floating-point numbers      |
+| `number`   | Numeric values              |
 | `string`   | Text strings                |
 | `bool`     | Boolean values (true/false) |
 | `document` | Arbitrary JSON-like objects |
@@ -20,11 +19,11 @@ Sentrie supports five fundamental primitive types:
 ### Declaring a Primitive Type
 
 ```text
-let u: int = 50
+let u: number = 50
 ```
 
 ```text
-let u: float = 50.5
+let u: number = 50.5
 ```
 
 ```text
@@ -52,15 +51,15 @@ Collections allow you to work with groups of related values:
 ### Declaring a Collection Type
 
 ```text
-let u: list[int] = [1, 2, 3]
+let u: list[number] = [1, 2, 3]
 ```
 
 ```text
-let u: map[int] = { "one": 1, "two": 2, "three": 3 }
+let u: map[number] = { "one": 1, "two": 2, "three": 3 }
 ```
 
 ```text
-let u: record[string, int, bool] = ["one", 1, true]
+let u: record[string, number, bool] = ["one", 1, true]
 ```
 
 :::caution
@@ -74,23 +73,23 @@ However, it is recommended to declare the type for better readability and to avo
 
 ### Accessing Collection Elements
 
-You can access collection elements using the `[index]` syntax. The index must be a `string` for maps and an `integer` for lists and records.
+You can access collection elements using the `[index]` syntax. The index must be a `string` for maps and a `number` for lists and records.
 
 ```text
-let u: list[int] = [1, 2, 3]
-let first: int = u[0]
+let u: list[number] = [1, 2, 3]
+let first: number = u[0]
 ```
 
 ```text
-let u: map[int] = { "one": 1, "two": 2, "three": 3 }
-let first: int = u["one"]
+let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+let first: number = u["one"]
 ```
 
 For maps, you can also access elements using the `.` syntax.
 
 ```text
-let u: map[int] = { "one": 1, "two": 2, "three": 3 }
-let first: int = u.one
+let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+let first: number = u.one
 ```
 
 ## Constraints
@@ -100,14 +99,14 @@ Constraints provide a way to validate values against specific rules. They are ap
 ### Basic Usage
 
 ```text
-let u: int @min(0) @max(100) = 50
+let u: number @min(0) @max(100) = 50
 ```
 
 :::note
 Constraints validate values at runtime. If a value doesn't meet the constraint requirements, validation will fail:
 
 ```text
-let u: int @min(0) @max(100) = 101  -- This will fail validation
+let u: number @min(0) @max(100) = 101  -- This will fail validation
 ```
 
 :::
@@ -132,7 +131,7 @@ let permissions: list[Permission] = ["read", "write"]
 Use contraints for runtime validation of data.
 
 ```sentrie
-shape Positive100 int @min(0) @max(100)
+shape Positive100 number @min(0) @max(100)
 let y = 50
 let c:Positive100 = y
 ```
@@ -142,7 +141,7 @@ In the above example, the value of `y` is validated against the constraints befo
 
 ## Available Constraints
 
-### Numeric Constraints (`int` and `float`)
+### Numeric Constraints (`number`)
 
 | Constraint            | Description                                     |
 | --------------------- | ----------------------------------------------- |
@@ -161,7 +160,7 @@ In the above example, the value of `y` is validated against the constraints befo
 | `@non_negative()`     | Value must be non-negative (≥ 0)                |
 | `@non_positive()`     | Value must be non-positive (≤ 0)                |
 
-### Float-Specific Constraints
+### Number-Specific Constraints
 
 | Constraint    | Description            |
 | ------------- | ---------------------- |
@@ -205,7 +204,7 @@ In the above example, the value of `y` is validated against the constraints befo
 You can convert between types using the `cast .. as` construct. The result is validated against the new type constraints before returning the result.
 
 ```text
-let u: int = cast "50" as int
+let u: number = cast "50" as number
 ```
 
 ```text

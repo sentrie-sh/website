@@ -24,7 +24,7 @@ Shapes can be used to create type aliases for built-in types with additional con
 shape ID string @uuid()
 shape Email string @email()
 shape Username string @minlength(3) @maxlength(20) @alphanumeric()
-shape UserAge int @min(13) @max(120)
+shape UserAge number @min(13) @max(120)
 ```
 
 This creates constrained types that can be used throughout your policies:
@@ -44,7 +44,7 @@ The most common use of shapes is to define structured data models:
 ```sentrie
 shape User {
   name: string
-  age: int
+  age: number
   email: string
 }
 ```
@@ -70,7 +70,7 @@ Shapes support different field requirements using special markers:
 ```sentrie
 shape User {
   name!: string           -- Required, cannot be null
-  age: int                -- Required, can be null
+  age: number                -- Required, can be null
   email?: string          -- Optional, can be omitted
   phone!?: string         -- Optional, but if present cannot be null
 }
@@ -139,7 +139,7 @@ Shapes can be composed from other shapes using the `with` keyword, allowing you 
 ```sentrie
 shape User {
   name: string
-  age: int
+  age: number
 }
 
 shape AdminUser with User {
@@ -183,9 +183,9 @@ Shape properties can have constraints applied to them, providing runtime validat
 ```sentrie
 shape User {
   name: string @minlength(2) @maxlength(50) @not_empty()
-  age: int @min(0) @max(150)
+  age: number @min(0) @max(150)
   email: string @email() @not_empty()
-  score: float @range(0.0, 100.0)
+  score: number @range(0.0, 100.0)
 }
 ```
 
@@ -228,7 +228,7 @@ shape ContactInfo {
 
 shape User {
   name!: string @minlength(2) @maxlength(100)
-  age: int @min(13) @max(120)  -- Can be null if unknown
+  age: number @min(13) @max(120)  -- Can be null if unknown
   contact!: ContactInfo
   preferences?: map[string]  -- Optional preferences
 }
@@ -294,7 +294,7 @@ namespace com/example/users
 
 shape User {
   name: string
-  age: int
+  age: number
 }
 
 policy example {
@@ -407,7 +407,7 @@ policy process_payment_2 {
 shape Category string @one_of("electronics", "clothing", "books", "home")
 shape Product {
   name!: string @minlength(1) @maxlength(100) @not_empty()
-  price!: float @positive() @range(0.01, 999999.99)
+  price!: number @positive() @range(0.01, 999999.99)
   category!: Category
   in_stock: bool
 }

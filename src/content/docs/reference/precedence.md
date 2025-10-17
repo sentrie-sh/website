@@ -25,8 +25,8 @@ Operator precedence defines which operations are performed first when multiple o
 ### Arithmetic Precedence
 
 ```sentrie
-let result: int = 2 + 3 * 4         -- Result: 14 (not 20)
-let calculation: float = 10 / 2 + 3 -- Result: 8.0 (not 1.25)
+let result: number = 2 + 3 * 4         -- Result: 14 (not 20)
+let calculation: number = 10 / 2 + 3 -- Result: 8.0 (not 1.25)
 ```
 
 ### Comparison vs Arithmetic
@@ -46,7 +46,7 @@ let mixed: bool = 5 > 3 and 2 < 4           -- Result: true
 ### Ternary Precedence
 
 ```sentrie
-let value: int = 5 > 3 ? 10 : 20                       -- Result: 10
+let value: number = 5 > 3 ? 10 : 20                       -- Result: 10
 let nested: string = true ? (false ? "A" : "B") : "C"  -- Result: "B"
 ```
 
@@ -56,10 +56,10 @@ let nested: string = true ? (false ? "A" : "B") : "C"  -- Result: "B"
 
 ```sentrie
 -- Without parentheses (follows precedence)
-let result1: int = 2 + 3 * 4        -- Result: 14
+let result1: number = 2 + 3 * 4        -- Result: 14
 
 -- With parentheses (override precedence)
-let result2: int = (2 + 3) * 4      -- Result: 20
+let result2: number = (2 + 3) * 4      -- Result: 20
 ```
 
 ### Complex Expressions
@@ -70,10 +70,10 @@ let access: bool = (user.age >= 18 and user.verified) or
                   (user.role == "admin" and user.active)
 
 -- Mixed operations
-let calculation: float = (10 + 5) * (3 - 1) / 2  -- Result: 15.0
+let calculation: number = (10 + 5) * (3 - 1) / 2  -- Result: 15.0
 
 -- Same precedence is evaluated from left to right
-let calculation: float = (10 + 5) * (5 - 2) / 2  -- Result: 22.5 (15 * 3 / 2)
+let calculation: number = (10 + 5) * (5 - 2) / 2  -- Result: 22.5 (15 * 3 / 2)
 
 ```
 
@@ -93,7 +93,7 @@ let result: bool = a and b or c and d
 
 ```sentrie
 -- Good: Logical grouping
-let price: float = (base_price + tax) * discount_rate
+let price: number = (base_price + tax) * discount_rate
 
 -- Good: Comparison grouping
 let valid: bool = (age >= 18) and (income > 50000)
@@ -103,10 +103,10 @@ let valid: bool = (age >= 18) and (income > 50000)
 
 ```sentrie
 -- Good: Step-by-step calculation
-let temp1: float = base_price + tax
-let temp2: float = temp1 * discount_rate
-let final_price: float = temp2 - shipping
+let temp1: number = base_price + tax
+let temp2: number = temp1 * discount_rate
+let final_price: number = temp2 - shipping
 
 -- Avoid: One complex expression
-let final_price: float = (base_price + tax) * discount_rate - shipping
+let final_price: number = (base_price + tax) * discount_rate - shipping
 ```
