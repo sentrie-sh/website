@@ -7,23 +7,29 @@ Rules form the core principle of policies in Sentrie. A policy is essentially a 
 
 ## The Foundation of Policies
 
-Every Sentrie policy must contain at least one exported rule, as rules are the building blocks that define business logic. A rule must be exported to be executed by the runtime or to be imported and used in other policies. This export mechanism enables modular policy design where complex business logic can be broken down into reusable components.
+Since rules are the building blocks that define business logic, every Sentrie policy must contain at least one exported rule.
+
+A rule must be exported to be executed by the runtime or to be imported and used in other policies. This export mechanism enables modular policy design where complex business logic can be broken down into reusable component rules.
 
 ## Rule Structure and Evaluation
 
 Rules consist of three essential components:
 
-- a **default value**
-- a **when predicate**
-- a **body**
+- a **body** (required)
+- a **default** (optional)
+- a **when predicate** (optional)
 
-The `when` predicate acts as a gatekeeper, determining whether the rule's body should be evaluated or if the default value should be used instead.
+The `when` predicate acts as a gatekeeper, determining whether the rule's `body` should be evaluated or if the `default` should be used instead.
 
-When the `when` condition evaluates to true, the rule's body is executed to produce the final decision. If the `when` condition is false, the rule falls back to its default value. However, if no default is provided when `when` is false, the rule's outcome becomes `UNKNOWN`, which is one of the three possible outcomes any rule can have: `TRUE`, `FALSE`, or `UNKNOWN`.
+When the `when` condition evaluates to [truthy](./#non-boolean-value-interpretation), the rule's body is executed to produce the final decision. If the `when` condition is not [truthy](./#non-boolean-value-interpretation), the rule falls back to its `default` value. A rule can have one of the three possible outcomes any rule can have: `TRUE`, `FALSE`, or `UNKNOWN`.
 
 ```typescript
 when ? body : default
 ```
+
+:::note[Remember]
+If no `default` is provided and `when` is not [truthy](./#non-boolean-value-interpretation), the rule's outcome falls back to `unknown`.
+:::
 
 ### Example Rule
 
@@ -41,9 +47,9 @@ policy user {
 :::note[Remember]
 
 - `when` and `default` are optional
-- `when` is true by default
-- `default` is unknown by default
-- If `when` is false and no `default` is provided, the rule's outcome becomes `UNKNOWN`
+- `when` is `true` by default
+- `default` is `unknown` by default
+- If `when` is not [truthy](./#non-boolean-value-interpretation) and no `default` is provided, the rule's outcome is `unknown`
 
 :::
 
@@ -88,14 +94,16 @@ This sandboxing only applies to rules imported from other policies. Rules within
 
 ## Non-Boolean Value Interpretation
 
-Sentrie rules can work with various data types, and when a rule's body or default doesn't explicitly return TRUE, FALSE, or UNKNOWN, the system infers the boolean outcome based on the value's truthiness. This follows intuitive rules:
+Sentrie rules can work with various data types, and when a rule's body or default doesn't explicitly return `true`, `false`, or `unknown`, the system infers the `true` or `false` outcome based on the value's truthiness.
+
+This follows the following intuitive rules:
 
 - nil and undefined values are considered false
 - boolean values are used as-is
 - strings are true if they have content (length > 0)
 - numbers are true if they're non-zero
 
-For collections like slices, arrays, and maps, truthiness depends on whether they contain elements.
+For collections like slices, arrays, and maps, truthiness depends on whether they contain elements:
 
 - Pointers and interfaces are true if they're not nil
 - struct values are considered true if they represent a non-nil struct instance

@@ -1,5 +1,5 @@
 ---
-title: Types and Constraints
+title: Types, Values and Constraints
 description: Sentrie has a comprehensive type system with primitive types, collections, and user-defined shapes. Types can have constraints applied to them.
 ---
 
@@ -71,6 +71,27 @@ Map keys must be strings.
 The type is optional for `let` statements. When undeclared, the value is not validated against any type constraints.
 However, it is recommended to declare the type for better readability and to avoid surprises where the type is not what you expect.
 :::
+
+### Accessing Collection Elements
+
+You can access collection elements using the `[index]` syntax. The index must be a `string` for maps and an `integer` for lists and records.
+
+```text
+let u: list[int] = [1, 2, 3]
+let first: int = u[0]
+```
+
+```text
+let u: map[int] = { "one": 1, "two": 2, "three": 3 }
+let first: int = u["one"]
+```
+
+For maps, you can also access elements using the `.` syntax.
+
+```text
+let u: map[int] = { "one": 1, "two": 2, "three": 3 }
+let first: int = u.one
+```
 
 ## Constraints
 

@@ -6,7 +6,7 @@ import { sentrieGrammar } from "./src/sentrie-grammar.ts";
 // https://astro.build/config
 export default defineConfig({
   site: "https://sentrie.sh",
-  trailingSlash: "always",
+  trailingSlash: "ignore",
   integrations: [
     starlight({
       title: "Sentrie",
@@ -80,8 +80,8 @@ export default defineConfig({
               slug: "reference/namespaces",
             },
             {
-              label: "Types and Constraints",
-              slug: "reference/types-and-constraints",
+              label: "Types, Values and Constraints",
+              slug: "reference/types-values-and-constraints",
             },
             {
               label: "Shapes",

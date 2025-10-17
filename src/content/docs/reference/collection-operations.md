@@ -16,7 +16,7 @@ The `filter` operation creates a new collection containing only elements that sa
 ### Syntax
 
 ```sentrie
-filter collection as element, index { yield expression }
+filter collection as element, index block_expression
 ```
 
 The `yield` statement returns a `bool` value. Only elements for which the predicate is truthy are included in the result. The `index` parameter is optional.
@@ -137,6 +137,238 @@ let e_words: list[string] = filter words as word, idx {
 -- Result: ["apple", "cherry", "elderberry"]
 ```
 
+## First Operation
+
+The `first` operation returns the first element in a collection that satisfies a given condition. Unlike `any` which returns a boolean, `first` returns the actual element value.
+
+### Syntax
+
+```sentrie
+first collection as element, index block_expression
+```
+
+The `yield` statement returns a `bool` value. The operation returns the first element for which the predicate is truthy. If no element satisfies the condition, it returns `undefined`. The `index` parameter is optional.
+
+### Basic Examples
+
+```sentrie
+let numbers: list[int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+-- Find first even number
+let first_even: int = first numbers as num, idx {
+  yield num % 2 == 0
+}
+-- Result: 2
+
+-- Find first number greater than 5
+let first_large: int = first numbers as num, idx {
+  yield num > 5
+}
+-- Result: 6
+
+-- Find first number at even index
+let first_even_indexed: int = first numbers as num, idx {
+  yield idx % 2 == 0
+}
+-- Result: 1 (first element at index 0)
+
+-- Find first negative number (none exist)
+let first_negative: int = first numbers as num, idx {
+  yield num < 0
+}
+-- Result: undefined
+```
+
+### Working with Shapes
+
+```sentrie
+shape Employee {
+  name!: string
+  department!: string
+  salary!: float
+  years_experience: int
+}
+
+let employees: list[Employee] = [
+  { name: "Alice", department: "Engineering", salary: 95000.0, years_experience: 5 },
+  { name: "Bob", department: "Marketing", salary: 75000.0, years_experience: 3 },
+  { name: "Charlie", department: "Engineering", salary: 110000.0, years_experience: 8 },
+  { name: "Diana", department: "Sales", salary: 65000.0, years_experience: 2 },
+  { name: "Eve", department: "Engineering", salary: 85000.0, years_experience: 4 }
+]
+
+-- Find first engineer
+let first_engineer: Employee = first employees as emp, idx {
+  yield emp.department == "Engineering"
+}
+-- Result: Alice
+
+-- Find first high earner
+let first_high_earner: Employee = first employees as emp, idx {
+  yield emp.salary >= 90000.0
+}
+-- Result: Alice
+
+-- Find first experienced employee
+let first_experienced: Employee = first employees as emp, idx {
+  yield emp.years_experience >= 5
+}
+-- Result: Alice
+
+-- Find first sales person
+let first_sales: Employee = first employees as emp, idx {
+  yield emp.department == "Sales"
+}
+-- Result: Diana
+```
+
+### String Operations
+
+```sentrie
+let words: list[string] = ["apple", "banana", "cherry", "date", "elderberry", "fig"]
+
+-- Find first word starting with 'a'
+let first_a_word: string = first words as word, idx {
+  yield word.starts_with("a")
+}
+-- Result: "apple"
+
+-- Find first word longer than 5 characters
+let first_long_word: string = first words as word, idx {
+  yield word.length() > 5
+}
+-- Result: "banana"
+
+-- Find first word containing 'e'
+let first_e_word: string = first words as word, idx {
+  yield word.has_substring("e")
+}
+-- Result: "apple"
+
+-- Find first word starting with 'z' (none exist)
+let first_z_word: string = first words as word, idx {
+  yield word.starts_with("z")
+}
+-- Result: undefined
+```
+
+### Complex Conditions
+
+```sentrie
+shape Product {
+  id!: string
+  name!: string
+  price!: float
+  category!: string
+  in_stock: bool
+}
+
+let products: list[Product] = [
+  { id: "1", name: "Laptop", price: 999.99, category: "Electronics", in_stock: true },
+  { id: "2", name: "Mouse", price: 29.99, category: "Electronics", in_stock: false },
+  { id: "3", name: "Book", price: 19.99, category: "Books", in_stock: true },
+  { id: "4", name: "Keyboard", price: 79.99, category: "Electronics", in_stock: true },
+  { id: "5", name: "Tablet", price: 599.99, category: "Electronics", in_stock: false }
+]
+
+-- Find first in-stock electronics under $100
+let first_affordable_electronics: Product = first products as product, idx {
+  yield product.category == "Electronics" and product.in_stock and product.price < 100.0
+}
+-- Result: Keyboard
+
+-- Find first expensive product (over $500)
+let first_expensive: Product = first products as product, idx {
+  yield product.price > 500.0
+}
+-- Result: Laptop
+
+-- Find first out-of-stock item
+let first_out_of_stock: Product = first products as product, idx {
+  yield not product.in_stock
+}
+-- Result: Mouse
+
+-- Find first book
+let first_book: Product = first products as product, idx {
+  yield product.category == "Books"
+}
+-- Result: Book
+```
+
+### Practical Use Cases
+
+```sentrie
+shape User {
+  name!: string
+  email!: string
+  verified: bool
+  last_login: string
+}
+
+let users: list[User] = [
+  { name: "Alice", email: "alice@example.com", verified: true, last_login: "2024-01-15" },
+  { name: "Bob", email: "bob@example.com", verified: false, last_login: "2024-01-10" },
+  { name: "Charlie", email: "charlie@example.com", verified: true, last_login: "2024-01-20" },
+  { name: "Diana", email: "diana@example.com", verified: false, last_login: "2024-01-05" }
+]
+
+-- Find first verified user
+let first_verified: User = first users as user, idx {
+  yield user.verified
+}
+-- Result: Alice
+
+-- Find first user with recent login (after 2024-01-12)
+let first_recent_user: User = first users as user, idx {
+  yield user.last_login > "2024-01-12"
+}
+-- Result: Alice
+
+-- Find first unverified user
+let first_unverified: User = first users as user, idx {
+  yield not user.verified
+}
+-- Result: Bob
+
+-- Find first user with specific email domain
+let first_gmail_user: User = first users as user, idx {
+  yield user.email.has_substring("@gmail.com")
+}
+-- Result: undefined (no Gmail users)
+```
+
+### Comparison with Other Operations
+
+```sentrie
+let numbers: list[int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+-- any: returns boolean
+let has_even: bool = any numbers as num, idx {
+  yield num % 2 == 0
+}
+-- Result: true
+
+-- first: returns the actual value
+let first_even: int = first numbers as num, idx {
+  yield num % 2 == 0
+}
+-- Result: 2
+
+-- filter: returns all matching elements
+let all_even: list[int] = filter numbers as num, idx {
+  yield num % 2 == 0
+}
+-- Result: [2, 4, 6, 8, 10]
+
+-- Using first with undefined check
+let first_large: int = first numbers as num, idx {
+  yield num > 15
+}
+let has_large: bool = first_large is defined
+-- Result: false (first_large is undefined)
+```
+
 ## Map Operation
 
 The `map` operation applies a function to each element of a collection, creating a new collection with the transformed values.
@@ -144,7 +376,7 @@ The `map` operation applies a function to each element of a collection, creating
 ### Syntax
 
 ```sentrie
-map collection as element, index { yield expression }
+map collection as element, index block_expression
 ```
 
 The `yield` statement returns the new element value for the resulting collection. The `index` parameter is optional and represents the position of the element in the collection.
@@ -264,10 +496,10 @@ The `reduce` operation combines all elements of a collection into a single value
 ### Syntax
 
 ```sentrie
-reduce collection from initialValue as element, index { yield expression }
+reduce collection from initialValue as accumulator, element, index block_expression
 ```
 
-The `yield` statement returns the new accumulator value. The `index` parameter is optional.
+The `yield` statement evaluates the new `accumulator` value. The `index` parameter is optional.
 
 ### Basic Examples
 
@@ -275,26 +507,26 @@ The `yield` statement returns the new accumulator value. The `index` parameter i
 let numbers: list[int] = [1, 2, 3, 4, 5]
 
 -- Sum all numbers
-let sum: int = reduce numbers from 0 as num, idx {
-  yield num + num
+let sum: int = reduce numbers from 0 as acc, num, idx {
+  yield acc + num
 }
 -- Result: 15
 
 -- Find the maximum number
-let max: int = reduce numbers from numbers[0] as num, idx {
-  yield num > num ? num : num
+let max: int = reduce numbers from numbers[0] as acc, num, idx {
+  yield num > acc ? num : acc
 }
 -- Result: 5
 
 -- Find the minimum number
-let min: int = reduce numbers from numbers[0] as num, idx {
-  yield num < num ? num : num
+let min: int = reduce numbers from numbers[0] as acc, num, idx {
+  yield num < acc ? num : acc
 }
 -- Result: 1
 
 -- Count elements
-let count: int = reduce numbers from 0 as num, idx {
-  yield idx + 1
+let count: int = reduce numbers from 0 as acc, num, idx {
+  yield acc + 1
 }
 -- Result: 5
 ```
@@ -305,20 +537,20 @@ let count: int = reduce numbers from 0 as num, idx {
 let words: list[string] = ["Hello", "World", "Sentrie"]
 
 -- Concatenate strings
-let sentence: string = reduce words from "" as word, idx {
-  yield word + (idx == 0 ? "" : " ") + word
+let sentence: string = reduce words from "" as acc, word, idx {
+  yield acc + (idx == 0 ? "" : " ") + word
 }
 -- Result: "Hello World Sentrie"
 
 -- Find longest word
-let longest: string = reduce words from words[0] as word, idx {
-  yield word.length() > word.length() ? word : word
+let longest: string = reduce words from words[0] as acc, word, idx {
+  yield count(word) > count(acc) ? word : acc
 }
 -- Result: "Sentrie"
 
 -- Count total characters
-let total_chars: int = reduce words from 0 as word, idx {
-  yield word.length()
+let total_chars: int = reduce words from 0 as acc, word, idx {
+  yield acc + count(word)
 }
 -- Result: 16
 ```
@@ -340,14 +572,14 @@ let sales: list[Sale] = [
 ]
 
 -- Calculate total revenue
-let total_revenue: float = reduce sales from 0.0 as sale, idx {
-  yield sale.quantity * sale.price
+let total_revenue: float = reduce sales from 0.0 as total_sale, sale, idx {
+  yield total_sale + (sale.quantity * sale.price)
 }
 -- Result: 2 * 999.99 + 5 * 29.99 + 3 * 79.99 + 1 * 999.99 = 3399.89
 
 -- Count total items sold
-let total_items: int = reduce sales from 0 as sale, idx {
-  yield sale.quantity
+let total_items: int = reduce sales from 0 as total_sale, sale, idx {
+  yield total_sale + sale.quantity
 }
 -- Result: 2 + 5 + 3 + 1 = 11
 
@@ -366,7 +598,7 @@ The `distinct` operation removes duplicate elements from a collection, keeping o
 ### Syntax
 
 ```sentrie
-distinct collection as left, right { yield expression }
+distinct collection as left, right block_expression
 ```
 
 The `yield` statement returns a `bool` value. If the predicate is truthy, the left and right values are considered the same and not included in the result.

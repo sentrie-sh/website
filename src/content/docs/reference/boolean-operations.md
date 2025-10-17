@@ -502,6 +502,13 @@ let all_short_names: bool = all products as product, idx {
 
 Both `in` and `contains` operators check if a value exists in a collection.
 
+`contains` checks if the left hand collection contains the right hand value. `in` checks if the left hand value is in the right hand collection.
+
+For purposes of clarity, we will use the following terminology:
+
+- `haystack` is the collection that is being searched
+- `needle` is the value that is being searched for
+
 #### Syntax
 
 ```sentrie
@@ -527,20 +534,31 @@ let can_read: bool = "read" in permissions
 
 #### Working with Maps
 
+For maps, if the `needle` is a string, it will be used as the key to check if the key exists in the `haystack`. if the `needle` is another map, then it will be used to check if the `needle` map is a subset of the `haystack` map.
+
 ```sentrie
 let user_permissions: map[string] = map[string]{
-  "read": "true",
-  "write": "false",
-  "delete": "true"
+  "read": true,
+  "write": false,
+  "delete": true,
+  "admin": true
 }
 
--- Check if user has read permission
-let can_read: bool = "read" in user_permissions
+-- Check if the "read" permission is set
+let has_read: bool = "read" in user_permissions and user_permissions["read"] == true
 -- Result: true
 
--- Check if user has admin permission
-let is_admin: bool = "admin" in user_permissions
--- Result: false
+```
+
+#### Negating `in` and `contains`
+
+`in` and `contains` can be negated by prefixing the operator with `not`, such as `not contains` and `not in`. This is equivalent to wrapping the expression in a unary `not` but results in a more readable form.
+
+#### Syntax
+
+```sentrie
+value not in collection
+collection not contains value
 ```
 
 ## State Checking Operations
