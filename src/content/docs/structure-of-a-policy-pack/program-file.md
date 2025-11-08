@@ -94,6 +94,7 @@ policy auth {
       userAge == calculatedUserAge
   }
 
+  -- export the decision of this rule so that it can be used by other policies and the runtime can execute it
   export decision of myrule
 }
 

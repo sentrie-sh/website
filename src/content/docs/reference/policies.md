@@ -10,8 +10,8 @@ Policies are the fundamental building blocks of Sentrie policy packs. They encap
 ### Basic Requirements
 
 - **Namespace**: Every policy must belong to a namespace
-- **Export**: Must export at least one decision (rule outcome)
 - **Rules**: Must declare one or more rules for decision logic
+- **Export**: Must export at least one decision (rule outcome)
 
 ### Core Components
 
@@ -175,7 +175,7 @@ let userPermissions = authResult.permissions -- Access the 'permissions' attachm
 
 ## Rule Attachments
 
-Rule attachments allow you to include additional metadata with exported rule outcomes. This metadata can be accessed when the rule is imported by other policies.
+Rule attachments allow you to include additional metadata with exported rule outcomes. This metadata can be accessed when the rule is imported by other policies or executed via the HTTP API.
 
 ### Exporting with Decision Attachments
 

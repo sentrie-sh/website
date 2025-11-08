@@ -5,6 +5,10 @@ description: Facts are input data declarations that provide external values to p
 
 Facts are named input values that can be injected into policy evaluation. They serve as the primary mechanism for providing external data to policies, enabling them to make decisions based on runtime information.
 
+:::note[Note]
+If a policy uses facts, then they must be declared at the top of the policy. Facts declarations can only be preceded by other facts or comments.
+:::
+
 ## Fact Declaration
 
 ### Basic Syntax

@@ -24,7 +24,7 @@ The `when` predicate acts as a gatekeeper, determining whether the rule's `body`
 When the `when` condition evaluates to [truthy](./#non-boolean-value-interpretation), the rule's body is executed to produce the final decision. If the `when` condition is not [truthy](./#non-boolean-value-interpretation), the rule falls back to its `default` value. A rule can have one of the three possible outcomes any rule can have: `TRUE`, `FALSE`, or `UNKNOWN`.
 
 ```typescript
-when ? body : default
+is_truthy(when) ? body : default
 ```
 
 :::note[Remember]

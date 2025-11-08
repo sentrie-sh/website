@@ -9,6 +9,7 @@ Sentrie provides a comprehensive set of boolean operations that allow you to eva
 
 Boolean operations in Sentrie include:
 
+- **Trinary Logic**: Three-valued logic with `true`, `false`, and `unknown`
 - **Ternary Operations**: Conditional value selection
 - **Logical Operations**: Boolean logic with `and`, `or`, `not`
 - **Comparison Operations**: Equality, inequality, and ordering comparisons
@@ -69,11 +70,210 @@ let status_message: string = product.in_stock ?
 -- Result: "Available for $999.99"
 ```
 
+## Trinary Logic
+
+Sentrie uses **trinary logic** (also known as three-valued logic), which extends traditional boolean logic with a third value: `unknown`. This is essential for handling cases where information may be incomplete or unavailable.
+
+### Trinary Values
+
+Sentrie supports three trinary values:
+
+- **`true`** - The condition is definitely true
+- **`false`** - The condition is definitely false
+- **`unknown`** - The condition's truth value cannot be determined
+
+### Kleene Truth Tables
+
+Sentrie implements **Kleene's three-valued logic**, which provides a consistent way to handle `unknown` values in logical operations.
+
+#### Logical AND (`and`)
+
+The `and` operator follows Kleene's AND truth table:
+
+| **AND**     | **true** | **false** | **unknown** |
+| ----------- | -------- | --------- | ----------- |
+| **true**    | `true`   | `false`   | `unknown`   |
+| **false**   | `false`  | `false`   | `false`     |
+| **unknown** | `unknown`| `false`   | `unknown`   |
+
+**Key behaviors:**
+- `true and x` = `x` (true is the identity element)
+- `false and x` = `false` (false dominates)
+- `unknown and true` = `unknown` (cannot determine if both are true)
+- `unknown and false` = `false` (false dominates)
+- `unknown and unknown` = `unknown` (cannot determine)
+
+#### Logical OR (`or`)
+
+The `or` operator follows Kleene's OR truth table:
+
+| **OR**      | **true** | **false** | **unknown** |
+| ----------- | -------- | --------- | ----------- |
+| **true**    | `true`   | `true`    | `true`     |
+| **false**   | `true`   | `false`   | `unknown`  |
+| **unknown** | `true`   | `unknown` | `unknown`  |
+
+**Key behaviors:**
+- `true or x` = `true` (true dominates)
+- `false or x` = `x` (false is the identity element)
+- `unknown or true` = `true` (true dominates)
+- `unknown or false` = `unknown` (cannot determine if either is true)
+- `unknown or unknown` = `unknown` (cannot determine)
+
+#### Logical NOT (`not`)
+
+The `not` operator follows this truth table:
+
+| **Input**   | **Output** |
+| ----------- | --------- |
+| **true**    | `false`   |
+| **false**   | `true`    |
+| **unknown** | `unknown` |
+
+**Key behavior:**
+- `not unknown` = `unknown` (cannot determine the opposite of unknown)
+
+### Trinary Logic Examples
+
+#### Basic Trinary Operations
+
+```sentrie
+-- Unknown from undefined field access
+let value = user.nonexistent.field
+let result = value == "test"  -- unknown (operation on unknown)
+
+-- AND with unknown
+let a = true
+let b = unknown
+let result1 = a and b  -- unknown
+
+let c = false
+let d = unknown
+let result2 = c and d  -- false (false dominates)
+
+-- OR with unknown
+let e = true
+let f = unknown
+let result3 = e or f  -- true (true dominates)
+
+let g = false
+let h = unknown
+let result4 = g or h  -- unknown
+```
+
+#### Practical Use Cases
+
+```sentrie
+shape User {
+  name!: string
+  email?: string
+  age?: number
+}
+
+fact user: User
+
+-- Check if user has email (handles unknown gracefully)
+let has_email: trinary = user.email is defined and user.email is not empty
+-- Result: true if email exists and is not empty
+--         false if email is defined but empty
+--         unknown if email is not defined
+
+-- Age verification with unknown handling
+let can_vote: trinary = user.age is defined ? (user.age >= 18) : unknown
+-- Result: true if age >= 18
+--         false if age < 18
+--         unknown if age is not defined
+
+-- Complex logic with unknown propagation
+let is_verified: trinary = user.email is defined and 
+                          user.email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+-- Result: true if email is defined and valid
+--         false if email is defined but invalid
+--         unknown if email is not defined
+```
+
+#### Handling Unknown in Rules
+
+```sentrie
+shape Account {
+  username!: string
+  email?: string
+  verified: bool
+}
+
+fact account: Account
+
+-- Rule that handles unknown gracefully
+rule can_access = default false when account.email is defined {
+  let email_valid = account.email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+  yield account.verified and email_valid
+}
+
+-- If email is not defined, the 'when' clause prevents evaluation
+-- If email is defined, the rule evaluates normally
+```
+
+#### Unknown Propagation
+
+```sentrie
+-- Unknown propagates through operations
+let a = user.nonexistent.field  -- unknown
+let b = a + 1                   -- unknown (operation on unknown)
+let c = b > 10                  -- unknown (comparison with unknown)
+let d = c and true              -- unknown (AND with unknown)
+let e = d or false              -- unknown (OR with unknown)
+```
+
+### Trinary vs Boolean
+
+Sentrie distinguishes between trinary and boolean values:
+
+- **Trinary** (`trinary`): Can be `true`, `false`, or `unknown`
+- **Boolean** (`bool`): Can only be `true` or `false` (a special case of trinary)
+
+When a boolean is used in a trinary context, it's automatically converted:
+- `true` (bool) → `true` (trinary)
+- `false` (bool) → `false` (trinary)
+
+### Best Practices for Trinary Logic
+
+1. **Check for definedness before operations:**
+```sentrie
+-- Good: Check if value is defined first
+let result = user.email is defined ? user.email.length() > 0 : false
+
+-- Avoid: Operations on potentially undefined values
+let result = user.email.length() > 0  -- unknown if email is undefined
+```
+
+2. **Use `is defined` to handle unknown:**
+```sentrie
+-- Explicitly handle unknown cases
+let can_proceed = user.age is defined and user.age >= 18
+```
+
+3. **Understand unknown propagation:**
+```sentrie
+-- Unknown propagates through all operations
+let value = user.missing.field  -- unknown
+let result = value + 1           -- unknown
+let comparison = result > 10     -- unknown
+```
+
+4. **Use default values in rules:**
+```sentrie
+-- Provide defaults for unknown cases
+rule can_access = default false when user.role is defined {
+  yield user.role == "admin"
+}
+-- Returns false if role is not defined (unknown case)
+```
+
 ## Logical Operations
 
 ### Logical AND (`and`)
 
-The `and` operator returns `true` only when both operands are truthy.
+The `and` operator follows Kleene's trinary logic. It returns `true` only when both operands are `true`, `false` when either operand is `false`, and `unknown` when one operand is `unknown` and the other is not `false`.
 
 #### Syntax
 
@@ -100,9 +300,29 @@ let is_valid_login: bool = username.length() >= 3 and password.length() >= 8
 -- Result: true
 ```
 
+#### Trinary Examples
+
+```sentrie
+-- AND with unknown
+let a = true
+let b = unknown
+let result1 = a and b  -- unknown
+
+let c = false
+let d = unknown
+let result2 = c and d  -- false (false dominates in AND)
+
+-- Unknown from undefined field
+let user_email = user.email  -- unknown if email is not defined
+let has_email = user_email is defined and user_email is not empty
+-- Result: unknown if email is not defined
+--         true if email is defined and not empty
+--         false if email is defined but empty
+```
+
 ### Logical OR (`or`)
 
-The `or` operator returns `true` when at least one operand is truthy.
+The `or` operator follows Kleene's trinary logic. It returns `true` when at least one operand is `true`, `false` only when both operands are `false`, and `unknown` when one operand is `unknown` and the other is not `true`.
 
 #### Syntax
 
@@ -129,9 +349,29 @@ let is_valid_payment: bool = payment_method == "credit_card" or
 -- Result: true
 ```
 
+#### Trinary Examples
+
+```sentrie
+-- OR with unknown
+let a = true
+let b = unknown
+let result1 = a or b  -- true (true dominates in OR)
+
+let c = false
+let d = unknown
+let result2 = c or d  -- unknown
+
+-- Handling optional fields
+let user_role = user.role  -- unknown if role is not defined
+let is_admin = user_role == "admin" or user_role == "superuser"
+-- Result: unknown if role is not defined
+--         true if role is "admin" or "superuser"
+--         false if role is something else
+```
+
 ### Logical NOT (`not` or `!`)
 
-The `not` operator (or `!`) returns the opposite boolean value.
+The `not` operator (or `!`) follows trinary logic. It returns the opposite value: `true` → `false`, `false` → `true`, and `unknown` → `unknown`.
 
 #### Syntax
 
@@ -154,6 +394,21 @@ let user_active: bool = !user_banned
 let empty_string: string = ""
 let has_content: bool = not (empty_string is empty)
 -- Result: false
+```
+
+#### Trinary Examples
+
+```sentrie
+-- NOT with unknown
+let a = unknown
+let result = not a  -- unknown (NOT of unknown is unknown)
+
+-- NOT with undefined field
+let user_status = user.status  -- unknown if status is not defined
+let is_inactive = not user_status
+-- Result: unknown if status is not defined
+--         false if status is true
+--         true if status is false
 ```
 
 ```sentrie

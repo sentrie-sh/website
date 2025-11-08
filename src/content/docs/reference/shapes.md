@@ -148,7 +148,7 @@ shape AdminUser with User {
 }
 ```
 
-The `AdminUser` shape inherits all fields from `User` and adds additional fields:
+The `AdminUser` shape includes all fields from `User` and adds additional fields:
 
 ```sentrie
 let admin: AdminUser = {
@@ -161,7 +161,7 @@ let admin: AdminUser = {
 
 ### Composition Rules
 
-- **Inheritance**: Child shapes inherit all fields from parent shapes
+- **Composition**: Composed shapes include all fields from base shapes
 - **No Circular Dependencies**: Shapes cannot reference themselves directly or indirectly
 - **No Duplicate Fields**: Shapes cannot have duplicate fields directly or indirectly
 - **Type Safety**: Values must match the exact shape they're assigned to
