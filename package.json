@@ -6,15 +6,15 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build --force && echo 'sentrie-sh.surge.sh' > CNAME",
-    "stage": "astro build --outDir stage --force",
-    "deploy-stage": "yarn stage && cd stage && surge --domain sentrie-sh-stage.surge.sh && cd - ",
+    "stage": "astro build --outDir dist-stage --force",
+    "deploy-stage": "yarn stage && cd dist-stage && surge --domain sentrie-sh-stage.surge.sh -y && cd - ",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.36.0",
+    "@astrojs/starlight": "^0.36.2",
     "@expressive-code/plugin-shiki": "^0.41.3",
-    "astro": "5.14.1",
+    "astro": "^5.15.3",
     "sharp": "^0.34.2"
   }
 }

@@ -76,6 +76,10 @@ export default defineConfig({
           label: "Reference",
           items: [
             {
+              label: "Language Reference",
+              slug: "reference",
+            },
+            {
               label: "Namespaces",
               slug: "reference/namespaces",
             },
@@ -126,12 +130,69 @@ export default defineConfig({
           ],
         },
         {
-          label: "Language Reference",
-          slug: "reference",
-        },
-        {
-          label: "Typescript Modules",
-          slug: "typescript-modules",
+          label: "TypeScript Modules",
+          items: [
+            {
+              label: "Overview",
+              slug: "reference/typescript_modules",
+            },
+            {
+              label: "Collection",
+              slug: "reference/typescript_modules/sentrie/collection",
+            },
+            {
+              label: "Crypto",
+              slug: "reference/typescript_modules/sentrie/crypto",
+            },
+            {
+              label: "Encoding",
+              slug: "reference/typescript_modules/sentrie/encoding",
+            },
+            {
+              label: "Hash",
+              slug: "reference/typescript_modules/sentrie/hash",
+            },
+            {
+              label: "JSON",
+              slug: "reference/typescript_modules/sentrie/json",
+            },
+            {
+              label: "JWT",
+              slug: "reference/typescript_modules/sentrie/jwt",
+            },
+            {
+              label: "Math",
+              slug: "reference/typescript_modules/sentrie/math",
+            },
+            {
+              label: "Net",
+              slug: "reference/typescript_modules/sentrie/net",
+            },
+            {
+              label: "Regex",
+              slug: "reference/typescript_modules/sentrie/regex",
+            },
+            {
+              label: "Semver",
+              slug: "reference/typescript_modules/sentrie/semver",
+            },
+            {
+              label: "String",
+              slug: "reference/typescript_modules/sentrie/string",
+            },
+            {
+              label: "Time",
+              slug: "reference/typescript_modules/sentrie/time",
+            },
+            {
+              label: "URL",
+              slug: "reference/typescript_modules/sentrie/url",
+            },
+            {
+              label: "UUID",
+              slug: "reference/typescript_modules/sentrie/uuid",
+            },
+          ],
         },
         {
           label: "CLI Reference",
