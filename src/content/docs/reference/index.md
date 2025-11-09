@@ -39,6 +39,8 @@ policy auth {
 shape User {
   -- shape definition
 }
+
+export shape User -- export shapes to allow visibility to other namespaces
 ```
 
 ## Namespaces
