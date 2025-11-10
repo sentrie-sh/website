@@ -1,0 +1,99 @@
+- Getting Started
+  - Installation
+  - What is Sentrie?
+  - Why Sentrie?
+  - What is Policy as Code?
+  - Writing your first Policy
+  - Running your Policy
+- CLI Reference
+  - serve
+  - init
+  - exec
+  - namespace
+    - list
+- Structure of a Policy Pack
+  - `sentrie.pack.toml` - The pack file
+  - `*.sentrie` - The policy files
+  - `*.ts` - The TypeScript files
+  - Example Pack
+- References
+  - Namespaces
+  - Types and Constraints
+  - Shapes
+  - Policies
+  - Facts
+  - Rules
+  - Variables and Values
+  - Using TypeScript
+  - Security and Permissions
+- Language Reference
+  - Basics
+    - Namespaces
+    - Policies
+    - Rules
+    - Expressions
+    - Types and Shapes
+    - Literals
+    - Operators
+  - Lex - the lexicon/language of sentrie
+    - Overview
+    - Program Structure
+    - Namespace
+    - Shapes and Types
+      - Primitive Types
+      - Aggregate Types
+      - Types and Validations - types have built in validations
+      - Shape Exports
+      - Shape Composition
+      - Shape aliases
+    - Policy
+      - Facts
+      - Uses
+      - Rules
+      - Rule Exports
+    - Values and Literals - The data that Sentrie policies operate on
+      - #Trinary - True, False, Unknown (an extension of booleans)
+      - #Numbers - Integer, Float
+      - #Strings - String, Heredoc
+      - #Null
+      - #Undefined
+      - #Lists
+      - #Maps
+      - #Records
+      - #Documents
+    - Scopes
+      - #Namespaces
+      - #Policies
+      - #RuleImport - imported rule is executed in an isolated context
+      - #Blocks - a block is a sequence of statements enclosed in curly braces - must contain an `yield` statement
+    - Arithmetic Operators
+      - #Addition
+      - #Subtraction
+      - #Multiplication
+      - #Division
+      - #Modulo
+    - Logical Operators
+      - #Pattern Matching
+      - #Is
+      - #Equal
+      - #Not Equal
+      - #Less Than
+      - #Less Than or Equal
+      - #Greater Than
+      - #Greater Than or Equal
+      - #Any
+      - #All
+      - #Filter
+      - #Contains
+      - #In - membership check
+      - #And
+      - #Or
+      - #Not - negation
+      - #Defined
+      - #Emptiness
+      - #Ternary Operator
+    - Collection Operations
+      - #Map
+      - #Distinct
+      - #Reduce
+      - #Count

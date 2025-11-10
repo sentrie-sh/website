@@ -1,36 +1,56 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
+title: Sentrie
+icon: sentrie
+editUrl: false
+description: Sentrie is an open-source policy evaluation engine with a `Rich Expression Language` and built in support for JavaScript.
 template: splash
+pagefind: false
 hero:
-  tagline: Congrats on setting up a new Starlight project!
+  tagline: The policy evaluation engine purpose-built for modern applications.
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/freeze.svg
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Quick Start
+      link: /getting-started/installation
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
+    - text: Documentation
+      link: getting-started/what-is-sentrie
       icon: external
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from "@astrojs/starlight/components";
 
-## Next steps
+## Features
 
 <CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+  <Card title="Rich Expression Language" icon="document">
+    Powerful expressions with arithmetic, logical, comparison, and collection
+    operations. Support for quantifiers, pattern matching, and conditional
+    expressions.
+    <br />
+    <a href="https://sentrie.sh/rich-expression-language">Learn more</a>
+  </Card>
+  <Card title="Run as a Service" icon="setting">
+    Run Sentrie as a service to evaluate policies using a well-defined and
+    minimal HTTP API.
+    <br />
+    <a href="https://sentrie.sh/run-as-a-service">Learn more</a>
+  </Card>
+  <Card title="JavaScript Integration" icon="setting">
+    Seamlessly integrate JavaScript modules for complex logic. Built-in modules
+    for UUID generation, crypto operations, and more.
+    <br />
+    <a href="https://sentrie.sh/javascript-modules">Learn more</a>
+  </Card>
+  <Card title="CLI Reference" icon="open-book">
+    The Sentrie CLI provides a powerful set of tools for managing your policies
+    and JavaScript modules.
+    <br />
+    <a href="/cli-reference">Learn more</a>
+  </Card>
+  <Card title="Type-Safe Inputs" icon="pencil">
+    Comprehensive type system with shapes, constraints, and built-in
+    validations.
+  </Card>
 </CardGrid>
