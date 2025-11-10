@@ -8,7 +8,7 @@ The `@sentrie/encoding` module provides various encoding and decoding utilities.
 ## Usage
 
 ```text
-use { base64Encode, base64Decode, hexEncode, urlEncode } from "@sentrie/encoding" as encoding
+use { base64Encode, base64Decode, hexEncode, urlEncode } from @sentrie/encoding
 ```
 
 ## Functions
@@ -28,8 +28,7 @@ Encodes a string using standard Base64 encoding.
 **Example:**
 
 ```text
-use { base64Encode } from "@sentrie/encoding" as encoding
-
+use { base64Encode } from @sentrie/encoding
 let encoded = encoding.base64Encode("Hello, World!")  // "SGVsbG8sIFdvcmxkIQ=="
 ```
 
@@ -48,8 +47,7 @@ Decodes a Base64-encoded string.
 **Example:**
 
 ```text
-use { base64Decode } from "@sentrie/encoding" as encoding
-
+use { base64Decode } from @sentrie/encoding
 let decoded = encoding.base64Decode("SGVsbG8sIFdvcmxkIQ==")  // "Hello, World!"
 ```
 
@@ -68,8 +66,7 @@ Encodes a string using URL-safe Base64 encoding. Uses `-` and `_` instead of `+`
 **Example:**
 
 ```text
-use { base64UrlEncode } from "@sentrie/encoding" as encoding
-
+use { base64UrlEncode } from @sentrie/encoding
 let encoded = encoding.base64UrlEncode("Hello, World!")
 ```
 
@@ -100,8 +97,7 @@ Encodes a string to hexadecimal representation.
 **Example:**
 
 ```text
-use { hexEncode } from "@sentrie/encoding" as encoding
-
+use { hexEncode } from @sentrie/encoding
 let encoded = encoding.hexEncode("Hello")  // "48656c6c6f"
 ```
 
@@ -120,8 +116,7 @@ Decodes a hexadecimal string.
 **Example:**
 
 ```text
-use { hexDecode } from "@sentrie/encoding" as encoding
-
+use { hexDecode } from @sentrie/encoding
 let decoded = encoding.hexDecode("48656c6c6f")  // "Hello"
 ```
 
@@ -140,8 +135,7 @@ URL-encodes a string using percent encoding (query string encoding). Encodes spe
 **Example:**
 
 ```text
-use { urlEncode } from "@sentrie/encoding" as encoding
-
+use { urlEncode } from @sentrie/encoding
 let encoded = encoding.urlEncode("Hello, World!")  // "Hello%2C%20World%21"
 ```
 
@@ -160,8 +154,7 @@ Decodes a URL-encoded string.
 **Example:**
 
 ```text
-use { urlDecode } from "@sentrie/encoding" as encoding
-
+use { urlDecode } from @sentrie/encoding
 let decoded = encoding.urlDecode("Hello%2C%20World%21")  // "Hello, World!"
 ```
 
@@ -171,8 +164,7 @@ let decoded = encoding.urlDecode("Hello%2C%20World%21")  // "Hello, World!"
 namespace com/example/mypolicy
 
 policy mypolicy {
-  use { base64Encode, base64Decode, urlEncode, urlDecode } from "@sentrie/encoding" as encoding
-
+  use { base64Encode, base64Decode, urlEncode, urlDecode } from @sentrie/encoding
   fact data!: string
 
   rule encodeData = default false {

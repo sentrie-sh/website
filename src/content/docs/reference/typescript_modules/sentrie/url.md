@@ -8,7 +8,7 @@ The `@sentrie/url` module provides URL parsing and manipulation utilities. **Not
 ## Usage
 
 ```text
-use { parse, join, getHost, getPath, getQuery, isValid } from "@sentrie/url" as url
+use { parse, join, getHost, getPath, getQuery, isValid } from @sentrie/url
 ```
 
 ## Types
@@ -45,8 +45,7 @@ Parses a URL string into its components.
 **Example:**
 
 ```text
-use { parse } from "@sentrie/url" as url
-
+use { parse } from @sentrie/url
 let parsed = url.parse("https://example.com:8080/path/to/resource?key=value#section")
 // {
 //   scheme: "https",
@@ -73,8 +72,7 @@ Joins multiple URL parts into a single URL. Resolves relative paths against the 
 **Example:**
 
 ```text
-use { join } from "@sentrie/url" as url
-
+use { join } from @sentrie/url
 let joined = url.join("https://example.com", "path", "to", "resource")  // "https://example.com/path/to/resource"
 ```
 
@@ -93,8 +91,7 @@ Extracts the host component from a URL.
 **Example:**
 
 ```text
-use { getHost } from "@sentrie/url" as url
-
+use { getHost } from @sentrie/url
 let host = url.getHost("https://example.com:8080/path")  // "example.com:8080"
 ```
 
@@ -113,8 +110,7 @@ Extracts the path component from a URL.
 **Example:**
 
 ```text
-use { getPath } from "@sentrie/url" as url
-
+use { getPath } from @sentrie/url
 let path = url.getPath("https://example.com/path/to/resource")  // "/path/to/resource"
 ```
 
@@ -133,8 +129,7 @@ Extracts the query string component from a URL.
 **Example:**
 
 ```text
-use { getQuery } from "@sentrie/url" as url
-
+use { getQuery } from @sentrie/url
 let query = url.getQuery("https://example.com/path?key=value&foo=bar")  // "key=value&foo=bar"
 ```
 
@@ -151,8 +146,7 @@ Validates whether a string is a valid URL. Basic validation checks for scheme an
 **Example:**
 
 ```text
-use { isValid } from "@sentrie/url" as url
-
+use { isValid } from @sentrie/url
 let valid = url.isValid("https://example.com")  // true
 let invalid = url.isValid("not-a-url")  // false
 ```
@@ -163,8 +157,7 @@ let invalid = url.isValid("not-a-url")  // false
 namespace com/example/validation
 
 policy mypolicy {
-  use { parse, getHost, getPath, isValid } from "@sentrie/url" as url
-
+  use { parse, getHost, getPath, isValid } from @sentrie/url
   fact requestUrl!: string
 
   rule validateUrl = default false {

@@ -73,10 +73,27 @@ export default defineConfig({
           ],
         },
         {
-          label: "Reference",
+          label: "Running Sentrie",
           items: [
             {
-              label: "Language Reference",
+              label: "Executing Policies",
+              slug: "running-sentrie/executing-policies",
+            },
+            {
+              label: "Serving Policies",
+              slug: "running-sentrie/serving-policies",
+            },
+            {
+              label: "OTEL Integration",
+              slug: "running-sentrie/otel-integration",
+            },
+          ],
+        },
+        {
+          label: "Language Reference",
+          items: [
+            {
+              label: "Overview",
               slug: "reference",
             },
             {

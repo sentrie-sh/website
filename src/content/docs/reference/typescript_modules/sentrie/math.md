@@ -8,7 +8,7 @@ The `@sentrie/math` module provides mathematical constants and functions. Simila
 ## Usage
 
 ```text
-use { PI, E, sin, cos, sqrt, pow } from "@sentrie/math" as math
+use { PI, E, sin, cos, sqrt, pow } from @sentrie/math
 ```
 
 ## Constants
@@ -33,8 +33,7 @@ Returns the absolute value of a number.
 **Example:**
 
 ```text
-use { abs } from "@sentrie/math" as math
-
+use { abs } from @sentrie/math
 let value = math.abs(-5)  // 5
 ```
 
@@ -45,8 +44,7 @@ Returns the smallest integer greater than or equal to a number (ceiling).
 **Example:**
 
 ```text
-use { ceil } from "@sentrie/math" as math
-
+use { ceil } from @sentrie/math
 let value = math.ceil(4.3)  // 5
 ```
 
@@ -57,8 +55,7 @@ Returns the largest integer less than or equal to a number (floor).
 **Example:**
 
 ```text
-use { floor } from "@sentrie/math" as math
-
+use { floor } from @sentrie/math
 let value = math.floor(4.7)  // 4
 ```
 
@@ -69,8 +66,7 @@ Returns the value of a number rounded to the nearest integer.
 **Example:**
 
 ```text
-use { round } from "@sentrie/math" as math
-
+use { round } from @sentrie/math
 let value = math.round(4.5)  // 5
 ```
 
@@ -83,8 +79,7 @@ Returns the maximum value from a list of numbers.
 **Example:**
 
 ```text
-use { max } from "@sentrie/math" as math
-
+use { max } from @sentrie/math
 let value = math.max(1, 5, 3, 9, 2)  // 9
 ```
 
@@ -97,8 +92,7 @@ Returns the minimum value from a list of numbers.
 **Example:**
 
 ```text
-use { min } from "@sentrie/math" as math
-
+use { min } from @sentrie/math
 let value = math.min(1, 5, 3, 9, 2)  // 1
 ```
 
@@ -113,8 +107,7 @@ Returns the square root of a number.
 **Example:**
 
 ```text
-use { sqrt } from "@sentrie/math" as math
-
+use { sqrt } from @sentrie/math
 let value = math.sqrt(16)  // 4
 ```
 
@@ -125,8 +118,7 @@ Returns the value of base raised to the power of exponent.
 **Example:**
 
 ```text
-use { pow } from "@sentrie/math" as math
-
+use { pow } from @sentrie/math
 let value = math.pow(2, 3)  // 8
 ```
 
@@ -137,8 +129,7 @@ Returns e raised to the power of x (eˣ).
 **Example:**
 
 ```text
-use { exp } from "@sentrie/math" as math
-
+use { exp } from @sentrie/math
 let value = math.exp(1)  // ≈ 2.718
 ```
 
@@ -151,8 +142,7 @@ Returns the natural logarithm (base e) of a number.
 **Example:**
 
 ```text
-use { log } from "@sentrie/math" as math
-
+use { log } from @sentrie/math
 let value = math.log(math.E)  // 1
 ```
 
@@ -165,8 +155,7 @@ Returns the base-10 logarithm of a number.
 **Example:**
 
 ```text
-use { log10 } from "@sentrie/math" as math
-
+use { log10 } from @sentrie/math
 let value = math.log10(100)  // 2
 ```
 
@@ -179,8 +168,7 @@ Returns the base-2 logarithm of a number.
 **Example:**
 
 ```text
-use { log2 } from "@sentrie/math" as math
-
+use { log2 } from @sentrie/math
 let value = math.log2(8)  // 3
 ```
 
@@ -195,8 +183,7 @@ Returns the sine of an angle in radians.
 **Example:**
 
 ```text
-use { sin, PI } from "@sentrie/math" as math
-
+use { sin, PI } from @sentrie/math
 let value = math.sin(math.PI / 2)  // 1
 ```
 
@@ -207,8 +194,7 @@ Returns the cosine of an angle in radians.
 **Example:**
 
 ```text
-use { cos, PI } from "@sentrie/math" as math
-
+use { cos, PI } from @sentrie/math
 let value = math.cos(0)  // 1
 ```
 
@@ -219,8 +205,7 @@ Returns the tangent of an angle in radians.
 **Example:**
 
 ```text
-use { tan, PI } from "@sentrie/math" as math
-
+use { tan, PI } from @sentrie/math
 let value = math.tan(math.PI / 4)  // ≈ 1
 ```
 
@@ -233,8 +218,7 @@ Returns the arcsine (inverse sine) of a number in radians.
 **Example:**
 
 ```text
-use { asin } from "@sentrie/math" as math
-
+use { asin } from @sentrie/math
 let value = math.asin(1)  // π/2
 ```
 
@@ -247,8 +231,7 @@ Returns the arccosine (inverse cosine) of a number in radians.
 **Example:**
 
 ```text
-use { acos } from "@sentrie/math" as math
-
+use { acos } from @sentrie/math
 let value = math.acos(0)  // π/2
 ```
 
@@ -259,8 +242,7 @@ Returns the arctangent (inverse tangent) of a number in radians.
 **Example:**
 
 ```text
-use { atan } from "@sentrie/math" as math
-
+use { atan } from @sentrie/math
 let value = math.atan(1)  // π/4
 ```
 
@@ -271,8 +253,7 @@ Returns the arctangent of the quotient of its arguments. This is useful for conv
 **Example:**
 
 ```text
-use { atan2 } from "@sentrie/math" as math
-
+use { atan2 } from @sentrie/math
 let angle = math.atan2(1, 1)  // π/4
 ```
 
@@ -299,8 +280,7 @@ Returns a pseudo-random number between 0 (inclusive) and 1 (exclusive). Similar 
 **Example:**
 
 ```text
-use { random } from "@sentrie/math" as math
-
+use { random } from @sentrie/math
 let value = math.random()  // 0.0 <= value < 1.0
 ```
 
@@ -310,8 +290,7 @@ let value = math.random()  // 0.0 <= value < 1.0
 namespace com/example/mypolicy
 
 policy mypolicy {
-  use { PI, sqrt, pow, sin, cos, random } from "@sentrie/math" as math
-
+  use { PI, sqrt, pow, sin, cos, random } from @sentrie/math
   fact radius!: number
   fact angle!: number
 

@@ -8,7 +8,7 @@ The `@sentrie/uuid` module provides functions for generating UUIDs (Universally 
 ## Usage
 
 ```text
-use { v4, v6, v7 } from "@sentrie/uuid" as uuid
+use { v4, v6, v7 } from @sentrie/uuid
 ```
 
 ## Functions
@@ -22,8 +22,7 @@ Generates a version 4 UUID (random UUID). Version 4 UUIDs are randomly generated
 **Example:**
 
 ```text
-use { v4 } from "@sentrie/uuid" as uuid
-
+use { v4 } from @sentrie/uuid
 let uuid = uuid.v4()  // "550e8400-e29b-41d4-a716-446655440000"
 ```
 
@@ -38,8 +37,7 @@ Generates a version 6 UUID (time-ordered UUID). Version 6 UUIDs are time-ordered
 **Example:**
 
 ```text
-use { v6 } from "@sentrie/uuid" as uuid
-
+use { v6 } from @sentrie/uuid
 let uuid = uuid.v6()  // Time-ordered UUID
 ```
 
@@ -54,8 +52,7 @@ Generates a version 7 UUID (time-ordered UUID with Unix timestamp). Version 7 UU
 **Example:**
 
 ```text
-use { v7 } from "@sentrie/uuid" as uuid
-
+use { v7 } from @sentrie/uuid
 let uuid = uuid.v7()  // Time-ordered UUID with Unix timestamp
 ```
 
@@ -85,8 +82,7 @@ let uuid = uuid.v7()  // Time-ordered UUID with Unix timestamp
 namespace com/example/resources
 
 policy mypolicy {
-  use { v4, v7 } from "@sentrie/uuid" as uuid
-
+  use { v4, v7 } from @sentrie/uuid
   fact resourceType!: string
 
   rule createResource = default false {

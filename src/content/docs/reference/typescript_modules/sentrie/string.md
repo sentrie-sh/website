@@ -7,8 +7,8 @@ The `@sentrie/string` module provides comprehensive string manipulation utilitie
 
 ## Usage
 
-```text
-use { trim, toLowerCase, toUpperCase, replace, split, substring } from "@sentrie/string" as str
+````text
+use { trim, toLowerCase, toUpperCase, replace, split, substring } from @sentrie/string
 ```
 
 ## Functions
@@ -22,10 +22,9 @@ Removes leading and trailing whitespace from a string.
 **Example:**
 
 ```text
-use { trim } from "@sentrie/string" as str
-
-let trimmed = str.trim("  hello  ")  // "hello"
-```
+use { trim } from @sentrie/string
+let trimmed = string.trim("  hello  ")  // "hello"
+````
 
 #### `trimLeft(str: string): string`
 
@@ -34,9 +33,8 @@ Removes leading whitespace from a string.
 **Example:**
 
 ```text
-use { trimLeft } from "@sentrie/string" as str
-
-let trimmed = str.trimLeft("  hello  ")  // "hello  "
+use { trimLeft } from @sentrie/string
+let trimmed = string.trimLeft("  hello  ")  // "hello  "
 ```
 
 #### `trimRight(str: string): string`
@@ -46,9 +44,8 @@ Removes trailing whitespace from a string.
 **Example:**
 
 ```text
-use { trimRight } from "@sentrie/string" as str
-
-let trimmed = str.trimRight("  hello  ")  // "  hello"
+use { trimRight } from @sentrie/string
+let trimmed = string.trimRight("  hello  ")  // "  hello"
 ```
 
 ### Case Conversion
@@ -60,9 +57,8 @@ Converts a string to lowercase.
 **Example:**
 
 ```text
-use { toLowerCase } from "@sentrie/string" as str
-
-let lower = str.toLowerCase("Hello, World!")  // "hello, world!"
+use { toLowerCase } from @sentrie/string
+let lower = string.toLowerCase("Hello, World!")  // "hello, world!"
 ```
 
 #### `toUpperCase(str: string): string`
@@ -72,9 +68,8 @@ Converts a string to uppercase.
 **Example:**
 
 ```text
-use { toUpperCase } from "@sentrie/string" as str
-
-let upper = str.toUpperCase("Hello, World!")  // "HELLO, WORLD!"
+use { toUpperCase } from @sentrie/string
+let upper = string.toUpperCase("Hello, World!")  // "HELLO, WORLD!"
 ```
 
 ### Replacement Functions
@@ -95,9 +90,8 @@ Replaces occurrences of a substring in a string.
 **Example:**
 
 ```text
-use { replace } from "@sentrie/string" as str
-
-let result = str.replace("hello world hello", "hello", "hi", 1)  // "hi world hello"
+use { replace } from @sentrie/string
+let result = string.replace("hello world hello", "hello", "hi", 1)  // "hi world hello"
 ```
 
 #### `replaceAll(str: string, oldStr: string, newStr: string): string`
@@ -107,9 +101,8 @@ Replaces all occurrences of a substring in a string.
 **Example:**
 
 ```text
-use { replaceAll } from "@sentrie/string" as str
-
-let result = str.replaceAll("hello world hello", "hello", "hi")  // "hi world hi"
+use { replaceAll } from @sentrie/string
+let result = string.replaceAll("hello world hello", "hello", "hi")  // "hi world hi"
 ```
 
 ### Splitting Functions
@@ -121,9 +114,8 @@ Splits a string into an array of substrings using a separator.
 **Example:**
 
 ```text
-use { split } from "@sentrie/string" as str
-
-let parts = str.split("hello,world,test", ",")  // ["hello", "world", "test"]
+use { split } from @sentrie/string
+let parts = string.split("hello,world,test", ",")  // ["hello", "world", "test"]
 ```
 
 ### Substring Functions
@@ -141,9 +133,8 @@ Extracts a substring from a string.
 **Example:**
 
 ```text
-use { substring } from "@sentrie/string" as str
-
-let sub = str.substring("Hello, World!", 0, 5)  // "Hello"
+use { substring } from @sentrie/string
+let sub = string.substring("Hello, World!", 0, 5)  // "Hello"
 ```
 
 #### `slice(str: string, start: number, end?: number): string`
@@ -153,9 +144,8 @@ Extracts a slice of a string. Similar to `substring`, but supports negative indi
 **Example:**
 
 ```text
-use { slice } from "@sentrie/string" as str
-
-let sliced = str.slice("Hello, World!", -6)  // "World!"
+use { slice } from @sentrie/string
+let sliced = string.slice("Hello, World!", -6)  // "World!"
 ```
 
 ### Checking Functions
@@ -167,9 +157,8 @@ Checks if a string starts with a specific prefix.
 **Example:**
 
 ```text
-use { startsWith } from "@sentrie/string" as str
-
-let starts = str.startsWith("Hello, World!", "Hello")  // true
+use { startsWith } from @sentrie/string
+let starts = string.startsWith("Hello, World!", "Hello")  // true
 ```
 
 #### `endsWith(str: string, suffix: string): boolean`
@@ -179,9 +168,8 @@ Checks if a string ends with a specific suffix.
 **Example:**
 
 ```text
-use { endsWith } from "@sentrie/string" as str
-
-let ends = str.endsWith("Hello, World!", "World!")  // true
+use { endsWith } from @sentrie/string
+let ends = string.endsWith("Hello, World!", "World!")  // true
 ```
 
 #### `includes(str: string, substr: string): boolean`
@@ -191,9 +179,8 @@ Checks if a string includes a specific substring.
 **Example:**
 
 ```text
-use { includes } from "@sentrie/string" as str
-
-let includes = str.includes("Hello, World!", "World")  // true
+use { includes } from @sentrie/string
+let includes = string.includes("Hello, World!", "World")  // true
 ```
 
 ### Search Functions
@@ -213,9 +200,8 @@ Finds the first index of a substring in a string.
 **Example:**
 
 ```text
-use { indexOf } from "@sentrie/string" as str
-
-let idx = str.indexOf("Hello, World!", "World")  // 7
+use { indexOf } from @sentrie/string
+let idx = string.indexOf("Hello, World!", "World")  // 7
 ```
 
 #### `lastIndexOf(str: string, substr: string, fromIndex?: number): number`
@@ -233,9 +219,8 @@ Finds the last index of a substring in a string.
 **Example:**
 
 ```text
-use { lastIndexOf } from "@sentrie/string" as str
-
-let idx = str.lastIndexOf("Hello, World!", "o")  // 8
+use { lastIndexOf } from @sentrie/string
+let idx = string.lastIndexOf("Hello, World!", "o")  // 8
 ```
 
 ### Padding Functions
@@ -253,9 +238,8 @@ Pads the start of a string to a specified length.
 **Example:**
 
 ```text
-use { padStart } from "@sentrie/string" as str
-
-let padded = str.padStart("5", 3, "0")  // "005"
+use { padStart } from @sentrie/string
+let padded = string.padStart("5", 3, "0")  // "005"
 ```
 
 #### `padEnd(str: string, length: number, padStr?: string): string`
@@ -265,9 +249,8 @@ Pads the end of a string to a specified length.
 **Example:**
 
 ```text
-use { padEnd } from "@sentrie/string" as str
-
-let padded = str.padEnd("5", 3, "0")  // "500"
+use { padEnd } from @sentrie/string
+let padded = string.padEnd("5", 3, "0")  // "500"
 ```
 
 ### Other Functions
@@ -288,9 +271,8 @@ Repeats a string a specified number of times.
 **Example:**
 
 ```text
-use { repeat } from "@sentrie/string" as str
-
-let repeated = str.repeat("ha", 3)  // "hahaha"
+use { repeat } from @sentrie/string
+let repeated = string.repeat("ha", 3)  // "hahaha"
 ```
 
 #### `charAt(str: string, index: number): string`
@@ -307,9 +289,8 @@ Gets the character at a specific index in a string.
 **Example:**
 
 ```text
-use { charAt } from "@sentrie/string" as str
-
-let char = str.charAt("Hello", 0)  // "H"
+use { charAt } from @sentrie/string
+let char = string.charAt("Hello", 0)  // "H"
 ```
 
 #### `length(str: string): number`
@@ -325,9 +306,8 @@ Gets the length of a string.
 **Example:**
 
 ```text
-use { length } from "@sentrie/string" as str
-
-let len = str.length("Hello")  // 5
+use { length } from @sentrie/string
+let len = string.length("Hello")  // 5
 ```
 
 ## Complete Example
@@ -336,23 +316,22 @@ let len = str.length("Hello")  // 5
 namespace com/example/validation
 
 policy mypolicy {
-  use { trim, toLowerCase, startsWith, includes, split } from "@sentrie/string" as str
-
+  use { trim, toLowerCase, startsWith, includes, split } from @sentrie/string
   fact email!: string
   fact username!: string
 
   rule validateEmail = default false {
-    let trimmed = str.trim(email)
-    let lower = str.toLowerCase(trimmed)
-    let hasAt = str.includes(lower, "@")
-    let hasDomain = str.includes(lower, ".")
+    let trimmed = string.trim(email)
+    let lower = string.toLowerCase(trimmed)
+    let hasAt = string.includes(lower, "@")
+    let hasDomain = string.includes(lower, ".")
     yield hasAt and hasDomain
   }
 
   rule validateUsername = default false {
-    let trimmed = str.trim(username)
-    let parts = str.split(trimmed, " ")
-    yield str.length(trimmed) >= 3 and str.length(parts) == 1
+    let trimmed = string.trim(username)
+    let parts = string.split(trimmed, " ")
+    yield string.length(trimmed) >= 3 and string.length(parts) == 1
   }
 
   export decision of validateEmail

@@ -8,7 +8,7 @@ The `@sentrie/collection` module provides utilities for both list/array and map/
 ## Usage
 
 ```text
-use { list_includes, map_keys, map_get } from "@sentrie/collection" as collection
+use { list_includes, map_keys, map_get } from @sentrie/collection
 ```
 
 ## List Functions
@@ -27,8 +27,7 @@ Checks if an array includes a specific item. Uses deep equality comparison.
 **Example:**
 
 ```text
-use { list_includes } from "@sentrie/collection" as collection
-
+use { list_includes } from @sentrie/collection
 let numbers = [1, 2, 3, 4, 5]
 let hasThree = collection.list_includes(numbers, 3)  // true
 ```
@@ -47,8 +46,7 @@ Finds the first index of an item in an array. Uses deep equality comparison.
 **Example:**
 
 ```text
-use { list_indexOf } from "@sentrie/collection" as collection
-
+use { list_indexOf } from @sentrie/collection
 let numbers = [1, 2, 3, 4, 5]
 let idx = collection.list_indexOf(numbers, 3)  // 2
 ```
@@ -79,8 +77,7 @@ Sorts an array in ascending order. Sorts numbers numerically and strings lexicog
 **Example:**
 
 ```text
-use { list_sort } from "@sentrie/collection" as collection
-
+use { list_sort } from @sentrie/collection
 let numbers = [3, 1, 4, 1, 5]
 let sorted = collection.list_sort(numbers)  // [1, 1, 3, 4, 5]
 ```
@@ -100,8 +97,7 @@ Removes duplicate values from an array. Uses equality comparison to detect dupli
 **Example:**
 
 ```text
-use { list_unique } from "@sentrie/collection" as collection
-
+use { list_unique } from @sentrie/collection
 let numbers = [1, 2, 2, 3, 3, 3]
 let unique = collection.list_unique(numbers)  // [1, 2, 3]
 ```
@@ -122,8 +118,7 @@ Splits an array into chunks of a specified size.
 **Example:**
 
 ```text
-use { list_chunk } from "@sentrie/collection" as collection
-
+use { list_chunk } from @sentrie/collection
 let numbers = [1, 2, 3, 4, 5, 6]
 let chunks = collection.list_chunk(numbers, 2)  // [[1, 2], [3, 4], [5, 6]]
 ```
@@ -143,8 +138,7 @@ Flattens a nested array structure by one level or recursively.
 **Example:**
 
 ```text
-use { list_flatten } from "@sentrie/collection" as collection
-
+use { list_flatten } from @sentrie/collection
 let nested = [[1, 2], [3, 4], [5, 6]]
 let flat = collection.list_flatten(nested)  // [1, 2, 3, 4, 5, 6]
 ```
@@ -166,8 +160,7 @@ Gets all keys from a map/object.
 **Example:**
 
 ```text
-use { map_keys } from "@sentrie/collection" as collection
-
+use { map_keys } from @sentrie/collection
 let user = {"name": "John", "age": 30, "role": "admin"}
 let keys = collection.map_keys(user)  // ["name", "age", "role"]
 ```
@@ -187,8 +180,7 @@ Gets all values from a map/object.
 **Example:**
 
 ```text
-use { map_values } from "@sentrie/collection" as collection
-
+use { map_values } from @sentrie/collection
 let user = {"name": "John", "age": 30, "role": "admin"}
 let values = collection.map_values(user)  // ["John", 30, "admin"]
 ```
@@ -208,8 +200,7 @@ Gets all key-value pairs from a map/object as an array of `[key, value]` tuples.
 **Example:**
 
 ```text
-use { map_entries } from "@sentrie/collection" as collection
-
+use { map_entries } from @sentrie/collection
 let user = {"name": "John", "age": 30}
 let entries = collection.map_entries(user)  // [["name", "John"], ["age", 30]]
 ```
@@ -228,8 +219,7 @@ Checks if a map/object contains a specific key.
 **Example:**
 
 ```text
-use { map_has } from "@sentrie/collection" as collection
-
+use { map_has } from @sentrie/collection
 let user = {"name": "John", "age": 30}
 let hasName = collection.map_has(user, "name")  // true
 let hasEmail = collection.map_has(user, "email")  // false
@@ -250,8 +240,7 @@ Gets a value from a map/object by key, with an optional default value.
 **Example:**
 
 ```text
-use { map_get } from "@sentrie/collection" as collection
-
+use { map_get } from @sentrie/collection
 let user = {"name": "John", "age": 30}
 let name = collection.map_get(user, "name")  // "John"
 let email = collection.map_get(user, "email", "unknown")  // "unknown"
@@ -272,8 +261,7 @@ Gets the number of key-value pairs in a map/object.
 **Example:**
 
 ```text
-use { map_size } from "@sentrie/collection" as collection
-
+use { map_size } from @sentrie/collection
 let user = {"name": "John", "age": 30, "role": "admin"}
 let size = collection.map_size(user)  // 3
 ```
@@ -293,8 +281,7 @@ Checks if a map/object is empty (has no entries).
 **Example:**
 
 ```text
-use { map_isEmpty } from "@sentrie/collection" as collection
-
+use { map_isEmpty } from @sentrie/collection
 let empty = {}
 let notEmpty = {"name": "John"}
 let isEmpty1 = collection.map_isEmpty(empty)  // true
@@ -318,8 +305,7 @@ Merges multiple maps/objects into a single map. Later maps override earlier maps
 **Example:**
 
 ```text
-use { map_merge } from "@sentrie/collection" as collection
-
+use { map_merge } from @sentrie/collection
 let user1 = {"name": "John", "age": 30}
 let user2 = {"age": 31, "role": "admin"}
 let merged = collection.map_merge(user1, user2)  // {"name": "John", "age": 31, "role": "admin"}
@@ -331,8 +317,7 @@ let merged = collection.map_merge(user1, user2)  // {"name": "John", "age": 31, 
 namespace com/example/mypolicy
 
 policy mypolicy {
-  use { list_includes, list_sort, map_keys, map_get } from "@sentrie/collection" as collection
-
+  use { list_includes, list_sort, map_keys, map_get } from @sentrie/collection
   fact numbers!: list[number]
   fact user!: document
 

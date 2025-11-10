@@ -8,7 +8,7 @@ The `@sentrie/net` module provides network and IP address utilities for network-
 ## Usage
 
 ```text
-use { cidrContains, parseIP, isIPv4, isPrivate } from "@sentrie/net" as net
+use { cidrContains, parseIP, isIPv4, isPrivate } from @sentrie/net
 ```
 
 ## CIDR Functions
@@ -29,8 +29,7 @@ Checks if a CIDR block or IP address is contained within another CIDR block. Sup
 **Example:**
 
 ```text
-use { cidrContains } from "@sentrie/net" as net
-
+use { cidrContains } from @sentrie/net
 let contains = net.cidrContains("192.168.1.0/24", "192.168.1.5")  // true
 let contains2 = net.cidrContains("10.0.0.0/8", "192.168.1.5")  // false
 ```
@@ -51,8 +50,7 @@ Checks if two CIDR blocks intersect or overlap. Supports both IPv4 and IPv6.
 **Example:**
 
 ```text
-use { cidrIntersects } from "@sentrie/net" as net
-
+use { cidrIntersects } from @sentrie/net
 let intersects = net.cidrIntersects("192.168.1.0/24", "192.168.1.0/28")  // true
 ```
 
@@ -69,8 +67,7 @@ Validates whether a string is a valid CIDR notation.
 **Example:**
 
 ```text
-use { cidrIsValid } from "@sentrie/net" as net
-
+use { cidrIsValid } from @sentrie/net
 let isValid = net.cidrIsValid("192.168.1.0/24")  // true
 let invalid = net.cidrIsValid("192.168.1.0")  // false
 ```
@@ -90,8 +87,7 @@ Expands a CIDR block to a list of all host IP addresses within that block.
 **Example:**
 
 ```text
-use { cidrExpand } from "@sentrie/net" as net
-
+use { cidrExpand } from @sentrie/net
 let ips = net.cidrExpand("192.168.1.0/30")  // ["192.168.1.1", "192.168.1.2"]
 ```
 
@@ -110,8 +106,7 @@ Merges a list of IP addresses and subnets into the smallest possible list of CID
 **Example:**
 
 ```text
-use { cidrMerge } from "@sentrie/net" as net
-
+use { cidrMerge } from @sentrie/net
 let merged = net.cidrMerge(["192.168.1.1", "192.168.1.2", "192.168.1.3"])
 ```
 
@@ -130,8 +125,7 @@ Parses an IP address string (IPv4 or IPv6).
 **Example:**
 
 ```text
-use { parseIP } from "@sentrie/net" as net
-
+use { parseIP } from @sentrie/net
 let ip = net.parseIP("192.168.1.1")  // "192.168.1.1"
 let invalid = net.parseIP("invalid")  // null
 ```
@@ -149,8 +143,7 @@ Checks if an IP address is IPv4.
 **Example:**
 
 ```text
-use { isIPv4 } from "@sentrie/net" as net
-
+use { isIPv4 } from @sentrie/net
 let isV4 = net.isIPv4("192.168.1.1")  // true
 let isV4_2 = net.isIPv4("::1")  // false
 ```
@@ -168,8 +161,7 @@ Checks if an IP address is IPv6.
 **Example:**
 
 ```text
-use { isIPv6 } from "@sentrie/net" as net
-
+use { isIPv6 } from @sentrie/net
 let isV6 = net.isIPv6("::1")  // true
 let isV6_2 = net.isIPv6("192.168.1.1")  // false
 ```
@@ -187,8 +179,7 @@ Checks if an IP address is in a private address range. Private ranges include: `
 **Example:**
 
 ```text
-use { isPrivate } from "@sentrie/net" as net
-
+use { isPrivate } from @sentrie/net
 let isPriv = net.isPrivate("192.168.1.1")  // true
 let isPriv2 = net.isPrivate("8.8.8.8")  // false
 ```
@@ -206,8 +197,7 @@ Checks if an IP address is a public (globally routable) address. Public addresse
 **Example:**
 
 ```text
-use { isPublic } from "@sentrie/net" as net
-
+use { isPublic } from @sentrie/net
 let isPub = net.isPublic("8.8.8.8")  // true
 let isPub2 = net.isPublic("192.168.1.1")  // false
 ```
@@ -225,8 +215,7 @@ Checks if an IP address is a loopback address. Loopback addresses include `127.0
 **Example:**
 
 ```text
-use { isLoopback } from "@sentrie/net" as net
-
+use { isLoopback } from @sentrie/net
 let isLoop = net.isLoopback("127.0.0.1")  // true
 let isLoop2 = net.isLoopback("::1")  // true
 ```
@@ -244,8 +233,7 @@ Checks if an IP address is a multicast address.
 **Example:**
 
 ```text
-use { isMulticast } from "@sentrie/net" as net
-
+use { isMulticast } from @sentrie/net
 let isMulti = net.isMulticast("224.0.0.1")  // true
 ```
 
@@ -255,8 +243,7 @@ let isMulti = net.isMulticast("224.0.0.1")  // true
 namespace com/example/network
 
 policy mypolicy {
-  use { cidrContains, parseIP, isPrivate, isPublic } from "@sentrie/net" as net
-
+  use { cidrContains, parseIP, isPrivate, isPublic } from @sentrie/net
   fact clientIp!: string
   fact allowedCidr!: string
 

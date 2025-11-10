@@ -8,7 +8,7 @@ The `@sentrie/regex` module provides regular expression pattern matching and man
 ## Usage
 
 ```text
-use { match, find, findAll, replace, replaceAll, split } from "@sentrie/regex" as regex
+use { match, find, findAll, replace, replaceAll, split } from @sentrie/regex
 ```
 
 ## Functions
@@ -29,8 +29,7 @@ Tests if a string matches a regular expression pattern.
 **Example:**
 
 ```text
-use { match } from "@sentrie/regex" as regex
-
+use { match } from @sentrie/regex
 let matches = regex.match("^[a-z]+$", "hello")  // true
 let noMatch = regex.match("^[0-9]+$", "hello")  // false
 ```
@@ -51,8 +50,7 @@ Finds the first match of a pattern in a string.
 **Example:**
 
 ```text
-use { find } from "@sentrie/regex" as regex
-
+use { find } from @sentrie/regex
 let match = regex.find("[0-9]+", "abc123def")  // "123"
 let noMatch = regex.find("[0-9]+", "abcdef")  // null
 ```
@@ -73,8 +71,7 @@ Finds all matches of a pattern in a string.
 **Example:**
 
 ```text
-use { findAll } from "@sentrie/regex" as regex
-
+use { findAll } from @sentrie/regex
 let matches = regex.findAll("[0-9]+", "abc123def456ghi")  // ["123", "456"]
 ```
 
@@ -95,8 +92,7 @@ Replaces the first occurrence of a pattern in a string.
 **Example:**
 
 ```text
-use { replace } from "@sentrie/regex" as regex
-
+use { replace } from @sentrie/regex
 let result = regex.replace("[0-9]+", "abc123def", "XXX")  // "abcXXXdef"
 ```
 
@@ -117,8 +113,7 @@ Replaces all occurrences of a pattern in a string.
 **Example:**
 
 ```text
-use { replaceAll } from "@sentrie/regex" as regex
-
+use { replaceAll } from @sentrie/regex
 let result = regex.replaceAll("[0-9]+", "abc123def456", "XXX")  // "abcXXXdefXXX"
 ```
 
@@ -138,8 +133,7 @@ Splits a string by a regular expression pattern.
 **Example:**
 
 ```text
-use { split } from "@sentrie/regex" as regex
-
+use { split } from @sentrie/regex
 let parts = regex.split("\\s+", "hello   world  test")  // ["hello", "world", "test"]
 ```
 
@@ -149,8 +143,7 @@ let parts = regex.split("\\s+", "hello   world  test")  // ["hello", "world", "t
 namespace com/example/validation
 
 policy mypolicy {
-  use { match, find, replaceAll } from "@sentrie/regex" as regex
-
+  use { match, find, replaceAll } from @sentrie/regex
   fact email!: string
   fact phoneNumber!: string
 

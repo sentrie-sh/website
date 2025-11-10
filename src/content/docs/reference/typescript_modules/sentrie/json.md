@@ -8,7 +8,7 @@ The `@sentrie/json` module provides JSON marshaling (encoding) and unmarshaling 
 ## Usage
 
 ```text
-use { marshal, unmarshal, isValid } from "@sentrie/json" as json
+use { marshal, unmarshal, isValid } from @sentrie/json
 ```
 
 ## Functions
@@ -28,8 +28,7 @@ Marshals (encodes) a JavaScript value to a JSON string.
 **Example:**
 
 ```text
-use { marshal } from "@sentrie/json" as json
-
+use { marshal } from @sentrie/json
 let obj = {"name": "John", "age": 30}
 let jsonStr = json.marshal(obj)  // '{"name":"John","age":30}'
 ```
@@ -49,8 +48,7 @@ Unmarshals (decodes) a JSON string to a JavaScript value.
 **Example:**
 
 ```text
-use { unmarshal } from "@sentrie/json" as json
-
+use { unmarshal } from @sentrie/json
 let jsonStr = '{"name":"John","age":30}'
 let obj = json.unmarshal(jsonStr)  // {"name": "John", "age": 30}
 ```
@@ -68,8 +66,7 @@ Validates whether a string is valid JSON.
 **Example:**
 
 ```text
-use { isValid } from "@sentrie/json" as json
-
+use { isValid } from @sentrie/json
 let valid = json.isValid('{"name":"John"}')  // true
 let invalid = json.isValid('{"name":"John"}')  // false (missing closing brace in example)
 ```
@@ -80,8 +77,7 @@ let invalid = json.isValid('{"name":"John"}')  // false (missing closing brace i
 namespace com/example/mypolicy
 
 policy mypolicy {
-  use { marshal, unmarshal, isValid } from "@sentrie/json" as json
-
+  use { marshal, unmarshal, isValid } from @sentrie/json
   fact data!: document
   fact jsonString!: string
 

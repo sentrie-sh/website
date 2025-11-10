@@ -45,7 +45,7 @@ export shape User -- export shapes to allow visibility to other namespaces
 
 ## Namespaces
 
-Namespaces organize your policies hierarchically and prevent naming conflicts.
+Namespaces organize your policies and shapes hierarchically and prevent naming conflicts.
 
 ### Syntax
 
@@ -61,12 +61,22 @@ namespace com/example/billing/v2
 namespace mycompany/policies/security
 ```
 
+### Namespace statements
+
+A namespace can contain:
+
+- **policies**: `policy IDENT { ... }`
+- **shapes**: `shape IDENT { ... }`
+- **shape exports**: `export shape IDENT`
+
 ### Rules
 
-- Namespaces must be declared at the top of the file
+- Namespaces must be declared at the top of the file (only comments can be placed before the namespace declaration)
 - Only one namespace per file
 - Namespace names must be valid identifiers
-- Use slash-separated hierarchical names for organization
+- Use slash-separated (`/`) hierarchical names for organization
+- Multiple root namespaces are allowed in a policy pack
+- Namespace forms the visibility boundary for unexported shapes
 
 ## Policies
 
@@ -743,9 +753,9 @@ rule processUser = default false when user is User {
 
 ```text
 -- Use built-in modules for common operations
-use { sha256 } from "@sentrie/hash"
-use { now } from "@sentrie/time" as time
-use { parse } from "@sentrie/json" as json
+use { sha256 } from @sentrie/hash
+use { now } from @sentrie/time as time
+use { parse } from @sentrie/json as json
 ```
 
 ## Examples

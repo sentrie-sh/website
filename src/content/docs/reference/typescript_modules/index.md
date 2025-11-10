@@ -15,7 +15,7 @@ namespace com/example/mypolicy
 policy mypolicy {
   use { now } from @sentrie/time
   use { sha256 } from @sentrie/hash
-  use { parse, format } from @sentrie/json as json
+  use { parse, format } from @sentrie/json
 
   fact data!: string
   fact timestamp!: number
@@ -214,9 +214,9 @@ Functions for generating UUIDs (Universally Unique Identifiers).
 namespace com/example/auth
 
 policy authentication {
-  use { sha256, hmac } from @sentrie/hash as hash
-  use { decode, verify } from @sentrie/jwt as jwt
-  use { base64Decode } from @sentrie/encoding as encoding
+  use { sha256, hmac } from @sentrie/hash
+  use { decode, verify } from @sentrie/jwt
+  use { base64Decode } from @sentrie/encoding
 
   fact token!: string
   fact secretKey!: string
@@ -244,9 +244,9 @@ policy authentication {
 namespace com/example/validation
 
 policy validation {
-  use { match } from @sentrie/regex as regex
-  use { trim, toLowerCase, includes } from @sentrie/string as str
-  use { isValid } from @sentrie/json as json
+  use { match } from @sentrie/regex
+  use { trim, toLowerCase, includes } from @sentrie/string
+  use { isValid } from @sentrie/json
 
   fact email!: string
   fact jsonData!: string
@@ -272,8 +272,8 @@ policy validation {
 namespace com/example/network
 
 policy network {
-  use { cidrContains, isPrivate, parseIP } from @sentrie/net as net
-  use { getHost, isValid } from @sentrie/url as url
+  use { cidrContains, isPrivate, parseIP } from @sentrie/net
+  use { getHost, isValid } from @sentrie/url
 
   fact clientIp!: string
   fact allowedCidr!: string
@@ -303,7 +303,7 @@ policy network {
 namespace com/example/time
 
 policy time {
-  use { now, isBefore, addDuration, format } from @sentrie/time as time
+  use { now, isBefore, addDuration, format } from @sentrie/time
 
   fact tokenExpiry!: number
   fact sessionStart!: number
@@ -334,38 +334,26 @@ All modules use the same import syntax:
 use { function1, function2 } from @sentrie/module
 ```
 
-**Note:** Built-in `@sentrie/*` modules do not use quotes. Local TypeScript files use quotes for relative paths.
+:::note
+Built-in `@sentrie/*` modules do not use quotes. Local TypeScript files use quotes for relative paths.
+:::
 
 You can optionally use an alias:
 
 ```text
-use { function1, function2 } from @sentrie/module as alias
+use { function1, function2 } from @sentrie/module
 ```
 
 If no alias is specified, the default alias is the last part of the module path.
 
 ## Module Aliasing
 
-When importing from a module, you can optionally specify an alias:
-
-```text
-use { now, parse } from @sentrie/time as time
-use { md5 } from @sentrie/hash as crypto
-```
-
-If no alias is specified, the default alias is the last part of the module path:
+When importing from a module, the default alias is the last part of the module path:
 
 ```text
 use { now } from @sentrie/time
 -- Default alias is "time" (last part of @sentrie/time)
 -- Use as: time.now()
-```
-
-With an explicit alias:
-
-```text
-use { now } from @sentrie/time as timeModule
--- Use as: timeModule.now()
 ```
 
 ## Best Practices

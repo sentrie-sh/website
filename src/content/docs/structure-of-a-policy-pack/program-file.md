@@ -78,7 +78,7 @@ shape User {
 
 policy auth {
   use { calculateAge } from "./utils.ts" as utils
-  use { hash } from "@sentrie/crypto" -- will alias to "crypto" by default
+  use { hash } from @sentrie/crypto -- will alias to crypto by default
 
   fact user!: User
   fact passwordInput!: string

@@ -8,7 +8,7 @@ The `@sentrie/jwt` module provides JSON Web Token decoding and verification util
 ## Usage
 
 ```text
-use { decode, verify, getPayload, getHeader } from "@sentrie/jwt" as jwt
+use { decode, verify, getPayload, getHeader } from @sentrie/jwt
 ```
 
 ## Functions
@@ -31,8 +31,7 @@ Decodes a JWT token and optionally verifies its signature.
 **Example:**
 
 ```text
-use { decode } from "@sentrie/jwt" as jwt
-
+use { decode } from @sentrie/jwt
 let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 let payload = jwt.decode(token, "secret-key")
 ```
@@ -52,8 +51,7 @@ Verifies a JWT token's signature.
 **Example:**
 
 ```text
-use { verify } from "@sentrie/jwt" as jwt
-
+use { verify } from @sentrie/jwt
 let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 let isValid = jwt.verify(token, "secret-key", "HS256")
 ```
@@ -75,8 +73,7 @@ Extracts the payload from a JWT token without verification.
 **Example:**
 
 ```text
-use { getPayload } from "@sentrie/jwt" as jwt
-
+use { getPayload } from @sentrie/jwt
 let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 let payload = jwt.getPayload(token)  // No verification - use with caution!
 ```
@@ -96,8 +93,7 @@ Extracts the header from a JWT token without verification.
 **Example:**
 
 ```text
-use { getHeader } from "@sentrie/jwt" as jwt
-
+use { getHeader } from @sentrie/jwt
 let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 let header = jwt.getHeader(token)
 ```
@@ -108,8 +104,7 @@ let header = jwt.getHeader(token)
 namespace com/example/auth
 
 policy mypolicy {
-  use { decode, verify } from "@sentrie/jwt" as jwt
-
+  use { decode, verify } from @sentrie/jwt
   fact token!: string
   fact secretKey!: string
 
