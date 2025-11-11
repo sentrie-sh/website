@@ -1,57 +1,17 @@
 ---
 title: "@sentrie/json"
-description: JSON marshaling and unmarshaling
+description: JSON validation utility
 ---
 
-The `@sentrie/json` module provides JSON marshaling (encoding) and unmarshaling (decoding) utilities. Functions take exactly one argument as specified.
+The `@sentrie/json` module provides JSON validation utilities. For JSON parsing and stringification, use the `@sentrie/js` module.
 
 ## Usage
 
 ```text
-use { marshal, unmarshal, isValid } from @sentrie/json
+use { isValid } from @sentrie/json
 ```
 
 ## Functions
-
-### `marshal(value: any): string`
-
-Marshals (encodes) a JavaScript value to a JSON string.
-
-**Parameters:**
-
-- `value` - The value to marshal (any JavaScript type: object, array, string, number, boolean, null)
-
-**Returns:** The JSON string representation of the value
-
-**Throws:** Error if the value cannot be marshaled (e.g., circular references)
-
-**Example:**
-
-```text
-use { marshal } from @sentrie/json
-let obj = {"name": "John", "age": 30}
-let jsonStr = json.marshal(obj)  // '{"name":"John","age":30}'
-```
-
-### `unmarshal(str: string): any`
-
-Unmarshals (decodes) a JSON string to a JavaScript value.
-
-**Parameters:**
-
-- `str` - The JSON string to unmarshal
-
-**Returns:** The decoded value (object, array, string, number, boolean, or null)
-
-**Throws:** Error if the JSON string is invalid or cannot be parsed
-
-**Example:**
-
-```text
-use { unmarshal } from @sentrie/json
-let jsonStr = '{"name":"John","age":30}'
-let obj = json.unmarshal(jsonStr)  // {"name": "John", "age": 30}
-```
 
 ### `isValid(str: string): boolean`
 
@@ -67,9 +27,26 @@ Validates whether a string is valid JSON.
 
 ```text
 use { isValid } from @sentrie/json
-let valid = json.isValid('{"name":"John"}')  // true
-let invalid = json.isValid('{"name":"John"}')  // false (missing closing brace in example)
+
+let jsonStr = '{"name": "John", "age": 30}'
+let isValid = json.isValid(jsonStr)  // true
+
+let invalidStr = '{"name": "John", "age":}'
+let isInvalid = json.isValid(invalidStr)  // false
 ```
+
+## JSON Parsing and Stringification
+
+For JSON parsing and stringification, use the `@sentrie/js` module:
+
+```text
+use { parse, stringify } from "@sentrie/js" as json
+
+let obj = json.parse('{"name": "John", "age": 30}')
+let str = json.stringify({"name": "John", "age": 30})
+```
+
+See the [@sentrie/js](/reference/typescript_modules/@sentrie/js) documentation for more information.
 
 ## Complete Example
 
@@ -77,23 +54,23 @@ let invalid = json.isValid('{"name":"John"}')  // false (missing closing brace i
 namespace com/example/mypolicy
 
 policy mypolicy {
-  use { marshal, unmarshal, isValid } from @sentrie/json
-  fact data!: document
-  fact jsonString!: string
+  use { isValid } from @sentrie/json as jsonUtil
+  use { parse, stringify } from "@sentrie/js" as json
 
-  rule processJson = default false {
-    let jsonStr = json.marshal(data)
-    let isValid = json.isValid(jsonString)
-    let parsed = json.unmarshal(jsonString)
-    yield isValid and parsed != null
+  fact data!: string
+
+  rule processData = default false {
+    let isValid = jsonUtil.isValid(data)
+    if isValid {
+      let parsed = json.parse(data)
+      let serialized = json.stringify(parsed)
+      yield serialized != ""
+    } else {
+      yield false
+    }
   }
 
-  export decision of processJson
+  export decision of processData
 }
 ```
 
-## Common Use Cases
-
-1. **Serializing data** - Convert Sentrie data structures to JSON strings for external APIs
-2. **Deserializing data** - Parse JSON strings from external sources into Sentrie data structures
-3. **Validating JSON** - Check if a string contains valid JSON before parsing

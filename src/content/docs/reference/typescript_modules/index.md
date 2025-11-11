@@ -15,7 +15,8 @@ namespace com/example/mypolicy
 policy mypolicy {
   use { now } from @sentrie/time
   use { sha256 } from @sentrie/hash
-  use { parse, format } from @sentrie/json
+  use { parse } from "@sentrie/js" as json
+  use { isValid } from @sentrie/json as jsonUtil
 
   fact data!: string
   fact timestamp!: number
@@ -24,7 +25,8 @@ policy mypolicy {
     let hash = sha256(data)
     let currentTime = now()
     let jsonData = json.parse(data)
-    yield hash != "" and currentTime > timestamp
+    let isValid = jsonUtil.isValid(data)
+    yield hash != "" and currentTime > timestamp and isValid
   }
 
   export decision of processData
@@ -44,22 +46,26 @@ List and map manipulation utilities. Functions are prefixed with `list_` for arr
 - `list_includes`, `list_sort`, `list_unique`, `list_chunk`
 - `map_keys`, `map_values`, `map_get`, `map_merge`
 
-#### [String](./sentrie/string)
+#### [JavaScript Globals](./sentrie/js)
 
-Comprehensive string manipulation utilities including trimming, case conversion, substring extraction, and more.
+Access to JavaScript globals (Math, String, Number, Date, JSON, Array) as individual functions.
 
 **Key Functions:**
 
-- `trim`, `toLowerCase`, `toUpperCase`
-- `replace`, `split`, `substring`, `startsWith`, `endsWith`
+- **Math**: `round`, `floor`, `ceil`, `max`, `min`, `abs`, `sqrt`, `pow`, `sin`, `cos`, `tan`, etc.
+- **String**: `length`, `fromCharCode`
+- **Number**: `isNaN`, `parseInt`, `parseFloat`, `isFinite`, `isInteger`
+- **Date**: `now`, `dateParse`, `UTC`
+- **JSON**: `parse`, `stringify`
+- **Array**: `isArray`, `from`, `of`
 
 #### [JSON](./sentrie/json)
 
-JSON marshaling and unmarshaling utilities, including validation.
+JSON validation utility.
 
 **Key Functions:**
 
-- `marshal`, `unmarshal`, `isValid`
+- `isValid` - Validates if a string is valid JSON
 
 ### Cryptography & Security
 
@@ -137,18 +143,20 @@ Date and time manipulation utilities. All timestamps are Unix timestamps (second
 
 - `RFC3339`, `RFC3339Nano`, `RFC1123`, `RFC1123Z`, `RFC822`, `RFC822Z`
 
-### Mathematics
+### JavaScript Globals
 
-#### [Math](./sentrie/math)
+#### [JavaScript Globals](./sentrie/js)
 
-Mathematical constants and functions. Similar to JavaScript's Math object, but with additional functions.
+Access to JavaScript globals (Math, String, Number, Date, JSON, Array) as individual functions. This module provides direct access to standard JavaScript functions.
 
 **Key Functions:**
 
-- `abs`, `ceil`, `floor`, `round`, `max`, `min`
-- `sqrt`, `pow`, `exp`, `log`, `log10`, `log2`
-- `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`
-- `sinh`, `cosh`, `tanh`, `random`
+- **Math**: `round`, `floor`, `ceil`, `max`, `min`, `abs`, `sqrt`, `pow`, `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `sinh`, `cosh`, `tanh`, `exp`, `log`, `log10`, `log2`, `random`
+- **String**: `length`, `fromCharCode`
+- **Number**: `isNaN`, `parseInt`, `parseFloat`, `isFinite`, `isInteger`
+- **Date**: `now`, `dateParse`, `UTC`
+- **JSON**: `parse`, `stringify`
+- **Array**: `isArray`, `from`, `of`
 
 **Constants:**
 
@@ -189,22 +197,21 @@ Functions for generating UUIDs (Universally Unique Identifiers).
 
 ## Complete Module List
 
-| Module                                      | Description                                         | Category           |
-| ------------------------------------------- | --------------------------------------------------- | ------------------ |
-| [@sentrie/collection](./sentrie/collection) | List and map manipulation utilities                 | Data Manipulation  |
-| [@sentrie/crypto](./sentrie/crypto)         | Cryptographic functions (SHA-256)                   | Cryptography       |
-| [@sentrie/encoding](./sentrie/encoding)     | Base64, Hex, and URL encoding/decoding              | Encoding           |
-| [@sentrie/hash](./sentrie/hash)             | Hash functions (MD5, SHA-1, SHA-256, SHA-512, HMAC) | Cryptography       |
-| [@sentrie/json](./sentrie/json)             | JSON marshaling and unmarshaling                    | Data Manipulation  |
-| [@sentrie/jwt](./sentrie/jwt)               | JSON Web Token decoding and verification            | Security           |
-| [@sentrie/math](./sentrie/math)             | Mathematical constants and functions                | Mathematics        |
-| [@sentrie/net](./sentrie/net)               | Network and IP address utilities                    | Network            |
-| [@sentrie/regex](./sentrie/regex)           | Regular expression pattern matching                 | Pattern Matching   |
-| [@sentrie/semver](./sentrie/semver)         | Semantic version comparison and validation          | Version Management |
-| [@sentrie/string](./sentrie/string)         | String manipulation utilities                       | Data Manipulation  |
-| [@sentrie/time](./sentrie/time)             | Date and time manipulation                          | Date & Time        |
-| [@sentrie/url](./sentrie/url)               | URL parsing and manipulation                        | Network            |
-| [@sentrie/uuid](./sentrie/uuid)             | UUID generation (v4, v6, v7)                        | Identifiers        |
+| Module                                      | Description                                                  | Category           |
+| ------------------------------------------- | ------------------------------------------------------------ | ------------------ |
+| [@sentrie/collection](./sentrie/collection) | List and map manipulation utilities                          | Data Manipulation  |
+| [@sentrie/crypto](./sentrie/crypto)         | Cryptographic functions (SHA-256)                            | Cryptography       |
+| [@sentrie/encoding](./sentrie/encoding)     | Base64, Hex, and URL encoding/decoding                       | Encoding           |
+| [@sentrie/hash](./sentrie/hash)             | Hash functions (MD5, SHA-1, SHA-256, SHA-512, HMAC)          | Cryptography       |
+| [@sentrie/js](./sentrie/js)                 | JavaScript globals (Math, String, Number, Date, JSON, Array) | JavaScript Globals |
+| [@sentrie/json](./sentrie/json)             | JSON validation utility                                      | Data Manipulation  |
+| [@sentrie/jwt](./sentrie/jwt)               | JSON Web Token decoding and verification                     | Security           |
+| [@sentrie/net](./sentrie/net)               | Network and IP address utilities                             | Network            |
+| [@sentrie/regex](./sentrie/regex)           | Regular expression pattern matching                          | Pattern Matching   |
+| [@sentrie/semver](./sentrie/semver)         | Semantic version comparison and validation                   | Version Management |
+| [@sentrie/time](./sentrie/time)             | Date and time manipulation                                   | Date & Time        |
+| [@sentrie/url](./sentrie/url)               | URL parsing and manipulation                                 | Network            |
+| [@sentrie/uuid](./sentrie/uuid)             | UUID generation (v4, v6, v7)                                 | Identifiers        |
 
 ## Common Use Cases
 
@@ -245,20 +252,20 @@ namespace com/example/validation
 
 policy validation {
   use { match } from @sentrie/regex
-  use { trim, toLowerCase, includes } from @sentrie/string
-  use { isValid } from @sentrie/json
+  use { length } from "@sentrie/js" as str
+  use { isValid } from @sentrie/json as jsonUtil
 
   fact email!: string
   fact jsonData!: string
 
   rule validateEmail = default false {
     let emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-    let trimmed = str.trim(email)
-    yield regex.match(emailPattern, trimmed)
+    let emailLength = str.length(email)
+    yield regex.match(emailPattern, email) and emailLength > 0
   }
 
   rule validateJson = default false {
-    yield json.isValid(jsonData)
+    yield jsonUtil.isValid(jsonData)
   }
 
   export decision of validateEmail

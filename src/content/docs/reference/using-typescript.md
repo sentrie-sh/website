@@ -203,20 +203,19 @@ export function User() {
 
 Sentrie provides a comprehensive set of built-in TypeScript libraries for common operations:
 
-- **[Collection](/reference/typescript_modules/@sentrie/collection)** - List and map manipulation utilities
-- **[Crypto](/reference/typescript_modules/@sentrie/crypto)** - Cryptographic functions (SHA-256)
-- **[Encoding](/reference/typescript_modules/@sentrie/encoding)** - Base64, Hex, and URL encoding/decoding
-- **[Hash](/reference/typescript_modules/@sentrie/hash)** - MD5, SHA-1, SHA-256, SHA-512, and HMAC
-- **[JSON](/reference/typescript_modules/@sentrie/json)** - JSON marshaling and unmarshaling
-- **[JWT](/reference/typescript_modules/@sentrie/jwt)** - JSON Web Token decoding and verification
-- **[Math](/reference/typescript_modules/@sentrie/math)** - Mathematical constants and functions
-- **[Net](/reference/typescript_modules/@sentrie/net)** - Network and IP address utilities
-- **[Regex](/reference/typescript_modules/@sentrie/regex)** - Regular expression pattern matching
-- **[Semver](/reference/typescript_modules/@sentrie/semver)** - Semantic version comparison and validation
-- **[String](/reference/typescript_modules/@sentrie/string)** - String manipulation utilities
-- **[Time](/reference/typescript_modules/@sentrie/time)** - Date and time manipulation
-- **[URL](/reference/typescript_modules/@sentrie/url)** - URL parsing and manipulation
-- **[UUID](/reference/typescript_modules/@sentrie/uuid)** - UUID generation (v4, v6, v7)
+- **[JavaScript Globals](/reference/typescript_modules/sentrie/js)** - JavaScript globals (Math, String, Number, Date, JSON, Array)
+- **[Collection](/reference/typescript_modules/sentrie/collection)** - List and map manipulation utilities
+- **[Crypto](/reference/typescript_modules/sentrie/crypto)** - Cryptographic functions (SHA-256)
+- **[Encoding](/reference/typescript_modules/sentrie/encoding)** - Base64, Hex, and URL encoding/decoding
+- **[Hash](/reference/typescript_modules/sentrie/hash)** - MD5, SHA-1, SHA-256, SHA-512, and HMAC
+- **[JSON](/reference/typescript_modules/sentrie/json)** - JSON validation utility
+- **[JWT](/reference/typescript_modules/sentrie/jwt)** - JSON Web Token decoding and verification
+- **[Net](/reference/typescript_modules/sentrie/net)** - Network and IP address utilities
+- **[Regex](/reference/typescript_modules/sentrie/regex)** - Regular expression pattern matching
+- **[Semver](/reference/typescript_modules/sentrie/semver)** - Semantic version comparison and validation
+- **[Time](/reference/typescript_modules/sentrie/time)** - Date and time manipulation
+- **[URL](/reference/typescript_modules/sentrie/url)** - URL parsing and manipulation
+- **[UUID](/reference/typescript_modules/sentrie/uuid)** - UUID generation (v4, v6, v7)
 
 See the [Built-in TypeScript Modules index](/reference/typescript_modules/) for detailed documentation on each library.
 
