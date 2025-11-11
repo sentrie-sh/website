@@ -154,6 +154,10 @@ export default defineConfig({
               slug: "reference/typescript_modules",
             },
             {
+              label: "JavaScript Globals",
+              slug: "reference/typescript_modules/sentrie/js",
+            },
+            {
               label: "Collection",
               slug: "reference/typescript_modules/sentrie/collection",
             },
@@ -178,10 +182,6 @@ export default defineConfig({
               slug: "reference/typescript_modules/sentrie/jwt",
             },
             {
-              label: "Math",
-              slug: "reference/typescript_modules/sentrie/math",
-            },
-            {
               label: "Net",
               slug: "reference/typescript_modules/sentrie/net",
             },
@@ -192,10 +192,6 @@ export default defineConfig({
             {
               label: "Semver",
               slug: "reference/typescript_modules/sentrie/semver",
-            },
-            {
-              label: "String",
-              slug: "reference/typescript_modules/sentrie/string",
             },
             {
               label: "Time",
