@@ -7,76 +7,78 @@ This guide will walk you through creating your first Sentrie policy step by step
 
 ## Basic Policy Structure
 
-A Sentrie policy consists of:
+A Sentrie policy file consists of exactly one namespace and at least one policy:
 
-1. **Namespace**: A container for related policies
-2. **Policy**: A named collection of rules
-3. **Rules**: Individual decision logic
-4. **Facts**: Input data for the policy
+- **Namespace**: A container for related policies.
+- **Policy**: A named collection of rules.
+
+A policy consists of:
+
+- **Rules**: Individual decision logic.
+- **Facts**: Input data for the policy.
+- **Exports**: Rules that are exported to make them available for external evaluation.
 
 ## Create a Policy Pack
 
 ```sh
 mkdir my-first-policy-pack
-cd my-first-policy-pack
-sentrie init my-first-policy-pack
+cd example-policy-pack
+sentrie init example-policy-pack
 ```
-
-:::note
-The name of the policy pack does not need to match the directory name.
-:::
 
 ## Define a Namespace
 
 ```diff lang=sentrie
 // first-policy.sentrie
-+ namespace user_management
++ namespace com/example/user_management
 ```
 
-> Every file MUST contain a namespace declaration.
-
-## Define a Shape
-
-```diff lang=sentrie
-// first-policy.sentrie
-namespace user_management
-
-+ shape User {
-+   role: string
-+   status: string
-+ }
-
-```
-
-:::note
-Shapes are used to define data structures. More information about shapes can be found in the [Types and Shapes](/reference/types-and-shapes/) reference.
+:::note[Remember]
+Every file MUST contain a namespace declaration and **MUST** be the first statement in the file.
 :::
 
 ## Define a Policy
 
 ```diff lang=sentrie
 // first-policy.sentrie
-namespace user_management
-
-shape User {
-  role: string
-  status: string
-}
+namespace com/example/user_management
 
 + policy user_access {
 +   -- policy content goes here
 + }
 ```
 
-## Add Facts
+## Define a Shape
 
 :::note
-A fact is a named value that can be injected into policy evaluation at runtime.
+Shapes are used to define data structures and aliases. More information about shapes can be found in the [Shapes](/reference/shapes/) reference.
 :::
 
 ```diff lang=sentrie
 // first-policy.sentrie
-namespace user_management
+namespace com/example/user_management
+
++ shape User {
++   role: string
++   status: string
++ }
+
+policy user_access {
+  -- policy content goes here
+}
+
+```
+
+## Add Facts
+
+:::note
+A fact is a named value that can be injected into policy evaluation at runtime. Every fact MUST have a shape / type annotation.
+More information about facts can be found in the [Facts](/reference/facts/) reference.
+:::
+
+```diff lang=sentrie
+// first-policy.sentrie
+namespace com/example/user_management
 
 shape User {
   role: string
@@ -84,20 +86,24 @@ shape User {
 }
 
 policy user_access {
-+  fact user!:User default {"role": "admin", "status": "active"}
++  fact user: User as currentUser
++  fact context?: Context as ctx default {"environment": "production"}
 }
 
 ```
 
 :::note
-A fact is optional by default. The `!` suffix indicates that the fact is required. If a required fact is not provided, the rule evaluation will result in an error.
+- Facts are **required by default** - they must be provided during execution
+- Use `?` to mark facts as **optional** - optional facts can be omitted
+- Only **optional facts** (`?`) can have default values
+- Facts are **always non-nullable** - null values are not allowed
 :::
 
 ## Add your first rule
 
 ```diff lang=sentrie
 // first-policy.sentrie
-namespace user_management
+namespace com/example/user_management
 
 shape User {
   role: string
@@ -105,7 +111,8 @@ shape User {
 }
 
 policy user_access {
-  fact user!:User default {"role": "admin", "status": "active"}
+  fact user: User as currentUser
+  fact context?: Context as ctx default {"environment": "production"}
 
 +  rule allow_admin = {
 +    yield user.role == "admin"
@@ -117,7 +124,7 @@ policy user_access {
 
 ```diff lang=sentrie
 // first-policy.sentrie
-namespace user_management
+namespace com/example/user_management
 
 shape User {
   role: string
@@ -125,7 +132,7 @@ shape User {
 }
 
 policy user_access {
-  fact user!:User default {"role": "admin", "status": "active"}
+  fact user: User as currentUser
 
   rule allow_admin = {
     yield user.role == "admin"
@@ -143,7 +150,7 @@ Lets use the output of the `allow_admin` rule to update the `allow_user` rule.
 
 ```diff lang=sentrie
 // first-policy.sentrie
-namespace user_management
+namespace com/example/user_management
 
 shape User {
   role: string
@@ -151,7 +158,7 @@ shape User {
 }
 
 policy user_access {
-  fact user!:User default {"role": "admin", "status": "active"}
+  fact user: User as currentUser
 
   rule allow_admin = {
     yield user.role == "admin"
@@ -172,7 +179,7 @@ Here, we are using the output of the `allow_admin` rule to create the `allow_use
 
 ```diff lang=sentrie
 // first-policy.sentrie
-namespace user_management
+namespace com/example/user_management
 
 shape User {
   role: string
@@ -180,7 +187,7 @@ shape User {
 }
 
 policy user_access {
-  fact user!:User default {"role": "admin", "status": "active"}
+  fact user: User as currentUser
 
   rule allow_admin = {
     yield user.role == "admin"
@@ -205,7 +212,7 @@ Here's a complete policy that checks user access:
 
 ```sentrie
 // first-policy.sentrie
-namespace user_management
+namespace com/example/user_management
 
 shape User {
   role: string
@@ -214,7 +221,7 @@ shape User {
 
 policy user_access {
 
-  fact user!:User default {"role": "admin", "status": "active"}
+  fact user: User as currentUser
 
   rule allow_admin = {
     yield user.role == "admin"
