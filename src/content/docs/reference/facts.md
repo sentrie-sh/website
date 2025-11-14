@@ -14,36 +14,62 @@ If a policy uses facts, then they must be declared at the top of the policy. Fac
 ### Basic Syntax
 
 ```sentrie
-fact name: Type as exposedName default defaultValue
+-- Required fact (default behavior)
+fact <name>: <type> ('as' <exposed_name>)?
+
+-- Optional fact (can have default)
+fact <name>?: <type> ('as' <exposed_name>)? ('default' <default_value>)?
 ```
+
+:::note[Note]
+- The `exposed_name` (via `as`) is the name that will be used to reference the fact when the policy is evaluated
+- If no `as` clause is provided, the fact name itself is used as the exposed name
+- The `default` clause is only allowed for optional facts (marked with `?`)
+- Facts are **required by default** - use `?` to make them optional
+- Facts are **always non-nullable** - null values are not allowed
+:::
 
 ### Required vs Optional Facts
 
 ```sentrie
--- Required fact (must be provided during evaluation)
-fact user!: User as user default { "id": "", "role": "guest" }
+-- Required fact (must be provided during execution, default behavior)
+fact user: User as user
 
--- Optional fact (can be omitted)
-fact context: Context as context default { "key": "value" }
+-- Optional fact (can be omitted, marked with ?)
+fact context?: Context as context default { "key": "value" }
 ```
+
+:::note[Important]
+- **Facts are required by default** - If no modifier is specified, the fact must be provided during execution
+- **Use `?` to mark facts as optional** - Optional facts can be omitted, but if provided, they must be non-null
+- **Facts are always non-nullable** - Null values are not allowed for facts
+- **Required facts cannot have default values** - Only optional facts can have defaults
+:::
 
 ## Fact Types and Constraints
 
 ### Primitive Types
 
 ```sentrie
-fact userId: string as id default "anonymous"
-fact isActive: bool as active default true
-fact score: number as points default 0
-fact price: number as cost default 0.0
+-- Required facts (must be provided)
+fact userId: string as id
+fact isActive: bool as active
+
+-- Optional facts with defaults
+fact score?: number as points default 0
+fact price?: number as cost default 0.0
+fact name?: string as userName default "anonymous"
 ```
 
 ### Collection Types
 
 ```sentrie
-fact permissions: list[string] as userPermissions default []
-fact metadata: map[string] as userMetadata default {}
-fact coordinates: record[number, number] as location default [ 0.0, 0.0 ]
+-- Required collection facts
+fact permissions: list[string] as userPermissions
+
+-- Optional collection facts with defaults
+fact metadata?: map[string] as userMetadata default {}
+fact coordinates?: record[number, number] as location default [ 0.0, 0.0 ]
 ```
 
 ### Shape Types
@@ -55,40 +81,78 @@ shape User {
   permissions!: list[string]
 }
 
-fact user: User as currentUser default { "id": "", "role": "guest", "permissions": [] }
+-- Required shape fact
+fact user: User as currentUser
+
+-- Optional shape fact with default
+fact user?: User as currentUser default { "id": "", "role": "guest", "permissions": [] }
 ```
 
 ## Fact Modifiers
 
-### Required Facts (`!`)
+### Required Facts (Default)
+
+Facts are **required by default**. They must be provided during policy execution, and they cannot have default values.
 
 ```sentrie
 -- Required fact - must be provided during evaluation
-fact user!: User as user default { "id": "", "role": "guest", "permissions": [] }
+fact user: User as user
 
--- If not provided, evaluation will fail
--- Even though a default value can be provided, it is ignored for required facts
+-- This will cause an error: required facts cannot have defaults
+-- fact user: User as user default { "id": "", "role": "guest" }  -- Error!
 ```
+
+### Optional Facts (`?`)
+
+Use the `?` operator to mark a fact as optional. Optional facts can be omitted during execution, and they can have default values.
+
+```sentrie
+-- Optional fact - can be omitted during evaluation
+fact context?: Context as context
+
+-- Optional fact with default value
+fact context?: Context as context default { "key": "value" }
+
+-- If not provided, the default value will be used (if specified)
+-- If no default is provided and the fact is omitted, it simply won't be available
+```
+
+:::warning[Important]
+- Facts are **always non-nullable** - Even if a fact is optional, if it is provided, it cannot be null
+- The `!` operator is **not supported** for facts - facts are always non-nullable by design
+- Only **optional facts** (`?`) can have default values
+:::
 
 ## Default Values
 
 ### Literal Defaults
 
+Default values can only be used with **optional facts** (marked with `?`).
+
 ```sentrie
--- String defaults
-fact name: string as userName default "anonymous"
+-- String defaults (optional facts)
+fact name?: string as userName default "anonymous"
 
--- Numeric defaults
-fact count: number as itemCount default 0
-fact rate: number as interestRate default 0.05
+-- Numeric defaults (optional facts)
+fact count?: number as itemCount default 0
+fact rate?: number as interestRate default 0.05
 
--- Boolean defaults
-fact enabled: bool as isEnabled default true
+-- Boolean defaults (optional facts)
+fact enabled?: bool as isEnabled default true
 
--- Collection defaults
-fact tags: list[string] as itemTags default []
-fact config: map[string] as settings default {}
+-- Collection defaults (optional facts)
+fact tags?: list[string] as itemTags default []
+fact config?: map[string] as settings default {}
 ```
+
+:::warning[Error]
+Required facts cannot have default values. This will cause a compilation error:
+
+```sentrie
+-- This will cause an error
+fact name: string as userName default "anonymous"  -- Error: required fact cannot have default
+```
+:::
 
 ### Shape Defaults
 
@@ -99,7 +163,8 @@ shape Product {
   price!: number
 }
 
-fact product: Product as currentProduct default {
+-- Optional fact with shape default
+fact product?: Product as currentProduct default {
   "id": "",
   "name": "Unknown",
   "price": 0.0
@@ -133,11 +198,15 @@ rule result = import decision of processOrder
 ### Runtime Validation
 
 ```sentrie
--- This will cause a type error
-fact user: User as user default { "id": 123 }  -- Error: string expected, got number
+-- Type validation: This will cause a type error
+fact user?: User as user default { "id": 123 }  -- Error: string expected, got number
 
 -- Correct usage
-fact user: User as user default { "id": "123" }
+fact user?: User as user default { "id": "123" }
+
+-- Null validation: Facts cannot be null
+-- This will cause a runtime error if null is provided
+fact user: User as user  -- If null is provided, error: "fact 'user' cannot be null"
 ```
 
 ## Best Practices
@@ -146,29 +215,33 @@ fact user: User as user default { "id": "123" }
 
 ```sentrie
 -- Good: Clear, descriptive fact names
-fact currentUser: User as user default { "id": "", "role": "guest" }
-fact orderData: Order as order default { "id": "", "items": [] }
+fact currentUser?: User as user default { "id": "", "role": "guest" }
+fact orderData?: Order as order default { "id": "", "items": [] }
 
 -- Avoid: Generic or unclear names
-fact data: User as d default { "id": "", "role": "guest" }
+fact data?: User as d default { "id": "", "role": "guest" }
 ```
 
 ### Provide Sensible Defaults
 
 ```sentrie
--- Good: Meaningful default values
-fact user: User as user default { "id": "anonymous", "role": "guest", "permissions": [] }
+-- Good: Meaningful default values for optional facts
+fact user?: User as user default { "id": "anonymous", "role": "guest", "permissions": [] }
 
 -- Avoid: Confusing or invalid defaults
-fact user: User as user default { "id": "", "role": "invalid", "permissions": null }
+fact user?: User as user default { "id": "", "role": "invalid", "permissions": null }  -- null not allowed
 ```
 
-### Use Required Facts Sparingly
+### Use Required Facts Appropriately
 
 ```sentrie
--- Good: Only mark truly required facts
-fact user!: User as user  -- No default, must be provided
+-- Good: Use required facts for data that must always be provided
+fact userId: string as id  -- Must be provided, no default allowed
 
--- Avoid: Marking everything as required
-fact user!: User as user default { "id": "", "role": "guest" }  -- Default ignored
+-- Good: Use optional facts with defaults for data that has sensible fallbacks
+fact context?: Context as ctx default { "environment": "production" }
+
+-- Avoid: Making everything required when defaults would be appropriate
+fact userId: string as id  -- If this often has a default, consider making it optional
+fact userId?: string as id default "anonymous"  -- Better if default makes sense
 ```

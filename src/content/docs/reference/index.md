@@ -95,7 +95,7 @@ policy IDENT {
 A policy can contain:
 
 - **Rules**: `rule IDENT = ...`
-- **Facts**: `fact IDENT : primitive/shape as IDENT default expr`
+- **Facts**: `fact IDENT ('?'?) : primitive/shape ('as' IDENT)? ('default' expr)?`
 - **Shapes**: `shape IDENT { ... }`
 - **Variables**: `let IDENT : primitive/shape = expr`
 - **Use statements**: `use { function1, function2 } from source as alias`
@@ -108,7 +108,8 @@ A policy can contain:
 namespace com/example/auth
 
 policy user {
-  fact user: User as user default {"role": "admin", "status": "active"}
+  fact user: User as currentUser
+  fact context?: Context as ctx default {"environment": "production"}
 
   let adminRoles = ["admin", "super_admin"]
 
@@ -552,17 +553,30 @@ See the [Built-in TypeScript Modules](/reference/typescript_modules/) documentat
 Facts are named values that can be injected into policy evaluation:
 
 ```text
-fact maxRetries: number as limit default 3
-fact apiKey: string as key default ""
-fact config: document as settings default {}
-fact user: User as user default {"role": "guest"}
+-- Required facts (must be provided)
+fact userId: string as id
+fact user: User as currentUser
+
+-- Optional facts (can be omitted, marked with ?)
+fact maxRetries?: number as limit default 3
+fact apiKey?: string as key default ""
+fact config?: document as settings default {}
+fact context?: Context as ctx default {"role": "guest"}
 ```
 
 Facts can have:
 
 - **Annotation**: `: primitive/shape` - primitive or shape annotation
+- **Optional modifier**: `?` - marks fact as optional (defaults are only allowed for optional facts)
 - **Alias**: `as alias` - name used in the policy
-- **Default value**: `default expr` - value if not provided
+- **Default value**: `default expr` - value if not provided (only for optional facts)
+
+:::note[Important]
+- Facts are **required by default** - must be provided during execution
+- Use `?` to mark facts as **optional** - can be omitted
+- Facts are **always non-nullable** - null values are not allowed
+- Only **optional facts** (`?`) can have default values
+:::
 
 ### Variables
 
@@ -723,8 +737,12 @@ namespace com/example/analytics
 ### 3. Use Facts for Configuration
 
 ```text
-fact maxLoginAttempts: number as limit default 3
-fact sessionTimeout: number as timeout default 3600
+-- Required facts (must be provided)
+fact maxLoginAttempts: number as limit
+
+-- Optional facts with defaults
+fact sessionTimeout?: number as timeout default 3600
+fact retryCount?: number as retries default 3
 ```
 
 ### 4. Validate Inputs
@@ -766,7 +784,7 @@ use { parse } from @sentrie/json as json
 namespace com/example/auth
 
 policy user {
-  fact user: User as user default {"role": "guest"}
+  fact user: User as currentUser
 
   rule isAdmin = default false when user.role == "admin" {
     yield true
@@ -814,9 +832,9 @@ policy document {
 namespace com/example/billing
 
 policy pricing {
-  fact basePrice: number as price default 0
-  fact discountRate: number as rate default 0.1
-  fact user: User as user
+  fact basePrice: number as price
+  fact discountRate?: number as rate default 0.1
+  fact user: User as currentUser
 
   use { max, min } from @sentrie/math as math
 

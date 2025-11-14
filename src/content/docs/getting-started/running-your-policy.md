@@ -20,7 +20,7 @@ shape User {
 
 policy user_access {
 
-  fact user!:User default {"role": "admin", "status": "active"}
+  fact user: User as currentUser
 
   rule allow_admin = {
     yield user.role == "admin"
@@ -32,6 +32,7 @@ policy user_access {
 
   export decision of allow_admin
   export decision of allow_user
+
 }
 ```
 
@@ -72,15 +73,17 @@ The `exec` command shows you:
 4. **Values**: The final results of exported rules
 5. **Attachments**: The attachments of the exported rules
 
-## Using Default Values
+## Providing Required Facts
 
-Since your policy has a default value for the `user` fact, you can also run it without providing data:
+Since the `user` fact is required (no `?` modifier), you must provide it when executing:
 
 ```bash
-sentrie exec first-policy.sentrie
+sentrie exec user_management/user_access --facts '{"user": {"role": "admin", "status": "active"}}'
 ```
 
-This will use the default values: `{"role": "admin", "status": "active"}`.
+:::note[Note]
+If a required fact is not provided, execution will fail with an error. Only optional facts (marked with `?`) can have default values and can be omitted.
+:::
 
 **Expected Output:**
 

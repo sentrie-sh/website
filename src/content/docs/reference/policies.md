@@ -54,8 +54,9 @@ shape Resource {
 policy userAccess {
   use { verifySignature, isBusinessHours } from "./auth-utils.ts" as auth
 
-  fact user!: User as user default { "id": "", "role": "guest", "permissions": [] }
-  fact resource!: Resource as resource default { "id": "", "type": "document", "owner": "" }
+  fact user: User as currentUser
+  fact resource: Resource as currentResource
+  fact context?: Context as ctx default { "environment": "production" }
 
   let isResourceOwner = user.id == resource.owner
   let hasValidSignature = auth.verifySignature(user.id, resource.id)
@@ -88,12 +89,21 @@ use { validateEmail } from "./validation.ts" as validators
 ### Fact Declarations
 
 ```sentrie
--- Required facts with defaults
-fact user!: User as user default { "id": "", "role": "guest" }
+-- Required facts (default behavior, must be provided)
+fact user: User as currentUser
+fact resource: Resource as currentResource
 
--- Optional facts
-fact context: Context as context default { "key": "value" }
+-- Optional facts (marked with ?, can have defaults)
+fact context?: Context as ctx default { "key": "value" }
+fact config?: Config as settings default { "environment": "production" }
 ```
+
+:::note[Important]
+- Facts are **required by default** - must be provided during execution
+- Use `?` to mark facts as **optional** - can be omitted
+- Only **optional facts** (`?`) can have default values
+- Facts are **always non-nullable** - null values are not allowed
+:::
 
 :::note
 Read more on facts [here](/reference/facts).
