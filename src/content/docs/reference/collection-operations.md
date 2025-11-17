@@ -9,7 +9,139 @@ Sentrie provides a comprehensive set of collection operations that allow you to 
 
 Collection operations in Sentrie are **only valid on collections** (lists and maps) and provide functional programming capabilities for data transformation. Each operation follows a consistent syntax pattern and returns new collections or values without modifying the original data.
 
-## Filter Operation
+## `any` Operation
+
+The `any` operation checks if at least one element in a collection satisfies a condition.
+
+### Syntax
+
+```sentrie
+any collection as element, index { yield expression }
+```
+
+### Examples
+
+```sentrie
+let numbers: list[number] = [1, 2, 3, 4, 5]
+let has_even: bool = any numbers as num, idx {
+  yield num % 2 == 0
+}
+-- Result: true
+
+let scores: list[number] = [85, 92, 78, 96, 85]
+let has_perfect_score: bool = any scores as score, idx {
+  yield score == 100
+}
+-- Result: false
+
+let words: list[string] = ["apple", "banana", "cherry"]
+let has_long_word: bool = any words as word, idx {
+  yield word.length() > 5
+}
+-- Result: true
+```
+
+### Working with Shapes
+
+```sentrie
+shape User {
+  name!: string
+  age: number
+  role!: string
+}
+
+let users: list[User] = [
+  { name: "Alice", age: 25, role: "admin" },
+  { name: "Bob", age: 30, role: "user" },
+  { name: "Charlie", age: 35, role: "moderator" }
+]
+
+-- Check if any user is admin
+let has_admin: bool = any users as user, idx {
+  yield user.role == "admin"
+}
+-- Result: true
+
+-- Check if any user is underage
+let has_minor: bool = any users as user, idx {
+  yield user.age < 18
+}
+-- Result: false
+
+-- Check if any user has long name
+let has_long_name: bool = any users as user, idx {
+  yield user.name.length() > 10
+}
+-- Result: false
+```
+
+## `all` Operation
+
+The `all` operation checks if all elements in a collection satisfy a condition.
+
+### Syntax
+
+```sentrie
+all collection as element, index { yield expression }
+```
+
+### Examples
+
+```sentrie
+let numbers: list[number] = [2, 4, 6, 8, 10]
+let all_even: bool = all numbers as num, idx {
+  yield num % 2 == 0
+}
+-- Result: true
+
+let scores: list[number] = [85, 92, 78, 96, 85]
+let all_passing: bool = all scores as score, idx {
+  yield score >= 80
+}
+-- Result: false
+
+let words: list[string] = ["apple", "banana", "cherry"]
+let all_short: bool = all words as word, idx {
+  yield word.length() <= 6
+}
+-- Result: true
+```
+
+### Working with Shapes
+
+```sentrie
+shape Product {
+  name!: string
+  price!: number
+  in_stock: bool
+}
+
+let products: list[Product] = [
+  { name: "Laptop", price: 999.99, in_stock: true },
+  { name: "Mouse", price: 29.99, in_stock: true },
+  { name: "Keyboard", price: 79.99, in_stock: true }
+]
+
+-- Check if all products are in stock
+let all_in_stock: bool = all products as product, idx {
+  yield product.in_stock
+}
+-- Result: true
+
+-- Check if all products are expensive
+let all_expensive: bool = all products as product, idx {
+  yield product.price > 50.0
+}
+-- Result: true
+
+-- Check if all products have short names
+let all_short_names: bool = all products as product, idx {
+  yield product.name.length() <= 10
+}
+-- Result: true
+```
+
+## `filter` Operation
 
 The `filter` operation creates a new collection containing only elements that satisfy a given condition.
 
@@ -137,7 +269,7 @@ let e_words: list[string] = filter words as word, idx {
 -- Result: ["apple", "cherry", "elderberry"]
 ```
 
-## First Operation
+## `first` Operation
 
 The `first` operation returns the first element in a collection that satisfies a given condition. Unlike `any` which returns a boolean, `first` returns the actual element value.
 
@@ -369,7 +501,7 @@ let has_large: bool = first_large is defined
 -- Result: false (first_large is undefined)
 ```
 
-## Map Operation
+## `map` Operation
 
 The `map` operation applies a function to each element of a collection, creating a new collection with the transformed values.
 
@@ -489,7 +621,7 @@ let product_codes: list[string] = map products as product, idx {
 -- Result: ["E1-1", "B2-2", "E3-3"]
 ```
 
-## Reduce Operation
+## `reduce` Operation
 
 The `reduce` operation combines all elements of a collection into a single value using an accumulator function.
 
@@ -591,7 +723,7 @@ let max_sale_value: number = reduce sales from 0.0 as sale, idx {
 -- Result: 1999.98 (2 * 999.99)
 ```
 
-## Distinct Operation
+## `distinct` Operation
 
 The `distinct` operation removes duplicate elements from a collection, keeping only unique values.
 
@@ -681,115 +813,6 @@ let unique_by_name_category: list[Product] = distinct products as left, right {
   yield left.name == right.name and left.category == right.category
 }
 -- Result: Keeps both laptops (different prices) but removes exact duplicates
-```
-
-## Count Operation
-
-The `count` operation returns the number of elements in a collection.
-
-### Syntax
-
-```sentrie
-count collection
-```
-
-### Basic Examples
-
-```sentrie
-let numbers: list[number] = [1, 2, 3, 4, 5]
-let total: number = count numbers
--- Result: 5
-
-let empty_list: list[string] = []
-let empty_count: number = count empty_list
--- Result: 0
-
-let single_item: list[number] = [42]
-let single_count: number = count single_item
--- Result: 1
-```
-
-### Counting with Conditions
-
-```sentrie
-let scores: list[number] = [85, 92, 78, 96, 85, 88]
-
--- Count passing scores (>= 80)
-let passing_scores: list[number] = filter scores as score, idx {
-  yield score >= 80
-}
-let passing_count: number = count passing_scores
--- Result: 5
-
--- Count failing scores (< 80)
-let failing_scores: list[number] = filter scores as score, idx {
-  yield score < 80
-}
-let failing_count: number = count failing_scores
--- Result: 1
-
--- Count scores in different ranges
-let excellent_scores: list[number] = filter scores as score, idx {
-  yield score >= 90
-}
-let excellent_count: number = count excellent_scores
--- Result: 2
-
-let good_scores: list[number] = filter scores as score, idx {
-  yield score >= 80 and score < 90
-}
-let good_count: number = count good_scores
--- Result: 3
-```
-
-### Counting Shape Properties
-
-```sentrie
-shape User {
-  name!: string
-  age: number
-  department!: string
-  active: bool
-}
-
-let users: list[User] = [
-  { name: "Alice", age: 25, department: "Engineering", active: true },
-  { name: "Bob", age: 17, department: "Engineering", active: false },
-  { name: "Charlie", age: 30, department: "Marketing", active: true },
-  { name: "Diana", age: 28, department: "Engineering", active: true },
-  { name: "Eve", age: 16, department: "Marketing", active: false }
-]
-
--- Count total users
-let total_users: number = count users
--- Result: 5
-
--- Count active users
-let active_users_list: list[User] = filter users as user, idx {
-  yield user.active
-}
-let active_users: number = count active_users_list
--- Result: 3
-
--- Count users by department
-let engineering_users: list[User] = filter users as user, idx {
-  yield user.department == "Engineering"
-}
-let engineering_count: number = count engineering_users
--- Result: 3
-
-let marketing_users: list[User] = filter users as user, idx {
-  yield user.department == "Marketing"
-}
-let marketing_count: number = count marketing_users
--- Result: 2
-
--- Count adult users
-let adult_users: list[User] = filter users as user, idx {
-  yield user.age >= 18
-}
-let adult_count: number = count adult_users
--- Result: 3
 ```
 
 ## Chaining Operations

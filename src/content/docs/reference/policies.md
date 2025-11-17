@@ -99,11 +99,12 @@ fact config?: Config as settings default { "environment": "production" }
 ```
 
 :::note[Important]
+
 - Facts are **required by default** - must be provided during execution
 - Use `?` to mark facts as **optional** - can be omitted
 - Only **optional facts** (`?`) can have default values
 - Facts are **always non-nullable** - null values are not allowed
-:::
+  :::
 
 :::note
 Read more on facts [here](/reference/facts).
@@ -120,6 +121,18 @@ let totalPrice = item.price * quantity
 let canAccess = user.active and
                 (user.role == "admin" or user.permissions contains "read")
 ```
+
+:::note[Important]
+
+- `let` declarations are **scoped to their immediate block** (`{}`)
+- `let` declarations **cannot be exported** - only rules can be exported
+- `let` declarations are **immutable** - once declared, their value cannot be changed
+- `let` declarations are used for **intermediate calculations** within a policy or rule block
+  :::
+
+:::note
+Read more on let declarations [here](/reference/let).
+:::
 
 ### Rule Declarations
 

@@ -105,6 +105,10 @@ export default defineConfig({
               slug: "reference/types-values-and-constraints",
             },
             {
+              label: "Trinary Values",
+              slug: "reference/trinary",
+            },
+            {
               label: "Shapes",
               slug: "reference/shapes",
             },
@@ -121,8 +125,8 @@ export default defineConfig({
               slug: "reference/rules",
             },
             {
-              label: "Collection Operations",
-              slug: "reference/collection-operations",
+              label: "Intermediate Values",
+              slug: "reference/let",
             },
             {
               label: "Arithmetic Operations",
@@ -131,6 +135,10 @@ export default defineConfig({
             {
               label: "Boolean Operations",
               slug: "reference/boolean-operations",
+            },
+            {
+              label: "Collection Operations",
+              slug: "reference/collection-operations",
             },
             {
               label: "Precedence",

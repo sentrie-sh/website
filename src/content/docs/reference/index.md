@@ -572,11 +572,12 @@ Facts can have:
 - **Default value**: `default expr` - value if not provided (only for optional facts)
 
 :::note[Important]
+
 - Facts are **required by default** - must be provided during execution
 - Use `?` to mark facts as **optional** - can be omitted
 - Facts are **always non-nullable** - null values are not allowed
 - Only **optional facts** (`?`) can have default values
-:::
+  :::
 
 ### Variables
 
@@ -594,6 +595,17 @@ Variables can have:
 
 - **Annotation**: `: primitive/shape` (optional) - primitive or shape annotation
 - **Initial value**: `= expr` (required)
+
+:::note[Important]
+
+- `let` declarations are **scoped to their immediate block** (`{}`)
+- `let` declarations **cannot be exported** - only rules can be exported
+- `let` declarations are **immutable** - once declared, their value cannot be changed
+  :::
+
+:::note
+Read more on let declarations [here](/reference/let).
+:::
 
 ### Reduce Expressions
 
@@ -859,4 +871,5 @@ policy pricing {
 - [Policies](/reference/policies) - Detailed information about policies
 - [Rules](/reference/rules) - Detailed information about rules
 - [Facts](/reference/facts) - Detailed information about facts
+- [Let Declarations](/reference/let) - Detailed information about let declarations
 - [Shapes](/reference/shapes) - Detailed information about shapes

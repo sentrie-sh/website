@@ -1,3 +1,6 @@
+# Do not include the PR_DESCRIPTION.md file in the repository.
+PR_DESCRIPTION.md
+
 # build output
 dist/
 dist-stage/

@@ -21,14 +21,14 @@ Rules consist of three essential components:
 
 The `when` predicate acts as a gatekeeper, determining whether the rule's `body` should be evaluated or if the `default` should be used instead.
 
-When the `when` condition evaluates to [truthy](./#non-boolean-value-interpretation), the rule's body is executed to produce the final decision. If the `when` condition is not [truthy](./#non-boolean-value-interpretation), the rule falls back to its `default` value. A rule can have one of the three possible outcomes any rule can have: `TRUE`, `FALSE`, or `UNKNOWN`.
+When the `when` condition evaluates to [truthy](/reference/trinary), the rule's body is executed to produce the final decision. If the `when` condition is not [truthy](/reference/trinary), the rule falls back to its `default` value. A rule can have one of the three possible outcomes any rule can have: `TRUE`, `FALSE`, or `UNKNOWN`.
 
 ```typescript
 is_truthy(when) ? body : default
 ```
 
 :::note[Remember]
-If no `default` is provided and `when` is not [truthy](./#non-boolean-value-interpretation), the rule's outcome falls back to `unknown`.
+If no `default` is provided and `when` is not [truthy](/reference/trinary), the rule's outcome falls back to `unknown`.
 :::
 
 ### Example Rule
@@ -49,7 +49,7 @@ policy user {
 - `when` and `default` are optional
 - `when` is `true` by default
 - `default` is `unknown` by default
-- If `when` is not [truthy](./#non-boolean-value-interpretation) and no `default` is provided, the rule's outcome is `unknown`
+- If `when` is not [truthy](/reference/trinary) and no `default` is provided, the rule's outcome is `unknown`
 
 :::
 
@@ -91,53 +91,6 @@ policy user_access {
 Rules can be imported from other policies, but this process involves careful isolation to maintain policy boundaries. When importing a rule decision, you must inject the necessary facts that the imported rule needs to evaluate. Crucially, imported rules are evaluated in their own sandboxed environment, which means they cannot affect or modify the context of the calling policy.
 
 This sandboxing only applies to rules imported from other policies. Rules within the same policy can reference each other directly without import restrictions, allowing for efficient internal policy organization while maintaining security boundaries between different policy modules.
-
-## Non-Boolean Value Interpretation
-
-Sentrie rules can work with various data types, and when a rule's body or default doesn't explicitly return `true`, `false`, or `unknown`, the system infers the `true` or `false` outcome based on the value's truthiness.
-
-This follows the following intuitive rules:
-
-- nil and undefined values are considered false
-- boolean values are used as-is
-- strings are true if they have content (length > 0)
-- numbers are true if they're non-zero
-
-For collections like slices, arrays, and maps, truthiness depends on whether they contain elements:
-
-- Pointers and interfaces are true if they're not nil
-- struct values are considered true if they represent a non-nil struct instance
-- Any other value defaults to true.
-
-Example (expressed in TypeScript-like pseudocode):
-
-```typescript
-function isTruthy(value: any): boolean {
-  // nil and undefined values are considered false
-  if (value === null || value === undefined) return false;
-
-  // boolean values are used as-is
-  if (typeof value === "boolean") return value;
-
-  // strings are true if they have content (length > 0)
-  if (typeof value === "string") return value.length > 0;
-
-  // numbers are true if they're non-zero
-  if (typeof value === "number") return value !== 0;
-
-  // slices, arrays, and maps are true if they contain elements
-  if (Array.isArray(value)) return value.length > 0;
-
-  // maps and sets are true if they contain elements
-  if (value instanceof Map || value instanceof Set) return value.size > 0;
-
-  // non-nil struct-like object are true
-  if (typeof value === "object") return true;
-
-  // default to true
-  return true; // default
-}
-```
 
 ## Practical Examples
 
