@@ -46,7 +46,7 @@ let obj = json.parse('{"name": "John", "age": 30}')
 let str = json.stringify({"name": "John", "age": 30})
 ```
 
-See the [@sentrie/js](/reference/typescript_modules/@sentrie/js) documentation for more information.
+See the [@sentrie/js](/reference/typescript_modules/sentrie/js) documentation for more information.
 
 ## Complete Example
 

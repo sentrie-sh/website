@@ -151,26 +151,50 @@ rule can_access = default false when account.email is defined {
 
 ```sentrie
 -- Unknown propagates through operations
-let a = user.nonexistent.field  -- unknown
-let b = a + 1                   -- unknown (operation on unknown)
-let c = b > 10                  -- unknown (comparison with unknown)
-let d = c and true              -- unknown (AND with unknown)
+let a = user.nonexistent.field  -- undefined
+let b = a + 1                   -- undefined (operation on undefined)
+let c = b > 10                  -- undefined (comparison with undefined)
+let d = c and true              -- unknown (AND with undefined)
 let e = d or false              -- unknown (OR with unknown)
 ```
 
-### Trinary vs Boolean
+## Non-Trinary Value Interpretation
 
-Sentrie distinguishes between trinary and boolean values:
+Sentrie can work with various data types, and when a value that isn't explicitly `true`, `false`, or `unknown` is used in a context that requires a `trinary` value, the system infers the `trinary` value based on the following rules:
 
-- **Trinary** (`trinary`): Can be `true`, `false`, or `unknown`
-- **Boolean** (`bool`): Can only be `true` or `false` (a special case of trinary)
+- `null` / `undefined` → `unknown`
+- Numeric primitives (`int`, `float`, `uint`, etc.) evaluate to `false` when zero, `true` otherwise.
+- `string` values are checked for textual keywords first (see table below), otherwise `true` when they are non-empty.
+- Structs, channels, functions, and any other non-`nil` value evaluate to `true`
 
-When a boolean is used in a trinary context, it's automatically converted:
+### String coercion
+
+Before falling back to the "non-empty string" rule, strings are normalized to lowercase and matched against the following keywords:
+
+| Input                                                        | Result    |
+| ------------------------------------------------------------ | --------- |
+| `"true"`, `"1"`, `"t"`                                       | `true`    |
+| `"false"`, `"0"`, `"f"`                                      | `false`   |
+| `"unknown"`, `"-1"`, `"n"`, `"nil"`, `"null"`, `"undefined"` | `unknown` |
+| Any other non-empty string                                   | `true`    |
+| Empty string (`""`)                                          | `false`   |
+
+### Collections
+
+For collections like `lists`, `maps`, `slices`, and `arrays`, truthiness depends on whether they contain elements. Empty collections are `false`; non-empty collections are `true`.
+
+## Trinary vs Boolean
+
+Sentrie does not distinguish between trinary and boolean values:
 
 - `true` (bool) → `true` (trinary)
 - `false` (bool) → `false` (trinary)
 
-### Best Practices for Trinary Logic
+:::note
+A `bool` value is a special case of a `trinary` value which can never be `unknown`.
+:::
+
+## Best Practices for Trinary Logic
 
 1. **Check for definedness before operations:**
 
@@ -207,28 +231,3 @@ rule can_access = default false when user.role is defined {
 }
 -- Returns false if role is not defined (unknown case)
 ```
-
-## Non-Trinary Value Interpretation
-
-Sentrie can work with various data types, and when a value that isn't explicitly `true`, `false`, or `unknown` is used in a context that requires a `trinary` value, the system infers the `trinary` value based on the following rules:
-
-- `null` / `undefined` → `unknown`
-- Numeric primitives (`int`, `float`, `uint`, etc.) evaluate to `false` when zero, `true` otherwise.
-- `string` values are checked for textual keywords first (see table below), otherwise `true` when they are non-empty.
-- Structs, channels, functions, and any other non-`nil` value evaluate to `true`
-
-### String coercion
-
-Before falling back to the "non-empty string" rule, strings are normalized to lowercase and matched against the following keywords:
-
-| Input                                                        | Result    |
-| ------------------------------------------------------------ | --------- |
-| `"true"`, `"1"`, `"t"`                                       | `true`    |
-| `"false"`, `"0"`, `"f"`                                      | `false`   |
-| `"unknown"`, `"-1"`, `"n"`, `"nil"`, `"null"`, `"undefined"` | `unknown` |
-| Any other non-empty string                                   | `true`    |
-| Empty string (`""`)                                          | `false`   |
-
-### Collections
-
-For collections like `lists`, `maps`, `slices`, and `arrays`, truthiness depends on whether they contain elements. Empty collections are `false`; non-empty collections are `true`.

@@ -152,10 +152,10 @@ export decision of allow
 
 Now that you have a basic understanding, explore:
 
-- [Installation Guide](/docs/installation) - Detailed installation options
-- [Writing Your First Policy](/docs/writing-your-first-policy) - Deep dive into policy creation
-- [Policy Language Reference](/docs/reference) - Complete language documentation
-- [CLI Reference](/docs/cli-reference) - Command-line interface documentation
+- [Installation Guide](/getting-started/installation) - Detailed installation options
+- [Writing Your First Policy](/getting-started/writing-your-first-policy) - Deep dive into policy creation
+- [Policy Language Reference](/reference) - Complete language documentation
+- [CLI Reference](/cli-reference) - Command-line interface documentation
 
 ## Common Patterns
 
@@ -216,6 +216,6 @@ policy pricing {
 
 ### Getting Help
 
-- Check the [Language Reference](/docs/reference) for syntax help
-- Look at the [CLI Reference](/docs/cli-reference) for command options
+- Check the [Language Reference](/reference) for syntax help
+- Look at the [CLI Reference](/cli-reference) for command options
 - Visit our [GitHub repository](https://github.com/sentrie-sh/sentrie) for examples and issues

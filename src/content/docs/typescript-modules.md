@@ -73,6 +73,6 @@ This feature is actively being developed. Check back for updates or follow our [
 
 ## Related Documentation
 
-- [Policy Language Reference](/docs/reference) - Learn about the core language features
-- [Writing Your First Policy](/docs/writing-your-first-policy) - Get started with basic policies
-- [CLI Reference](/docs/cli-reference) - Command-line interface documentation
+- [Policy Language Reference](/reference) - Learn about the core language features
+- [Writing Your First Policy](/getting-started/writing-your-first-policy) - Get started with basic policies
+- [CLI Reference](/cli-reference) - Command-line interface documentation
