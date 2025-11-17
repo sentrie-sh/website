@@ -10,14 +10,16 @@ Sentrie provides a comprehensive set of boolean operations that allow you to eva
 Boolean operations in Sentrie include:
 
 - **Trinary Logic**: Three-valued logic with `true`, `false`, and `unknown`
-- **Ternary Operations**: Conditional value selection
+- **Conditional Operators**: Ternary (`? :`) and Elvis (`?:`) operators for conditional value selection
 - **Logical Operations**: Boolean logic with `and`, `or`, `not`
 - **Comparison Operations**: Equality, inequality, and ordering comparisons
 - **Pattern Matching**: Regular expression matching
 - **Collection Operations**: Testing collections with `any`, `all`, `in`, `contains`
 - **State Checking**: Checking emptiness and definedness
 
-## Ternary Operations
+## Conditional Operators
+
+Sentrie provides two operators for conditional value selection: the ternary operator and the Elvis operator. The Elvis operator is a shorthand for a common pattern using the ternary operator.
 
 ### Ternary Operator (`? :`)
 
@@ -70,365 +72,44 @@ let status_message: string = product.in_stock ?
 -- Result: "Available for $999.99"
 ```
 
-## Trinary Logic
+### Elvis Operator (`?:`)
 
-Sentrie uses **trinary logic** (also known as three-valued logic), which extends traditional boolean logic with a third value: `unknown`. This is essential for handling cases where information may be incomplete or unavailable.
+The Elvis operator (`?:`) provides a shorthand way to provide a default value when the left-hand expression is not truthy. It is equivalent to using the ternary operator with the same expression on both sides of the `?`.
 
-### Trinary Values
-
-Sentrie supports three trinary values:
-
-- **`true`** - The condition is definitely true
-- **`false`** - The condition is definitely false
-- **`unknown`** - The condition's truth value cannot be determined
-
-### Kleene Truth Tables
-
-Sentrie implements **Kleene's three-valued logic**, which provides a consistent way to handle `unknown` values in logical operations.
-
-#### Logical AND (`and`)
-
-The `and` operator follows Kleene's AND truth table:
-
-| **AND**     | **true** | **false** | **unknown** |
-| ----------- | -------- | --------- | ----------- |
-| **true**    | `true`   | `false`   | `unknown`   |
-| **false**   | `false`  | `false`   | `false`     |
-| **unknown** | `unknown`| `false`   | `unknown`   |
-
-**Key behaviors:**
-- `true and x` = `x` (true is the identity element)
-- `false and x` = `false` (false dominates)
-- `unknown and true` = `unknown` (cannot determine if both are true)
-- `unknown and false` = `false` (false dominates)
-- `unknown and unknown` = `unknown` (cannot determine)
-
-#### Logical OR (`or`)
-
-The `or` operator follows Kleene's OR truth table:
-
-| **OR**      | **true** | **false** | **unknown** |
-| ----------- | -------- | --------- | ----------- |
-| **true**    | `true`   | `true`    | `true`     |
-| **false**   | `true`   | `false`   | `unknown`  |
-| **unknown** | `true`   | `unknown` | `unknown`  |
-
-**Key behaviors:**
-- `true or x` = `true` (true dominates)
-- `false or x` = `x` (false is the identity element)
-- `unknown or true` = `true` (true dominates)
-- `unknown or false` = `unknown` (cannot determine if either is true)
-- `unknown or unknown` = `unknown` (cannot determine)
-
-#### Logical NOT (`not`)
-
-The `not` operator follows this truth table:
-
-| **Input**   | **Output** |
-| ----------- | --------- |
-| **true**    | `false`   |
-| **false**   | `true`    |
-| **unknown** | `unknown` |
-
-**Key behavior:**
-- `not unknown` = `unknown` (cannot determine the opposite of unknown)
-
-### Trinary Logic Examples
-
-#### Basic Trinary Operations
-
-```sentrie
--- Unknown from undefined field access
-let value = user.nonexistent.field
-let result = value == "test"  -- unknown (operation on unknown)
-
--- AND with unknown
-let a = true
-let b = unknown
-let result1 = a and b  -- unknown
-
-let c = false
-let d = unknown
-let result2 = c and d  -- false (false dominates)
-
--- OR with unknown
-let e = true
-let f = unknown
-let result3 = e or f  -- true (true dominates)
-
-let g = false
-let h = unknown
-let result4 = g or h  -- unknown
-```
-
-#### Practical Use Cases
-
-```sentrie
-shape User {
-  name!: string
-  email?: string
-  age?: number
-}
-
-fact user: User
-
--- Check if user has email (handles unknown gracefully)
-let has_email: trinary = user.email is defined and user.email is not empty
--- Result: true if email exists and is not empty
---         false if email is defined but empty
---         unknown if email is not defined
-
--- Age verification with unknown handling
-let can_vote: trinary = user.age is defined ? (user.age >= 18) : unknown
--- Result: true if age >= 18
---         false if age < 18
---         unknown if age is not defined
-
--- Complex logic with unknown propagation
-let is_verified: trinary = user.email is defined and 
-                          user.email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
--- Result: true if email is defined and valid
---         false if email is defined but invalid
---         unknown if email is not defined
-```
-
-#### Handling Unknown in Rules
-
-```sentrie
-shape Account {
-  username!: string
-  email?: string
-  verified: bool
-}
-
-fact account: Account
-
--- Rule that handles unknown gracefully
-rule can_access = default false when account.email is defined {
-  let email_valid = account.email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-  yield account.verified and email_valid
-}
-
--- If email is not defined, the 'when' clause prevents evaluation
--- If email is defined, the rule evaluates normally
-```
-
-#### Unknown Propagation
-
-```sentrie
--- Unknown propagates through operations
-let a = user.nonexistent.field  -- unknown
-let b = a + 1                   -- unknown (operation on unknown)
-let c = b > 10                  -- unknown (comparison with unknown)
-let d = c and true              -- unknown (AND with unknown)
-let e = d or false              -- unknown (OR with unknown)
-```
-
-### Trinary vs Boolean
-
-Sentrie distinguishes between trinary and boolean values:
-
-- **Trinary** (`trinary`): Can be `true`, `false`, or `unknown`
-- **Boolean** (`bool`): Can only be `true` or `false` (a special case of trinary)
-
-When a boolean is used in a trinary context, it's automatically converted:
-- `true` (bool) → `true` (trinary)
-- `false` (bool) → `false` (trinary)
-
-### Best Practices for Trinary Logic
-
-1. **Check for definedness before operations:**
-```sentrie
--- Good: Check if value is defined first
-let result = user.email is defined ? user.email.length() > 0 : false
-
--- Avoid: Operations on potentially undefined values
-let result = user.email.length() > 0  -- unknown if email is undefined
-```
-
-2. **Use `is defined` to handle unknown:**
-```sentrie
--- Explicitly handle unknown cases
-let can_proceed = user.age is defined and user.age >= 18
-```
-
-3. **Understand unknown propagation:**
-```sentrie
--- Unknown propagates through all operations
-let value = user.missing.field  -- unknown
-let result = value + 1           -- unknown
-let comparison = result > 10     -- unknown
-```
-
-4. **Use default values in rules:**
-```sentrie
--- Provide defaults for unknown cases
-rule can_access = default false when user.role is defined {
-  yield user.role == "admin"
-}
--- Returns false if role is not defined (unknown case)
-```
-
-## Logical Operations
-
-### Logical AND (`and`)
-
-The `and` operator follows Kleene's trinary logic. It returns `true` only when both operands are `true`, `false` when either operand is `false`, and `unknown` when one operand is `unknown` and the other is not `false`.
+When the left-hand expression evaluates to a non-truthy value (including `false`, `null`, `undefined` → `unknown`, `0`, `""`, or empty collections), the default value is used.
 
 #### Syntax
 
 ```sentrie
-condition1 and condition2
+expression ?: defaultValue
 ```
 
-#### Basic Examples
+This is equivalent to:
 
 ```sentrie
-let age: number = 25
-let has_license: bool = true
-let can_drive: bool = age >= 18 and has_license
--- Result: true
-
-let score: number = 85
-let attendance: number = 0.95
-let passes_course: bool = score >= 80 and attendance >= 0.9
--- Result: true
-
-let username: string = "alice"
-let password: string = "secret123"
-let is_valid_login: bool = username.length() >= 3 and password.length() >= 8
--- Result: true
-```
-
-#### Trinary Examples
-
-```sentrie
--- AND with unknown
-let a = true
-let b = unknown
-let result1 = a and b  -- unknown
-
-let c = false
-let d = unknown
-let result2 = c and d  -- false (false dominates in AND)
-
--- Unknown from undefined field
-let user_email = user.email  -- unknown if email is not defined
-let has_email = user_email is defined and user_email is not empty
--- Result: unknown if email is not defined
---         true if email is defined and not empty
---         false if email is defined but empty
-```
-
-### Logical OR (`or`)
-
-The `or` operator follows Kleene's trinary logic. It returns `true` when at least one operand is `true`, `false` only when both operands are `false`, and `unknown` when one operand is `unknown` and the other is not `true`.
-
-#### Syntax
-
-```sentrie
-condition1 or condition2
-```
-
-#### Basic Examples
-
-```sentrie
-let user_role: string = "user"
-let is_admin: bool = user_role == "admin" or user_role == "superuser"
--- Result: false
-
-let age: number = 16
-let has_parental_consent: bool = true
-let can_register: bool = age >= 18 or has_parental_consent
--- Result: true
-
-let payment_method: string = "credit_card"
-let is_valid_payment: bool = payment_method == "credit_card" or
-                             payment_method == "paypal" or
-                             payment_method == "bank_transfer"
--- Result: true
-```
-
-#### Trinary Examples
-
-```sentrie
--- OR with unknown
-let a = true
-let b = unknown
-let result1 = a or b  -- true (true dominates in OR)
-
-let c = false
-let d = unknown
-let result2 = c or d  -- unknown
-
--- Handling optional fields
-let user_role = user.role  -- unknown if role is not defined
-let is_admin = user_role == "admin" or user_role == "superuser"
--- Result: unknown if role is not defined
---         true if role is "admin" or "superuser"
---         false if role is something else
-```
-
-### Logical NOT (`not` or `!`)
-
-The `not` operator (or `!`) follows trinary logic. It returns the opposite value: `true` → `false`, `false` → `true`, and `unknown` → `unknown`.
-
-#### Syntax
-
-```sentrie
-not condition
-!condition
+expression ? expression : defaultValue
 ```
 
 #### Examples
 
 ```sentrie
-let is_weekend: bool = false
-let is_weekday: bool = not is_weekend
--- Result: true
+-- If product.price is not truthy (null/undefined → unknown, 0, etc.), use 100 as the default
+let price: number = product.price ?: 100
 
-let user_banned: bool = false
-let user_active: bool = !user_banned
--- Result: true
+-- If user.name is empty or undefined (→ unknown), use "Anonymous" as the default
+let displayName: string = user.name ?: "Anonymous"
 
-let empty_string: string = ""
-let has_content: bool = not (empty_string is empty)
--- Result: false
+-- If items list is empty or undefined (→ unknown), use an empty list as the default
+let safeItems: list[string] = items ?: []
 ```
 
-#### Trinary Examples
+:::note[Note]
+When `null` or `undefined` values are used with the Elvis operator, they are converted to `unknown` in trinary logic. Since `unknown` is not truthy, the default value is used.
+:::
 
-```sentrie
--- NOT with unknown
-let a = unknown
-let result = not a  -- unknown (NOT of unknown is unknown)
+## Logical Operations
 
--- NOT with undefined field
-let user_status = user.status  -- unknown if status is not defined
-let is_inactive = not user_status
--- Result: unknown if status is not defined
---         false if status is true
---         true if status is false
-```
-
-```sentrie
-shape Account {
-  username!: string
-  locked: bool
-  suspended: bool
-  email_verified: bool
-}
-
-fact account: Account
-
--- Account is usable
-let account_usable: bool = not account.locked and not account.suspended
--- Result: true
-
--- Needs verification
-let needs_verification: bool = not account.email_verified
--- Result: false
-```
+For details on trinary logic, see the [Kleene's three-valued logic](/reference/trinary#kleene-truth-tables) section.
 
 ## Comparison Operations
 
@@ -620,138 +301,6 @@ let is_valid_username: bool = username matches "^[a-zA-Z0-9_]{3,20}$"
 ```
 
 ## Collection Operations
-
-### Any (`any`)
-
-The `any` operation checks if at least one element in a collection satisfies a condition.
-
-#### Syntax
-
-```sentrie
-any collection as element, index { yield expression }
-```
-
-#### Examples
-
-```sentrie
-let numbers: list[number] = [1, 2, 3, 4, 5]
-let has_even: bool = any numbers as num, idx {
-  yield num % 2 == 0
-}
--- Result: true
-
-let scores: list[number] = [85, 92, 78, 96, 85]
-let has_perfect_score: bool = any scores as score, idx {
-  yield score == 100
-}
--- Result: false
-
-let words: list[string] = ["apple", "banana", "cherry"]
-let has_long_word: bool = any words as word, idx {
-  yield word.length() > 5
-}
--- Result: true
-```
-
-#### Working with Shapes
-
-```sentrie
-shape User {
-  name!: string
-  age: number
-  role!: string
-}
-
-let users: list[User] = [
-  { name: "Alice", age: 25, role: "admin" },
-  { name: "Bob", age: 30, role: "user" },
-  { name: "Charlie", age: 35, role: "moderator" }
-]
-
--- Check if any user is admin
-let has_admin: bool = any users as user, idx {
-  yield user.role == "admin"
-}
--- Result: true
-
--- Check if any user is underage
-let has_minor: bool = any users as user, idx {
-  yield user.age < 18
-}
--- Result: false
-
--- Check if any user has long name
-let has_long_name: bool = any users as user, idx {
-  yield user.name.length() > 10
-}
--- Result: false
-```
-
-### All (`all`)
-
-The `all` operation checks if all elements in a collection satisfy a condition.
-
-#### Syntax
-
-```sentrie
-all collection as element, index { yield expression }
-```
-
-#### Examples
-
-```sentrie
-let numbers: list[number] = [2, 4, 6, 8, 10]
-let all_even: bool = all numbers as num, idx {
-  yield num % 2 == 0
-}
--- Result: true
-
-let scores: list[number] = [85, 92, 78, 96, 85]
-let all_passing: bool = all scores as score, idx {
-  yield score >= 80
-}
--- Result: false
-
-let words: list[string] = ["apple", "banana", "cherry"]
-let all_short: bool = all words as word, idx {
-  yield word.length() <= 6
-}
--- Result: true
-```
-
-#### Working with Shapes
-
-```sentrie
-shape Product {
-  name!: string
-  price!: number
-  in_stock: bool
-}
-
-let products: list[Product] = [
-  { name: "Laptop", price: 999.99, in_stock: true },
-  { name: "Mouse", price: 29.99, in_stock: true },
-  { name: "Keyboard", price: 79.99, in_stock: true }
-]
-
--- Check if all products are in stock
-let all_in_stock: bool = all products as product, idx {
-  yield product.in_stock
-}
--- Result: true
-
--- Check if all products are expensive
-let all_expensive: bool = all products as product, idx {
-  yield product.price > 50.0
-}
--- Result: true
-
--- Check if all products have short names
-let all_short_names: bool = all products as product, idx {
-  yield product.name.length() <= 10
-}
--- Result: true
-```
 
 ### Membership (`in` and `contains`)
 
@@ -1000,6 +549,8 @@ let can_access: bool = user.active and
 ### Data Validation System
 
 ```sentrie
+use {length} from @sentrie/js as str
+
 shape RegistrationData {
   username!: string
   email?: string
@@ -1019,18 +570,20 @@ let registration: RegistrationData = {
 -- Comprehensive validation
 let is_valid_registration: bool =
   registration.username is not empty and
-  registration.username.length() >= 3 and
-  registration.username.length() <= 20 and
+  str.length(registration.username) >= 3 and
+  str.length(registration.username) <= 20 and
   registration.username matches "^[a-zA-Z0-9_]+$" and
   registration.password is not empty and
-  registration.password.length() >= 8 and
+  str.length(registration.password) >= 8 and
   registration.password matches ".*[A-Z].*" and
   registration.password matches ".*[0-9].*" and
   registration.age >= 13 and
   registration.age <= 120 and
   registration.terms_accepted and
-  (registration.email is not defined or
-   registration.email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
+  (
+    registration.email is not defined or
+    registration.email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+  )
 -- Result: true
 ```
 
@@ -1062,7 +615,7 @@ let can_access: bool = user.active and user.verified or user.role == "admin" and
 ```sentrie
 -- Check for empty values before operations
 let is_valid: bool = user.name is not empty and
-                    user.name.length() >= 2 and
+                    str.length(user.name) >= 2 and
                     user.email is defined and
                     user.email is not empty
 ```

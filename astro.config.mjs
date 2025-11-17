@@ -97,16 +97,24 @@ export default defineConfig({
               slug: "reference",
             },
             {
-              label: "Namespaces",
-              slug: "reference/namespaces",
+              label: "Types and Values",
+              slug: "reference/types-and-values",
             },
             {
-              label: "Types, Values and Constraints",
-              slug: "reference/types-values-and-constraints",
+              label: "Constraints",
+              slug: "reference/constraints",
+            },
+            {
+              label: "Trinary Values",
+              slug: "reference/trinary",
             },
             {
               label: "Shapes",
               slug: "reference/shapes",
+            },
+            {
+              label: "Namespaces",
+              slug: "reference/namespaces",
             },
             {
               label: "Policies",
@@ -121,8 +129,8 @@ export default defineConfig({
               slug: "reference/rules",
             },
             {
-              label: "Collection Operations",
-              slug: "reference/collection-operations",
+              label: "Intermediate Values",
+              slug: "reference/let",
             },
             {
               label: "Arithmetic Operations",
@@ -131,6 +139,10 @@ export default defineConfig({
             {
               label: "Boolean Operations",
               slug: "reference/boolean-operations",
+            },
+            {
+              label: "Collection Operations",
+              slug: "reference/collection-operations",
             },
             {
               label: "Precedence",

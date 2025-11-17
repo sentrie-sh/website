@@ -47,4 +47,4 @@ policy mypolicy {
 
 ## See Also
 
-- [@sentrie/hash](./@sentrie/hash) - For additional hash algorithms (MD5, SHA-1, SHA-512, HMAC)
+- [@sentrie/hash](./hash) - For additional hash algorithms (MD5, SHA-1, SHA-512, HMAC)

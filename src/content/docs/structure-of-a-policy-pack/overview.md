@@ -41,7 +41,7 @@ The PackFile (`sentrie.pack.toml`) file serves as the manifest and metadata conf
 
 - Defines the root of the policy pack
 - All absolute paths are resolved relative to this file's location
-- `@local` prefix in `use` statements resolves to this file's location (refer to [`use` statements](/reference/use-statements/))
+- `@local` prefix in `use` statements resolves to this file's location (refer to [`use` statements](/reference/using-typescript))
 
 ### ProgramFile
 
@@ -55,7 +55,7 @@ A ProgramFile (`*.sentrie`) file contains the core policy definitions written in
 
 ### `*.ts`
 
-TypeScript files (`*.ts`) provide Typescript module functionality within policy packs. Policies can refer to and execute functions defined in these modules using the `use` statement (refer to [`use` statements](/reference/use-statements/)).
+TypeScript files (`*.ts`) provide Typescript module functionality within policy packs. Policies can refer to and execute functions defined in these modules using the `use` statement (refer to [`use` statements](/reference/using-typescript)).
 
 **What they can contain:**
 
@@ -70,7 +70,7 @@ TypeScript files (`*.ts`) provide Typescript module functionality within policy 
 - Compiled to JavaScript using a built-in opinionated TypeScript compiler
 - Leverage full TypeScript power while keeping policies declarative
 
-For more information, see the [TypeScript Integration](/reference/using-typescript/) reference. For a list of built-in modules, see the [TypeScript Integration](/reference/typescript-integration/) reference.
+For more information, see the [TypeScript Integration](/reference/using-typescript/) reference. For a list of built-in modules, see the [Built-in TypeScript Modules](/reference/typescript_modules/) reference.
 
 ## Organization
 
