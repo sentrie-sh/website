@@ -294,7 +294,7 @@ let tags: list[string] @maxlength(10) = ["tag1", "tag2"]
 ```
 
 :::note
-While type annotations are optional, they are recommended for better readability and to catch type errors early. For reference, see [Types, Values and Constraints](/reference/types-values-and-constraints) and [Shapes](/reference/shapes) for more information.
+While type annotations are optional, they are recommended for better readability and to catch type errors early. For reference, see [Types and Values](/reference/types-and-values) and [Shapes](/reference/shapes) for more information.
 :::
 
 ## Using Let in Complex Expressions

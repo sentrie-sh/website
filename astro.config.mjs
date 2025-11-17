@@ -97,12 +97,12 @@ export default defineConfig({
               slug: "reference",
             },
             {
-              label: "Namespaces",
-              slug: "reference/namespaces",
+              label: "Types and Values",
+              slug: "reference/types-and-values",
             },
             {
-              label: "Types, Values and Constraints",
-              slug: "reference/types-values-and-constraints",
+              label: "Constraints",
+              slug: "reference/constraints",
             },
             {
               label: "Trinary Values",
@@ -111,6 +111,10 @@ export default defineConfig({
             {
               label: "Shapes",
               slug: "reference/shapes",
+            },
+            {
+              label: "Namespaces",
+              slug: "reference/namespaces",
             },
             {
               label: "Policies",
