@@ -15,7 +15,7 @@ namespace com/example/mypolicy
 policy mypolicy {
   use { now } from @sentrie/time
   use { sha256 } from @sentrie/hash
-  use { parse } from "@sentrie/js" as json
+  use { parse } from @sentrie/js as json
   use { isValid } from @sentrie/json as jsonUtil
 
   fact data!: string
@@ -252,7 +252,7 @@ namespace com/example/validation
 
 policy validation {
   use { match } from @sentrie/regex
-  use { length } from "@sentrie/js" as str
+  use { length } from @sentrie/js as str
   use { isValid } from @sentrie/json as jsonUtil
 
   fact email!: string
