@@ -90,7 +90,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "Language Reference",
+          label: "Reference",
           items: [
             {
               label: "Overview",
