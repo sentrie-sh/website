@@ -6,7 +6,7 @@ description: Sentrie is an open-source policy evaluation engine with a `Rich Exp
 template: splash
 pagefind: false
 hero:
-  tagline: The policy evaluation engine purpose-built for modern applications.
+  tagline: Sentrie is a modern policy engine built for today’s applications — with a clean expression language, a powerful type system, first-class Typescript module support, and deterministic evaluation.
   image:
     file: ../../assets/freeze.svg
   actions:
@@ -29,19 +29,19 @@ import { Card, CardGrid } from "@astrojs/starlight/components";
     operations. Support for quantifiers, pattern matching, and conditional
     expressions.
     <br />
-    <a href="https://sentrie.sh/rich-expression-language">Learn more</a>
+    <a href="/reference">Learn more</a>
+  </Card>
+  <Card title="JavaScript Integration" icon="setting">
+    Seamlessly integrate TypeScript modules for complex logic. Built-in modules
+    for data manipulation, cryptography, and more.
+    <br />
+    <a href="/reference/using-typescript">Learn more</a>
   </Card>
   <Card title="Run as a Service" icon="setting">
     Run Sentrie as a service to evaluate policies using a well-defined and
     minimal HTTP API.
     <br />
-    <a href="https://sentrie.sh/run-as-a-service">Learn more</a>
-  </Card>
-  <Card title="JavaScript Integration" icon="setting">
-    Seamlessly integrate JavaScript modules for complex logic. Built-in modules
-    for UUID generation, crypto operations, and more.
-    <br />
-    <a href="https://sentrie.sh/javascript-modules">Learn more</a>
+    <a href="/running-sentrie/serving-policies">Learn more</a>
   </Card>
   <Card title="CLI Reference" icon="open-book">
     The Sentrie CLI provides a powerful set of tools for managing your policies
@@ -52,5 +52,7 @@ import { Card, CardGrid } from "@astrojs/starlight/components";
   <Card title="Type-Safe Inputs" icon="pencil">
     Comprehensive type system with shapes, constraints, and built-in
     validations.
+    <br />
+    <a href="/reference/types-and-values">Learn more</a>
   </Card>
 </CardGrid>
