@@ -182,7 +182,7 @@ You can create your own TypeScript modules in your policy pack. These modules:
 Example TypeScript file (`user.ts` in the pack root):
 
 ```typescript
-import { something } from "@local/something";
+import { something } from @local/something;
 
 export function User() {
   return {

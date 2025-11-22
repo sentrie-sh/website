@@ -90,7 +90,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "Language Reference",
+          label: "Reference",
           items: [
             {
               label: "Overview",
@@ -145,12 +145,16 @@ export default defineConfig({
               slug: "reference/collection-operations",
             },
             {
-              label: "Precedence",
-              slug: "reference/precedence",
+              label: "Using Functions",
+              slug: "reference/functions",
             },
             {
               label: "Using TypeScript",
               slug: "reference/using-typescript",
+            },
+            {
+              label: "Precedence",
+              slug: "reference/precedence",
             },
             {
               label: "Security and Permissions",

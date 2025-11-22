@@ -1,0 +1,317 @@
+---
+title: "*.ts"
+description: "TypeScript files provide reusable functionality for policies in a policy pack."
+---
+
+import { FileTree } from "@astrojs/starlight/components";
+
+TypeScript files (`*.ts`) are modules that provide reusable functionality for your Sentrie policies. They enable you to write complex logic, utility functions, and integrations that can be shared across multiple policies.
+
+## Overview
+
+TypeScript files in Sentrie policy packs:
+
+- **Compile to JavaScript** - Automatically transpiled using Sentrie's built-in TypeScript compiler
+- **Module system** - Support ES6 `import`/`export` syntax
+- **Type safety** - Full TypeScript type checking and IntelliSense support
+- **Flexible organization** - Can be placed anywhere within the policy pack directory structure
+
+## File Organization
+
+TypeScript files can be organized flexibly within your policy pack:
+
+- **Any location** - Can be located anywhere in the policy pack directory tree
+- **No required structure** - No prescribed directory structure; organize as needed
+- **Relative to pack root** - All paths are resolved relative to the `sentrie.pack.toml` file location
+
+**Example structure:**
+
+<FileTree>
+
+- policy-pack
+  - sentrie.pack.toml
+  - utils.ts # Root level
+  - helpers/
+    - validation.ts # In subdirectory
+    - formatting.ts
+  - policies/
+    - auth/
+      - user-helpers.ts # Nested directories
+
+</FileTree>
+
+## Using TypeScript Files in Policies
+
+Functions defined in TypeScript files can be imported into policies using the `use` statement. There are two ways to reference them:
+
+### Relative Path References
+
+Use relative paths from the policy file location:
+
+```sentrie
+namespace com/example/auth
+
+policy userAccess {
+  use { calculateAge, validateEmail } from "./utils.ts" as utils
+
+  fact user!: User
+
+  rule checkAccess = {
+    yield utils.calculateAge(user.birthDate) >= 18
+      and utils.validateEmail(user.email)
+  }
+
+  export decision of checkAccess
+}
+```
+
+**Path resolution:**
+
+- `./utils.ts` - Same directory as the current policy file
+- `../helpers/validation.ts` - Parent directory, then into `helpers` subdirectory
+- `./utils/helper.ts` - Subdirectory relative to the policy file
+
+### `@local` References
+
+Use `@local` prefix for paths relative to the pack root ([sentrie.pack.toml](/structure-of-a-policy-pack/packfile/)):
+
+```sentrie
+namespace com/example/auth
+
+policy userAccess {
+  use { calculateAge } from "@local/utils/helpers" as helpers
+
+  fact user!: User
+
+  rule checkAccess = {
+    yield helpers.calculateAge(user.birthDate) >= 18
+  }
+
+  export decision of checkAccess
+}
+```
+
+**Path normalization:** Relative paths are automatically normalized to `@local` paths internally. Both `./utils.ts` and `@local/utils` reference the same file when resolved from the appropriate location.
+
+## TypeScript File Structure
+
+### Basic Example
+
+A simple TypeScript file exporting utility functions:
+
+```typescript
+// utils.ts
+export function calculateAge(birthDate: string): number {
+  const birth = new Date(birthDate);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+
+  return age;
+}
+
+export function validateEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+```
+
+### Importing Other Modules
+
+TypeScript files can import from:
+
+1. **Built-in Sentrie modules** - Using `@sentrie/*` prefix
+2. **Other local TypeScript files** - Using relative paths or `@local` prefix
+
+```typescript
+// helpers/validation.ts
+import { sha256 } from "@sentrie/hash";
+import { validateEmail } from "./email-utils";
+
+export function validatePassword(password: string, hash: string): boolean {
+  return sha256(password) === hash;
+}
+
+export function validateUserEmail(email: string): boolean {
+  return validateEmail(email);
+}
+```
+
+### Exporting Functions and Types
+
+TypeScript files can export functions, types/interfaces, and constants. However, **only functions can be imported and used by policies** via the `use` statement.
+
+- **Functions** - Can be imported and used in policies via the `use` statement
+- **Types/Interfaces** - Can be exported but cannot be used directly by policies (policies use Sentrie shapes for type definitions)
+- **Constants** - Can be exported but cannot be used directly by policies
+
+```typescript
+// user.ts
+import { something } from "@local/something";
+
+// This interface can be exported but cannot be used via 'use' statement
+export interface UserData {
+  name: string;
+  email: string;
+  role: string;
+}
+
+// This function CAN be used in policies via 'use' statement
+export function createUser(name: string, email: string): UserData {
+  return {
+    name,
+    email,
+    role: "user",
+    metadata: something(),
+  };
+}
+
+// This constant can be exported but cannot be used via 'use' statement
+export const DEFAULT_ROLE = "user";
+```
+
+**Note:** While TypeScript files can export types and constants, only exported functions are available to policies through the `use` statement. Types and constants exported from TypeScript files are primarily useful for TypeScript-to-TypeScript imports within your module system.
+
+## Import Statements in TypeScript Files
+
+TypeScript files support standard ES6 `import` syntax:
+
+### Importing Built-in Modules
+
+```typescript
+import { now, parse } from "@sentrie/time";
+import { sha256, md5 } from "@sentrie/hash";
+import { encodeBase64 } from "@sentrie/encoding";
+```
+
+### Importing Local Files
+
+You can use either relative paths or `@local` prefix:
+
+```typescript
+// Using relative path
+import { helper } from "./helper";
+import { utils } from "../utils/helpers";
+
+// Using @local prefix (normalized internally)
+import { helper } from "@local/helper";
+import { utils } from "@local/utils/helpers";
+```
+
+**Note:** Both relative paths and `@local` paths are normalized to `@local` references internally, ensuring consistent module resolution.
+
+## Module Aliasing in Policies
+
+When importing functions from a TypeScript file in a policy, you can specify an alias:
+
+```sentrie
+namespace com/example/auth
+
+policy myPolicy {
+  // Default alias (last part of path)
+  use { calculateAge } from "./utils.ts"
+  // Use as: utils.calculateAge()
+
+  // Explicit alias
+  use { validateEmail } from "./helpers/validation.ts" as validators
+  // Use as: validators.validateEmail()
+}
+```
+
+**Important:** Only functions can be imported via the `use` statement. Types, interfaces, and constants exported from TypeScript files cannot be used directly in policies.
+
+## Compilation and Runtime
+
+- **Automatic compilation** - TypeScript files are automatically transpiled to JavaScript when needed
+- **Lazy loading** - Modules are compiled on-demand when first referenced
+- **Caching** - Compiled modules are cached for performance
+- **Error handling** - Compilation errors are reported with clear messages
+
+## Best Practices
+
+1. **Organize by functionality** - Group related functions in the same file
+2. **Use descriptive names** - Name files and functions clearly
+3. **Leverage built-in modules** - Use `@sentrie/*` modules for common operations
+4. **Keep functions pure** - Prefer pure functions for better testability
+5. **Document exports** - Add comments for complex functions
+6. **Reuse modules** - Create shared utilities that can be used across multiple policies
+
+## Example: Complete TypeScript Module
+
+Here's a complete example showing a TypeScript file with imports and exports:
+
+```typescript
+// utils/user-helpers.ts
+import { now } from "@sentrie/time";
+import { sha256 } from "@sentrie/hash";
+import { validateEmail } from "../validation/email";
+
+export interface User {
+  id: string;
+  email: string;
+  birthDate: string;
+  passwordHash: string;
+}
+
+export function calculateAge(birthDate: string): number {
+  const birth = new Date(birthDate);
+  const today = new Date(now());
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+
+  return age;
+}
+
+export function verifyPassword(password: string, hash: string): boolean {
+  return sha256(password) === hash;
+}
+
+export function isValidUser(user: User): boolean {
+  return validateEmail(user.email) && user.id.length > 0;
+}
+```
+
+Used in a policy (only functions are imported via `use`):
+
+```sentrie
+namespace com/example/auth
+
+shape User {
+  id!: string
+  email!: string
+  birthDate!: string
+  passwordHash!: string
+}
+
+policy userAccess {
+  // Only functions can be imported via 'use' statement
+  use { calculateAge, verifyPassword, isValidUser } from "./utils/user-helpers.ts" as userUtils
+
+  fact user!: User
+  fact passwordInput!: string
+
+  rule allowAccess = {
+    yield userUtils.isValidUser(user)
+      and userUtils.verifyPassword(passwordInput, user.passwordHash)
+      and userUtils.calculateAge(user.birthDate) >= 18
+  }
+
+  export decision of allowAccess
+}
+```
+
+**Note:** The `User` interface exported from the TypeScript file cannot be used directly in the policy. Instead, define a Sentrie `shape` for the `user` fact type, as shown above.
+
+## Related Documentation
+
+- [Using TypeScript in Policies](/reference/using-typescript/) - Complete guide to using TypeScript with Sentrie
+- [Built-in TypeScript Modules](/reference/typescript_modules/) - Available `@sentrie/*` modules
+- [Policy Pack Structure](/structure-of-a-policy-pack/overview/) - Overview of policy pack organization

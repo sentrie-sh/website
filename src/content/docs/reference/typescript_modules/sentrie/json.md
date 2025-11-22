@@ -40,7 +40,7 @@ let isInvalid = json.isValid(invalidStr)  // false
 For JSON parsing and stringification, use the `@sentrie/js` module:
 
 ```text
-use { parse, stringify } from "@sentrie/js" as json
+use { parse, stringify } from @sentrie/js as json
 
 let obj = json.parse('{"name": "John", "age": 30}')
 let str = json.stringify({"name": "John", "age": 30})
@@ -55,7 +55,7 @@ namespace com/example/mypolicy
 
 policy mypolicy {
   use { isValid } from @sentrie/json as jsonUtil
-  use { parse, stringify } from "@sentrie/js" as json
+  use { parse, stringify } from @sentrie/js as json
 
   fact data!: string
 
@@ -73,4 +73,3 @@ policy mypolicy {
   export decision of processData
 }
 ```
-
