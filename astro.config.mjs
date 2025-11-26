@@ -45,6 +45,10 @@ export default defineConfig({
               label: "Running your Policy",
               slug: "getting-started/running-your-policy",
             },
+            {
+              label: "Policy Enforcement",
+              slug: "getting-started/enforcement",
+            },
           ],
         },
         {
