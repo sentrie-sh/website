@@ -5,7 +5,7 @@ import { sentrieGrammar } from "./src/sentrie-grammar.ts";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://sentrie.sh",
+  site: process.env.ASTRO_SITE_URL || "https://sentrie.sh",
   trailingSlash: "ignore",
   integrations: [
     starlight({
