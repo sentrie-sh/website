@@ -19,12 +19,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
 
       - name: Install dependencies
         run: |
-          rm -rf node_modules
-          npm install --include=optional
+          npm cache clean --force
+          rm -rf node_modules package-lock.json
+          npm install
 
       - name: Build Astro site
         env:
