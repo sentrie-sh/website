@@ -24,6 +24,18 @@ All Sentrie commands support these global options:
 
 ## Commands
 
+### `exec`
+
+Execute a policy or rule from a policy pack.
+
+See the [exec command documentation](./exec) for details.
+
+### `init`
+
+Initialize a new policy pack.
+
+See the [init command documentation](./init) for details.
+
 ### `serve`
 
 Start the Sentrie HTTP server to evaluate policies.
@@ -106,6 +118,38 @@ The server supports graceful shutdown:
 - **SIGTERM**: Graceful shutdown
 - **SIGKILL**: Immediate shutdown
 
+### `validate`
+
+Validate a policy pack's structure, syntax, and type correctness.
+
+#### Syntax
+
+```bash
+sentrie validate <FQN> [OPTIONS]
+```
+
+#### Options
+
+| Option            | Type   | Default | Description                       |
+| ----------------- | ------ | ------- | --------------------------------- |
+| `--pack-location` | string | `./`    | Directory containing policy files |
+| `--facts`         | string | `{}`    | Facts for type checking           |
+
+#### Examples
+
+```bash
+# Validate a policy pack
+sentrie validate user_management/user_access
+
+# Validate with facts for type checking
+sentrie validate user_management/user_access --facts '{"user":{"role":"admin"}}'
+
+# Validate from a specific location
+sentrie validate com/example/auth/access_control --pack-location ./policies
+```
+
+See the [validate command documentation](./validate) for details.
+
 ## HTTP API
 
 When the server is running, it provides a REST API for policy evaluation.
@@ -120,90 +164,102 @@ http://localhost:7529
 
 #### Decision Execution
 
-**POST** `/decision/{namespace}/{policy}/{rule}?{runconfig_params}`
+**POST** `/decision/{target...}`
 
-Execute a specific rule with the provided facts.
+Execute a policy or rule. The `{target...}` path parameter contains the full path to the namespace, policy, and optionally the rule.
 
-##### Path Parameters
+##### Path Format
 
-- `namespace`: The namespace containing the policy (can contain multiple segments separated by '/')
-- `policy`: The policy name (second to last segment in the path)
-- `rule`: The rule name to execute (last segment in the path)
+- `/decision/{namespace}/{policy}/{rule}` - Execute a specific rule
+- `/decision/{namespace}/{policy}` - Execute all exported rules in a policy
 
-##### Path Structure
-
-The path follows this pattern: `/decision/{namespace}/{policy}/{rule}` where:
-
-- The **last segment** is the rule name
-- The **second to last segment** is the policy name
-- **Everything before that** is the namespace (can contain multiple `/`-separated segments)
-
-##### Examples
-
-- `/decision/sh/sentra/auth/v1/user/allow` → namespace: `sh/sentra/auth/v1`, policy: `user`, rule: `allow`
-- `/decision/org/department/team/policy/rule` → namespace: `org/department/team`, policy: `policy`, rule: `rule`
-
-##### Query Parameters
-
-- `runconfig_params`: Optional configuration parameters for rule execution
+The path is resolved to extract:
+- `namespace`: The namespace (all segments except the last two)
+- `policy`: The policy name (second to last segment)
+- `rule`: The rule name (last segment, optional)
 
 ##### Request Body
 
-The request body should be a JSON object containing the facts to evaluate:
+The request body must be a JSON object with a `facts` field:
 
 ```json
 {
-  "user": {
-    "id": "user123",
-    "role": "admin"
-  },
-  "resource": {
-    "id": "resource456",
-    "owner": "user123"
+  "facts": {
+    "user": {
+      "id": "user123",
+      "role": "admin"
+    },
+    "resource": {
+      "id": "resource456",
+      "owner": "user123"
+    }
   }
 }
 ```
 
 ##### Response
 
-The response is a JSON object containing the decision and any attachments:
+The response is a JSON object containing an array of decisions:
 
 ```json
 {
-  "decision": true,
-  "attachments": {
-    "reason": "User is admin",
-    "timestamp": "2025-01-27T10:00:00Z"
-  }
+  "decisions": [
+    {
+      "policy": "user",
+      "namespace": "com/example/auth",
+      "rule": "isAdmin",
+      "decision": {
+        "state": "TRUE",
+        "value": true
+      },
+      "attachments": {
+        "role": "admin"
+      },
+      "trace": { ... }
+    }
+  ],
+  "error": ""
 }
 ```
 
+##### Query Parameters
+
+Query parameters are parsed as run configuration (currently parsed but not used in execution).
+
 ##### Error Responses
 
-**400 Bad Request**
+Errors are returned using RFC 9457 Problem Details format with `Content-Type: application/problem+json`:
 
+**400 Bad Request**
 ```json
 {
-  "error": "Invalid request body",
-  "message": "Expected JSON object"
+  "type": "https://sentrie.sh/problems/400",
+  "title": "Invalid JSON",
+  "status": 400,
+  "detail": "The request body could not be parsed as valid JSON",
+  "instance": "request-id-12345"
 }
 ```
 
 **404 Not Found**
-
 ```json
 {
-  "error": "Policy not found",
-  "message": "Policy 'com/example/auth/user' not found"
+  "type": "https://sentrie.sh/problems/404",
+  "title": "Invalid Path",
+  "status": 404,
+  "detail": "Policy 'com/example/auth/user' not found",
+  "instance": "request-id-12345"
 }
 ```
 
-**500 Internal Server Error**
-
+**405 Method Not Allowed**
 ```json
 {
-  "error": "Policy evaluation failed",
-  "message": "Error in rule 'allow': division by zero"
+  "type": "https://sentrie.sh/problems/405",
+  "title": "Method Not Allowed",
+  "status": 405,
+  "detail": "Only POST requests are supported for this endpoint",
+  "instance": "request-id-12345"
 }
 ```
 
@@ -214,7 +270,11 @@ The response is a JSON object containing the decision and any attachments:
 ```bash
 curl -X POST "http://localhost:7529/decision/com/example/auth/user/allow" \
   -H "Content-Type: application/json" \
-  -d '{"user": {"id": "user123", "role": "admin"}}'
+  -d '{
+    "facts": {
+      "user": {"id": "user123", "role": "admin"}
+    }
+  }'
 ```
 
 #### Resource Access Control
@@ -223,8 +283,10 @@ curl -X POST "http://localhost:7529/decision/com/example/auth/user/allow" \
 curl -X POST "http://localhost:7529/decision/com/example/resources/document/canRead" \
   -H "Content-Type: application/json" \
   -d '{
-    "user": {"id": "user123", "role": "user"},
-    "document": {"id": "doc456", "owner": "user123"}
+    "facts": {
+      "user": {"id": "user123", "role": "user"},
+      "document": {"id": "doc456", "owner": "user123"}
+    }
   }'
 ```
 
@@ -234,8 +296,10 @@ curl -X POST "http://localhost:7529/decision/com/example/resources/document/canR
 curl -X POST "http://localhost:7529/decision/com/example/billing/pricing/calculatePrice" \
   -H "Content-Type: application/json" \
   -d '{
-    "user": {"id": "user123", "isPremium": true},
-    "product": {"id": "prod789", "price": 100.0}
+    "facts": {
+      "user": {"id": "user123", "isPremium": true},
+      "product": {"id": "prod789", "price": 100.0}
+    }
   }'
 ```
 
@@ -416,7 +480,11 @@ sentrie serve --pack-location . --port 8080
 ```bash
 curl -X POST "http://localhost:8080/decision/com/example/auth/user/allow" \
   -H "Content-Type: application/json" \
-  -d '{"user": {"role": "admin"}}'
+  -d '{
+    "facts": {
+      "user": {"role": "admin"}
+    }
+  }'
 ```
 
 ### Production Deployment
