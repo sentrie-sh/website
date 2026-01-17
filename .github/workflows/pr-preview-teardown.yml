@@ -1,0 +1,49 @@
+name: PR Preview Teardown
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  teardown-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Surge
+        run: npm install --global surge
+
+      - name: Teardown Surge deployment
+        env:
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+        continue-on-error: true
+        run: |
+          surge teardown sentrie-pr-${{ github.event.pull_request.number }}.surge.sh
+
+      - name: Find existing preview comment
+        id: find-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "<!-- surge-preview -->"
+
+      - name: Update preview comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            <!-- surge-preview -->
+            ## 🚀 Preview Deployment
+
+            ${{ github.event.pull_request.merged == true && '✅ **Preview removed (PR merged)**' || '❌ **Preview removed (PR closed)**' }}
+
+            The preview deployment for this PR has been automatically removed.

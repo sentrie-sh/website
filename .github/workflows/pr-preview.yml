@@ -1,0 +1,64 @@
+name: PR Preview Deployment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Astro site
+        env:
+          ASTRO_PREVIEW: "true"
+          ASTRO_SITE_URL: "https://sentrie-pr-${{ github.event.pull_request.number }}.surge.sh"
+        run: npm run build
+
+      - name: Install Surge
+        run: npm install --global surge
+
+      - name: Deploy to Surge
+        env:
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+        run: |
+          cd dist
+          surge --domain sentrie-pr-${{ github.event.pull_request.number }}.surge.sh -y
+
+      - name: Find existing preview comment
+        id: find-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "<!-- surge-preview -->"
+
+      - name: Create or update preview comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            <!-- surge-preview -->
+            ## 🚀 Preview Deployment
+
+            A preview of this PR has been deployed to:
+
+            **🔗 [View Preview](https://sentrie-pr-${{ github.event.pull_request.number }}.surge.sh)**
+
+            This preview will be automatically removed when the PR is merged or closed.
