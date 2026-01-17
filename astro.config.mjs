@@ -87,10 +87,6 @@ export default defineConfig({
               label: "Serving Policies",
               slug: "running-sentrie/serving-policies",
             },
-            {
-              label: "OTEL Integration",
-              slug: "running-sentrie/otel-integration",
-            },
           ],
         },
         {
@@ -131,6 +127,10 @@ export default defineConfig({
             {
               label: "Rules",
               slug: "reference/rules",
+            },
+            {
+              label: "Exporting and Importing Rules",
+              slug: "reference/exporting-and-importing-rules",
             },
             {
               label: "Intermediate Values",
@@ -245,6 +245,10 @@ export default defineConfig({
             {
               label: "serve",
               slug: "cli-reference/serve",
+            },
+            {
+              label: "validate",
+              slug: "cli-reference/validate",
             },
           ],
         },
