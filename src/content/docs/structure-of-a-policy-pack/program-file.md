@@ -80,9 +80,9 @@ policy auth {
   use { calculateAge } from "./utils.ts" as utils
   use { hash } from @sentrie/crypto -- will alias to crypto by default
 
-  fact user!: User
-  fact passwordInput!: string
-  fact userAge!: number
+  fact user: User
+  fact passwordInput: string
+  fact userAge: number
 
   let isPasswordValid = crypto.md5(passwordInput) == user.passwordHash
   let calculatedUserAge = utils.calculateAge(user.birthDate)
