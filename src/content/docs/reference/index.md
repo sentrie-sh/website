@@ -19,6 +19,7 @@ This is the complete reference for the Sentrie policy language. It covers all la
 - [TypeScript Modules](#typescript-modules)
 - [Facts and Variables](#facts-and-variables)
 - [Exports and Imports](#exports-and-imports)
+- [Exporting and Importing Rules](/reference/exporting-and-importing-rules) - Complete guide to rule exports and imports
 
 ## Program Structure
 
@@ -533,13 +534,12 @@ policy mypolicy {
 - `@sentrie/crypto` - Cryptographic functions (SHA-256)
 - `@sentrie/encoding` - Base64, Hex, and URL encoding/decoding
 - `@sentrie/hash` - Hash functions (MD5, SHA-1, SHA-256, SHA-512, HMAC)
-- `@sentrie/json` - JSON marshaling and unmarshaling
+- `@sentrie/js` - JavaScript globals (Math, String, Number, Date, JSON, Array)
+- `@sentrie/json` - JSON validation utility
 - `@sentrie/jwt` - JSON Web Token decoding and verification
-- `@sentrie/math` - Mathematical constants and functions
 - `@sentrie/net` - Network and IP address utilities
 - `@sentrie/regex` - Regular expression pattern matching
 - `@sentrie/semver` - Semantic version comparison and validation
-- `@sentrie/string` - String manipulation utilities
 - `@sentrie/time` - Date and time manipulation
 - `@sentrie/url` - URL parsing and manipulation
 - `@sentrie/uuid` - UUID generation (v4, v6, v7)
@@ -848,7 +848,7 @@ policy pricing {
   fact discountRate?: number as rate default 0.1
   fact user: User as currentUser
 
-  use { max, min } from @sentrie/math as math
+  use { max, min } from @sentrie/js as math
 
   rule calculatePrice = default 0 {
     let base = price
