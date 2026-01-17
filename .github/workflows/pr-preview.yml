@@ -8,6 +8,9 @@ permissions:
   contents: read
   pull-requests: write
 
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+
 jobs:
   deploy-preview:
     name: Deploy Preview
@@ -20,6 +23,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: |
@@ -41,26 +45,28 @@ jobs:
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
         run: |
           cd dist
-          surge --project . --domain sentrie-pr-${{ github.event.pull_request.number }}.surge.sh
+          surge --project . \
+            --domain "sentrie-pr-${{ github.event.pull_request.number }}.surge.sh" \
+            -y
 
       - name: Verify deployment
+        timeout-minutes: 2
         run: |
           PREVIEW_URL="https://sentrie-pr-${{ github.event.pull_request.number }}.surge.sh"
           echo "Verifying deployment at $PREVIEW_URL..."
           for i in {1..10}; do
-            if curl -f -o /dev/null -s "$PREVIEW_URL"; then
+            if curl -fsSL -o /dev/null "$PREVIEW_URL"; then
               echo "Deployment verified successfully!"
               exit 0
             fi
-            echo "Attempt $i/10 failed, retrying in 1 second..."
-            sleep 1
+            echo "Attempt $i/10 failed, retrying in 2 seconds..."
+            sleep 2
           done
           echo "Deployment verification failed after 10 attempts"
           exit 1
 
       - name: Find existing preview comment
         id: find-comment
-        continue-on-error: true
         uses: peter-evans/find-comment@v3
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -72,12 +78,13 @@ jobs:
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
           body: |
             <!-- surge-preview -->
             ## 🚀 Preview Deployment
 
             A preview of this PR has been deployed to:
 
-            🔗 ** [View Preview](https://sentrie-pr-${{ github.event.pull_request.number }}.surge.sh) **
+            🔗 **[View Preview](https://sentrie-pr-${{ github.event.pull_request.number }}.surge.sh)**
 
             This preview will be automatically removed when the PR is merged or closed.
