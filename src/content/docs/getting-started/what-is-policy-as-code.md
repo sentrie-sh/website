@@ -38,7 +38,7 @@ shape User {
 }
 
 policy access_control {
-  fact user!: User
+  fact user: User
 
   rule admin_access = user.role == "admin"
 

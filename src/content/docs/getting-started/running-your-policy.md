@@ -20,7 +20,7 @@ shape User {
 
 policy user_access {
 
-  fact user: User as currentUser
+  fact user: User
 
   rule allow_admin = {
     yield user.role == "admin"
@@ -51,7 +51,7 @@ If no rule name is provided, the executor will evaluate all exported rules and r
 **Expected Output:**
 
 ```
-Namespace: sh/sentrie/example
+Namespace: user_management
 Policy:    user_access
 
 Rules:

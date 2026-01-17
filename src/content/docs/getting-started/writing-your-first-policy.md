@@ -93,11 +93,12 @@ policy user_access {
 ```
 
 :::note
+
 - Facts are **required by default** - they must be provided during execution
 - Use `?` to mark facts as **optional** - optional facts can be omitted
 - Only **optional facts** (`?`) can have default values
 - Facts are **always non-nullable** - null values are not allowed
-:::
+  :::
 
 ## Add your first rule
 
