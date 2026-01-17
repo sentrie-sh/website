@@ -22,9 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm cache clean --force
-          rm -rf node_modules package-lock.json
-          npm install
+          npm ci
 
       - name: Build Astro site
         env:
@@ -76,6 +74,6 @@ jobs:
 
             A preview of this PR has been deployed to:
 
-            **🔗 [View Preview](https://sentrie-pr-${{ github.event.pull_request.number }}.surge.sh)**
+            🔗 ** [View Preview](https://sentrie-pr-${{ github.event.pull_request.number }}.surge.sh) **
 
             This preview will be automatically removed when the PR is merged or closed.

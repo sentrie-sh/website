@@ -44,6 +44,6 @@ jobs:
             <!-- surge-preview -->
             ## 🚀 Preview Deployment
 
-            ${{ github.event.pull_request.merged == true && '✅ **Preview removed (PR merged)**' || '❌ **Preview removed (PR closed)**' }}
+            ${{ github.event.pull_request.merged == true && '✅ ** Preview removed (PR merged) **' || '❌ ** Preview removed (PR closed) **' }}
 
             The preview deployment for this PR has been automatically removed.
