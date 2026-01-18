@@ -215,10 +215,6 @@ The API includes CORS headers to allow cross-origin requests:
 - `Access-Control-Allow-Methods: POST, OPTIONS`
 - `Access-Control-Allow-Headers: Content-Type`
 
-## Request ID Middleware
-
-All requests include a request ID in the response headers and error responses for tracing and debugging purposes.
-
 ## Limitations and Future Work
 
 :::warning[Work in Progress]
