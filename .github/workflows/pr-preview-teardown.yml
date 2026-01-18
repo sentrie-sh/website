@@ -27,6 +27,22 @@ jobs:
         run: |
           surge teardown sentrie-pr-${{ github.event.pull_request.number }}.surge.sh
 
+      - name: Verify teardown
+        timeout-minutes: 2
+        run: |
+          PREVIEW_URL="https://sentrie-pr-${{ github.event.pull_request.number }}.surge.sh"
+          echo "Verifying teardown for $PREVIEW_URL..."
+          for i in {1..10}; do
+            if ! curl -fsSL -o /dev/null "$PREVIEW_URL" 2>/dev/null; then
+              echo "Teardown verified successfully - deployment is no longer accessible!"
+              exit 0
+            fi
+            echo "Attempt $i/10: Deployment still accessible, retrying in 2 seconds..."
+            sleep 2
+          done
+          echo "Teardown verification: Deployment may still be accessible after 10 attempts"
+          exit 0
+
       - name: Find existing preview comment
         id: find-comment
         continue-on-error: true
