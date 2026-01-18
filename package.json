@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build --force && echo 'sentrie-sh.surge.sh' > CNAME",
+    "build": "astro build --force",
     "stage": "astro build --outDir dist-stage --force",
     "deploy-stage": "yarn stage && cd dist-stage && surge --domain sentrie-sh-stage.surge.sh -y && cd - ",
     "preview": "astro preview",
