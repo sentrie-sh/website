@@ -174,6 +174,10 @@ export decision of canRead
   attach timestamp as currentTime()
 ```
 
+:::note
+For a complete guide on exporting and importing rules, see [Exporting and Importing Rules](/reference/exporting-and-importing-rules).
+:::
+
 ### Import Rule outcomes of other policies
 
 ```sentrie
@@ -195,6 +199,10 @@ let accessReason = authResult.reason         -- Access the 'reason' attachment
 let accessLevel = authResult.level           -- Access the 'level' attachment
 let userPermissions = authResult.permissions -- Access the 'permissions' attachment
 ```
+
+:::note
+For detailed information on importing rules, fact injection, and accessing attachments, see [Exporting and Importing Rules](/reference/exporting-and-importing-rules).
+:::
 
 ## Rule Attachments
 
@@ -405,6 +413,10 @@ rule authResult = import decision of authenticate
 -- Use imported result
 rule canProceed = authResult and user.verified
 ```
+
+:::note
+Learn more about cross-policy dependencies, sandboxing, and best practices in [Exporting and Importing Rules](/reference/exporting-and-importing-rules).
+:::
 
 ## Best Practices
 

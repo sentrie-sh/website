@@ -7,11 +7,14 @@ description: Let declarations are containers for intermediate values within bloc
 
 :::note[Important]
 
-- `let` declarations are **scoped to their immediate block** (`{}`)
-- `let` declarations **cannot be exported** - only rules can be exported
-- `let` declarations are **immutable** - once declared, their value cannot be changed
-- `let` declarations are used for **intermediate calculations** within a policy or rule block
-  :::
+`let` declarations are:
+
+- **Scoped to their immediate block** (`{}`)
+- **Cannot be exported** - only rules can be exported
+- **Immutable** - once declared, their value cannot be changed
+- **Used for intermediate calculations** within a policy or rule block
+
+:::
 
 ## Let Declaration Syntax
 
@@ -35,6 +38,13 @@ let totalPrice = item.price * quantity
 let count: number = 10
 let name: string = "example"
 let isActive: bool = true
+
+-- With type annotations and constraints
+let count: number @min(0) @max(100) = 50
+let name: string @minlength(3) @maxlength(20) = "example"
+
+-- can be shapes as well
+let user: User = { name: "John Doe", age: 30 }
 ```
 
 ## Block Scoping

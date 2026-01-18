@@ -287,6 +287,101 @@ rule validateAccess = default false when user.role is defined {
 
 </details>
 
+### `as_list(value) => list[any]`
+
+<details>
+<summary>Normalizes "one-or-many" inputs by wrapping non-list values in a single-element list.</summary>
+
+The `as_list` function takes a single value and ensures it's a list. If the input is already a list, it returns it unchanged. If the input is not a list, it wraps it in a single-element list.
+
+**Examples:**
+
+- `as_list(42)` → `[42]`
+- `as_list("hello")` → `["hello"]`
+- `as_list([1, 2, 3])` → `[1, 2, 3]`
+
+```sentrie
+let single_value = 42
+let as_list_value = as_list(single_value)  -- Returns [42]
+
+let already_list = [1, 2, 3]
+let unchanged = as_list(already_list)  -- Returns [1, 2, 3]
+```
+
+**Note:** If the input contains `undefined` values, the function returns `undefined`.
+
+</details>
+
+### `flatten(list, depth?) => list[any]`
+
+<details>
+<summary>Flattens nested lists to a controlled depth.</summary>
+
+The `flatten` function takes a list and optionally a depth parameter, and flattens nested lists up to the specified depth. The default depth is 1 if not specified.
+
+**Examples:**
+
+- `flatten([[1, 2], [3, 4]])` → `[1, 2, 3, 4]` (default depth 1)
+- `flatten([[1, 2], [3, 4]], 1)` → `[1, 2, 3, 4]`
+- `flatten([[[1, 2]], [[3, 4]]], 2)` → `[1, 2, 3, 4]`
+- `flatten([1, 2, 3], 0)` → `[1, 2, 3]` (no flattening)
+
+```sentrie
+let nested = [[1, 2], [3, 4], [5]]
+let flattened = flatten(nested)  -- Returns [1, 2, 3, 4, 5]
+
+let deeply_nested = [[[1, 2]], [[3, 4]]]
+let flattened_deep = flatten(deeply_nested, 2)  -- Returns [1, 2, 3, 4]
+```
+
+**Note:** If the input contains `undefined` values, the function returns `undefined`.
+
+</details>
+
+### `flatten_deep(list) => list[any]`
+
+<details>
+<summary>Recursively flattens nested lists to arbitrary depth.</summary>
+
+The `flatten_deep` function takes a list and recursively flattens all nested lists, regardless of nesting depth.
+
+**Examples:**
+
+- `flatten_deep([[1, 2], [3, [4, 5]]])` → `[1, 2, 3, 4, 5]`
+- `flatten_deep([[[1]], [[2, 3]], [4]])` → `[1, 2, 3, 4]`
+
+```sentrie
+let deeply_nested = [[1, [2, [3, 4]]], [5, 6]]
+let fully_flattened = flatten_deep(deeply_nested)  -- Returns [1, 2, 3, 4, 5, 6]
+```
+
+**Note:** If the input contains `undefined` values, the function returns `undefined`.
+
+</details>
+
+### `normalise_list(value) => list[any]`
+
+<details>
+<summary>Normalizes messy list inputs with one level of nesting.</summary>
+
+The `normalise_list` function first applies `as_list` to wrap non-list values, then flattens exactly one level of nesting. It errors if the input contains deeper than one level of nesting.
+
+**Examples:**
+
+- `normalise_list(42)` → `[42]` (wrapped, then no flattening needed)
+- `normalise_list([1, 2, 3])` → `[1, 2, 3]` (already flat)
+- `normalise_list([[1, 2], [3, 4]])` → `[1, 2, 3, 4]` (one level flattened)
+- `normalise_list([[[1, 2]]])` → Error (deeper than one level)
+
+```sentrie
+let mixed_input = [[1, 2], 3, [4, 5]]
+let normalized = normalise_list(mixed_input)  -- Returns [1, 2, 3, 4, 5]
+```
+
+**Note:** If the input contains `undefined` values, the function returns `undefined`.
+
+</details>
+
 :::note
 Built-in functions are fast and lightweight. While they support memoization syntax (see [Function Memoization](#function-memoization)), they are not actually memoized as caching would provide minimal benefit for these operations.
 :::

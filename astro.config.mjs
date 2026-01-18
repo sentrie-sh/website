@@ -7,9 +7,14 @@ import { sentrieGrammar } from "./src/sentrie-grammar.ts";
 export default defineConfig({
   site: process.env.ASTRO_SITE_URL || "https://sentrie.sh",
   trailingSlash: "ignore",
+  prefetch: {
+    defaultStrategy: "viewport",
+    prefetchAll: true,
+  },
   integrations: [
     starlight({
       title: "Sentrie",
+      credits: true,
       social: [
         {
           icon: "github",
@@ -87,10 +92,6 @@ export default defineConfig({
               label: "Serving Policies",
               slug: "running-sentrie/serving-policies",
             },
-            {
-              label: "OTEL Integration",
-              slug: "running-sentrie/otel-integration",
-            },
           ],
         },
         {
@@ -131,6 +132,10 @@ export default defineConfig({
             {
               label: "Rules",
               slug: "reference/rules",
+            },
+            {
+              label: "Exporting and Importing Rules",
+              slug: "reference/exporting-and-importing-rules",
             },
             {
               label: "Intermediate Values",
@@ -245,6 +250,10 @@ export default defineConfig({
             {
               label: "serve",
               slug: "cli-reference/serve",
+            },
+            {
+              label: "validate",
+              slug: "cli-reference/validate",
             },
           ],
         },

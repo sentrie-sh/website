@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Minimalistic shield for Sentrie -->
+  <path d="M50 15 
+           L20 25 
+           L20 50 
+           C20 65, 30 80, 50 85 
+           C70 80, 80 65, 80 50 
+           L80 25 
+           Z" 
+        stroke="currentColor" 
+        stroke-width="4" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="none"/>
+  <!-- Inner accent line for depth -->
+  <path d="M50 20 
+           L30 28 
+           L30 50 
+           C30 62, 38 74, 50 78 
+           C62 74, 70 62, 70 50 
+           L70 28 
+           Z" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="none"/>
+</svg>
