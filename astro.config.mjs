@@ -7,9 +7,14 @@ import { sentrieGrammar } from "./src/sentrie-grammar.ts";
 export default defineConfig({
   site: process.env.ASTRO_SITE_URL || "https://sentrie.sh",
   trailingSlash: "ignore",
+  prefetch: {
+    defaultStrategy: "viewport",
+    prefetchAll: true,
+  },
   integrations: [
     starlight({
       title: "Sentrie",
+      credits: true,
       social: [
         {
           icon: "github",
