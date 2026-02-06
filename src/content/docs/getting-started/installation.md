@@ -13,17 +13,13 @@ Convenience scripts are provided for macOS, Linux, and Windows.
 
 ### On macOS
 
-**Recommended: Homebrew Formula** (reduces Gatekeeper friction)
+**Recommended: Homebrew Formula**
 
 ```bash
 brew install sentrie-sh/tap/sentrie
 ```
 
-**Alternative: Homebrew Cask**
-
-```bash
-brew install --cask sentrie-sh/tap/sentrie
-```
+> **Why Formulas instead of Casks?** macOS Gatekeeper flags binaries installed via Homebrew Casks, requiring users to manually remove quarantine attributes or approve the binary in System Settings. Formulas are treated as regular binaries by Gatekeeper, avoiding these security warnings and providing a seamless installation experience.
 
 **Alternative: Install script**
 
