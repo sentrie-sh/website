@@ -11,7 +11,23 @@ Convenience scripts are provided for macOS, Linux, and Windows.
 
 ## Installing the latest version
 
-### On macOS, Linux and WSL2
+### On macOS
+
+**Recommended: Homebrew Formula**
+
+```bash
+brew install sentrie-sh/tap/sentrie
+```
+
+> **Why Formulas instead of Casks?** macOS Gatekeeper flags binaries installed via Homebrew Casks, requiring users to manually remove quarantine attributes or approve the binary in System Settings. Formulas are treated as regular binaries by Gatekeeper, avoiding these security warnings and providing a seamless installation experience.
+
+**Alternative: Install script**
+
+```bash
+curl -fsSL https://sentrie.sh/install.sh | bash
+```
+
+### On Linux and WSL2
 
 ```bash
 curl -fsSL https://sentrie.sh/install.sh | bash
@@ -33,7 +49,15 @@ This should display the current version of Sentrie.
 
 ## Installing a specific version
 
-### On macOS, Linux and WSL2
+### On macOS
+
+For specific versions, use the install script:
+
+```bash
+curl -fsSL https://sentrie.sh/install.sh | bash -s v0.1.0
+```
+
+### On Linux and WSL2
 
 ```bash
 curl -fsSL https://sentrie.sh/install.sh | bash -s v0.1.0
