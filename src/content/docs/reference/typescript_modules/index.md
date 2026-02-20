@@ -3,7 +3,6 @@ title: Built-in TypeScript Modules
 description: "Reference for built-in @sentrie/* modules: import syntax and module list."
 ---
 
-# Built-in TypeScript Modules
 
 Built-in modules provide functions for hashing, encoding, time, JSON, regex, and more. Import with `use { ... } from @sentrie/module`; no quotes. For custom modules see [Writing custom TypeScript modules](/extensibility/writing-custom-typescript-modules).
 

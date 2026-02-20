@@ -3,7 +3,6 @@ title: "validate Command"
 description: "Validate a policy pack and its structure."
 ---
 
-# validate Command
 
 The `validate` command validates a policy pack's structure, syntax, and type correctness without executing policies. This is useful for checking that your policies are correctly formatted and can be loaded before deployment.
 

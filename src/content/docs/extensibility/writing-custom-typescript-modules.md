@@ -3,7 +3,6 @@ title: Writing Custom TypeScript Modules
 description: "How to add and use your own TypeScript modules in a policy pack: paths, exports, and use statement."
 ---
 
-# Writing Custom TypeScript Modules
 
 You can add TypeScript files to your policy pack and import them in policies with the `use` statement. Paths are relative to the policy file or use `@local` (pack root). Built-in modules are `@sentrie/*`; local files use quoted relative paths.
 

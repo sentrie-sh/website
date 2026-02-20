@@ -3,7 +3,6 @@ title: Facts
 description: "Fact declaration syntax: required/optional, type, alias, default."
 ---
 
-# Facts
 
 Facts are named inputs to a policy. They are declared at the top of the policy (after comments and other facts). Required by default; use `?` for optional. Only optional facts may have a default. Facts are non-nullable.
 

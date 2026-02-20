@@ -3,8 +3,6 @@ title: Quick Start
 description: Install Sentrie and run your first policy evaluation.
 ---
 
-# Quick Start
-
 Install the Sentrie binary and evaluate a policy from the command line. This page covers installation and a minimal run (no policy pack layout).
 
 ## Syntax

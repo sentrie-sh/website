@@ -3,7 +3,6 @@ title: CLI Reference
 description: "Sentrie CLI: exec, init, serve, validate. Syntax, options, and behavior."
 ---
 
-# CLI Reference
 
 The Sentrie CLI provides commands to execute policies, initialize packs, serve an HTTP API, and validate packs. All commands support `--help`, `--version`, `--debug`, `--log-level`.
 

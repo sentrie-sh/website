@@ -3,7 +3,6 @@ title: "serve Command"
 description: "Start the Sentrie HTTP server to evaluate policies."
 ---
 
-# serve Command
 
 The `serve` command starts the Sentrie HTTP server to evaluate policies.
 

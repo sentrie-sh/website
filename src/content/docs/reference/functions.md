@@ -3,7 +3,6 @@ title: Functions
 description: Function call syntax and TypeScript module usage; memoization.
 ---
 
-# Functions
 
 Functions are called with `name(args...)` or `alias.name(args...)` for imported modules. Sentrie has no built-in global functions; all functions come from TypeScript modules imported with `use`.
 

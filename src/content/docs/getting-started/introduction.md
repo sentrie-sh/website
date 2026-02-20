@@ -3,7 +3,6 @@ title: Introduction & Core Philosophy
 description: Sentrie is a policy engine with deterministic evaluation. This page states what Sentrie is and why determinism is central.
 ---
 
-# Introduction & Core Philosophy
 
 Sentrie is an open-source policy engine. You write business rules in a dedicated language; the engine evaluates them with deterministic, bounded execution. Use it when you need consistent policy decisions across services, auditability, and predictable performance.
 

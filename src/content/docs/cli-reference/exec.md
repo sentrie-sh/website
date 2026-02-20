@@ -3,7 +3,6 @@ title: "exec Command"
 description: "Execute a policy or rule with Sentrie."
 ---
 
-# exec Command
 
 The `exec` command executes a policy or rule from a policy pack. This is the primary way to test and run your policies locally.
 

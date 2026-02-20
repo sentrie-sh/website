@@ -3,7 +3,6 @@ title: Security and Permissions
 description: "Policy pack permissions: filesystem, network, environment."
 ---
 
-# Security and Permissions
 
 Permissions define what a policy pack can access: filesystem (read), network hosts, and environment variables. They are set in `sentrie.pack.toml` under `[permissions]`. Default is pack-root filesystem only; no network; no env.
 

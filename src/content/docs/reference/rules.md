@@ -3,7 +3,6 @@ title: Rules
 description: Rule syntax, evaluation (when/default/body), and outcome (trinary or value).
 ---
 
-# Rules
 
 A rule defines a decision: an optional `when` condition, an optional `default`, and a body that must contain `yield`. If `when` is truthy the body is evaluated; otherwise the `default` (or `unknown`) is used.
 

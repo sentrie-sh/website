@@ -3,7 +3,6 @@ title: Policies
 description: "Policy syntax and allowed statements: facts, rules, let, use, export."
 ---
 
-# Policies
 
 A policy is a named block inside a namespace. It contains facts (inputs), rules (decisions), optional `let` bindings and `use` statements, and at least one `export decision of` rule.
 

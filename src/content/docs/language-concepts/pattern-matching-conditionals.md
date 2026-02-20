@@ -3,7 +3,6 @@ title: Pattern Matching & Conditionals
 description: How conditional selection (ternary, Elvis), pattern matching (matches), and state checks work in Sentrie.
 ---
 
-# Pattern Matching & Conditionals
 
 Sentrie uses trinary logic (`true`, `false`, `unknown`) and provides the ternary and Elvis operators for conditional values, plus `matches` for regex and `is defined` / `is empty` for state checks. This page describes how these work.
 

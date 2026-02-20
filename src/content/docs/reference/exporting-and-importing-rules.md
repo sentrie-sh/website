@@ -3,7 +3,6 @@ title: "Exporting and Importing Rules"
 description: "Learn how to export rules from policies and import them into other policies for code reuse and composition."
 ---
 
-# Exporting and Importing Rules
 
 Sentrie allows you to export rules from one policy and import them into another, enabling code reuse and policy composition. This guide covers how to export rules, import them, and work with attachments.
 

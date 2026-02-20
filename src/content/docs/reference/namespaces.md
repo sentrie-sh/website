@@ -3,7 +3,6 @@ title: Namespaces
 description: Namespace syntax and rules for organizing policies and shapes.
 ---
 
-# Namespaces
 
 Namespaces group policies and shapes and form the visibility boundary for unexported shapes. Each `*.sentrie` file has exactly one namespace and it must be the first statement.
 

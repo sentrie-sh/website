@@ -3,8 +3,6 @@ title: "CLI Reference"
 description: "Complete reference for the Sentrie command-line interface."
 ---
 
-# CLI Reference
-
 This document provides comprehensive reference for the Sentrie command-line interface.
 
 ## Overview

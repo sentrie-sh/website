@@ -3,8 +3,6 @@ title: "Getting Started"
 description: "Learn the basics of Sentrie and write your first policy."
 ---
 
-# Getting Started
-
 Welcome to Sentrie! This guide will help you get up and running with Sentrie quickly.
 
 ## What is Sentrie?

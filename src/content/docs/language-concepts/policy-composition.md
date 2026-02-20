@@ -3,7 +3,6 @@ title: Policy Composition
 description: "How exporting and importing rules work: syntax, attachments, sandboxing, and namespace resolution."
 ---
 
-# Policy Composition
 
 Policies export rules so they can be executed via CLI/API or imported by other policies. Importing a rule runs it in isolation with only the facts you supply via `with` clauses. This page describes how export and import work.
 

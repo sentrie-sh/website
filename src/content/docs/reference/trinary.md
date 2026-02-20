@@ -3,7 +3,6 @@ title: Trinary Values
 description: "Three-valued logic: true, false, unknown; truthiness and Kleene tables."
 ---
 
-# Trinary Values
 
 Sentrie uses trinary logic: `true`, `false`, and `unknown`. Unknown represents indeterminate truth (e.g. undefined field access). Logical operators follow Kleene's three-valued logic.
 

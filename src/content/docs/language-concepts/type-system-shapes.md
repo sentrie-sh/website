@@ -3,7 +3,6 @@ title: Type System & Shapes Overview
 description: "How types, shapes, and constraints work in Sentrie: structure, validation, and composition."
 ---
 
-# Type System & Shapes Overview
 
 The type system defines values (primitives, collections, documents) and structured data (shapes). Constraints validate values at runtime. Understanding how types and shapes work is required to define facts and rules correctly.
 

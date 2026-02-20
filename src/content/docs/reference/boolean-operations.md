@@ -3,7 +3,6 @@ title: Boolean Operations
 description: Logical (and, or, xor, not) and comparison (==, !=, <, <=, >, >=) operators.
 ---
 
-# Boolean Operations
 
 Logical and comparison operators produce trinary or bool results. Operands are trinary; comparisons and logical ops follow [trinary](/reference/trinary) semantics.
 

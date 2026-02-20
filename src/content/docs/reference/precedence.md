@@ -3,7 +3,6 @@ title: Precedence
 description: Operator precedence (highest to lowest) for expressions.
 ---
 
-# Precedence
 
 Operators are evaluated in order of precedence (highest first). Same precedence is left-to-right unless stated otherwise. Use parentheses to override.
 

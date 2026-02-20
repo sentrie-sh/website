@@ -3,7 +3,6 @@ title: "@sentrie/uuid"
 description: UUID generation (v4, v6, v7).
 ---
 
-# @sentrie/uuid
 
 Generates UUIDs. v4: random; v6/v7: time-ordered. Use when you need unique identifiers or time-ordered IDs for indexing.
 

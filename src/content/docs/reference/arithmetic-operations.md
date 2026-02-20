@@ -3,7 +3,6 @@ title: Arithmetic Operations
 description: "Arithmetic operators: +, -, *, /, %; types and edge cases."
 ---
 
-# Arithmetic Operations
 
 Arithmetic operators operate on `number` (float64). All numeric operands are unified as `number`. Result type is `number`.
 

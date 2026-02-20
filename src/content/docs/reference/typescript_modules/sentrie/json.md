@@ -3,7 +3,6 @@ title: "@sentrie/json"
 description: JSON validation. For parse/stringify use @sentrie/js.
 ---
 
-# @sentrie/json
 
 Provides `isValid` to check if a string is valid JSON. For parsing and stringifying use [@sentrie/js](/reference/typescript_modules/sentrie/js).
 

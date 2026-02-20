@@ -3,7 +3,6 @@ title: Shapes
 description: "Shape syntax: data models, field modifiers, composition, and type aliases."
 ---
 
-# Shapes
 
 Shapes define structured data (fields) or type aliases (base type + constraints). They are used for facts and `let` bindings. Optional fields use `?`; required non-null use `!`. Composition uses `with Base`.
 

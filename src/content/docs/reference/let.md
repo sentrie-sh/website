@@ -3,7 +3,6 @@ title: Intermediate Values (let)
 description: let declaration syntax, scoping, and immutability.
 ---
 
-# Intermediate Values (let)
 
 `let` binds a name to an expression inside a block. It is scoped to that block, immutable, and cannot be exported. Used for intermediate calculations in policies and rules.
 

@@ -3,7 +3,6 @@ title: Running as a Service
 description: "HTTP API for policy evaluation: endpoints, request/response schemas, and error format."
 ---
 
-# Running as a Service
 
 Start the server with `sentrie serve`. The API exposes health and decision evaluation. Request/response are JSON. Errors use RFC 9457 Problem Details.
 

@@ -3,7 +3,6 @@ title: Collection Operations
 description: "Quantifiers and transformers: any, all, filter, map, reduce, count, distinct."
 ---
 
-# Collection Operations
 
 Collection operations apply to lists and maps. They are declarative: they return new values or collections and do not mutate the input. Syntax uses a block with `yield`.
 
