@@ -9,13 +9,7 @@ Install the Sentrie binary and evaluate a policy from the command line. This pag
 
 ## Syntax
 
-Install (macOS with Homebrew):
-
-```bash
-brew install sentrie-sh/tap/sentrie
-```
-
-Install (macOS, Linux, WSL2 — install script):
+Install (macOS, Linux, WSL2):
 
 ```bash
 curl -fsSL https://sentrie.sh/install.sh | bash

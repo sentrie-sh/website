@@ -14,6 +14,7 @@ The type system defines values (primitives, collections, documents) and structur
 **Collections:** `list[T]` | `map[T]` | `record[T1, T2, ...]`
 
 **Shape (data model):**
+
 ```text
 shape Name {
   field!: type
@@ -30,12 +31,12 @@ shape Name {
 
 ## Parameters
 
-| Concept | Required | Description |
-| :--- | :--- | :--- |
-| Field `!` | No | Required non-null; field must be present and not null. |
-| Field `?` | No | Optional; field may be omitted. |
-| No marker | — | Required but may be null. |
-| `with Base` | No | Shape inherits all fields of Base plus its own. |
+| Concept     | Required | Description                                            |
+| :---------- | :------- | :----------------------------------------------------- |
+| Field `!`   | No       | Required non-null; field must be present and not null. |
+| Field `?`   | No       | Optional; field may be omitted.                        |
+| No marker   | -        | Required but may be null.                              |
+| `with Base` | No       | Shape inherits all fields of Base plus its own.        |
 
 **Returns:** N/A (type system). Constraint validation fails at runtime if a value does not meet the type or constraints; evaluation aborts.
 

@@ -16,13 +16,13 @@ fact name? : type [ as alias ] [ default expr ]  -- optional
 
 ## Parameters
 
-| Part | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `name` | identifier | Yes | Declaration name. |
-| `name?` | — | No | `?` makes the fact optional. |
-| `type` | shape/primitive | Yes | Type of the fact value. |
-| `as alias` | identifier | No | Name used in the policy body; default is `name`. |
-| `default expr` | expression | No | Only for optional facts; used when fact is omitted. |
+| Part           | Type            | Required | Description                                         |
+| :------------- | :-------------- | :------- | :-------------------------------------------------- |
+| `name`         | identifier      | Yes      | Declaration name.                                   |
+| `name?`        | -               | No       | `?` makes the fact optional.                        |
+| `type`         | shape/primitive | Yes      | Type of the fact value.                             |
+| `as alias`     | identifier      | No       | Name used in the policy body; default is `name`.    |
+| `default expr` | expression      | No       | Only for optional facts; used when fact is omitted. |
 
 **Returns:** N/A (declaration). At evaluation time, fact names (or aliases) are bound to the provided JSON input.
 

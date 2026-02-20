@@ -7,12 +7,12 @@ description: Enforcing policies using Sentrie
 
 Sentrie is a **deterministic policy decision engine**. It evaluates structured inputs against rules and returns `true`, `false`, or `unknown`. That's it.
 
-The engine is **pure** and **side-effect-free**—no mutations, no API calls, no state changes. This makes it safe to embed deep in your stack: IAM systems, API gateways, control planes, multi-tenant services, anywhere you need fast, reliable authorization decisions.
+The engine is **pure** and **side-effect-free**-no mutations, no API calls, no state changes. This makes it safe to embed deep in your stack: IAM systems, API gateways, control planes, multi-tenant services, anywhere you need fast, reliable authorization decisions.
 
 Because enforcement lives outside the policy, the same rules work across different systems with different enforcement modes - whether you're blocking requests, redacting data, or triggering step-up auth.
 
 :::note[Sentrie makes decisions]
-Sentrie focuses on **decision quality** — your systems handle enforcement.
+Sentrie focuses on **decision quality** - your systems handle enforcement.
 :::
 
 ## Why Enforcement is External
@@ -27,9 +27,9 @@ Different platforms enforce differently:
 
 Keeping the engine pure gives you three guarantees:
 
-- **Determinism** — same input = same output, always
-- **Reproducibility** — decisions are safe to replay and audit
-- **Portability** — runs identically everywhere
+- **Determinism** - same input = same output, always
+- **Reproducibility** - decisions are safe to replay and audit
+- **Portability** - runs identically everywhere
 
 This is what makes Sentrie safe for **real-time**, **latency-sensitive** paths.
 

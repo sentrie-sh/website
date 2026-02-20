@@ -11,7 +11,7 @@ Sentrie uses trinary logic (`true`, `false`, `unknown`) and provides the ternary
 
 **Ternary:** `condition ? trueValue : falseValue`
 
-**Elvis:** `expression ?: defaultValue`  (equivalent to `expression ? expression : defaultValue`)
+**Elvis:** `expression ?: defaultValue` (equivalent to `expression ? expression : defaultValue`)
 
 **Pattern match:** `string matches pattern`
 
@@ -21,13 +21,13 @@ Sentrie uses trinary logic (`true`, `false`, `unknown`) and provides the ternary
 
 ## Parameters
 
-| Construct | Left | Right | Description |
-| :--- | :--- | :--- | :--- |
-| `? :` | condition (trinary) | trueValue, falseValue | If condition is truthy, result is trueValue; else falseValue. |
-| `?:` | expression | defaultValue | If expression is truthy, result is expression; else defaultValue. |
-| `matches` | string | string (regex) | True if string matches the regex pattern. |
-| `is defined` | any | — | True if value is not undefined. |
-| `is empty` | string/list/map | — | True if empty (e.g. `""`, `[]`, `{}`). |
+| Construct    | Left                | Right                 | Description                                                       |
+| :----------- | :------------------ | :-------------------- | :---------------------------------------------------------------- |
+| `? :`        | condition (trinary) | trueValue, falseValue | If condition is truthy, result is trueValue; else falseValue.     |
+| `?:`         | expression          | defaultValue          | If expression is truthy, result is expression; else defaultValue. |
+| `matches`    | string              | string (regex)        | True if string matches the regex pattern.                         |
+| `is defined` | any                 | -                     | True if value is not undefined.                                   |
+| `is empty`   | string/list/map     | -                     | True if empty (e.g. `""`, `[]`, `{}`).                            |
 
 **Returns:** For ternary/Elvis: the selected value (any type). For `matches`, `is defined`, `is empty`: boolean (or trinary where applicable). Non-truthy for Elvis includes `false`, `null`, `undefined` (treated as unknown), `0`, `""`, empty collections.
 

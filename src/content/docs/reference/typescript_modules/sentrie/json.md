@@ -16,11 +16,11 @@ alias.isValid(str)
 
 ## Parameters
 
-| Name | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `str` | string | Yes | String to validate as JSON. |
+| Name  | Type   | Required | Description                 |
+| :---- | :----- | :------- | :-------------------------- |
+| `str` | string | Yes      | String to validate as JSON. |
 
-**Returns:** `boolean` — true if the string is valid JSON, false otherwise.
+**Returns:** `boolean` - true if the string is valid JSON, false otherwise.
 
 ## Examples
 

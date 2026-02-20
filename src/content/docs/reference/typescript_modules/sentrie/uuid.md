@@ -18,13 +18,13 @@ alias.v7()
 
 ## Parameters
 
-| Function | Parameters | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `v4()` | none | — | Random UUID (version 4). |
-| `v6()` | none | — | Time-ordered UUID (version 6). |
-| `v7()` | none | — | Time-ordered UUID with Unix timestamp (version 7). |
+| Function | Parameters | Required | Description                                        |
+| :------- | :--------- | :------- | :------------------------------------------------- |
+| `v4()`   | none       | -        | Random UUID (version 4).                           |
+| `v6()`   | none       | -        | Time-ordered UUID (version 6).                     |
+| `v7()`   | none       | -        | Time-ordered UUID with Unix timestamp (version 7). |
 
-**Returns:** `string` — UUID in form `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. Throws on generation failure.
+**Returns:** `string` - UUID in form `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. Throws on generation failure.
 
 ## Examples
 
