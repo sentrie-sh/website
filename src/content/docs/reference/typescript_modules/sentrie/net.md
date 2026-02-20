@@ -257,3 +257,11 @@ policy mypolicy {
   export decision of checkAccess
 }
 ```
+
+## Behavior & Constraints
+
+- IPv4 and IPv6; CIDR and single IP. parseIP returns parsed representation or null. Invalid CIDR/IP throws.
+
+## Constraints & Edge Cases
+
+- Invalid CIDR or IP throws. Use isPrivate, isPublic, isLoopback for classification.

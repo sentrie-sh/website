@@ -136,8 +136,11 @@ policy mypolicy {
 }
 ```
 
-## Security Recommendations
+## Behavior & Constraints
 
-1. **Use SHA-256 or SHA-512** for secure hashing instead of MD5 or SHA-1
-2. **Use HMAC** for message authentication with a secret key
-3. **Store hashed passwords** using SHA-256 or SHA-512 with proper salt (consider using HMAC with a secret key)
+- All hash functions return hexadecimal-encoded strings. Input is string; HMAC takes algorithm name, message, and secret key.
+- Use SHA-256 or SHA-512 for security; MD5 and SHA-1 are cryptographically broken.
+
+## Constraints & Edge Cases
+
+- Invalid input (e.g. non-hex for decode) may throw. HMAC algorithm must be supported (e.g. sha256).

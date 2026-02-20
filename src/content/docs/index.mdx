@@ -11,10 +11,10 @@ hero:
     file: ../../assets/freeze.svg
   actions:
     - text: Quick Start
-      link: /getting-started/installation
+      link: /getting-started/quick-start
       icon: right-arrow
     - text: Documentation
-      link: getting-started/what-is-sentrie
+      link: getting-started/introduction
       icon: external
       variant: minimal
 ---
@@ -24,41 +24,39 @@ import { Card, CardGrid } from "@astrojs/starlight/components";
 ## Features
 
 <CardGrid stagger>
-  <Card title="Rich Expression Language" icon="document">
-    Powerful expressions with arithmetic, logical, comparison, and collection
-    operations. Support for quantifiers, pattern matching, and conditional
-    expressions.
+  <Card title="Quick Start" icon="document">
+    Install Sentrie and run your first policy evaluation. Installation and
+    basic usage.
     <br />
-    <a href="/reference">Learn more</a>
-  </Card>
-  <Card title="Composable Policies" icon="setting">
-    Build complex policies from simpler policies by exporting decisions that can
-    be used by other policies.
-    <br />
-    <a href="/reference/exporting-and-importing-rules">Learn more</a>
-  </Card>
-  <Card title="JavaScript Integration" icon="setting">
-    Seamlessly integrate TypeScript modules for complex logic. Built-in modules
-    for data manipulation, cryptography, and more.
-    <br />
-    <a href="/reference/using-typescript">Learn more</a>
-  </Card>
-  <Card title="Run as a Service" icon="setting">
-    Run Sentrie as a service to evaluate policies using a well-defined and
-    minimal HTTP API.
-    <br />
-    <a href="/running-sentrie/serving-policies">Learn more</a>
-  </Card>
-  <Card title="CLI Reference" icon="open-book">
-    The Sentrie CLI provides a powerful set of tools for managing your policies
-    and JavaScript modules.
-    <br />
-    <a href="/cli-reference">Learn more</a>
+    <a href="/getting-started/quick-start">Learn more</a>
   </Card>
   <Card title="Type-Safe Inputs" icon="pencil">
     Comprehensive type system with shapes, constraints, and built-in
     validations.
     <br />
     <a href="/reference/types-and-values">Learn more</a>
+  </Card>
+  <Card title="Rich Expression Language" icon="document">
+    Arithmetic, logical, comparison, and collection operations. Quantifiers,
+    pattern matching, and conditionals.
+    <br />
+    <a href="/reference/arithmetic-operations">Learn more</a>
+  </Card>
+  <Card title="Composable Policies" icon="setting">
+    Build complex policies from simpler policies by exporting and importing
+    decisions.
+    <br />
+    <a href="/language-concepts/policy-composition">Learn more</a>
+  </Card>
+  <Card title="TypeScript Integration" icon="setting">
+    Built-in TypeScript modules and writing custom modules for complex logic.
+    <br />
+    <a href="/reference/typescript_modules">Learn more</a>
+  </Card>
+  <Card title="Run as a Service" icon="setting">
+    Run Sentrie as a service with a well-defined HTTP API for policy
+    evaluation.
+    <br />
+    <a href="/deployment-operations/running-as-service">Learn more</a>
   </Card>
 </CardGrid>

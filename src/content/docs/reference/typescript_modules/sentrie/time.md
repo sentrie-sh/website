@@ -242,3 +242,11 @@ Common format patterns:
 - `"15:04:05"` - Time: `15:04:05`
 - `"2006-01-02 15:04:05"` - Date and time: `2006-01-02 15:04:05`
 - `"Mon, 02 Jan 2006 15:04:05 MST"` - RFC1123 format
+
+## Behavior & Constraints
+
+- Timestamps are Unix seconds. now() is fixed within an execution. addDuration/subtractDuration use duration strings (e.g. "1h", "30m"). isBefore/isAfter/isBetween compare timestamps.
+
+## Constraints & Edge Cases
+
+- Invalid format or duration may throw. Constants (RFC3339, etc.) are format layout strings.

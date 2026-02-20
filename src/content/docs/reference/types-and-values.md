@@ -1,114 +1,65 @@
 ---
 title: Types and Values
-description: Sentrie has a comprehensive type system with primitive types, collections, and user-defined shapes.
+description: Built-in primitive and collection types and type declarations.
 ---
 
-Sentrie provides a robust type system that includes primitive types, collection types, and [user-defined shapes](/reference/shapes/). The type system is enhanced by a powerful [constraint system](/reference/constraints) that allows you to validate values against specific rules.
+# Types and Values
 
-## Primitive Types
+Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `document`) and collection types (`list[T]`, `map[T]`, `record[T1,T2,...]`). User-defined shapes extend these. Types can be used in `let`, `fact`, and shape fields.
 
-Sentrie supports five fundamental primitive types:
+## Syntax
 
-| Type       | Description                                                     |
-| ---------- | --------------------------------------------------------------- |
-| `number`   | Numeric values                                                  |
-| `string`   | Text strings                                                    |
-| `trinary`  | Trinary values (`true` / `false` / `unknown`)                   |
-| `bool`     | Boolean values (`true` / `false`) - a special case of `trinary` |
-| `document` | Arbitrary JSON-like objects                                     |
+**Primitives:** `number` | `string` | `trinary` | `bool` | `document`
 
-### Declaring a Primitive Type
+**Collections:** `list[T]` | `map[T]` | `record[T1, T2, ...]`
+
+**Cast:** `cast expr as type`
+
+List index: `expr[number]`. Map index: `expr[string]` or `expr.key`.
+
+## Parameters
+
+| Type | Description |
+| :--- | :--- |
+| `number` | float64. |
+| `string` | UTF-8 string. |
+| `trinary` | `true` \| `false` \| `unknown`. |
+| `bool` | `true` \| `false` (subset of trinary). |
+| `document` | JSON-like object. |
+| `list[T]` | Ordered list of T; index by number. |
+| `map[T]` | String keys, T values; keys must be strings. |
+| `record[T1,T2,...]` | Fixed-length tuple. |
+
+**Returns:** N/A for types. `cast` returns the value after validation against the target type (and constraints); fails if invalid.
+
+## Examples
+
+### Basic Usage
 
 ```text
 let u: number = 50
+let s: string = "hello"
+let b: bool = true
+let arr: list[number] = [1, 2, 3]
+let m: map[number] = { "one": 1, "two": 2 }
+let r: record[string, number, bool] = ["one", 1, true]
 ```
+
+### Advanced Usage
 
 ```text
-let u: number = 50.5
+let first: number = arr[0]
+let one: number = m["one"]
+let oneAlt: number = m.one
+let x: number = cast "50" as number
 ```
 
-```text
-let u: string = "hello"
-```
+## Behavior & Constraints
 
-```text
-let u: bool = true
-```
+- Type annotation on `let` is optional; when omitted, value is not validated against a type.
+- Map keys must be strings. Division by zero aborts evaluation. Constraint failure aborts evaluation.
 
-```text
-let u: document = { "name": "John", "age": 30 }
-```
+## Constraints & Edge Cases
 
-## Collection Types
-
-Collections allow you to work with groups of related values:
-
-| Type                  | Description                                 |
-| --------------------- | ------------------------------------------- |
-| `list[T]`             | Lists of type `T`                           |
-| `map[T]`              | Maps with `string` keys and type `T` values |
-| `record[T1, T2, ...]` | Tuples with specific types                  |
-
-### Declaring a Collection Type
-
-```text
-let u: list[number] = [1, 2, 3]
-```
-
-```text
-let u: map[number] = { "one": 1, "two": 2, "three": 3 }
-```
-
-```text
-let u: record[string, number, bool] = ["one", 1, true]
-```
-
-:::caution
-Map keys must be strings.
-:::
-
-:::note
-The type is optional for `let` statements. When undeclared, the value is not validated against any type constraints.
-However, it is recommended to declare the type for better readability and to avoid surprises where the type is not what you expect.
-:::
-
-### Accessing Collection Elements
-
-You can access collection elements using the `[index]` syntax. The index must be a `string` for maps and a `number` for lists and records.
-
-```text
-let u: list[number] = [1, 2, 3]
-let first: number = u[0]
-```
-
-```text
-let u: map[number] = { "one": 1, "two": 2, "three": 3 }
-let first: number = u["one"]
-```
-
-For maps, you can also access elements using the `.` syntax.
-
-```text
-let u: map[number] = { "one": 1, "two": 2, "three": 3 }
-let first: number = u.one
-```
-
-## Converting Types
-
-You can convert between types using the `cast .. as` construct. The result is validated against the new type constraints before returning the result.
-
-```text
-let u: number = cast "50" as number
-```
-
-```text
-let u: string = cast 50 as string
-```
-
-```text
-let u: bool = cast "true" as bool
-```
-
-```text
-let u: document = cast { "name": "John", "age": 30 } as document
-```
+- Map keys must be strings. Access with `[index]`: number for list/record, string for map.
+- `cast` validates against the target type and any constraints; failure aborts evaluation.

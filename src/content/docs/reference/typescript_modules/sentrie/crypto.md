@@ -45,6 +45,10 @@ policy mypolicy {
 }
 ```
 
-## See Also
+## Behavior & Constraints
 
-- [@sentrie/hash](./hash) - For additional hash algorithms (MD5, SHA-1, SHA-512, HMAC)
+- Returns SHA-256 hash as hexadecimal string. For more algorithms use [@sentrie/hash](/reference/typescript_modules/sentrie/hash).
+
+## Constraints & Edge Cases
+
+- Input must be string. Invalid or unsupported input may throw.

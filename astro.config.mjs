@@ -26,235 +26,69 @@ export default defineConfig({
         {
           label: "Getting Started",
           items: [
-            {
-              label: "What is Sentrie?",
-              slug: "getting-started/what-is-sentrie",
-            },
-            {
-              label: "What is Policy as Code?",
-              slug: "getting-started/what-is-policy-as-code",
-            },
-            {
-              label: "Why Sentrie?",
-              slug: "getting-started/why-sentrie",
-            },
-            {
-              label: "Installation",
-              slug: "getting-started/installation",
-            },
-            {
-              label: "Writing your first Policy",
-              slug: "getting-started/writing-your-first-policy",
-            },
-            {
-              label: "Running your Policy",
-              slug: "getting-started/running-your-policy",
-            },
-            {
-              label: "Policy Enforcement",
-              slug: "getting-started/enforcement",
-            },
+            { label: "Introduction & Core Philosophy", slug: "getting-started/introduction" },
+            { label: "Quick Start", slug: "getting-started/quick-start" },
           ],
         },
         {
-          label: "Structure of a Policy Pack",
+          label: "Language Concepts",
           items: [
-            {
-              label: "Overview",
-              slug: "structure-of-a-policy-pack/overview",
-            },
-            {
-              label: "Pack File",
-              slug: "structure-of-a-policy-pack/packfile",
-            },
-            {
-              label: "Program File",
-              slug: "structure-of-a-policy-pack/program-file",
-            },
-            {
-              label: "TypeScript File",
-              slug: "structure-of-a-policy-pack/typescript-file",
-            },
-            {
-              label: "Example Pack",
-              slug: "structure-of-a-policy-pack/example-pack",
-            },
+            { label: "Type System & Shapes Overview", slug: "language-concepts/type-system-shapes" },
+            { label: "Policy Composition", slug: "language-concepts/policy-composition" },
+            { label: "Pattern Matching & Conditionals", slug: "language-concepts/pattern-matching-conditionals" },
           ],
         },
         {
-          label: "Running Sentrie",
+          label: "Language Reference",
           items: [
-            {
-              label: "Executing Policies",
-              slug: "running-sentrie/executing-policies",
-            },
-            {
-              label: "Serving Policies",
-              slug: "running-sentrie/serving-policies",
-            },
-          ],
-        },
-        {
-          label: "Reference",
-          items: [
-            {
-              label: "Overview",
-              slug: "reference",
-            },
-            {
-              label: "Types and Values",
-              slug: "reference/types-and-values",
-            },
-            {
-              label: "Constraints",
-              slug: "reference/constraints",
-            },
-            {
-              label: "Trinary Values",
-              slug: "reference/trinary",
-            },
-            {
-              label: "Shapes",
-              slug: "reference/shapes",
-            },
-            {
-              label: "Namespaces",
-              slug: "reference/namespaces",
-            },
-            {
-              label: "Policies",
-              slug: "reference/policies",
-            },
-            {
-              label: "Facts",
-              slug: "reference/facts",
-            },
-            {
-              label: "Rules",
-              slug: "reference/rules",
-            },
-            {
-              label: "Exporting and Importing Rules",
-              slug: "reference/exporting-and-importing-rules",
-            },
-            {
-              label: "Intermediate Values",
-              slug: "reference/let",
-            },
-            {
-              label: "Arithmetic Operations",
-              slug: "reference/arithmetic-operations",
-            },
-            {
-              label: "Boolean Operations",
-              slug: "reference/boolean-operations",
-            },
-            {
-              label: "Collection Operations",
-              slug: "reference/collection-operations",
-            },
-            {
-              label: "Using Functions",
-              slug: "reference/functions",
-            },
-            {
-              label: "Using TypeScript",
-              slug: "reference/using-typescript",
-            },
-            {
-              label: "Precedence",
-              slug: "reference/precedence",
-            },
-            {
-              label: "Security and Permissions",
-              slug: "reference/security-and-permissions",
-            },
+            { label: "Overview", slug: "reference" },
+            { label: "Namespaces", slug: "reference/namespaces" },
+            { label: "Policies", slug: "reference/policies" },
+            { label: "Rules", slug: "reference/rules" },
+            { label: "Facts", slug: "reference/facts" },
+            { label: "Intermediate Values (let)", slug: "reference/let" },
+            { label: "Types and Values", slug: "reference/types-and-values" },
+            { label: "Constraints", slug: "reference/constraints" },
+            { label: "Trinary Values", slug: "reference/trinary" },
+            { label: "Shapes", slug: "reference/shapes" },
+            { label: "Arithmetic Operations", slug: "reference/arithmetic-operations" },
+            { label: "Boolean Operations", slug: "reference/boolean-operations" },
+            { label: "Collection Operations", slug: "reference/collection-operations" },
+            { label: "Functions", slug: "reference/functions" },
+            { label: "Precedence", slug: "reference/precedence" },
+            { label: "Security and Permissions", slug: "reference/security-and-permissions" },
           ],
         },
         {
           label: "TypeScript Modules",
           items: [
-            {
-              label: "Overview",
-              slug: "reference/typescript_modules",
-            },
-            {
-              label: "JavaScript Globals",
-              slug: "reference/typescript_modules/sentrie/js",
-            },
-            {
-              label: "Collection",
-              slug: "reference/typescript_modules/sentrie/collection",
-            },
-            {
-              label: "Crypto",
-              slug: "reference/typescript_modules/sentrie/crypto",
-            },
-            {
-              label: "Encoding",
-              slug: "reference/typescript_modules/sentrie/encoding",
-            },
-            {
-              label: "Hash",
-              slug: "reference/typescript_modules/sentrie/hash",
-            },
-            {
-              label: "JSON",
-              slug: "reference/typescript_modules/sentrie/json",
-            },
-            {
-              label: "JWT",
-              slug: "reference/typescript_modules/sentrie/jwt",
-            },
-            {
-              label: "Net",
-              slug: "reference/typescript_modules/sentrie/net",
-            },
-            {
-              label: "Regex",
-              slug: "reference/typescript_modules/sentrie/regex",
-            },
-            {
-              label: "Semver",
-              slug: "reference/typescript_modules/sentrie/semver",
-            },
-            {
-              label: "Time",
-              slug: "reference/typescript_modules/sentrie/time",
-            },
-            {
-              label: "URL",
-              slug: "reference/typescript_modules/sentrie/url",
-            },
-            {
-              label: "UUID",
-              slug: "reference/typescript_modules/sentrie/uuid",
-            },
+            { label: "Overview", slug: "reference/typescript_modules" },
+            { label: "JavaScript Globals", slug: "reference/typescript_modules/sentrie/js" },
+            { label: "Collection", slug: "reference/typescript_modules/sentrie/collection" },
+            { label: "Crypto", slug: "reference/typescript_modules/sentrie/crypto" },
+            { label: "Encoding", slug: "reference/typescript_modules/sentrie/encoding" },
+            { label: "Hash", slug: "reference/typescript_modules/sentrie/hash" },
+            { label: "JSON", slug: "reference/typescript_modules/sentrie/json" },
+            { label: "JWT", slug: "reference/typescript_modules/sentrie/jwt" },
+            { label: "Net", slug: "reference/typescript_modules/sentrie/net" },
+            { label: "Regex", slug: "reference/typescript_modules/sentrie/regex" },
+            { label: "Semver", slug: "reference/typescript_modules/sentrie/semver" },
+            { label: "Time", slug: "reference/typescript_modules/sentrie/time" },
+            { label: "URL", slug: "reference/typescript_modules/sentrie/url" },
+            { label: "UUID", slug: "reference/typescript_modules/sentrie/uuid" },
           ],
         },
         {
-          label: "CLI Reference",
+          label: "Extensibility",
           items: [
-            {
-              label: "Overview",
-              slug: "cli-reference",
-            },
-            {
-              label: "init",
-              slug: "cli-reference/init",
-            },
-            {
-              label: "exec",
-              slug: "cli-reference/exec",
-            },
-            {
-              label: "serve",
-              slug: "cli-reference/serve",
-            },
-            {
-              label: "validate",
-              slug: "cli-reference/validate",
-            },
+            { label: "Writing Custom TypeScript Modules", slug: "extensibility/writing-custom-typescript-modules" },
+          ],
+        },
+        {
+          label: "Deployment & Operations",
+          items: [
+            { label: "CLI Reference", slug: "deployment-operations/cli-reference" },
+            { label: "Running as a Service", slug: "deployment-operations/running-as-service" },
           ],
         },
       ],

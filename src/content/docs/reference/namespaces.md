@@ -1,68 +1,51 @@
 ---
 title: Namespaces
-description: Namespaces are a way to organize your policies and shapes.
+description: Namespace syntax and rules for organizing policies and shapes.
 ---
 
-Namespaces are a way to organize your policies and shapes. These MUST be declared at the top of a `*.sentrie` file.
+# Namespaces
 
-Namespaces form a natural hierarchy using the `/` delimiter.
-
-A `namespace` is a container for related:
-
-- policies
-- shapes
-- child namespaces
+Namespaces group policies and shapes and form the visibility boundary for unexported shapes. Each `*.sentrie` file has exactly one namespace and it must be the first statement.
 
 ## Syntax
 
 ```text
-// policy.sentrie
--- This is a namespace declaration
-namespace fully/qualified/namespace/name
+namespace fully/qualified/name
 ```
 
-Where `FQN` (Fully Qualified Name) is a slash-separated identifier:
+FQN is slash-separated identifiers (e.g. `com/example/auth`, `mycompany/policies/security`).
+
+## Parameters
+
+| Element | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| FQN | identifier path | Yes | Slash-separated; valid identifiers only. |
+
+**Returns:** N/A (declaration).
+
+## Examples
+
+### Basic Usage
 
 ```text
 namespace com/example/auth
-namespace com/example/billing
-namespace com/company/finance/reports
-namespace mycompany/policies/security
+namespace com/example/billing/v2
+```
+
+### Advanced Usage
+
+```text
 namespace mycompany/policies/privacy/gdpr
 ```
 
-In the above example, the namespace nesting looks like this:
+## Behavior & Constraints
 
-```
-com
-|-- example
-|   |-- auth
-|   |-- billing
-|-- company
-|   |-- finance
-|       |-- reports
+- Only comments may appear before the namespace declaration.
+- One namespace per file.
+- Namespace forms the visibility boundary: unexported shapes are visible only within the same namespace.
+- Multiple root namespaces are allowed across a policy pack (different files).
 
-mycompany
-|-- policies
-|   |-- security
-|   |   |-- ...
-|   |-- privacy
-|   |   |-- gdpr
-|   |   |-- ...
-```
+## Constraints & Edge Cases
 
-## Rules
-
-- Namespaces must be declared at the top of the file (only comments can be placed before the namespace declaration)
-- Only one namespace per file
-- Namespace names must be valid identifiers
-- Use slash-separated (`/`) hierarchical names for organization
-- Multiple root namespaces are allowed in a policy pack
-- Namespace forms the visibility boundary for unexported shapes
-
-## Best Practices
-
-- Use descriptive namespace names that reflect their purpose
-- Group related policies and shapes in namespaces - refer to [Policies](/reference/policies/) and [Shapes](/reference/shapes/)
-- Keep individual policies and shapes within a namespace focused on specific domains or features
-- Consider using consistent naming patterns across your team
+- Namespace names must be valid identifiers.
+- Child “namespaces” are not separate declarations; hierarchy is by naming convention (e.g. `a/b/c`).
