@@ -30,27 +30,27 @@ let c = not unknown       -- unknown
 
 ### Kleene AND
 
-| AND | true | false | unknown |
+| **AND** | true | false | unknown |
 | --- | --- | --- | --- |
-| true | true | false | unknown |
-| false | false | false | false |
-| unknown | unknown | false | unknown |
+| **true** | true | false | unknown |
+| **false** | false | false | false |
+| **unknown** | unknown | false | unknown |
 
 ### Kleene OR
 
-| OR | true | false | unknown |
+| **OR** | true | false | unknown |
 | --- | --- | --- | --- |
-| true | true | true | true |
-| false | true | false | unknown |
-| unknown | true | unknown | unknown |
+| **true** | true | true | true |
+| **false** | true | false | unknown |
+| **unknown** | true | unknown | unknown |
 
 ### NOT
 
-| Input | Output |
+| **Input** | Output |
 | --- | --- |
-| true | false |
-| false | true |
-| unknown | unknown |
+| **true** | false |
+| **false** | true |
+| **unknown** | unknown |
 
 ## Behavior & Constraints
 

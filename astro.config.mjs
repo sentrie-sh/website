@@ -57,6 +57,7 @@ export default defineConfig({
             { label: "Shapes", slug: "reference/shapes" },
             { label: "Arithmetic Operations", slug: "reference/arithmetic-operations" },
             { label: "Boolean Operations", slug: "reference/boolean-operations" },
+            { label: "Membership Operations", slug: "reference/membership-operations" },
             { label: "Collection Operations", slug: "reference/collection-operations" },
             { label: "Functions", slug: "reference/functions" },
             { label: "Precedence", slug: "reference/precedence" },
@@ -89,9 +90,18 @@ export default defineConfig({
           ],
         },
         {
+          label: "CLI Reference",
+          items: [
+            { label: "Overview", slug: "cli-reference" },
+            { label: "sentrie exec", slug: "cli-reference/exec" },
+            { label: "sentrie init", slug: "cli-reference/init" },
+            { label: "sentrie serve", slug: "cli-reference/serve" },
+            { label: "sentrie validate", slug: "cli-reference/validate" },
+          ],
+        },
+        {
           label: "Deployment & Operations",
           items: [
-            { label: "CLI Reference", slug: "deployment-operations/cli-reference" },
             { label: "Running as a Service", slug: "deployment-operations/running-as-service" },
           ],
         },

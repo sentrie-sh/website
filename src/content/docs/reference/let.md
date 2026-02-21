@@ -13,7 +13,7 @@ let name = expr
 let name : type = expr
 ```
 
-## Concepts
+## Reference
 
 | Part | Type | Required | Description |
 | :--- | :--- | :--- | :--- |

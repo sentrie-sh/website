@@ -15,7 +15,7 @@ net     = ["host1.com", "host2.com"]
 env     = ["VAR1", "VAR2"]
 ```
 
-## Concepts
+## Reference
 
 | Key | Type | Description |
 | :--- | :--- | :--- |

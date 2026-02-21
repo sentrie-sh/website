@@ -15,7 +15,7 @@ alias.functionName(arg1, arg2, ...)
 
 Import: `use { fn1, fn2 } from source [ as alias ]`
 
-## Concepts
+## Reference
 
 | Element | Type | Required | Description |
 | :--- | :--- | :--- | :--- |

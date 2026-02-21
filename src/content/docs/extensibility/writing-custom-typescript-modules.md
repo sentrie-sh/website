@@ -15,7 +15,7 @@ use { fn1 } from "@local/path/to/module" [ as alias ]
 
 Built-in: `use { fn1 } from @sentrie/module` (no quotes). Local: quoted path or `@local/...`; resolved relative to current file or pack root.
 
-## Concepts
+## Parameters
 
 | Element | Type | Required | Description |
 | :--- | :--- | :--- | :--- |

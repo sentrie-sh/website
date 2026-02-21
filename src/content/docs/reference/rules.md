@@ -12,7 +12,7 @@ A rule defines a decision: an optional `when` condition, an optional `default`, 
 rule IDENT = [ default expr ] [ when expr ] { stmt* yield expr }
 ```
 
-## Concepts
+## Reference
 
 | Part | Type | Required | Description |
 | :--- | :--- | :--- | :--- |

@@ -8,7 +8,7 @@
 // The formal definition or type signature
 ```
 
-## Concepts
+## Parameters
 
 | Name        | Type   | Required | Description                                           |
 | :---------- | :----- | :------- | :---------------------------------------------------- |

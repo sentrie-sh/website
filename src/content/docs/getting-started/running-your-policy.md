@@ -8,19 +8,19 @@ Use `sentrie exec` to evaluate one or all exported rules in a policy. You supply
 ## Syntax
 
 ```bash
-sentrie exec TARGET [ --facts JSON ] [ --pack PATH ]
+sentrie exec TARGET [ --facts JSON ] [ --pack-location PATH ]
 ```
 
-- **TARGET:** `namespace/policy` (all exported rules) or `namespace/policy/rule` (single rule). Run from pack directory or use `--pack PATH`.
+- **TARGET:** `namespace/policy` (all exported rules) or `namespace/policy/rule` (single rule). Run from pack directory or use `--pack-location PATH`.
 - **Facts:** JSON object. Keys are fact names (or aliases). Required facts must be present; optional facts may be omitted if they have defaults.
 
-## Concepts
+## Options
 
 | Concept | Required | Description |
 | :--- | :--- | :--- |
 | Target | Yes | `namespace/policy` or `namespace/policy/rule`. Slashes match namespace and policy/rule identifiers. |
 | Facts | Depends | JSON object. Required if the policy declares required facts. Keys match fact names (or aliases). |
-| Pack path | No | Default: current directory. Use `--pack PATH` to point at a different pack root. |
+| Pack path | No | Default: current directory. Use `--pack-location PATH` to point at a different pack root. |
 
 **Returns:** Exit code 0 on success; non-zero on evaluation or CLI error. Rule names and decision values are printed to stdout. Output includes namespace, policy, rules (match and value), and optional attachments.
 
@@ -73,14 +73,14 @@ Values:
 ### Using a specific pack directory
 
 ```bash
-sentrie exec com/example/user_management/user_access --pack /path/to/my-pack --facts '{"user": {"role": "user", "status": "active"}}'
+sentrie exec com/example/user_management/user_access --pack-location /path/to/my-pack --facts '{"user": {"role": "user", "status": "active"}}'
 ```
 
 ## Behavior & Constraints
 
 - **Target format:** `namespace/policy` or `namespace/policy/rule`. Namespace and policy/rule must exist; rule must be exported.
 - **Facts JSON:** Keys must match fact names (or aliases) in the policy. Types must satisfy the declared shapes. Required facts missing → evaluation error.
-- **Working directory:** If `--pack` is omitted, the current directory is used as the pack root (must contain `*.sentrie` and optionally `sentrie.pack.toml`).
+- **Working directory:** If `--pack-location` is omitted, the current directory is used as the pack root (must contain `*.sentrie` and optionally `sentrie.pack.toml`).
 - **Exit code:** 0 on success; non-zero on parse error, missing fact, or evaluation failure.
 
 ## Constraints & Edge Cases

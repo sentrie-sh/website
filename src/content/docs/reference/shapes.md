@@ -21,7 +21,7 @@ shape Name {
 
 **Composition:** `shape Child with Base { ... }`
 
-## Concepts
+## Reference
 
 | Modifier | Description |
 | :--- | :--- |
