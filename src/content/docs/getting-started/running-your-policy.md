@@ -1,105 +1,92 @@
 ---
 title: Running your first Policy
-description: Learn how to run the policy you created using the exec command
+description: "Evaluate policies with sentrie exec: target, facts JSON, and output format."
 ---
 
-Now that you've created your first policy in the [Writing your first Policy](/getting-started/writing-your-first-policy/) guide, let's run it using the `sentrie exec` command.
+Use `sentrie exec` to evaluate one or all exported rules in a policy. You supply a target (`namespace/policy` or `namespace/policy/rule`) and a JSON object of facts. The CLI returns rule results and exit code.
 
-## Your Policy
-
-Assuming you followed the previous guide, you should have a policy file `first-policy.sentrie` that looks like this:
-
-```sentrie
-// first-policy.sentrie
-namespace user_management
-
-shape User {
-  role: string
-  status: string
-}
-
-policy user_access {
-
-  fact user: User
-
-  rule allow_admin = {
-    yield user.role == "admin"
-  }
-
-  rule allow_user = {
-    yield allow_admin or (user.role == "user" and user.status == "active")
-  }
-
-  export decision of allow_admin
-  export decision of allow_user
-
-}
-```
-
-## Running the Policy
-
-Use the `sentrie exec` command to run your policy against test data:
+## Syntax
 
 ```bash
-sentrie exec user_management/user_access/allow_user --facts '{"user": {"role": "user", "status": "active"}}'
+sentrie exec TARGET [ --facts JSON ] [ --pack PATH ]
 ```
 
-:::note
-If no rule name is provided, the executor will evaluate all exported rules and return the results.
-:::
+- **TARGET:** `namespace/policy` (all exported rules) or `namespace/policy/rule` (single rule). Run from pack directory or use `--pack PATH`.
+- **Facts:** JSON object. Keys are fact names (or aliases). Required facts must be present; optional facts may be omitted if they have defaults.
 
-**Expected Output:**
+## Concepts
 
+| Concept | Required | Description |
+| :--- | :--- | :--- |
+| Target | Yes | `namespace/policy` or `namespace/policy/rule`. Slashes match namespace and policy/rule identifiers. |
+| Facts | Depends | JSON object. Required if the policy declares required facts. Keys match fact names (or aliases). |
+| Pack path | No | Default: current directory. Use `--pack PATH` to point at a different pack root. |
+
+**Returns:** Exit code 0 on success; non-zero on evaluation or CLI error. Rule names and decision values are printed to stdout. Output includes namespace, policy, rules (match and value), and optional attachments.
+
+## Examples
+
+### Evaluate a single rule
+
+Policy has namespace `com/example/user_management`, policy `user_access`, exported rule `allow_user`. Required fact: `user` (shape `User` with `role`, `status`).
+
+```bash
+sentrie exec com/example/user_management/user_access/allow_user --facts '{"user": {"role": "user", "status": "active"}}'
 ```
-Namespace: user_management
+
+Example stdout:
+
+```text
+Namespace: com/example/user_management
 Policy:    user_access
 
 Rules:
-  ✓ allow_admin: ⨯ False
   ✓ allow_user: ✓ True
 
 Values:
-  ✓ allow_admin: false
   ✓ allow_user: true
 ```
 
-## Understanding the Output
+### Evaluate all exported rules in a policy
 
-The `exec` command shows you:
-
-1. **Namespace**: The namespace of the policy
-2. **Policy**: The policy name
-3. **Rules**: Which rules matched (✓) or didn't match (✗)
-4. **Values**: The final results of exported rules
-5. **Attachments**: The attachments of the exported rules
-
-## Providing Required Facts
-
-Since the `user` fact is required (no `?` modifier), you must provide it when executing:
+Omit the rule name to run every exported rule:
 
 ```bash
-sentrie exec user_management/user_access --facts '{"user": {"role": "admin", "status": "active"}}'
+sentrie exec com/example/user_management/user_access --facts '{"user": {"role": "admin", "status": "active"}}'
 ```
 
-:::note[Note]
-If a required fact is not provided, execution will fail with an error. Only optional facts (marked with `?`) can have default values and can be omitted.
-:::
+Example stdout:
 
-**Expected Output:**
-
-```
-Namespace: user_management
+```text
+Namespace: com/example/user_management
 Policy:    user_access
 
 Rules:
-  ✓ allow_user: ✓ True
   ✓ allow_admin: ✓ True
+  ✓ allow_user: ✓ True
 
 Values:
-  ✓ allow_user: true
   ✓ allow_admin: true
+  ✓ allow_user: true
 ```
 
-## Next Steps
+### Using a specific pack directory
 
-Now that you can run policies, explore the [CLI Reference](/cli-reference/) to learn about all available commands and options.
+```bash
+sentrie exec com/example/user_management/user_access --pack /path/to/my-pack --facts '{"user": {"role": "user", "status": "active"}}'
+```
+
+## Behavior & Constraints
+
+- **Target format:** `namespace/policy` or `namespace/policy/rule`. Namespace and policy/rule must exist; rule must be exported.
+- **Facts JSON:** Keys must match fact names (or aliases) in the policy. Types must satisfy the declared shapes. Required facts missing → evaluation error.
+- **Working directory:** If `--pack` is omitted, the current directory is used as the pack root (must contain `*.sentrie` and optionally `sentrie.pack.toml`).
+- **Exit code:** 0 on success; non-zero on parse error, missing fact, or evaluation failure.
+
+## Constraints & Edge Cases
+
+- Missing required fact → evaluation error; optional fact may be omitted if it has a default.
+- Invalid or malformed JSON in `--facts` → CLI error.
+- Invalid target (unknown namespace, policy, or rule) → error.
+- Rule name in target must be an exported rule; otherwise target is invalid.
+- At least one rule must be exported from the policy to be executable via `sentrie exec`.

@@ -1,235 +1,81 @@
 ---
 title: Writing your first Policy
-description: Learn how to write your first Sentrie policy
+description: "Minimal policy structure: namespace, policy, shape, facts, rules, exports."
 ---
 
-This guide will walk you through creating your first Sentrie policy step by step.
+A Sentrie policy file contains one namespace and one or more policies. Each policy declares facts (inputs), rules (decision logic), and exports (rules exposed for evaluation). This page gives the minimal structure and a complete example.
 
-## Basic Policy Structure
+## Syntax
 
-A Sentrie policy file consists of exactly one namespace and at least one policy:
+```text
+namespace SLUG
 
-- **Namespace**: A container for related policies.
-- **Policy**: A named collection of rules.
+shape ShapeName { field!: type  field?: type }
 
-A policy consists of:
-
-- **Rules**: Individual decision logic.
-- **Facts**: Input data for the policy.
-- **Exports**: Rules that are exported to make them available for external evaluation.
-
-## Create a Policy Pack
-
-```sh
-mkdir my-first-policy-pack
-cd example-policy-pack
-sentrie init example-policy-pack
-```
-
-## Define a Namespace
-
-```diff lang=sentrie
-// first-policy.sentrie
-+ namespace com/example/user_management
-```
-
-:::note[Remember]
-Every file MUST contain a namespace declaration and **MUST** be the first statement in the file.
-:::
-
-## Define a Policy
-
-```diff lang=sentrie
-// first-policy.sentrie
-namespace com/example/user_management
-
-+ policy user_access {
-+   -- policy content goes here
-+ }
-```
-
-## Define a Shape
-
-:::note
-Shapes are used to define data structures and aliases. More information about shapes can be found in the [Shapes](/reference/shapes/) reference.
-:::
-
-```diff lang=sentrie
-// first-policy.sentrie
-namespace com/example/user_management
-
-+ shape User {
-+   role: string
-+   status: string
-+ }
-
-policy user_access {
-  -- policy content goes here
-}
-
-```
-
-## Add Facts
-
-:::note
-A fact is a named value that can be injected into policy evaluation at runtime. Every fact MUST have a shape / type annotation.
-More information about facts can be found in the [Facts](/reference/facts/) reference.
-:::
-
-```diff lang=sentrie
-// first-policy.sentrie
-namespace com/example/user_management
-
-shape User {
-  role: string
-  status: string
-}
-
-policy user_access {
-+  fact user: User as currentUser
-+  fact context?: Context as ctx default {"environment": "production"}
-}
-
-```
-
-:::note
-
-- Facts are **required by default** - they must be provided during execution
-- Use `?` to mark facts as **optional** - optional facts can be omitted
-- Only **optional facts** (`?`) can have default values
-- Facts are **always non-nullable** - null values are not allowed
-  :::
-
-## Add your first rule
-
-```diff lang=sentrie
-// first-policy.sentrie
-namespace com/example/user_management
-
-shape User {
-  role: string
-  status: string
-}
-
-policy user_access {
-  fact user: User as currentUser
-  fact context?: Context as ctx default {"environment": "production"}
-
-+  rule allow_admin = {
-+    yield user.role == "admin"
-+  }
+policy IDENT {
+  fact name: Type [ as alias ]
+  fact name?: Type [ as alias ] [ default expr ]
+  rule ruleName = [ default (true|false) ] [ when condition ] { yield expr }
+  export decision of ruleName
 }
 ```
 
-## Add your second rule
+- File must start with exactly one `namespace`. One or more `shape` and `policy` blocks follow.
+- Policy must have at least one `rule` and at least one `export decision of`.
 
-```diff lang=sentrie
-// first-policy.sentrie
-namespace com/example/user_management
+## Concepts
 
-shape User {
-  role: string
-  status: string
-}
+| Concept   | Required | Description                                                                                                         |
+| :-------- | :------- | :------------------------------------------------------------------------------------------------------------------ |
+| Namespace | Yes      | Single `namespace SLUG` per file; first statement. Slash-separated (e.g. `com/example/app`).                        |
+| Shape     | No       | Data model for facts. Required/optional fields: `field!`, `field?`.                                                 |
+| Policy    | Yes      | Named block containing facts, rules, and exports.                                                                   |
+| Fact      | No       | Input to the policy. Required by default; `?` makes optional. Only optional facts may have `default`. Non-nullable. |
+| Rule      | Yes (≥1) | Block that yields a decision. May reference other rules in the same policy.                                         |
+| Export    | Yes (≥1) | `export decision of ruleName` makes the rule callable via CLI/API and importable.                                   |
 
-policy user_access {
-  fact user: User as currentUser
+## Examples
 
-  rule allow_admin = {
-    yield user.role == "admin"
-  }
-
-+  rule allow_user = {
-+    yield user.role == "user" and user.status == "active"
-+  }
-}
-```
-
-## Composing Rules
-
-Lets use the output of the `allow_admin` rule to update the `allow_user` rule.
-
-```diff lang=sentrie
-// first-policy.sentrie
-namespace com/example/user_management
-
-shape User {
-  role: string
-  status: string
-}
-
-policy user_access {
-  fact user: User as currentUser
-
-  rule allow_admin = {
-    yield user.role == "admin"
-  }
-
-  rule allow_user = {
--    yield user.role == "user" and user.status == "active"
-+    yield allow_admin or user.role == "user" and user.status == "active"
-  }
-}
-```
-
-:::note
-Here, we are using the output of the `allow_admin` rule to create the `allow_user` rule. This rule grants access if the user is an admin or a user.
-:::
-
-## Export Rules
-
-```diff lang=sentrie
-// first-policy.sentrie
-namespace com/example/user_management
-
-shape User {
-  role: string
-  status: string
-}
-
-policy user_access {
-  fact user: User as currentUser
-
-  rule allow_admin = {
-    yield user.role == "admin"
-  }
-
-  rule allow_user = {
-    yield allow_admin or user.role == "user" and user.status == "active"
-  }
-
-+  export decision of allow_admin
-+  export decision of allow_user
-}
-```
-
-:::note
-Rules are exported to make them available for external evaluation. This includes evaluation by the Sentrie CLI or the HTTP API. A policy MUST contain at least one exported rule.
-:::
-
-## Complete Example
-
-Here's a complete policy that checks user access:
+### Minimal policy (one rule)
 
 ```sentrie
-// first-policy.sentrie
 namespace com/example/user_management
 
 shape User {
-  role: string
-  status: string
+  role!: string
+  status!: string
 }
 
 policy user_access {
-
   fact user: User as currentUser
 
-  rule allow_admin = {
-    yield user.role == "admin"
+  rule allow_admin = default false {
+    yield currentUser.role == "admin"
   }
 
-  rule allow_user = {
-    yield allow_admin or user.role == "user" and user.status == "active"
+  export decision of allow_admin
+}
+```
+
+### Composing rules and exporting multiple rules
+
+```sentrie
+namespace com/example/user_management
+
+shape User {
+  role!: string
+  status!: string
+}
+
+policy user_access {
+  fact user: User as currentUser
+
+  rule allow_admin = default false {
+    yield currentUser.role == "admin"
+  }
+
+  rule allow_user = default false {
+    yield allow_admin or (currentUser.role == "user" and currentUser.status == "active")
   }
 
   export decision of allow_admin
@@ -237,6 +83,31 @@ policy user_access {
 }
 ```
 
-## Next Steps
+### Optional fact with default
 
-Now that you've written your first policy, learn how to [run your policy](/getting-started/running-your-policy/) to see it in action.
+```sentrie
+policy user_access {
+  fact user: User as currentUser
+  fact context?: document as ctx default {"environment": "production"}
+
+  rule allow = default false {
+    yield currentUser.role == "admin"
+  }
+  export decision of allow
+}
+```
+
+## Behavior & Constraints
+
+- **File structure:** One namespace per file; namespace must be the first statement. Shapes and policies follow.
+- **Facts:** Declared before rules. Required facts must be provided at evaluation time; optional facts may be omitted or have defaults.
+- **Rules:** May reference other rules in the same policy by name (e.g. `yield allow_admin or ...`). At least one rule must be exported for the policy to be executable.
+- **Exports:** Only exported rules are available to `sentrie exec` and the HTTP API. A policy must export at least one rule.
+
+## Constraints & Edge Cases
+
+- Namespace slug uses slashes (e.g. `com/example/app`). No leading/trailing slash.
+- Shape field required: `field!: type`. Optional: `field?: type`.
+- Fact without `?` is required; missing required fact at evaluation → error.
+- Optional fact (`?`) may have `default expr`; if omitted at evaluation, default is used.
+- Rule body must yield a value (e.g. `yield expr`). Default when omitted: `default false` or `default true` as declared.

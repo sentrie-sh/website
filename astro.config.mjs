@@ -28,6 +28,10 @@ export default defineConfig({
           items: [
             { label: "Introduction & Core Philosophy", slug: "getting-started/introduction" },
             { label: "Quick Start", slug: "getting-started/quick-start" },
+            { label: "Installation", slug: "getting-started/installation" },
+            { label: "Writing your first Policy", slug: "getting-started/writing-your-first-policy" },
+            { label: "Running your Policy", slug: "getting-started/running-your-policy" },
+            { label: "Enforcement", slug: "getting-started/enforcement" },
           ],
         },
         {
