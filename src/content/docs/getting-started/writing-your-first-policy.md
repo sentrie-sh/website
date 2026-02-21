@@ -29,7 +29,7 @@ policy IDENT {
 | :-------- | :------- | :------------------------------------------------------------------------------------------------------------------ |
 | Namespace | Yes      | Single `namespace SLUG` per file; first statement. Slash-separated (e.g. `com/example/app`).                        |
 | Shape     | No       | Data model for facts. Required/optional fields: `field!`, `field?`.                                                 |
-| Policy    | Yes      | Named block containing facts, rules, and exports.                                                                   |
+| Policy    | No       | Named block containing facts, rules, and exports.                                                                   |
 | Fact      | No       | Input to the policy. Required by default; `?` makes optional. Only optional facts may have `default`. Non-nullable. |
 | Rule      | Yes (≥1) | Block that yields a decision. May reference other rules in the same policy.                                         |
 | Export    | Yes (≥1) | `export decision of ruleName` makes the rule callable via CLI/API and importable.                                   |
