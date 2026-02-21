@@ -70,3 +70,4 @@ Before you implement this, keep a few boundaries in mind:
 
 - **Constraint:** Undefined field access yields `unknown`; operations on `unknown` propagate according to the Kleene tables above. Rule `when` and ternary/Elvis use truthiness: only `true` is truthy.
 - **Edge case:** If a `when` evaluates to `unknown`, the rule uses its default or returns `unknown`. `not unknown` is `unknown`.
+- For runtime validation of trinary values (e.g. require `true` or forbid `unknown`), see [Constraints](/reference/constraints) — trinary supports `@not_unknown()`, `@eq`, `@neq`, `@is_true()`, and `@is_false()`.
