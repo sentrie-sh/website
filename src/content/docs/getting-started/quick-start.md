@@ -27,13 +27,44 @@ Verify:
 sentrie --version
 ```
 
+## Writing your first policy
+
+```bash
+sentrie init my-pack
+```
+
+This will create a new policy pack in the current directory.
+
+```bash
+$ echo 'namespace auth { \
+  policy user { \
+    rule allow = default false { \
+      yield true \
+    } \
+  } \
+}' > my-pack/policy.sentrie
+```
+
+```bash
+sentrie exec auth/user/allow
+
+Namespace: auth
+Policy:    user
+
+Rules:
+  ✓ allow: ✓ True
+
+Values:
+  ✓ allow: true
+```
+
 ## Parameters
 
-| Step | Required | Description |
-| :--- | :--- | :--- |
-| Policy pack path | Yes | Directory containing `*.sentrie` and optional pack manifest. |
-| Target | Yes | `namespace/policy` or `namespace/policy/rule`. |
-| Facts | Depends | JSON object of fact names to values; required if the policy declares required facts. |
+| Step             | Required | Description                                                                          |
+| :--------------- | :------- | :----------------------------------------------------------------------------------- |
+| Policy pack path | No       | Directory containing `*.sentrie.toml` pack manifest. Default: current directory.     |
+| Target           | Yes      | `namespace/policy` or `namespace/policy/rule`.                                       |
+| Facts            | Depends  | JSON object of fact names to values; required if the policy declares required facts. |
 
 **Returns:** Exit code 0 on success; non-zero on evaluation or CLI error. Decision output is printed to stdout.
 
