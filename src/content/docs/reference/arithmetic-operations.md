@@ -18,7 +18,7 @@ expr % expr
 
 Unary: `+ expr` | `- expr`
 
-## Parameters
+## Concepts
 
 | Operator | Description | Result |
 | :--- | :--- | :--- |

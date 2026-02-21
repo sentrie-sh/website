@@ -28,7 +28,7 @@ shape Name {
 
 **Constraints:** Applied with `@` on types (e.g. `number @min(0) @max(100)`).
 
-## Parameters
+## Concepts
 
 | Concept     | Required | Description                                            |
 | :---------- | :------- | :----------------------------------------------------- |

@@ -13,7 +13,7 @@ use { isValid } from @sentrie/json [ as alias ]
 alias.isValid(str)
 ```
 
-## Parameters
+## Concepts
 
 | Name  | Type   | Required | Description                 |
 | :---- | :----- | :------- | :-------------------------- |

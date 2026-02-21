@@ -14,7 +14,7 @@ Logical: `and` | `or` | `xor` | `not` | `!`
 
 **Returns:** Trinary. For `when` and conditionals: only `true` is truthy; `false` and `unknown` are not.
 
-## Parameters
+## Concepts
 
 Truthiness: only `true` is truthy. `false` and `unknown` are non-truthy (e.g. for `when`, ternary, Elvis).
 

@@ -16,7 +16,7 @@ Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `docume
 
 List index: `expr[number]`. Map index: `expr[string]` or `expr.key`.
 
-## Parameters
+## Concepts
 
 | Type | Description |
 | :--- | :--- |

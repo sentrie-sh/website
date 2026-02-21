@@ -13,7 +13,7 @@ fact name : type [ as alias ] [ default expr ]   -- required
 fact name? : type [ as alias ] [ default expr ]  -- optional
 ```
 
-## Parameters
+## Concepts
 
 | Part           | Type            | Required | Description                                         |
 | :------------- | :-------------- | :------- | :-------------------------------------------------- |

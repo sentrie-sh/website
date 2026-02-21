@@ -15,7 +15,7 @@ alias.v6()
 alias.v7()
 ```
 
-## Parameters
+## Concepts
 
 | Function | Parameters | Required | Description                                        |
 | :------- | :--------- | :------- | :------------------------------------------------- |

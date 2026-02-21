@@ -14,7 +14,7 @@ Logical and comparison operators produce trinary or bool results. Operands are t
 
 **Conditional:** `condition ? trueValue : falseValue` | `expr ?: default`
 
-## Parameters
+## Concepts
 
 | Operator | Description | Returns |
 | :--- | :--- | :--- |

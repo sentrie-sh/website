@@ -14,7 +14,7 @@ namespace fully/qualified/name
 
 FQN is slash-separated identifiers (e.g. `com/example/auth`, `mycompany/policies/security`).
 
-## Parameters
+## Concepts
 
 | Element | Type | Required | Description |
 | :--- | :--- | :--- | :--- |

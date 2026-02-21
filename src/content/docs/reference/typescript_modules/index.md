@@ -14,7 +14,7 @@ use { fn1, fn2 } from @sentrie/module [ as alias ]
 
 Built-in modules: `@sentrie/module` (no quotes). Default alias is the last path segment (e.g. `time` for `@sentrie/time`).
 
-## Parameters
+## Concepts
 
 | Element | Type | Required | Description |
 | :--- | :--- | :--- | :--- |

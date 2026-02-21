@@ -14,7 +14,7 @@ type @constraint1(args) @constraint2
 
 Examples: `number @min(0) @max(100)`, `string @email`, `list[string @one_of("a","b")]`.
 
-## Parameters
+## Concepts
 
 | Category | Constraints (examples) |
 | :--- | :--- |

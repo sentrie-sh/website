@@ -73,7 +73,7 @@ Evaluates a policy or rule. `{target...}` = path segments: `namespace/policy` or
 | `attachments` | object | Exported attachments for that rule. |
 | `error` | string | Non-empty if execution failed. |
 
-## Parameters
+## Concepts
 
 | Endpoint | Method | Path | Body |
 | :--- | :--- | :--- | :--- |

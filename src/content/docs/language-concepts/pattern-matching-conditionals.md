@@ -18,7 +18,7 @@ Sentrie uses trinary logic (`true`, `false`, `unknown`) and provides the ternary
 
 **Emptiness:** `value is empty` | `value is not empty`
 
-## Parameters
+## Concepts
 
 | Construct    | Left                | Right                 | Description                                                       |
 | :----------- | :------------------ | :-------------------- | :---------------------------------------------------------------- |

@@ -27,7 +27,7 @@ Verify:
 sentrie --version
 ```
 
-## Parameters
+## Concepts
 
 | Step | Required | Description |
 | :--- | :--- | :--- |

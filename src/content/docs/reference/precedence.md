@@ -10,7 +10,7 @@ Operators are evaluated in order of precedence (highest first). Same precedence 
 
 Expressions combine operators; precedence determines binding. Ternary `? :` is right-associative.
 
-## Parameters
+## Concepts
 
 | Precedence | Operators | Description |
 | :--- | :--- | :--- |

@@ -20,7 +20,7 @@ distinct collection
 
 Index parameter is optional in some forms. For maps, element is key-value or value depending on operation.
 
-## Parameters
+## Concepts
 
 | Operation | Input | Output | Description |
 | :--- | :--- | :--- | :--- |

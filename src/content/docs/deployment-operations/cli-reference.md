@@ -15,7 +15,7 @@ sentrie serve [OPTIONS] [policy-pack]
 sentrie validate <FQN> [OPTIONS]
 ```
 
-## Parameters
+## Concepts
 
 | Command | Required | Description |
 | :--- | :--- | :--- |

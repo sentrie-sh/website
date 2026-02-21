@@ -24,7 +24,7 @@ rule localName = import decision of ruleName
   with targetFact2 as expression2
 ```
 
-## Parameters
+## Concepts
 
 | Element | Type | Required | Description |
 | :--- | :--- | :--- | :--- |

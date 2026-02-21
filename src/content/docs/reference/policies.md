@@ -18,7 +18,7 @@ policy IDENT {
 }
 ```
 
-## Parameters
+## Concepts
 
 | Statement | Required | Description |
 | :--- | :--- | :--- |
