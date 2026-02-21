@@ -20,7 +20,7 @@ distinct collection
 
 Index parameter is optional in some forms. For maps, element is key-value or value depending on operation.
 
-## Reference
+## Configuration & Arguments
 
 | Operation | Input | Output | Description |
 | :--- | :--- | :--- | :--- |
@@ -34,9 +34,9 @@ Index parameter is optional in some forms. For maps, element is key-value or val
 
 **Returns:** As in table. Empty collection: `any` false, `all` true, `count` 0. Reduce with empty collection returns initial.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```sentrie
 let has_even: bool = any numbers as num, idx { yield num % 2 == 0 }
@@ -48,19 +48,20 @@ let n: number = count numbers
 let uniq: list[number] = distinct numbers
 ```
 
-### Advanced Usage
+### Going further
 
 ```sentrie
 let sum: number = reduce scores from 0 as acc, score, idx { yield acc + score }
 let avg: number = sum / count scores
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Only valid on collections (lists, maps). Original collection is not modified.
 - Block must yield once per iteration. Type of yield must match (trinary for any/all/filter predicate; expr for map/reduce).
 
-## Constraints & Edge Cases
 
 - Empty collection: `any` → false, `all` → true, `filter`/`map`/`distinct` → empty, `count` → 0, `reduce` → initial.
 - Reduce: first iteration uses initial as acc; subsequent use previous yield as acc.

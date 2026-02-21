@@ -15,7 +15,7 @@ net     = ["host1.com", "host2.com"]
 env     = ["VAR1", "VAR2"]
 ```
 
-## Reference
+## Configuration & Arguments
 
 | Key | Type | Description |
 | :--- | :--- | :--- |
@@ -25,16 +25,16 @@ env     = ["VAR1", "VAR2"]
 
 **Returns:** N/A (configuration). Violations (e.g. reading outside fs_read) cause runtime failure.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```toml
 [permissions]
 fs_read = ["."]
 ```
 
-### Advanced Usage
+### Going further
 
 ```toml
 [permissions]
@@ -43,11 +43,12 @@ net     = ["example.com"]
 env     = ["ORG_DSN", "REDIS_PASSWORD"]
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - By default: filesystem access is limited to the policy pack root; no network; no environment variables.
 - Explicit entries grant access only to listed paths/hosts/vars. Modules run with the same permissions as the pack.
 
-## Constraints & Edge Cases
 
 - Invalid or missing paths/hosts may be rejected at load or runtime. Restrict permissions to the minimum required.

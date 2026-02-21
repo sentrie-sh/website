@@ -15,7 +15,7 @@ alias.functionName(arg1, arg2, ...)
 
 Import: `use { fn1, fn2 } from source [ as alias ]`
 
-## Reference
+## Configuration & Arguments
 
 | Element | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
@@ -25,9 +25,9 @@ Import: `use { fn1, fn2 } from source [ as alias ]`
 
 **Returns:** Per function; see module docs. Invalid args or runtime errors abort evaluation.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```sentrie
 use { sha256 } from @sentrie/hash
@@ -36,18 +36,19 @@ let h = sha256(data)
 let t = time.now()
 ```
 
-### Advanced Usage
+### Going further
 
 ```sentrie
 use { calculateAge, validateEmail } from "./utils.ts" as utils
 yield utils.calculateAge(user.birthDate) >= 18 and utils.validateEmail(user.email)
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Functions are memoized per (function, args) when applicable; repeated calls with same args may return cached result.
 - Module scope: `use` is per policy; alias is used in that policy only.
 
-## Constraints & Edge Cases
 
 - Missing or wrong-type arguments can cause runtime errors. See [Built-in TypeScript modules](/reference/typescript_modules/) and [Writing custom TypeScript modules](/extensibility/writing-custom-typescript-modules) for contracts.

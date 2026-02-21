@@ -3,64 +3,88 @@ title: Installation
 description: Learn how to install Sentrie
 ---
 
-Sentrie is a single binary executable. It has no external dependencies.
+When you need to run Sentrie locally or on a server, you install a single binary. There are no external dependencies—just the executable. Convenience scripts are provided for macOS, Linux, and Windows so you can install or pin a version with one command.
 
-On macOS, both M1 (arm64) and Intel (x64) executables are provided. On Windows and Linux, both x64 and arm64 executables are provided.
+Here is the basic syntax:
 
-Convenience scripts are provided for macOS, Linux, and Windows.
-
-## Installing the latest version
-
-### On macOS
+**macOS / Linux / WSL2:**
 
 ```bash
 curl -fsSL https://sentrie.sh/install.sh | bash
 ```
 
-### On Linux and WSL2
-
-```bash
-curl -fsSL https://sentrie.sh/install.sh | bash
-```
-
-### On Windows
+**Windows:**
 
 ```bash
 irm https://sentrie.sh/install.ps1 | iex
 ```
 
-### Verify Installation
+**Verify:**
 
 ```bash
 sentrie --version
 ```
 
-This should display the current version of Sentrie.
+## Configuration & Arguments
 
-## Installing a specific version
+You can install the latest or a specific version depending on your platform:
 
-### On macOS
+| Platform | Command (latest) | Command (specific version) |
+| :------- | :--------------- | :-------------------------- |
+| macOS, Linux, WSL2 | `curl -fsSL https://sentrie.sh/install.sh \| bash` | `curl -fsSL https://sentrie.sh/install.sh \| bash -s v0.1.0` |
+| Windows | `irm https://sentrie.sh/install.ps1 \| iex` | `$v="0.1.0"; irm https://sentrie.sh/install.ps1 \| iex` |
 
-For specific versions, use the install script:
+**Returns:** N/A. The script installs the binary; `sentrie --version` confirms the install.
+
+---
+
+## Examples in Action
+
+### Installing the latest version on macOS or Linux
+
+You want the current release and are on macOS, Linux, or WSL2.
+
+```bash
+curl -fsSL https://sentrie.sh/install.sh | bash
+```
+
+### Installing the latest version on Windows
+
+You are on Windows and want to use the PowerShell installer.
+
+```bash
+irm https://sentrie.sh/install.ps1 | iex
+```
+
+### Pinning a specific version
+
+You need a fixed version (e.g. for CI or reproducibility).
+
+**Unix:**
 
 ```bash
 curl -fsSL https://sentrie.sh/install.sh | bash -s v0.1.0
 ```
 
-### On Linux and WSL2
-
-```bash
-curl -fsSL https://sentrie.sh/install.sh | bash -s v0.1.0
-```
-
-### On Windows
+**Windows:**
 
 ```bash
 $v="0.1.0"; irm https://sentrie.sh/install.ps1 | iex
 ```
 
-### Verify Installation
+### Verifying the installation
+
+You want to confirm the binary is on your PATH and see the version.
 
 ```bash
 sentrie --version
 ```
+
+---
+
+## Good to Know
+
+Before you rely on this in automation, keep a few boundaries in mind:
+
+- **Constraint:** Sentrie is a single binary; no extra runtime. Supported: macOS (arm64, x64), Linux (x64, arm64), Windows (x64, arm64).
+- **Edge case:** Scripts install to a standard location and update PATH as appropriate for the platform. For custom installs or air-gapped environments, you can download the binary directly from the release artifacts.

@@ -16,7 +16,7 @@ Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `docume
 
 List index: `expr[number]`. Map index: `expr[string]` or `expr.key`.
 
-## Reference
+## Configuration & Arguments
 
 | Type | Description |
 | :--- | :--- |
@@ -31,9 +31,9 @@ List index: `expr[number]`. Map index: `expr[string]` or `expr.key`.
 
 **Returns:** N/A for types. `cast` returns the value after validation against the target type (and constraints); fails if invalid.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```text
 let u: number = 50
@@ -44,7 +44,7 @@ let m: map[number] = { "one": 1, "two": 2 }
 let r: record[string, number, bool] = ["one", 1, true]
 ```
 
-### Advanced Usage
+### Going further
 
 ```text
 let first: number = arr[0]
@@ -53,12 +53,13 @@ let oneAlt: number = m.one
 let x: number = cast "50" as number
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Type annotation on `let` is optional; when omitted, value is not validated against a type.
 - Map keys must be strings. Division by zero aborts evaluation. Constraint failure aborts evaluation.
 
-## Constraints & Edge Cases
 
 - Map keys must be strings. Access with `[index]`: number for list/record, string for map.
 - `cast` validates against the target type and any constraints; failure aborts evaluation.

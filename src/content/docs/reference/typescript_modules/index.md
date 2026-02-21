@@ -14,7 +14,7 @@ use { fn1, fn2 } from @sentrie/module [ as alias ]
 
 Built-in modules: `@sentrie/module` (no quotes). Default alias is the last path segment (e.g. `time` for `@sentrie/time`).
 
-## Reference
+## Configuration & Arguments
 
 | Element | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
@@ -24,9 +24,9 @@ Built-in modules: `@sentrie/module` (no quotes). Default alias is the last path 
 
 **Returns:** N/A (import). Function return types are per module; see linked pages.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```text
 use { now } from @sentrie/time
@@ -34,7 +34,7 @@ use { sha256 } from @sentrie/hash
 use { isValid } from @sentrie/json as jsonUtil
 ```
 
-### Advanced Usage
+### Going further
 
 ```text
 use { now } from @sentrie/time
@@ -63,10 +63,11 @@ let ok = jsonUtil.isValid(data)
 | [@sentrie/url](/reference/typescript_modules/sentrie/url) | parse, join, getHost, getPath, getQuery, isValid |
 | [@sentrie/uuid](/reference/typescript_modules/sentrie/uuid) | v4, v6, v7 |
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Only the listed functions can be imported. Paths are resolved at load time. Invalid function names or modules cause errors.
 
-## Constraints & Edge Cases
 
 - Built-in `@sentrie/*` modules do not use quotes. Local files use quoted paths (e.g. `"./utils.ts"`). JWT module only decodes/verifies; it does not create tokens. Prefer SHA-256/SHA-512 over MD5/SHA-1 for security.

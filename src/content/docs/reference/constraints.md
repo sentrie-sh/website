@@ -14,7 +14,7 @@ type @constraint1(args) @constraint2
 
 Examples: `number @min(0) @max(100)`, `string @email`, `list[string @one_of("a","b")]`.
 
-## Reference
+## Configuration & Arguments
 
 | Category | Constraints (examples) |
 | :--- | :--- |
@@ -24,26 +24,27 @@ Examples: `number @min(0) @max(100)`, `string @email`, `list[string @one_of("a",
 
 **Returns:** N/A. Constraint failure raises an error and aborts evaluation.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```text
 let u: number @min(0) @max(100) = 50
 shape Permission string @one_of("read", "write", "delete")
 ```
 
-### Advanced Usage
+### Going further
 
 ```text
 let permissions: list[string @one_of("read", "write", "delete")] = ["read", "write"]
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Constraints are checked at runtime when a value is assigned or cast to the constrained type.
 - Order of application is defined by the runtime. All specified constraints must pass.
 
-## Constraints & Edge Cases
 
 - Failing constraint validation aborts evaluation immediately. Use shapes to reuse constrained types.

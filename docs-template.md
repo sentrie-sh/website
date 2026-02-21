@@ -1,49 +1,50 @@
-# [Feature / Function Name]
+# [Feature Name]
 
-[A brief, 1-2 sentence introductory paragraph. Write this for the human. Explain what the feature is and the primary reason a developer would reach for it. Keep it factual and avoid marketing fluff, but let it flow naturally.]
+[A short, conversational paragraph explaining what this is and the exact problem it solves. Write as if you are explaining it to a colleague. Focus on the "why"—e.g., "When you need to guarantee the exact structure of an incoming payload before evaluating it, use Shapes."]
 
-## Syntax
+Here is the basic syntax:
 
 ```typescript
 // The formal definition or type signature
 ```
 
-## Parameters
+## Configuration & Arguments
 
-| Name        | Type   | Required | Description                                           |
-| :---------- | :----- | :------- | :---------------------------------------------------- |
-| `paramName` | `Type` | Yes/No   | A clear, concise explanation of what this input does. |
+[A brief, friendly sentence setting up the table, e.g., "You can customize the behavior using the following parameters:"]
 
-**Returns:** `ReturnType` - [A brief description of the output, e.g., "A boolean indicating whether the constraint was met."]
+| Argument    | Type   | Required | What it does                                  |
+| :---------- | :----- | :------- | :-------------------------------------------- |
+| `paramName` | `Type` | Yes/No   | A plain-English explanation of this argument. |
 
-## Examples
+**Returns:** `ReturnType` — [Explain what the developer gets back in plain English, e.g., "A validated object, or it aborts the evaluation if constraints fail."]
 
-### Basic Usage
+---
 
-[One sentence explaining what this example demonstrates.]
+## Examples in Action
 
-```typescript
-// Minimum reproducible code block. Use realistic variable names.
-```
+### [Scenario 1: e.g., Validating a standard user profile]
 
-### Advanced Usage
-
-[One sentence explaining the complexity or edge case shown here.]
+[One to two sentences explaining the real-world context of this example. Why would a developer actually write this?]
 
 ```typescript
-// Example showing composition, complex input, or error handling.
+// Clean, copy-pasteable code using realistic variable names
+// like userAge or billingAddress instead of foo and bar.
 ```
 
-## Behavior & Constraints
+### [Scenario 2: e.g., Handling complex nested objects]
 
-> **Note:** [Optional: A high-visibility callout for the most critical thing a human needs to know before using this feature.]
+[Context for the advanced use case. What edge case or complexity does this solve?]
 
-- **[Constraint 1]:** e.g., Failing constraint validation will abort evaluation immediately.
-- **[Limitation]:** e.g., Does not support dynamic key generation. All keys must be explicitly declared.
-- **[Compatibility]:** e.g., Cannot be used in conjunction with [Feature Y].
+```typescript
+// Advanced example code showing composition or error handling.
+```
 
-## Constraints & Edge Cases
+---
 
-- [Limitation 1: e.g., "Failing constraint validation will abort evaluation immediately."]
-- [Limitation 2: e.g., "Does not support dynamic key generation."]
-- [Mutual Exclusions: e.g., "Cannot be used in conjunction with X."]
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind to ensure predictable execution:
+
+- **[Constraint]:** [e.g., "Sentrie evaluates these strictly. If an incoming payload includes keys not defined in your Shape, the evaluation will fail."]
+- **[Performance tip]:** [e.g., "If you are validating deeply nested JSON, keep your recursion depth under X for optimal performance."]
+- **[Edge case]:** [e.g., "Null values are only accepted if you explicitly use the `.nullable()` modifier."]

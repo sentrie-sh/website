@@ -18,7 +18,7 @@ expr % expr
 
 Unary: `+ expr` | `- expr`
 
-## Reference
+## Configuration & Arguments
 
 | Operator | Description | Result |
 | :--- | :--- | :--- |
@@ -30,9 +30,9 @@ Unary: `+ expr` | `- expr`
 
 **Returns:** `number`. Division by zero aborts evaluation.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```sentrie
 let sum: number = 5 + 3
@@ -42,18 +42,19 @@ let quot: number = 15 / 3
 let rem: number = 10 % 3
 ```
 
-### Advanced Usage
+### Going further
 
 ```sentrie
 let area: number = rect.width * rect.height
 let safe: number = divisor != 0 ? 10 / divisor : 0.0
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - All operands are `number`; mixed integer/float is allowed. Division is float (e.g. 7/2 = 3.5).
 - Modulo: remainder after division; divisor zero aborts.
 
-## Constraints & Edge Cases
 
 - Division by zero aborts evaluation. Use a guard (e.g. ternary) to avoid.

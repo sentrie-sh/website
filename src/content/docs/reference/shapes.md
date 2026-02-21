@@ -21,7 +21,7 @@ shape Name {
 
 **Composition:** `shape Child with Base { ... }`
 
-## Reference
+## Configuration & Arguments
 
 | Modifier | Description |
 | :--- | :--- |
@@ -32,9 +32,9 @@ shape Name {
 
 **Returns:** N/A (type definition). Values are validated when assigned or passed as facts.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```sentrie
 shape User {
@@ -44,7 +44,7 @@ shape User {
 }
 ```
 
-### Advanced Usage
+### Going further
 
 ```sentrie
 shape Base { id!: string }
@@ -52,11 +52,12 @@ shape Extended with Base { role!: string }
 shape ID string @uuid()
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Composed shape includes all fields of Base plus its own. Circular composition is not allowed.
 - Optional fields: use `is defined` to check before use. Exported shapes are visible across namespaces.
 
-## Constraints & Edge Cases
 
 - Unexported shapes are namespace-local. Field order in literals does not affect type checking.

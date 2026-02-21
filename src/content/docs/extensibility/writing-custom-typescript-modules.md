@@ -15,7 +15,7 @@ use { fn1 } from "@local/path/to/module" [ as alias ]
 
 Built-in: `use { fn1 } from @sentrie/module` (no quotes). Local: quoted path or `@local/...`; resolved relative to current file or pack root.
 
-## Parameters
+## Configuration & Arguments
 
 | Element | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
@@ -25,9 +25,9 @@ Built-in: `use { fn1 } from @sentrie/module` (no quotes). Local: quoted path or 
 
 **Returns:** N/A (import). Call as `alias.fn1(args)` in the policy.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```text
 use { calculateAge, validateEmail } from "./utils.ts" as utils
@@ -36,7 +36,7 @@ rule myrule = default false {
 }
 ```
 
-### Advanced Usage
+### Going further
 
 ```text
 use { calculateAge, validateEmail } from "../helpers/validation.ts"
@@ -46,12 +46,13 @@ yield utils.calculateAge(user.birthDate) >= 18
 
 Path resolution: `./file.ts` = same directory as policy; `../parent.ts` = parent; `./utils/helper.ts` = subdirectory. All normalized to `@local` internally. `@local/user/id` → `$PACKROOT/user/id.ts`.
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - TypeScript files must live inside the policy pack root. They can import other local modules and built-in `@sentrie/*` modules.
 - Exported functions and types are available to policies. Relative imports in `.ts` files are resolved relative to that file and normalized to `@local`.
 - Default alias is the last path segment (e.g. `utils` for `./utils.ts`). Use `as alias` to override.
 
-## Constraints & Edge Cases
 
 - Module must export the requested names. Invalid path or missing export causes load error. Use [Built-in TypeScript Modules](/reference/typescript_modules/) for common operations; add custom modules for pack-specific logic.

@@ -3,9 +3,9 @@ title: Writing your first Policy
 description: "Minimal policy structure: namespace, policy, shape, facts, rules, exports."
 ---
 
-A Sentrie policy file contains one namespace and one or more policies. Each policy declares facts (inputs), rules (decision logic), and exports (rules exposed for evaluation). This page gives the minimal structure and a complete example.
+When you need to define who can do what (or any decision your app will enforce), you describe it in a Sentrie policy: one namespace per file, shapes for your input data, and policies that declare facts, rules, and exports. This page walks through the minimal structure and a few typical scenarios.
 
-## Syntax
+Here is the basic syntax:
 
 ```text
 namespace SLUG
@@ -20,23 +20,30 @@ policy IDENT {
 }
 ```
 
-- File must start with exactly one `namespace`. One or more `shape` and `policy` blocks follow.
-- Policy must have at least one `rule` and at least one `export decision of`.
+The file must start with exactly one `namespace`. One or more `shape` and `policy` blocks follow. Each policy must have at least one `rule` and at least one `export decision of`.
 
-## Concepts
+## Configuration & Arguments
 
-| Concept   | Required | Description                                                                                                         |
-| :-------- | :------- | :------------------------------------------------------------------------------------------------------------------ |
-| Namespace | Yes      | Single `namespace SLUG` per file; first statement. Slash-separated (e.g. `com/example/app`).                        |
-| Shape     | No       | Data model for facts. Required/optional fields: `field!`, `field?`.                                                 |
-| Policy    | No       | Named block containing facts, rules, and exports.                                                                   |
-| Fact      | No       | Input to the policy. Required by default; `?` makes optional. Only optional facts may have `default`. Non-nullable. |
-| Rule      | Yes (≥1) | Block that yields a decision. May reference other rules in the same policy.                                         |
-| Export    | Yes (≥1) | `export decision of ruleName` makes the rule callable via CLI/API and importable.                                   |
+You can structure a policy using these elements:
 
-## Examples
+| Argument | Required | What it does |
+| :------- | :------- | :----------- |
+| Namespace | Yes | Single `namespace SLUG` per file; first statement. Slash-separated (e.g. `com/example/app`). |
+| Shape | No | Data model for facts. Required fields: `field!`; optional: `field?`. |
+| Policy | No | Named block containing facts, rules, and exports. |
+| Fact | No | Input to the policy. Required by default; `?` makes optional. Only optional facts may have `default`. Non-nullable. |
+| Rule | Yes (≥1) | Block that yields a decision. May reference other rules in the same policy. |
+| Export | Yes (≥1) | `export decision of ruleName` makes the rule callable via CLI/API and importable. |
 
-### Minimal policy (one rule)
+**Returns:** N/A (authoring). At runtime, evaluation returns the exported rule decision(s) (e.g. boolean).
+
+---
+
+## Examples in Action
+
+### Defining a minimal policy with one rule
+
+You want a single allow/deny decision based on a user shape (e.g. role). You need one namespace, one shape, one rule, and one export.
 
 ```sentrie
 namespace com/example/user_management
@@ -58,6 +65,8 @@ policy user_access {
 ```
 
 ### Composing rules and exporting multiple rules
+
+You want to reuse one rule inside another (e.g. “admin or active user”) and expose both outcomes so the CLI or API can call either.
 
 ```sentrie
 namespace com/example/user_management
@@ -83,7 +92,9 @@ policy user_access {
 }
 ```
 
-### Optional fact with default
+### Using an optional fact with a default
+
+You have a fact that is optional (e.g. context) and you want a default when the caller doesn’t supply it.
 
 ```sentrie
 policy user_access {
@@ -97,17 +108,12 @@ policy user_access {
 }
 ```
 
-## Behavior & Constraints
+---
 
-- **File structure:** One namespace per file; namespace must be the first statement. Shapes and policies follow.
-- **Facts:** Declared before rules. Required facts must be provided at evaluation time; optional facts may be omitted or have defaults.
-- **Rules:** May reference other rules in the same policy by name (e.g. `yield allow_admin or ...`). At least one rule must be exported for the policy to be executable.
-- **Exports:** Only exported rules are available to `sentrie exec` and the HTTP API. A policy must export at least one rule.
+## Good to Know
 
-## Constraints & Edge Cases
+Before you implement this, keep a few boundaries in mind:
 
-- Namespace slug uses slashes (e.g. `com/example/app`). No leading/trailing slash.
-- Shape field required: `field!: type`. Optional: `field?: type`.
-- Fact without `?` is required; missing required fact at evaluation → error.
-- Optional fact (`?`) may have `default expr`; if omitted at evaluation, default is used.
-- Rule body must yield a value (e.g. `yield expr`). Default when omitted: `default false` or `default true` as declared.
+- **Constraint:** One namespace per file; namespace must be the first statement. Facts are declared before rules. Required facts must be provided at evaluation time; optional facts may be omitted or use defaults. At least one rule must be exported for the policy to be executable.
+- **Constraint:** Only exported rules are available to `sentrie exec` and the HTTP API. Rules in the same policy may reference each other by name (e.g. `yield allow_admin or ...`).
+- **Edge case:** Namespace slug uses slashes (e.g. `com/example/app`); no leading or trailing slash. Shape: `field!: type` for required, `field?: type` for optional. Fact without `?` is required; missing required fact at evaluation → error. Optional fact (`?`) may have `default expr`. Rule body must yield a value; you can declare `default false` or `default true`.

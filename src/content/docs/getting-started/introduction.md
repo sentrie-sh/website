@@ -40,14 +40,15 @@ policy <Name> {
 - One namespace per file; namespace must be the first statement.
 - Policies contain facts (inputs), rules (logic), and exports (rules exposed for evaluation).
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - **Facts**: Required by default; use `?` for optional. All facts are non-nullable. Optional facts may have a default.
 - **Rules**: Must yield a value in the body when the `when` condition is true; otherwise the default (or `unknown` if no default) is used.
 - **Exports**: A policy must export at least one rule for it to be evaluable via CLI or API.
 - **TypeScript modules**: Allowed for extra functions; execution remains bounded by the engine.
 
-## Constraints & Edge Cases
 
 - Policy logic cannot cause infinite loops or unbounded recursion in the Sentrie language.
 - Required facts must be provided at evaluation time or evaluation fails.

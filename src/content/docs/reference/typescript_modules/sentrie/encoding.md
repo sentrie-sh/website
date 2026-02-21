@@ -178,10 +178,11 @@ policy mypolicy {
 }
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Base64/hex/URL encode decode; input and output are strings. Invalid Base64/hex input may throw.
 
-## Constraints & Edge Cases
 
 - base64Url omits padding; URL encoding is percent-encoding. Decode errors throw.

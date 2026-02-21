@@ -13,7 +13,7 @@ use { isValid } from @sentrie/json [ as alias ]
 alias.isValid(str)
 ```
 
-## Reference
+## Configuration & Arguments
 
 | Name  | Type   | Required | Description                 |
 | :---- | :----- | :------- | :-------------------------- |
@@ -21,9 +21,9 @@ alias.isValid(str)
 
 **Returns:** `boolean` - true if the string is valid JSON, false otherwise.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```text
 use { isValid } from @sentrie/json as jsonUtil
@@ -31,7 +31,7 @@ let ok = jsonUtil.isValid('{"name": "John", "age": 30}')
 let bad = jsonUtil.isValid('{"name": "John", "age":}')
 ```
 
-### Advanced Usage
+### Going further
 
 ```text
 use { isValid } from @sentrie/json as jsonUtil
@@ -41,10 +41,11 @@ rule processData = default false {
 }
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Only validates syntax; does not parse. Use `@sentrie/js` for `parse` and `stringify`.
 
-## Constraints & Edge Cases
 
 - Empty string is not valid JSON. Invalid UTF-8 or malformed structure returns false.

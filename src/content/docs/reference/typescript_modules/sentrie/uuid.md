@@ -15,7 +15,7 @@ alias.v6()
 alias.v7()
 ```
 
-## Reference
+## Configuration & Arguments
 
 | Function | Parameters | Required | Description                                        |
 | :------- | :--------- | :------- | :------------------------------------------------- |
@@ -25,9 +25,9 @@ alias.v7()
 
 **Returns:** `string` - UUID in form `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. Throws on generation failure.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```text
 use { v4, v7 } from @sentrie/uuid
@@ -35,7 +35,7 @@ let id = uuid.v4()
 let timeId = uuid.v7()
 ```
 
-### Advanced Usage
+### Going further
 
 ```text
 use { v4, v7 } from @sentrie/uuid
@@ -46,10 +46,11 @@ rule createResource = default false {
 }
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - v4: random; no ordering. v6/v7: time-ordered for better DB indexing/sorting. v7 includes Unix timestamp.
 
-## Constraints & Edge Cases
 
 - UUIDs are not cryptographically secure; use proper CSPRNG for security-sensitive randomness. Generation failure throws.

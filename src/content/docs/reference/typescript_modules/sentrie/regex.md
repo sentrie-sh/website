@@ -200,10 +200,11 @@ let alnumPattern = "^[a-zA-Z0-9_]+$"
 - Repeated use of the same pattern in a single execution context will use the cached compiled pattern
 - Patterns are automatically cleaned up after execution
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Patterns are strings; compiled and cached per execution. match/find/findAll/replace/replaceAll/split follow standard regex semantics.
 
-## Constraints & Edge Cases
 
 - Invalid pattern throws. Replace/split return new string/list; original unchanged.

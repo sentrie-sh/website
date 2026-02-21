@@ -4,7 +4,9 @@ description: Rule syntax, evaluation (when/default/body), and outcome (trinary o
 ---
 
 
-A rule defines a decision: an optional `when` condition, an optional `default`, and a body that must contain `yield`. If `when` is truthy the body is evaluated; otherwise the `default` (or `unknown`) is used.
+When you need to define a single decision (e.g. allow/deny or a computed value) that can depend on a condition and a fallback, you write a rule. A rule has an optional `when` guard, an optional `default`, and a body that must contain `yield`. If `when` is truthy the body is evaluated; otherwise the `default` (or `unknown`) is used.
+
+Here is the basic syntax:
 
 ## Syntax
 
@@ -12,7 +14,7 @@ A rule defines a decision: an optional `when` condition, an optional `default`, 
 rule IDENT = [ default expr ] [ when expr ] { stmt* yield expr }
 ```
 
-## Reference
+## Configuration & Arguments
 
 | Part | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
@@ -22,16 +24,16 @@ rule IDENT = [ default expr ] [ when expr ] { stmt* yield expr }
 
 **Returns:** The `yield` expression value when body runs, else `default` (or `unknown`). Type is trinary or any value type.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Defining a single rule with a default
 
 ```sentrie
 rule allow = default false { yield true }
 rule isAdmin = default false when user.role is defined { yield user.role == "admin" }
 ```
 
-### Advanced Usage
+### Using when and TypeScript in a rule
 
 ```sentrie
 rule getPrice = default 0 when product.price is defined {
@@ -41,13 +43,14 @@ rule getPrice = default 0 when product.price is defined {
 }
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Evaluation: `is_truthy(when) ? body_result : default`. Truthy follows [trinary](/reference/trinary) semantics.
 - Body must yield exactly once when evaluated. Only the chosen branch (body or default) is evaluated.
 - Rules in the same policy can reference other rules by name. Exported rules can be imported elsewhere.
 
-## Constraints & Edge Cases
 
 - If no `default` and `when` is not truthy, outcome is `unknown`.
 - Recursion in rule evaluation is bounded by the language (no unbounded recursion).

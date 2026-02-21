@@ -31,7 +31,9 @@ export shape IDENT
 
 **Composition:** [Policy composition](/language-concepts/policy-composition) (export/import) · [Writing custom TypeScript modules](/extensibility/writing-custom-typescript-modules)
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - One namespace per file; namespace must be the first statement (comments allowed before).
 - Policies must export at least one rule to be executable or importable.

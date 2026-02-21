@@ -136,11 +136,12 @@ policy mypolicy {
 }
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - All hash functions return hexadecimal-encoded strings. Input is string; HMAC takes algorithm name, message, and secret key.
 - Use SHA-256 or SHA-512 for security; MD5 and SHA-1 are cryptographically broken.
 
-## Constraints & Edge Cases
 
 - Invalid input (e.g. non-hex for decode) may throw. HMAC algorithm must be supported (e.g. sha256).

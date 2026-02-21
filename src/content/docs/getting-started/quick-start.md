@@ -3,9 +3,9 @@ title: Quick Start
 description: Install Sentrie and run your first policy evaluation.
 ---
 
-Install the Sentrie binary and evaluate a policy from the command line. This page covers installation and a minimal run (no policy pack layout).
+When you need to run policy checks from the command line or script a one-off evaluation, you install the Sentrie binary and use `sentrie exec` with a target and facts. This page gets you from zero to a first run.
 
-## Syntax
+Here is the basic syntax:
 
 Install (macOS, Linux, WSL2):
 
@@ -19,60 +19,34 @@ Install (Windows):
 irm https://sentrie.sh/install.ps1 | iex
 ```
 
-Specific version (script): append version to the install script (e.g. `bash -s v0.1.0` for Unix; set `$v="0.1.0"` for Windows).
-
-Verify:
+Verify and run a policy:
 
 ```bash
 sentrie --version
+sentrie exec <namespace/policy> [or namespace/policy/rule] [ --facts '<JSON>' ]
 ```
 
-## Writing your first policy
+For a specific version, append it to the install script (e.g. `bash -s v0.1.0` on Unix; set `$v="0.1.0"` on Windows).
 
-```bash
-sentrie init my-pack
-```
+## Configuration & Arguments
 
-This will create a new policy pack in the current directory.
+You control what gets evaluated using the pack directory, target, and facts:
 
-```bash
-$ echo 'namespace auth { \
-  policy user { \
-    rule allow = default false { \
-      yield true \
-    } \
-  } \
-}' > my-pack/policy.sentrie
-```
-
-```bash
-sentrie exec auth/user/allow
-
-Namespace: auth
-Policy:    user
-
-Rules:
-  ✓ allow: ✓ True
-
-Values:
-  ✓ allow: true
-```
-
-## Parameters
-
-| Step             | Required | Description                                                                          |
-| :--------------- | :------- | :----------------------------------------------------------------------------------- |
-| Policy pack path | No       | Directory containing `*.sentrie.toml` pack manifest. Default: current directory.     |
-| Target           | Yes      | `namespace/policy` or `namespace/policy/rule`.                                       |
-| Facts            | Depends  | JSON object of fact names to values; required if the policy declares required facts. |
+| Argument | Required | What it does |
+| :------- | :------- | :------------ |
+| Policy pack path | No | Directory containing your `*.sentrie` files (and optional pack manifest). Default: current directory. |
+| Target | Yes | `namespace/policy` runs all exported rules; `namespace/policy/rule` runs a single rule. |
+| Facts | Depends | JSON object of fact names to values. Required if the policy declares required facts. |
 
 **Returns:** Exit code 0 on success; non-zero on evaluation or CLI error. Decision output is printed to stdout.
 
-## Examples
+---
 
-### Basic Usage
+## Examples in Action
 
-Create a minimal pack and run one rule:
+### Running a single rule with inline facts
+
+You have a policy that expects a `user` fact and exports a rule `allow`. You want to see the decision for one concrete user.
 
 ```bash
 mkdir my-pack && cd my-pack
@@ -100,15 +74,15 @@ policy access {
 }
 ```
 
-Evaluate (from the pack directory):
+From the pack directory, run the rule with facts:
 
 ```bash
 sentrie exec com/example/app/access/allow --facts '{"user": {"role": "user", "status": "active"}}'
 ```
 
-### Advanced Usage
+### Evaluating every exported rule in a policy
 
-Evaluate all exported rules in a policy and pass multiple facts:
+You want to see the outcome of all exported rules in one policy (e.g. for debugging or auditing). Omit the rule name from the target.
 
 ```bash
 sentrie exec com/example/app/access --facts '{"user": {"role": "admin", "status": "active"}}'
@@ -116,16 +90,13 @@ sentrie exec com/example/app/access --facts '{"user": {"role": "admin", "status"
 
 Facts JSON keys must match the fact names (or aliases) declared in the policy. Required facts must be present.
 
-## Behavior & Constraints
+---
 
-- **Single binary**: No extra runtime; the executable is self-contained.
-- **Platforms**: macOS (arm64, x64), Linux (x64, arm64), Windows (x64, arm64).
-- **Facts**: Required facts must be provided; otherwise evaluation fails. Optional facts may be omitted if they have defaults.
-- **Target**: Use `namespace/policy` to evaluate all exported rules; use `namespace/policy/rule` for a single rule.
+## Good to Know
 
-## Constraints & Edge Cases
+Before you rely on this in scripts or CI, keep a few boundaries in mind:
 
-- Missing required fact → evaluation error.
-- Invalid JSON in `--facts` → CLI error.
-- Invalid target path (unknown namespace/policy/rule) → error.
-- At least one rule must be exported from a policy to be executable via `sentrie exec`.
+- **Single binary:** No extra runtime; the executable is self-contained. Supported platforms: macOS (arm64, x64), Linux (x64, arm64), Windows (x64, arm64).
+- **Facts:** Required facts must be provided; otherwise evaluation fails. Optional facts may be omitted if they have defaults.
+- **Target:** Use `namespace/policy` to evaluate all exported rules; use `namespace/policy/rule` for a single rule. Invalid or missing target (unknown namespace/policy/rule) causes an error.
+- **Edge case:** Missing required fact → evaluation error. Invalid JSON in `--facts` → CLI error. At least one rule must be exported from a policy to be executable via `sentrie exec`.

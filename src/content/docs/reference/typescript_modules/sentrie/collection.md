@@ -333,10 +333,11 @@ policy mypolicy {
 }
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - List functions use `list_` prefix; map functions use `map_` prefix. Operations do not mutate the original collection.
 
-## Constraints & Edge Cases
 
 - Throws if input is not an array (for list_*) or not an object (for map_*). Deep equality used where applicable.

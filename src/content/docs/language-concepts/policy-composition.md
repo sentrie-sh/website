@@ -24,7 +24,7 @@ rule localName = import decision of ruleName
   with targetFact2 as expression2
 ```
 
-## Reference
+## Configuration & Arguments
 
 | Element | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
@@ -35,9 +35,9 @@ rule localName = import decision of ruleName
 
 **Returns:** Exported rule’s decision (trinary or value). If attachments exist, import returns an object with the decision and attachment fields (e.g. `authResult.role`).
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```sentrie
 namespace com/example/auth
@@ -72,7 +72,7 @@ policy documentAccess {
 }
 ```
 
-### Advanced Usage
+### Going further
 
 Export with attachments; import and use them:
 
@@ -106,7 +106,9 @@ policy resources {
 }
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - **Export:** A policy must export at least one rule. Only exported rules are executable via CLI/API and importable. Rules in the same policy can reference each other without export.
 - **Import:** The imported rule runs in a sandbox: it sees only the facts provided by `with` clauses. It cannot access the calling policy’s other facts or context. Facts are type-checked against the target policy.
@@ -114,7 +116,6 @@ policy resources {
 - **Recursion:** Circular imports (A imports B, B imports A) are prevented and will fail.
 - **Namespace:** Use full `namespace/policy` or, in the same namespace, policy name only. Fact names in `with` must match the target policy’s fact alias.
 
-## Constraints & Edge Cases
 
 - Rule not found: ensure the rule is exported and the namespace/policy path and rule name are correct (case-sensitive).
 - Fact not found: use the target policy’s fact alias in `with`, not the original name.

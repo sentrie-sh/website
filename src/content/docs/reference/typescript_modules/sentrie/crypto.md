@@ -45,10 +45,11 @@ policy mypolicy {
 }
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Returns SHA-256 hash as hexadecimal string. For more algorithms use [@sentrie/hash](/reference/typescript_modules/sentrie/hash).
 
-## Constraints & Edge Cases
 
 - Input must be string. Invalid or unsupported input may throw.

@@ -39,9 +39,9 @@ shape Name {
 
 **Returns:** N/A (type system). Constraint validation fails at runtime if a value does not meet the type or constraints; evaluation aborts.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```sentrie
 shape User {
@@ -53,7 +53,7 @@ shape User {
 let u: User = { name: "Alice", age: 28 }
 ```
 
-### Advanced Usage
+### Going further
 
 ```sentrie
 shape Base { id!: string }
@@ -62,7 +62,9 @@ shape Extended with Base { role!: string }
 let e: Extended = { id: "1", role: "admin" }
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - **Primitives:** `number` (float64), `string`, `trinary` (`true`/`false`/`unknown`), `bool` (subset of trinary), `document` (JSON-like).
 - **Collections:** `list[T]` index by number; `map[T]` keys are strings (dot or `["key"]` access); `record[T1,T2,...]` fixed-length tuple.
@@ -70,7 +72,6 @@ let e: Extended = { id: "1", role: "admin" }
 - **Constraints:** Validate at runtime. Failing constraint validation aborts evaluation immediately.
 - **Cast:** `cast expr as Type` converts and validates against the target type (and its constraints).
 
-## Constraints & Edge Cases
 
 - Map keys must be strings.
 - Type annotation on `let` is optional; if omitted, values are not validated against types.

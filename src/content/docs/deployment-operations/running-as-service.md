@@ -82,9 +82,9 @@ Evaluates a policy or rule. `{target...}` = path segments: `namespace/policy` or
 
 **Returns:** See schemas above. 400 for invalid JSON or path; 404 for unknown policy/rule; 405 for wrong method; 500 for evaluation error.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Calling the decision endpoint with curl
 
 ```bash
 curl -X POST "http://localhost:7529/decision/com/example/auth/user/allow" \
@@ -92,7 +92,7 @@ curl -X POST "http://localhost:7529/decision/com/example/auth/user/allow" \
   -d '{"facts":{"user":{"role":"admin"}}}'
 ```
 
-### Advanced Usage
+### Passing multiple facts in the request body
 
 ```bash
 curl -X POST "http://localhost:7529/decision/com/example/auth/user" \
@@ -121,10 +121,11 @@ curl -X POST "http://localhost:7529/decision/com/example/auth/user" \
 | 405 | Method not allowed (e.g. GET on /decision). |
 | 500 | Internal error during evaluation. |
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Base URL: default `http://localhost:7529`. `--listen all` binds 0.0.0.0. Only POST is allowed for `/decision/{target...}`. Query parameters are parsed but not used for execution semantics.
 
-## Constraints & Edge Cases
 
 - Facts must match policy declarations (required facts present; types/shapes valid). Missing or invalid facts can return 400 or 500. CORS headers are sent (`Access-Control-Allow-Origin: *` etc.). No built-in auth or rate limiting.

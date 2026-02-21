@@ -10,7 +10,7 @@ Operators are evaluated in order of precedence (highest first). Same precedence 
 
 Expressions combine operators; precedence determines binding. Ternary `? :` is right-associative.
 
-## Reference
+## Configuration & Arguments
 
 | Precedence | Operators | Description |
 | :--- | :--- | :--- |
@@ -27,9 +27,9 @@ Expressions combine operators; precedence determines binding. Ternary `? :` is r
 
 **Returns:** N/A (ordering rule). Result type is that of the top-level expression.
 
-## Examples
+## Examples in Action
 
-### Basic Usage
+### Typical use
 
 ```sentrie
 let result: number = 2 + 3 * 4         -- 14
@@ -37,17 +37,18 @@ let valid: bool = 5 + 3 > 7            -- true
 let complex: bool = true and false or true  -- true
 ```
 
-### Advanced Usage
+### Going further
 
 ```sentrie
 let value: number = 5 > 3 ? 10 : 20   -- 10
 let nested: string = true ? (false ? "A" : "B") : "C"  -- "B"
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - Parentheses override precedence. Same level: left to right except ternary (right-associative).
 
-## Constraints & Edge Cases
 
 - Use parentheses when in doubt to make intent explicit.

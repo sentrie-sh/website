@@ -258,10 +258,11 @@ policy mypolicy {
 }
 ```
 
-## Behavior & Constraints
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
 
 - IPv4 and IPv6; CIDR and single IP. parseIP returns parsed representation or null. Invalid CIDR/IP throws.
 
-## Constraints & Edge Cases
 
 - Invalid CIDR or IP throws. Use isPrivate, isPublic, isLoopback for classification.
