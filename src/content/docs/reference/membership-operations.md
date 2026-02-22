@@ -44,7 +44,7 @@ haystack contains needle
 ### Map — subset
 
 - **Haystack:** map. **Needle:** map.
-- **Result:** true if every key in needle exists in haystack and the corresponding values are equal (by `==`). Extra keys in haystack are allowed. If any key in needle is missing from haystack or any value differs, result is false.
+- **Result:** true if every key in needle exists in haystack and the corresponding values are equal (by `==`). Extra keys in haystack are allowed. If any key in needle is missing from haystack or any value differs, result is false. The value comparison is **recursive**: when values are themselves maps or lists, they are compared recursively (nested maps must match key-for-key; nested lists element-for-element).
 
 ## Examples in Action
 
@@ -70,5 +70,5 @@ Before you implement this, keep a few boundaries in mind:
 - **Strings:** Needle must be non-empty for a true result; empty needle → false. Empty string haystack → false (unless needle is also empty; then typically false by “non-empty substring” rule).
 - **Lists:** Element-wise equality; no deep comparison beyond the language’s `==`. Empty list → false.
 - **Maps (key):** Needle string checks key presence only. Map keys are strings.
-- **Maps (subset):** Needle map: every key in needle must exist in haystack with the same value; extra keys in haystack are allowed. Type mismatch (e.g. haystack not a map, or needle not string/map) → false.
+- **Maps (subset):** Needle map: every key in needle must exist in haystack with the same value; extra keys in haystack are allowed. Value equality is recursive (nested maps/lists are compared recursively). Type mismatch (e.g. haystack not a map, or needle not string/map) → false.
 - **Regex:** For pattern matching on strings, use [matches](/reference/boolean-operations) in Boolean Operations.

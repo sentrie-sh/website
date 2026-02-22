@@ -9,15 +9,34 @@ Collection operations apply to lists and maps. They are declarative: they return
 
 ```text
 any collection as element, index { yield trinary }
-all collection as element, index { yield trinary }
-filter collection as element, index { yield trinary }
-map collection as element, index { yield expr }
-reduce collection from initial as acc, element, index { yield expr }
-count collection
-distinct collection
 ```
 
-- **element, index:** Loop variables. For lists, element is the item and index is the position (0-based). For maps, element and index semantics are implementation-defined (e.g. key-value pair or value and key). The index parameter may be optional in some forms.
+```text
+all collection as element, index { yield trinary }
+```
+
+```text
+count collection
+```
+
+```text
+distinct collection as left, right { yield trinary }
+```
+
+```text
+reduce collection from initial as acc, element, index { yield expr }
+```
+
+```text
+filter collection as element, index { yield trinary }
+```
+
+```text
+map collection as element, index { yield expr }
+```
+
+- **element, index:** Loop variables (for `any`, `all`, `filter`, `map`, `reduce`). For lists, element is the item and index is the position (0-based). For maps, element and index semantics are implementation-defined (e.g. key-value pair or value and key). The index parameter may be optional in some forms.
+- **left, right:** For `distinct`, two iterator names. During evaluation, `left` is bound to an item already in the distinct result so far, and `right` is the candidate element. The block must yield a trinary/boolean: truthy means “left and right are equal” (candidate is a duplicate and is dropped), falsy means “different” (candidate is added to the result). Typically you yield `left == right` or a custom equality.
 - **acc, element, index:** For `reduce`, `acc` is the accumulator (initial value on first iteration, then the previous `yield` result), `element` is the current element, and `index` is the position/key as above.
 
 ## Configuration & Arguments
@@ -30,13 +49,14 @@ distinct collection
 | `map`      | collection          | list            | New list whose elements are the yielded values (one per element). Type of each yield can be any type.                                                   |
 | `reduce`   | collection, initial | type of initial | Fold: start with `acc = initial`; for each element, set `acc` to the yielded expression. Final `acc` is the result. Empty collection → returns initial. |
 | `count`    | collection          | number          | Number of elements in the collection. Empty → 0.                                                                                                        |
-| `distinct` | collection          | same type       | New collection with duplicate elements removed. Equality for deduplication is by the language’s `==`.                                                   |
+| `distinct` | collection          | same type       | New list with duplicates removed. Takes two iterator names (`left`, `right`) and a predicate block. For each candidate (`right`), the block is evaluated with each already-selected item (`left`); if any evaluation is truthy, the candidate is treated as a duplicate. Typically the block yields `left == right` or a custom equality. **Input must be a list** (maps are not supported). |
 
 **Returns:** As in the table. For `any`/`all`, the result is the trinary/boolean produced by the predicate. For `filter`/`map`/`distinct`, the result is a new collection (or list for `map`). For `reduce`, the result is the final accumulator. For `count`, the result is a number.
 
 ## Block and yield rules
 
 - **any, all, filter:** The block must yield a value that is interpreted as truthy or falsy (trinary/boolean). One yield per iteration. The block is evaluated once per element.
+- **distinct:** The block must yield a trinary/boolean (predicate). It is evaluated for each pair (already-selected item as `left`, candidate item as `right`). Truthy means “equal” (candidate is a duplicate); falsy means “different” (candidate is kept). Typically `yield left == right`.
 - **map:** The block must yield an expression per iteration. The type of the yielded value can be any type; the result is a list of those values.
 - **reduce:** The block must yield an expression that becomes the next accumulator. First iteration: `acc` is `initial`. Subsequent iterations: `acc` is the previous yield. The final yield (after the last element) is the result of `reduce`.
 
@@ -63,7 +83,7 @@ let evens: list[number] = filter numbers as num, idx { yield num % 2 == 0 }
 let doubled: list[number] = map numbers as num, idx { yield num * 2 }
 let sum: number = reduce numbers from 0 as acc, num, idx { yield acc + num }
 let n: number = count numbers
-let uniq: list[number] = distinct numbers
+let uniq: list[number] = distinct numbers as left, right { yield left == right }
 ```
 
 ### reduce with initial and multiple uses
@@ -78,6 +98,6 @@ let avg: number = sum / count scores
 Before you implement this, keep a few boundaries in mind:
 
 - **Applicability:** Only valid on collections (lists, maps). The original collection is not modified.
-- **Block:** Must yield once per iteration. For `any`/`all`/`filter` the yield is a predicate (trinary/boolean); for `map`/`reduce` the yield is an expression that becomes the new value or accumulator.
+- **Block:** Must yield once per iteration (or per comparison for `distinct`). For `any`/`all`/`filter`/`distinct` the yield is a predicate (trinary/boolean); for `map`/`reduce` the yield is an expression that becomes the new value or accumulator. **distinct** accepts only lists; the block receives `left` (item already in result) and `right` (candidate), e.g. `distinct items as left, right { yield left == right }`.
 - **Empty collection:** `any` → false, `all` → true, `filter`/`map`/`distinct` → empty result, `count` → 0, `reduce` → initial.
 - **Reduce:** First iteration uses `initial` as `acc`; each subsequent iteration uses the previous `yield` result as `acc`.
