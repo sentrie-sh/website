@@ -1,6 +1,6 @@
 ---
 title: Rules
-description: Exhaustive reference for rule syntax, when/default/body evaluation, outcome type, and cross-references.
+description: "Rule syntax, when/default/body evaluation, outcome type, and cross-references."
 ---
 
 A rule defines a single named decision: an optional `when` guard, an optional `default` value when the guard is not truthy, and a body that must contain exactly one `yield`. If the `when` expression is truthy, the body is evaluated and its `yield` value is the rule’s outcome; otherwise the outcome is the `default` (or `unknown` if no default is given). Rules are the only construct that can be exported for execution or import.

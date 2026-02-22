@@ -1,6 +1,6 @@
 ---
 title: Intermediate Values (let)
-description: Exhaustive reference for let declaration syntax, scoping, immutability, and type validation.
+description: "let declaration syntax, scoping, immutability, and type validation."
 ---
 
 `let` binds a name to an expression inside a block. It is used for intermediate values in a [policy](/reference/policies) or inside a [rule](/reference/rules) body. The binding is scoped to the block, is immutable (no reassignment), and cannot be exported. Only [rules](/reference/rules) can be exported. If a type annotation is present, the value is validated at runtime (including [constraints](/reference/constraints)); validation failure aborts evaluation.

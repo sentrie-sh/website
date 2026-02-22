@@ -1,6 +1,6 @@
 ---
 title: Collection Operations
-description: "Exhaustive reference for quantifiers and transformers (any, all, filter, map, reduce, count, distinct); syntax, parameters, and edge cases."
+description: "Quantifiers and transformers (any, all, filter, map, reduce, count, distinct); syntax, parameters, and edge cases."
 ---
 
 Collection operations apply to lists and maps. They are declarative: they return new values or new collections and do not mutate the input. Syntax uses a block with a single `yield` per iteration. The collection is iterated in order (list order or map iteration order); for `reduce`, an initial value is combined with each element via the yielded expression.

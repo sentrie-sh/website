@@ -1,6 +1,6 @@
 ---
 title: Arithmetic Operations
-description: Exhaustive reference for arithmetic operators (+, -, *, /, %), unary +/-, operand types, and edge cases including division by zero.
+description: "Arithmetic operators (+, -, *, /, %), unary +/-, operand types, and edge cases including division by zero."
 ---
 
 Arithmetic operators operate on `number` (float64). All numeric operands are treated as `number`; there is no separate integer type. The result of every arithmetic operation is `number`. Division by zero and modulo by zero abort evaluation with an error.

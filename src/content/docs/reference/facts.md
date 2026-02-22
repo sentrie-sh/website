@@ -1,6 +1,6 @@
 ---
 title: Facts
-description: "Exhaustive reference for fact declaration syntax (required/optional, type, alias, default) and binding at evaluation."
+description: "Fact declaration syntax (required/optional, type, alias, default) and binding at evaluation."
 ---
 
 Facts are named, typed inputs to a [policy](/reference/policies). They are declared at the top of the policy (before [let](/reference/let), [use](/reference/functions), and [rules](/reference/rules)). Each fact has a name, a type (shape or primitive), an optional alias used in the policy body, and—only for optional facts—an optional default expression. Required facts must be supplied at evaluation time or evaluation fails. Facts are non-nullable when supplied: null is not allowed as a fact value.

@@ -1,9 +1,9 @@
 ---
 title: Policy Language Reference
-description: Exhaustive dictionary of Sentrie language syntax, types, operators, and constructs.
+description: "Reference for Sentrie language syntax, types, operators, and constructs."
 ---
 
-This section is a strict reference for the Sentrie policy language. Every page is intended to be exhaustive: full syntax variants, all options and arguments in tables, when and where each feature applies, edge cases, and multiple examples. For conceptual overviews and “how it works,” see [Language Concepts](/language-concepts/type-system-shapes).
+This section is a reference for the Sentrie policy language: syntax, types, operators, and constructs. Pages include syntax variants, options and arguments in tables, where each feature applies, edge cases, and examples. For conceptual overviews and “how it works,” see [Language Concepts](/language-concepts/type-system-shapes).
 
 ## Program structure
 

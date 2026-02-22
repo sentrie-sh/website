@@ -1,6 +1,6 @@
 ---
 title: Precedence
-description: Exhaustive reference for operator precedence (highest to lowest), associativity, and use of parentheses.
+description: "Operator precedence (highest to lowest), associativity, and use of parentheses."
 ---
 
 Operators are evaluated in order of precedence: higher precedence binds first. When two operators have the same precedence, they are usually evaluated left-to-right; the ternary operator `? :` is right-associative. Parentheses `( ... )` override precedence and explicitly group subexpressions.

@@ -1,6 +1,6 @@
 ---
 title: Boolean Operations
-description: Exhaustive reference for logical (and, or, xor, not), comparison (==, !=, <, <=, >, >=), pattern (matches), and conditional (ternary, Elvis) operators.
+description: "Logical (and, or, xor, not), comparison (==, !=, <, <=, >, >=), pattern (matches), and conditional (ternary, Elvis) operators."
 ---
 
 Boolean operations combine conditions, compare values, and branch on truthiness. Logical and comparison operators use [trinary](/reference/trinary) semantics (true, false, unknown). The pattern operator `matches` works on strings and returns a boolean. The ternary (`? :`) and Elvis (`?:`) operators choose a value based on whether a condition is truthy; only `true` is truthy.

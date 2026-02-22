@@ -1,6 +1,6 @@
 ---
 title: Types and Values
-description: Exhaustive reference for built-in primitive and collection types, type declarations, indexing, cast, and validation.
+description: "Built-in primitive and collection types, type declarations, indexing, cast, and validation."
 ---
 
 Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `document`) and collection types (`list[T]`, `map[T]`, `record[T1,T2,...]`). User-defined [shapes](/reference/shapes) extend these. Types can be used in [let](/reference/let), [facts](/reference/facts), and shape fields. Types may carry [constraints](/reference/constraints) for runtime validation.

@@ -1,6 +1,6 @@
 ---
 title: Trinary Values
-description: "Exhaustive reference for three-valued logic (true, false, unknown), truthiness, Kleene AND/OR/NOT tables, and use in when, ternary, and Elvis."
+description: "Three-valued logic (true, false, unknown), truthiness, Kleene AND/OR/NOT tables, and use in when, ternary, and Elvis."
 ---
 
 Sentrie uses three values for logic and conditions: `true`, `false`, and `unknown`. `unknown` represents an indeterminate result (e.g. an optional field that is not present, or a comparison involving `unknown`). [Rule](/reference/rules) `when` guards, the [ternary](/reference/boolean-operations) operator (`? :`), and the Elvis operator (`?:`) use **truthiness**: only `true` is truthy; `false` and `unknown` are non-truthy. Logical operators (`and`, `or`, `xor`, `not`/`!`) follow **Kleene** three-valued logic so `unknown` propagates in defined ways.

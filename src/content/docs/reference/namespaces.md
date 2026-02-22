@@ -1,6 +1,6 @@
 ---
 title: Namespaces
-description: Exhaustive reference for namespace syntax, placement rules, visibility of shapes and policies, and cross-file behavior.
+description: "Namespace syntax, placement rules, visibility of shapes and policies, and cross-file behavior."
 ---
 
 Namespaces group [policies](/reference/policies) and [shapes](/reference/shapes) and define visibility boundaries. Each `*.sentrie` file has exactly one namespace declaration. The namespace must be the first statement in the file (only comments may appear before it). Unexported shapes are visible only within the same namespace; exported shapes can be referenced from other namespaces.

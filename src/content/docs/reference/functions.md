@@ -1,6 +1,6 @@
 ---
 title: Functions
-description: Exhaustive reference for function call syntax, TypeScript module import (use), aliasing, and memoization.
+description: "Function call syntax, TypeScript module import (use), aliasing, and memoization."
 ---
 
 Functions in Sentrie are provided by TypeScript modules. There are no built-in global functions in the language; all callable functions come from modules imported with `use` inside a [policy](/reference/policies). Calls use the form `functionName(args...)` for functions imported without an alias, or `alias.functionName(args...)` when the module is imported with an alias.

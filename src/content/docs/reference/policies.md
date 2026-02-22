@@ -1,6 +1,6 @@
 ---
 title: Policies
-description: Exhaustive reference for policy syntax, statement order (facts, let, use, rules, export), and evaluation behavior.
+description: "Policy syntax, statement order (facts, let, use, rules, export), and evaluation behavior."
 ---
 
 A policy is a named block inside a [namespace](/reference/namespaces) that groups [facts](/reference/facts), optional [let](/reference/let) bindings, optional [use](/reference/functions) imports, [rules](/reference/rules), and one or more `export decision of` declarations. It defines the inputs and decision logic that the CLI or HTTP API can execute. To be runnable or importable, a policy must have at least one rule and at least one exported decision.

@@ -1,6 +1,6 @@
 ---
 title: Constraints
-description: Exhaustive reference for constraint syntax and all constraints (e.g. @min, @max, @email) on number, string, list, and trinary types.
+description: "Constraint syntax and all constraints (e.g. @min, @max, @email) on number, string, list, and trinary types."
 ---
 
 Constraints validate values at runtime using the `@` syntax on types. They apply to primitives, collection elements, and shape fields. Validation failure aborts evaluation.
