@@ -77,7 +77,7 @@ jobs:
         run: |
           echo "Verifying deployment at ${{ env.PREVIEW_URL }}..."
           for i in {1..10}; do
-            if curl -fsSL -o /dev/null "{{ env.PREVIEW_URL }}"; then
+            if curl -fsSL -o /dev/null "${{ env.PREVIEW_URL }}"; then
               echo "Deployment verified successfully at ${{ env.PREVIEW_URL }}!"
               exit 0
             fi
