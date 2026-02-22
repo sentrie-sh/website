@@ -1,6 +1,6 @@
 ---
 title: Shapes
-description: Exhaustive reference for shape syntax: data models, field modifiers (required/optional, nullable), composition with base shapes, type aliases, export, and validation.
+description: "Exhaustive reference for shape syntax (data models, field modifiers, composition, type aliases, export) and validation."
 ---
 
 Shapes define structured data (field-based models) or type aliases (a base type plus optional [constraints](/reference/constraints)). They are used as the type of [facts](/reference/facts), [let](/reference/let) bindings, and nested fields. Shape values are validated at runtime when assigned or passed as input.

@@ -1,6 +1,6 @@
 ---
 title: Security and Permissions
-description: Exhaustive reference for policy pack permissions: filesystem read, network, and environment variables; configuration and defaults.
+description: "Exhaustive reference for policy pack permissions (filesystem read, network, environment variables); configuration and defaults."
 ---
 
 Permissions define what a policy pack can access at runtime: which filesystem paths can be read, which network hosts can be contacted, and which environment variable names are exposed to the pack. They are configured in the pack configuration file (e.g. `sentrie.pack.toml`) under a `[permissions]` section. Default behavior is restrictive: typically only the pack root is readable; no network access; no environment variables. Explicit entries grant access only to the listed paths, hosts, and variable names.

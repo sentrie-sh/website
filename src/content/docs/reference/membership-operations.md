@@ -1,6 +1,6 @@
 ---
 title: Membership Operations
-description: Exhaustive reference for containment operators: in and contains (list, map, string); semantics and edge cases.
+description: "Exhaustive reference for containment operators (in, contains) for list, map, and string; semantics and edge cases."
 ---
 
 The `in` and `contains` operators test containment: whether a value appears in a list, a key exists in a map, a substring appears in a string, or (for maps) one map is a “subset” of another. Both return a boolean. `needle in haystack` and `haystack contains needle` are equivalent; only the argument order differs.

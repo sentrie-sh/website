@@ -1,6 +1,6 @@
 ---
 title: Collection Operations
-description: Exhaustive reference for quantifiers and transformers: any, all, filter, map, reduce, count, distinct; syntax, parameters, and edge cases.
+description: "Exhaustive reference for quantifiers and transformers (any, all, filter, map, reduce, count, distinct); syntax, parameters, and edge cases."
 ---
 
 Collection operations apply to lists and maps. They are declarative: they return new values or new collections and do not mutate the input. Syntax uses a block with a single `yield` per iteration. The collection is iterated in order (list order or map iteration order); for `reduce`, an initial value is combined with each element via the yielded expression.
@@ -22,15 +22,15 @@ distinct collection
 
 ## Configuration & Arguments
 
-| Operation | Input | Output | Description |
-| :-------- | :---- | :----- | :---------- |
-| `any` | collection | bool/trinary | true if at least one element yields a truthy value. Short-circuits: iteration stops at first truthy. Empty collection → false. |
-| `all` | collection | bool/trinary | true if every element yields a truthy value. Short-circuits: iteration stops at first falsy. Empty collection → true. |
-| `filter` | collection | same type | New collection containing only elements for which the block yields truthy. |
-| `map` | collection | list | New list whose elements are the yielded values (one per element). Type of each yield can be any type. |
-| `reduce` | collection, initial | type of initial | Fold: start with `acc = initial`; for each element, set `acc` to the yielded expression. Final `acc` is the result. Empty collection → returns initial. |
-| `count` | collection | number | Number of elements in the collection. Empty → 0. |
-| `distinct` | collection | same type | New collection with duplicate elements removed. Equality for deduplication is by the language’s `==`. |
+| Operation  | Input               | Output          | Description                                                                                                                                             |
+| :--------- | :------------------ | :-------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `any`      | collection          | bool/trinary    | true if at least one element yields a truthy value. Short-circuits: iteration stops at first truthy. Empty collection → false.                          |
+| `all`      | collection          | bool/trinary    | true if every element yields a truthy value. Short-circuits: iteration stops at first falsy. Empty collection → true.                                   |
+| `filter`   | collection          | same type       | New collection containing only elements for which the block yields truthy.                                                                              |
+| `map`      | collection          | list            | New list whose elements are the yielded values (one per element). Type of each yield can be any type.                                                   |
+| `reduce`   | collection, initial | type of initial | Fold: start with `acc = initial`; for each element, set `acc` to the yielded expression. Final `acc` is the result. Empty collection → returns initial. |
+| `count`    | collection          | number          | Number of elements in the collection. Empty → 0.                                                                                                        |
+| `distinct` | collection          | same type       | New collection with duplicate elements removed. Equality for deduplication is by the language’s `==`.                                                   |
 
 **Returns:** As in the table. For `any`/`all`, the result is the trinary/boolean produced by the predicate. For `filter`/`map`/`distinct`, the result is a new collection (or list for `map`). For `reduce`, the result is the final accumulator. For `count`, the result is a number.
 
@@ -42,15 +42,15 @@ distinct collection
 
 ## Empty collection behavior
 
-| Operation | Empty collection result |
-| :-------- | :---------------------- |
-| `any` | false |
-| `all` | true |
-| `filter` | empty collection |
-| `map` | empty list |
-| `reduce` | initial (unchanged) |
-| `count` | 0 |
-| `distinct` | empty collection |
+| Operation  | Empty collection result |
+| :--------- | :---------------------- |
+| `any`      | false                   |
+| `all`      | true                    |
+| `filter`   | empty collection        |
+| `map`      | empty list              |
+| `reduce`   | initial (unchanged)     |
+| `count`    | 0                       |
+| `distinct` | empty collection        |
 
 ## Examples in Action
 
