@@ -25,6 +25,7 @@ export shape IDENT
 - **[Rules](/reference/rules):** Rule syntax, when/default/body, outcome type, truthiness, cross-references.
 - **[Facts](/reference/facts):** Required/optional facts, type, alias, default, binding at evaluation, import binding.
 - **[Intermediate values (let)](/reference/let):** let syntax, scoping, immutability, type validation.
+- **[Identifiers](/reference/identifiers):** What counts as a valid identifier (characters, reserved keywords).
 
 ### Types
 

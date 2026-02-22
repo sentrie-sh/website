@@ -11,7 +11,7 @@ Namespaces group [policies](/reference/policies) and [shapes](/reference/shapes)
 namespace fully/qualified/name
 ```
 
-The name is a **fully qualified name (FQN)**: one or more identifiers separated by forward slashes (e.g. `com/example/auth`, `mycompany/policies/security`, `app/v1`). No leading or trailing slash. Each segment must be a valid identifier.
+The name is a **fully qualified name (FQN)**: one or more [identifiers](/reference/identifiers) separated by forward slashes (e.g. `com/example/auth`, `mycompany/policies/security`, `app/v1`). No leading or trailing slash. Each segment must be a valid identifier.
 
 ## Configuration & Arguments
 
@@ -75,6 +75,6 @@ The pack contains two namespaces. Import and resolution rules determine how one 
 Before you implement this, keep a few boundaries in mind:
 
 - **Constraint:** Only comments may appear before the namespace declaration. One namespace per file. Multiple root namespaces are allowed across the pack (in different files).
-- **Naming:** Each segment of the FQN must be a valid identifier. No leading or trailing slash. Child “namespaces” (e.g. `a` vs `a/b`) are not separate language constructs; hierarchy is by convention in the FQN string.
+- **Naming:** Each segment of the FQN must be a [valid identifier](/reference/identifiers). No leading or trailing slash. Child “namespaces” (e.g. `a` vs `a/b`) are not separate language constructs; hierarchy is by convention in the FQN string.
 - **Resolution:** When another namespace references an exported shape or imports a decision, the full namespace path (and policy name, for rules) is used by the runtime/tooling to resolve the target. See [Policy composition](/language-concepts/policy-composition) for import syntax and behavior.
 - **Files and namespaces:** The relationship between physical files and namespace FQNs is tooling-dependent; typically one file per namespace, but the reference does not forbid multiple files sharing the same namespace if the tooling supports it.

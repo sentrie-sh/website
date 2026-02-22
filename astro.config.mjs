@@ -51,6 +51,7 @@ export default defineConfig({
             { label: "Rules", slug: "reference/rules" },
             { label: "Facts", slug: "reference/facts" },
             { label: "Intermediate Values (let)", slug: "reference/let" },
+            { label: "Identifiers", slug: "reference/identifiers" },
             { label: "Types and Values", slug: "reference/types-and-values" },
             { label: "Constraints", slug: "reference/constraints" },
             { label: "Trinary Values", slug: "reference/trinary" },
