@@ -1,73 +1,100 @@
 ---
 title: Trinary Values
-description: "Three-valued logic: true, false, unknown; truthiness and Kleene tables."
+description: Exhaustive reference for three-valued logic: true, false, unknown; truthiness; Kleene AND/OR/NOT tables; and use in when, ternary, and Elvis.
 ---
 
-Sentrie uses three values for logic and conditions: `true`, `false`, and `unknown`. Unknown covers cases where the result is indeterminate (e.g. an undefined field). When you write `when` guards or use ternary/Elvis, only `true` is treated as truthy; logical operators follow Kleene’s three-valued logic so unknown propagates in predictable ways.
+Sentrie uses three values for logic and conditions: `true`, `false`, and `unknown`. `unknown` represents an indeterminate result (e.g. an optional field that is not present, or a comparison involving `unknown`). [Rule](/reference/rules) `when` guards, the [ternary](/reference/boolean-operations) operator (`? :`), and the Elvis operator (`?:`) use **truthiness**: only `true` is truthy; `false` and `unknown` are non-truthy. Logical operators (`and`, `or`, `xor`, `not`/`!`) follow **Kleene** three-valued logic so `unknown` propagates in defined ways.
 
-Here is the basic syntax:
+## Syntax
 
-Literals: `true` | `false` | `unknown`  
+**Literals:** `true` | `false` | `unknown`
 
-Logical: `and` | `or` | `xor` | `not` | `!`
+**Logical operators (binary):** `and` | `or` | `xor`
+
+**Logical negation (unary):** `not expr` | `! expr`
 
 ## Configuration & Arguments
 
-Truthiness and logical outcomes work like this:
+### Truthiness
 
-- **Truthiness:** Only `true` is truthy. `false` and `unknown` are non-truthy (e.g. for `when`, ternary, Elvis).
-- **NOT:** One operand; result is trinary.
+Used by `when`, ternary (`? :`), and Elvis (`?:`):
 
-| **Input** | Output |
-| --- | --- |
-| **true** | false |
-| **false** | true |
-| **unknown** | unknown |
+| Value     | Truthy? |
+| :-------- | :------ |
+| `true`    | Yes     |
+| `false`   | No      |
+| `unknown` | No      |
 
-**Kleene AND**
+So a rule with `when cond` runs its body only if `cond` evaluates to `true`; if `cond` is `false` or `unknown`, the rule uses its default (or `unknown`).
 
-| **AND** | true | false | unknown |
-| --- | --- | --- | --- |
-| **true** | true | false | unknown |
-| **false** | false | false | false |
+### NOT (unary)
+
+One operand. The operand is interpreted as trinary; the result is trinary.
+
+| Input     | Output   |
+| :-------- | :------- |
+| `true`    | `false`  |
+| `false`   | `true`   |
+| `unknown` | `unknown` |
+
+### Kleene AND (binary)
+
+| AND       | true    | false   | unknown |
+| :-------- | :------ | :------ | :------ |
+| **true**  | true    | false   | unknown |
+| **false** | false   | false   | false   |
 | **unknown** | unknown | false | unknown |
 
-**Kleene OR**
+### Kleene OR (binary)
 
-| **OR** | true | false | unknown |
-| --- | --- | --- | --- |
-| **true** | true | true | true |
-| **false** | true | false | unknown |
-| **unknown** | true | unknown | unknown |
+| OR        | true    | false   | unknown |
+| :-------- | :------ | :------ | :------ |
+| **true**  | true    | true    | true    |
+| **false** | true    | false   | unknown |
+| **unknown** | true  | unknown | unknown |
 
-**Returns:** Trinary. For `when` and conditionals, only `true` is truthy; `false` and `unknown` are not.
+### XOR (binary)
 
----
+XOR is defined so that exactly one of the two operands is truthy for the result to be true. When either operand is `unknown`, the result is typically `unknown` (implementation-defined). See the runtime for the exact table.
+
+**Returns:** Trinary. For `when` and conditionals, only `true` is truthy.
+
+## When unknown arises
+
+- **Optional or missing field:** Accessing a field that is not present (e.g. on an optional shape field) may yield `unknown` or a type-specific default depending on context.
+- **Comparisons:** Equality or ordering with `unknown` often yields `unknown` (e.g. `unknown == true` → `unknown`).
+- **Logical propagation:** As in the Kleene tables, `and`/`or`/`not` propagate `unknown` instead of treating it as true or false.
 
 ## Examples in Action
 
-### Propagating unknown in expressions
-
-You are chaining conditions and want to see how `unknown` behaves so your rules don’t accidentally allow or deny when data is missing.
+### Propagating unknown
 
 ```sentrie
 let a = true and unknown   -- unknown
-let b = false or unknown  -- unknown
-let c = not unknown       -- unknown
+let b = false or unknown   -- unknown
+let c = not unknown        -- unknown
 ```
 
-### Using unknown in a rule when
+### When guard and unknown
 
-You rely on a `when` guard; if the condition is unknown (e.g. optional field missing), the rule should fall back to its default instead of treating it as true.
+If a `when` expression evaluates to `unknown` (e.g. optional field missing), the rule does not run its body; it uses its default or returns `unknown`:
 
-In practice: `unknown` in a `when` causes the rule to use its default (or an `unknown` outcome). `not unknown` remains `unknown`.
+```sentrie
+rule allow = default false when user.role is defined {
+  yield user.role == "admin"
+}
+```
 
----
+Here `user.role is defined` is false or unknown when the field is missing; the outcome is then `default false` (or `unknown` if no default).
+
+### Trinary constraints
+
+For runtime validation of trinary values (e.g. require `true` or forbid `unknown`), use [Constraints](/reference/constraints): trinary supports `@not_unknown()`, `@eq`, `@neq`, `@is_true()`, and `@is_false()`.
 
 ## Good to Know
 
 Before you implement this, keep a few boundaries in mind:
 
-- **Constraint:** Undefined field access yields `unknown`; operations on `unknown` propagate according to the Kleene tables above. Rule `when` and ternary/Elvis use truthiness: only `true` is truthy.
-- **Edge case:** If a `when` evaluates to `unknown`, the rule uses its default or returns `unknown`. `not unknown` is `unknown`.
-- For runtime validation of trinary values (e.g. require `true` or forbid `unknown`), see [Constraints](/reference/constraints) — trinary supports `@not_unknown()`, `@eq`, `@neq`, `@is_true()`, and `@is_false()`.
+- **Constraint:** Undefined or missing field access can yield `unknown`. Operations on `unknown` propagate according to the Kleene tables. Rule `when` and ternary/Elvis use truthiness: only `true` is truthy.
+- **Edge case:** If a `when` evaluates to `unknown`, the rule uses its default or returns `unknown`. `not unknown` is `unknown`, so it is still non-truthy.
+- **Trinary constraints:** See [Constraints](/reference/constraints) for `@not_unknown()`, `@eq`, `@neq`, `@is_true()`, `@is_false()` on trinary/bool types.

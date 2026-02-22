@@ -1,74 +1,86 @@
 ---
 title: Boolean Operations
-description: Logical (and, or, xor, not), comparison (==, !=, <, <=, >, >=), pattern (matches), and conditional operators.
+description: Exhaustive reference for logical (and, or, xor, not), comparison (==, !=, <, <=, >, >=), pattern (matches), and conditional (ternary, Elvis) operators.
 ---
 
-When you need to combine conditions, compare values, or branch on truthiness, you use Sentrie’s logical, comparison, pattern, and conditional operators. They keep a consistent story: logical and comparison ops use [trinary](/reference/trinary) semantics (true, false, unknown), and the pattern operator `matches` works on strings only.
+Boolean operations combine conditions, compare values, and branch on truthiness. Logical and comparison operators use [trinary](/reference/trinary) semantics (true, false, unknown). The pattern operator `matches` works on strings and returns a boolean. The ternary (`? :`) and Elvis (`?:`) operators choose a value based on whether a condition is truthy; only `true` is truthy.
 
-Here is the basic syntax:
+## Syntax
 
-**Logical (binary):** `and` | `or` | `xor`  
+**Logical (binary):** `and` | `or` | `xor`
 
-**Negation (unary):** `not expr` | `! expr`  
+**Negation (unary):** `not expr` | `! expr`
 
-**Comparison:** `==` | `!=` | `is` | `is not` | `<` | `<=` | `>` | `>=`  
+**Comparison:** `==` | `!=` | `is` | `is not` | `<` | `<=` | `>` | `>=`
 
-**Pattern:** `string matches pattern` (pattern is a regex string)  
+**Pattern:** `stringExpr matches patternExpr` (both operands strings; right is a regex pattern)
 
 **Conditional:** `condition ? trueValue : falseValue` | `expr ?: default`
 
 ## Configuration & Arguments
 
-You can combine and compare values using these operators:
+| Operator             | Operands                         | What it does                                                                                                                   | Returns                 |
+| :------------------- | :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
+| `and`                | expr, expr                       | Logical AND (Kleene). Short-circuits: if left is false, right is not evaluated.                                                | trinary                 |
+| `or`                 | expr, expr                       | Logical OR (Kleene). Short-circuits: if left is true, right is not evaluated.                                                  | trinary                 |
+| `xor`                | expr, expr                       | Logical XOR. True when exactly one operand is truthy.                                                                          | trinary                 |
+| `not`, `!`           | expr                             | Logical NOT (unary). One operand; converted to trinary then negated (true↔false; unknown→unknown).                             | trinary                 |
+| `==`, `is`           | expr, expr                       | Equality. Both sides must be comparable.                                                                                       | trinary                 |
+| `!=`, `is not`       | expr, expr                       | Inequality.                                                                                                                    | trinary                 |
+| `<`, `<=`, `>`, `>=` | expr, expr                       | Ordering. Both sides must be comparable (e.g. number, string).                                                                 | trinary                 |
+| `matches`            | string, string                   | Left: value; right: regex pattern (Go [regexp](https://pkg.go.dev/regexp)). Invalid pattern → error.                           | bool                    |
+| `? :`                | condition, trueValue, falseValue | Ternary: if condition is truthy, result is trueValue; else falseValue. Only the chosen branch is evaluated. Right-associative. | type of chosen branch   |
+| `?:`                 | expr, default                    | Elvis: if expr is truthy, result is expr; else result is default. Non-truthy: false, unknown, null, 0, "", empty collection.   | type of expr or default |
 
-| Operator | What it does | Returns |
-| :------- | :----------- | :------ |
-| `and` | Logical AND (Kleene) | trinary |
-| `or` | Logical OR (Kleene) | trinary |
-| `xor` | Logical XOR | trinary |
-| `not`, `!` | Logical NOT (unary). Single operand; converted to trinary then negated. | trinary |
-| `==`, `is` | Equality | trinary |
-| `!=`, `is not` | Inequality | trinary |
-| `<`, `<=`, `>`, `>=` | Ordering | trinary |
-| `matches` | String matches regex (left: string, right: pattern). Invalid regex → error. | bool |
-| `? :` | Ternary: pick trueValue or falseValue by condition | type of chosen branch |
-| `?:` | Elvis: use expression if truthy, else default | type |
+**Returns:** Trinary for logical and comparison; bool for `matches`; type of the chosen value for ternary and Elvis.
 
-**Returns:** Trinary or the selected value. For Elvis, non-truthy means `false`, `unknown`, `null`, `0`, `""`, or empty collection.
+## Truthiness (for ternary and Elvis)
 
----
+Only `true` is truthy. The following are treated as non-truthy: `false`, `unknown`, `null`, `0`, `""`, and empty collections. So `expr ?: default` yields `default` when `expr` is any of these.
+
+## Short-circuit and evaluation order
+
+- **and:** Left-to-right. If the left operand is false, the right is not evaluated.
+- **or:** Left-to-right. If the left operand is true, the right is not evaluated.
+- **? ::** Only the branch selected by the condition is evaluated. The condition is always evaluated first.
 
 ## Examples in Action
 
-### Combining conditions and using a default value
-
-You are building a rule that depends on role and age, and you want a readable label or a fallback when a field is missing.
+### Logical and comparison
 
 ```sentrie
 let a: bool = true and false
 let b: bool = age >= 18
 let c: bool = not (user.role in allowed_roles)
+```
+
+### Ternary and Elvis
+
+```sentrie
 let d: string = age >= 18 ? "adult" : "minor"
 let e: string = user.name ?: "Anonymous"
 ```
 
-### Checking role with regex and negated membership
+### Pattern matching (regex)
 
-You need to allow access for admins or active users, validate an email format, and exclude guests.
+```sentrie
+let g: bool = email matches `^[a-z]+@[a-z]+\\.com$`
+```
+
+Left and right must be strings. The right is interpreted as a Go regexp. Invalid pattern causes an evaluation error.
+
+### Combining conditions
 
 ```sentrie
 let f: bool = user.role == "admin" or (user.role == "user" and user.status == "active")
-let g: bool = email matches `^[a-z]+@[a-z]+\\.com$`
 let h: bool = not (role in ["guest"]) and status == "active"
 ```
-
----
 
 ## Good to Know
 
 Before you wire these into policies, keep a few boundaries in mind:
 
-- **not / !:** Unary prefix; one operand. It is converted to trinary then negated (true↔false; unknown stays unknown). `not unknown` yields `unknown`. You can write `not expr` or `! expr` (no space required after `!`).
+- **not / !:** Unary prefix; one operand. Converted to trinary then negated. `not unknown` yields `unknown`. You can write `not expr` or `! expr` (no space required after `!`).
 - **Short-circuit:** `and` and `or` evaluate left-to-right; the right side may be skipped. The ternary evaluates only the chosen branch.
 - **Comparison:** Both sides must be comparable; result is trinary. Equality with `unknown` yields `unknown`.
-- **matches:** Left and right must be strings. The right side is interpreted as a [Go regexp](https://pkg.go.dev/regexp) pattern. Invalid pattern string causes an evaluation error. For membership in collections or substrings, use [in](/reference/membership-operations) or [contains](/reference/membership-operations).
+- **matches:** Left and right must be strings. Right is a [Go regexp](https://pkg.go.dev/regexp) pattern. Invalid pattern causes an evaluation error. For membership in collections or substring checks, use [in](/reference/membership-operations) or [contains](/reference/membership-operations).
