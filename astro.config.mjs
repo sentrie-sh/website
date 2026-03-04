@@ -44,6 +44,20 @@ export default defineConfig({
           ],
         },
         {
+          label: "Guides",
+          items: [
+            { label: "Testing Policies", slug: "guides/testing-policies" },
+            {
+              label: "Policy Design Best Practices",
+              slug: "guides/policy-design-best-practices",
+            },
+            {
+              label: "Deployment and Security",
+              slug: "guides/deployment-and-security",
+            },
+          ],
+        },
+        {
           label: "Language Concepts",
           items: [
             {
@@ -92,6 +106,7 @@ export default defineConfig({
             },
             { label: "Functions", slug: "reference/functions" },
             { label: "Precedence", slug: "reference/precedence" },
+            { label: "Errors", slug: "reference/errors" },
             {
               label: "Security and Permissions",
               slug: "reference/security-and-permissions",
@@ -164,6 +179,13 @@ export default defineConfig({
             { label: "sentrie init", slug: "cli-reference/init" },
             { label: "sentrie serve", slug: "cli-reference/serve" },
             { label: "sentrie validate", slug: "cli-reference/validate" },
+          ],
+        },
+        {
+          label: "Troubleshooting",
+          items: [
+            { label: "Overview", slug: "troubleshooting" },
+            { label: "Common Errors", slug: "troubleshooting/common-errors" },
           ],
         },
         {

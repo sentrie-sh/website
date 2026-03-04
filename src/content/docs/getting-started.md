@@ -204,15 +204,12 @@ policy pricing {
 
 ## Troubleshooting
 
-### Common Issues
+For a catalog of common problems and fixes, see:
 
-**Policy not found**: Make sure your namespace and policy names match exactly in the URL path.
+- [Troubleshooting Overview](/troubleshooting)
+- [Common Errors](/troubleshooting/common-errors)
 
-**Invalid JSON**: Ensure your request body is valid JSON and matches the expected structure.
-
-**Server won't start**: Check that port 7529 is available, or use `--port` to specify a different port.
-
-### Getting Help
+You can also:
 
 - Check the [Language Reference](/reference) for syntax help
 - Look at the [CLI Reference](/cli-reference) for command options
