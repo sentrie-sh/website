@@ -29,7 +29,7 @@ Computes the MD5 hash of a string.
 
 ```text
 use { md5 } from @sentrie/hash
-let hash = hash.md5("Hello, World!")  // "65a8e27d8879283831b664bd8b7f0ad4"
+let hash = md5("Hello, World!")  // "65a8e27d8879283831b664bd8b7f0ad4"
 ```
 
 ### `sha1(str: string): string`
@@ -105,7 +105,7 @@ Computes HMAC (Hash-based Message Authentication Code) for data using a secret k
 
 ```text
 use { hmac } from @sentrie/hash
-let mac = hash.hmac("sha256", "Hello, World!", "secret-key")
+let mac = hmac("sha256", "Hello, World!", "secret-key")
 ```
 
 ## Complete Example

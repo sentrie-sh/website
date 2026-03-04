@@ -57,9 +57,9 @@ policy userAccess {
 
 ```sentrie
 policy userAccess {
-  use { sha256 } from @sentrie/hash
   fact user: User as currentUser
   fact context?: Context as ctx default {}
+  use { sha256 } from @sentrie/hash
   let adminRoles = ["admin", "super_admin"]
   rule canRead = default false when currentUser.role is defined {
     yield currentUser.role in adminRoles

@@ -4,7 +4,7 @@ description: "Learn how to export rules from policies and import them into other
 ---
 
 
-Sentrie allows you to export rules from one policy and import them into another, enabling code reuse and policy composition. This guide covers how to export rules, import them, and work with attachments.
+Sentrie allows you to export rules from one policy and import them into another, enabling code reuse and policy composition. This guide focuses on patterns, best practices, and troubleshooting. For the core syntax and evaluation semantics of export/import, see [Policy Composition](/language-concepts/policy-composition).
 
 ## Why Export and Import?
 

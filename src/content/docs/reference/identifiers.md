@@ -26,7 +26,51 @@ So: only ASCII letters, digits, and underscores. No spaces, hyphens, or other ch
 
 ## Reserved keywords
 
-Language keywords are reserved and cannot be used as identifiers. Examples: `let`, `rule`, `policy`, `namespace`, `fact`, `shape`, `export`, `use`, `when`, `default`, `true`, `false`, `unknown`, `and`, `or`, `xor`, `not`, `in`, `is`, `cast`, `yield`, and type names like `string`, `number`, `list`, `map`. So you cannot name a rule `let` or a variable `when`. Use a name that is not a keyword (e.g. `myLet`, `defaultValue`).
+Language keywords are reserved and cannot be used as identifiers. Using them as names (for rules, facts, shapes, etc.) will result in parse errors.
+
+### Core keywords
+
+| Keyword | Notes |
+| :------ | :---- |
+| `namespace` | Namespace declaration. |
+| `policy` | Policy declaration. |
+| `shape` | Shape declaration. |
+| `fact` | Fact declaration. |
+| `rule` | Rule declaration. |
+| `export` | Exporting decisions or shapes. |
+| `use` | Importing TypeScript modules. |
+| `let` | Intermediate values. |
+| `when` | Rule guard. |
+| `default` | Default value for rules. |
+| `yield` | Value returned from a rule body. |
+
+### Literals and logical operators
+
+| Keyword | Notes |
+| :------ | :---- |
+| `true` | Boolean literal. |
+| `false` | Boolean literal. |
+| `unknown` | Trinary literal. |
+| `and` | Logical AND. |
+| `or` | Logical OR. |
+| `xor` | Logical XOR. |
+| `not` | Logical NOT. |
+| `in` | Membership operator. |
+| `is` / `is not` | Type and existence checks. |
+
+### Built-in types
+
+| Keyword | Notes |
+| :------ | :---- |
+| `string` | String type. |
+| `number` | Numeric type. |
+| `bool` | Boolean type. |
+| `trinary` | Three-valued logic type. |
+| `document` | Unstructured JSON-like value. |
+| `list` | List collection type. |
+| `map` | Map collection type. |
+
+Do not use any of these as identifiers. For example, avoid naming a rule `let` or a fact `default`. Prefer descriptive names such as `userRule`, `defaultDecision`, or `currentUser` instead.
 
 ## Where identifiers are used
 
