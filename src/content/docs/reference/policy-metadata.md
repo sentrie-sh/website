@@ -20,7 +20,7 @@ tag "key" = "value"
 
 - **`title`**: one string; after trimming whitespace it must be non-empty.
 - **`description`**: one string; may be empty after trim.
-- **`version`**: one string that must be a valid **SemVer** (as accepted by Sentrie’s semver parser, including a leading `v` such as `"v1.2.3"` if supported). The **source literal** is preserved for display.
+- **`version`**: one string. **SemVer validation** runs on the literal after **trimming leading and trailing whitespace** (so `"  v1.2.3  "` is accepted as `1.2.3`). **`VersionLiteral` / stored display text** keeps the **exact source string** from the policy, including any surrounding spaces inside the quotes.
 - **`tag`**: `tag "key" = "value"`; repeatable. The **key** must be non-empty after trim. The **value** may be empty or whitespace-only; duplicate keys are allowed (tags are multi-valued, order preserved).
 
 `title`, `description`, `version`, and `tag` are **reserved keywords** in the lexer everywhere in a program, not only inside policies.
