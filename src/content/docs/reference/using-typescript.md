@@ -33,12 +33,16 @@ Built-in libraries are prefixed with `@sentrie/`:
 ```text
 namespace com/example/auth
 
-policy mypolicy {
-  use { now } from @sentrie/time
-  use { sha256 } from @sentrie/hash
+shape User {
+  passwordHash: string
+}
 
+policy mypolicy {
   fact user!: User
   fact passwordInput!: string
+
+  use { now } from @sentrie/time
+  use { sha256 } from @sentrie/hash
 
   rule myrule = default false {
     let currentTime = time.now()
@@ -57,11 +61,16 @@ You can import TypeScript files from your policy pack using relative paths. Thes
 ```text
 namespace com/example/auth
 
+shape User {
+  birthDate: string
+  email: string
+}
+
 policy mypolicy {
+  fact user: User
+
   use { calculateAge } from "./utils.ts" as utils
   use { validateEmail } from "../helpers/validation.ts"
-
-  fact user!: utils.User
 
   rule myrule = default false {
     yield utils.calculateAge(user.birthDate) >= 18
@@ -86,13 +95,13 @@ shape User {
 }
 
 policy mypolicy {
-  use { md5, sha256 } from @sentrie/hash
-  use { now } from @sentrie/time
-  use { calculateAge, validateEmail } from "./utils.ts"
-
   fact user!: User
   fact passwordInput!: string
   fact userAge!: number
+
+  use { md5, sha256 } from @sentrie/hash
+  use { now } from @sentrie/time
+  use { calculateAge, validateEmail } from "./utils.ts" as utils
 
   rule myrule = default false {
     yield

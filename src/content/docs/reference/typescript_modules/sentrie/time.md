@@ -211,8 +211,9 @@ Examples:
 namespace com/example/access
 
 policy mypolicy {
-  use { now, isBefore, addDuration, format } from @sentrie/time
   fact tokenExpiry!: number
+
+  use { now, isBefore, addDuration, format } from @sentrie/time
 
   rule checkTokenExpiry = default false {
     let currentTime = time.now()

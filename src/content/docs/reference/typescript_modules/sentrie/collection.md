@@ -317,9 +317,10 @@ let merged = collection.map_merge(user1, user2)  // {"name": "John", "age": 31, 
 namespace com/example/mypolicy
 
 policy mypolicy {
-  use { list_includes, list_sort, map_keys, map_get } from @sentrie/collection
   fact numbers!: list[number]
   fact user!: document
+
+  use { list_includes, list_sort, map_keys, map_get } from @sentrie/collection
 
   rule myrule = default false {
     let sorted = collection.list_sort(numbers)

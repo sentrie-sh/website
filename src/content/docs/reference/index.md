@@ -81,7 +81,7 @@ A namespace can contain:
 
 ## Policies
 
-Policies are containers for rules, facts, and other declarations.
+Policies are containers for rules, facts, and other declarations. See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`, and for the required **metadata → facts → uses → body** ordering.
 
 ### Syntax
 
@@ -93,13 +93,14 @@ policy IDENT {
 
 ### Policy Statements
 
-A policy can contain:
+A policy can contain (in grouped order; comments anywhere):
 
-- **Rules**: `rule IDENT = ...`
+- **Metadata** (optional): `title`, `description`, `version`, `tag "key" = "value"`
 - **Facts**: `fact IDENT ('?'?) : primitive/shape ('as' IDENT)? ('default' expr)?`
-- **Shapes**: `shape IDENT { ... }`
-- **Variables**: `let IDENT : primitive/shape = expr`
 - **Use statements**: `use { function1, function2 } from source as alias`
+- **Rules**: `rule IDENT = ...`
+- **Shapes**: `shape IDENT { ... }` (policy-local; body section)
+- **Variables**: `let IDENT : primitive/shape = expr`
 - **Exports**: `export decision of IDENT`
 - **Comments**: `-- comment`
 
@@ -488,11 +489,11 @@ Built-in modules are prefixed with `@sentrie/`:
 namespace com/example/auth
 
 policy mypolicy {
+  fact data!: string
+
   use { now } from @sentrie/time as time
   use { sha256 } from @sentrie/hash
   use { parse, format } from @sentrie/json as json
-
-  fact data!: string
 
   rule processData = default false {
     let timestamp = time.now()
@@ -513,9 +514,9 @@ You can import TypeScript files from your policy pack using relative paths:
 namespace com/example/auth
 
 policy mypolicy {
-  use { calculateAge, validateEmail } from "./utils.ts" as utils
-
   fact user!: User
+
+  use { calculateAge, validateEmail } from "./utils.ts" as utils
 
   rule validateUser = default false {
     yield utils.calculateAge(user.birthDate) >= 18

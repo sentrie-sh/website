@@ -15,10 +15,13 @@ Policies are the fundamental building blocks of Sentrie policy packs. They encap
 
 ### Core Components
 
-- **Facts**: Declare input data declarations with types and defaults with `fact` statements
+Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts** → optional **uses** → **body** (`let`, `rule`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
+
+- **Metadata** (optional): `title`, `description`, `version`, `tag` — static strings for docs and tooling
+- **Facts**: Input data with `fact` statements (**all facts before any `use`**)
+- **Use**: External TypeScript functions via `use` statements (after facts, if any)
 - **Variables**: Intermediate calculations using `let` statements
 - **Rules**: Decision logic with conditions and outcomes with `rule` statements
-- **Use**: External TypeScript functions via `use` statements
 - **Exports**: Rule outcomes for external consumption with `export` statements
 
 ## Declaring Policies
@@ -52,11 +55,17 @@ shape Resource {
 }
 
 policy userAccess {
-  use { verifySignature, isBusinessHours } from "./auth-utils.ts" as auth
+  title "User access control"
+  description "Read/write access for documents based on ownership and auth signals"
+  version "1.0.0"
+  tag "domain" = "authz"
+  tag "cloud" = "aws"
 
   fact user: User as currentUser
   fact resource: Resource as currentResource
   fact context?: Context as ctx default { "environment": "production" }
+
+  use { verifySignature, isBusinessHours } from "./auth-utils.ts" as auth
 
   let isResourceOwner = user.id == resource.owner
   let hasValidSignature = auth.verifySignature(user.id, resource.id)
