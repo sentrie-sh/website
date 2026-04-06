@@ -44,6 +44,8 @@ fact context?: Context as context default { "key": "value" }
 - **Use `?` to mark facts as optional** - Optional facts can be omitted, but if provided, they must be non-null
 - **Facts are always non-nullable** - Null values are not allowed for facts
 - **Required facts cannot have default values** - Only optional facts can have defaults
+- **Facts before uses:** If a policy has both `fact` and `use` statements, every `fact` must appear before the first `use`. A policy may have **uses with no facts** (skip the facts block).
+
 :::
 
 ## Fact Types and Constraints

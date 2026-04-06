@@ -25,29 +25,10 @@ tag "key" = "value"
 
 `title`, `description`, `version`, and `tag` are **reserved keywords** in the lexer everywhere in a program, not only inside policies.
 
-## Policy body ordering (required)
-
-Ignoring comments, statements inside a policy must follow this **grouped** order:
-
-1. **Metadata block** (optional): any of `title`, `description`, `version`, `tag*`, grouped together at the top.
-2. **Facts block** (optional): `fact*` — all facts before any `use`.
-3. **Uses block** (optional): `use*`.
-4. **Body**: `rule`, `export` (rule export), `let`, `shape`, etc.
-
-**Comments** may appear anywhere and do **not** break these groups. **Metadata** may be separated only by comments and still count as one contiguous metadata block.
-
-**Facts before uses:** If a policy has both `fact` and `use` statements, every `fact` must appear before the first `use`. A policy may have **uses with no facts** (skip the facts block).
-
-**Shapes** in a policy are **body** statements. Putting `shape` (or any body statement) before the header sections is invalid if you still need `fact` / `use` / metadata after it.
-
 ## Uniqueness
 
 - At most one `title`, one `description`, and one `version` per policy.
 - `tag` may repeat; the same key may appear multiple times.
-
-## Index representation (tooling)
-
-When a policy is indexed, tags are kept in **source order** as a list of pairs. Implementations may also expose a **map from key to values** (all values for that key, in order) for lookups. If a map is provided, **iteration order over the map is not a stability contract**—use the ordered list when you need deterministic output.
 
 ## Validation errors (indexing)
 

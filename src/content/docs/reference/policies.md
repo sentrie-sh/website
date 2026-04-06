@@ -24,6 +24,19 @@ Statements inside a policy follow a **fixed grouped order** (comments may appear
 - **Rules**: Decision logic with conditions and outcomes with `rule` statements
 - **Exports**: Rule outcomes for external consumption with `export` statements
 
+## Policy body ordering (required)
+
+Ignoring comments, statements inside a policy must follow this **grouped** order:
+
+1. **Metadata block** (optional): any of `title`, `description`, `version`, `tag*`, grouped together at the top.
+2. **Facts block** (optional): `fact*` — all facts before any `use`.
+3. **Uses block** (optional): `use*`.
+4. **Body**: `rule`, `export` (rule export), `let`, `shape`, etc.
+
+**Comments** may appear anywhere and do **not** break these groups. **Metadata** may be separated only by comments and still count as one contiguous metadata block.
+
+**Shapes** in a policy are **body** statements. Putting `shape` (or any body statement) before the header sections is invalid if you still need `fact` / `use` / metadata after it.
+
 ## Declaring Policies
 
 ### Basic Syntax
