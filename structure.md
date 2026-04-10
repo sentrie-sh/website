@@ -92,8 +92,6 @@
       - #Defined
       - #Emptiness
       - #Ternary Operator
-    - Collection Operations
-      - #Map
-      - #Distinct
-      - #Reduce
-      - #Count
+    - Using Functions
+      - List builtins (any, all, filter, first, collect, reduce, distinct)
+      - count, merge, error, list helpers
