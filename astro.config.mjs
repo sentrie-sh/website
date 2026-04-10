@@ -150,10 +150,6 @@ export default defineConfig({
               slug: "reference/boolean-operations",
             },
             {
-              label: "Collection Operations",
-              slug: "reference/collection-operations",
-            },
-            {
               label: "Using Functions",
               slug: "reference/functions",
             },
