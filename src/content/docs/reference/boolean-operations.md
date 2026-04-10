@@ -14,7 +14,7 @@ Boolean operations in Sentrie include:
 - **Logical Operations**: Boolean logic with `and`, `or`, `not`
 - **Comparison Operations**: Equality, inequality, and ordering comparisons
 - **Pattern Matching**: Regular expression matching
-- **Collection Operations**: Testing collections with `any`, `all`, `in`, `contains`
+- **Collection builtins and membership**: List quantifiers (`any`, `all`), plus `in` and `contains`
 - **State Checking**: Checking emptiness and definedness
 
 ## Conditional Operators
@@ -338,10 +338,10 @@ let can_read: bool = "read" in permissions
 
 #### Working with Maps
 
-For maps, if the `needle` is a string, it will be used as the key to check if the key exists in the `haystack`. if the `needle` is another map, then it will be used to check if the `needle` map is a subset of the `haystack` map.
+For dicts, if the `needle` is a string, it will be used as the key to check if the key exists in the `haystack`. If the `needle` is another dict, then it will be used to check if the `needle` dict is a subset of the `haystack` dict.
 
 ```sentrie
-let user_permissions: map[string] = map[string]{
+let user_permissions: dict[string] = {
   "read": true,
   "write": false,
   "delete": true,
@@ -540,9 +540,9 @@ let can_access: bool = user.active and
                       user.age >= resource.min_age and
                       (user.role == resource.required_role or
                        user.role == "superuser") and
-                      all resource.required_permissions as perm, idx {
+                      all(resource.required_permissions, (perm) => {
                         yield perm in user.permissions
-                      }
+                      })
 -- Result: true
 ```
 

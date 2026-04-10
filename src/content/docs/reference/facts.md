@@ -68,7 +68,7 @@ fact name?: string as userName default "anonymous"
 fact permissions: list[string] as userPermissions
 
 -- Optional collection facts with defaults
-fact metadata?: map[string] as userMetadata default {}
+fact metadata?: dict[string] as userMetadata default {}
 fact coordinates?: record[number, number] as location default [ 0.0, 0.0 ]
 ```
 
@@ -142,7 +142,7 @@ fact enabled?: bool as isEnabled default true
 
 -- Collection defaults (optional facts)
 fact tags?: list[string] as itemTags default []
-fact config?: map[string] as settings default {}
+fact config?: dict[string] as settings default {}
 ```
 
 :::warning[Error]

@@ -199,7 +199,7 @@ policy example {
   use { sha256 } from @sentrie/hash
   use { now } from @sentrie/time as time
 
-  fact userData: map[string]any
+  fact userData: dict[string]any
   fact items: list[string]
 
   -- Policy-level let with function calls
@@ -222,12 +222,345 @@ policy example {
 
 Sentrie provides a set of built-in functions that are always available without any imports. These functions are optimized for performance and are commonly used operations.
 
+### Higher-order list builtins
+
+Sentrie provides builtins for working with **lists**: `any`, `all`, `filter`, `first`, `collect`, `reduce`, and `distinct`. Each step that inspects or transforms an element uses an **inline lambda** written as `(param) => { ... }` or `(param, index) => { ... }` with `yield` for the result of each invocation.
+
+- These builtins take a **list** as the first argument (except `reduce`, which also takes an initial accumulator, and `distinct`, which can take an optional key function).
+- Predicate builtins (`any`, `all`, `filter`, `first`) expect a lambda with **arity 1 or 2** (element, optional index). The predicate should yield a **trinary/boolean** interpretation for truthiness.
+- `collect` expects arity 1 or 2; each yield is the next element of the result list.
+- `reduce` expects a lambda with **arity 2 or 3** (`accumulator`, `element`, optional `index`).
+- `distinct` with one argument deduplicates by **scalar identity** of elements. With two arguments, the second is a **key function**; the key must be a supported scalar kind (`string`, `number`, `boolean`, `trinary`, `null`, or `undefined`).
+
+Operations return **new lists** (or scalars for `any`, `all`, `reduce`, `first`) and do not mutate the input.
+
+The **`dict[T]`** type describes JSON-like objects with string keys and values of type `T`. List transforms use the **`collect(...)`** builtin; `dict[...]` is only for types.
+
+### `any(list, predicate)`
+
+Returns whether **at least one** element satisfies the predicate.
+
+```sentrie
+any(list, (element) => { yield expression })
+any(list, (element, index) => { yield expression })
+```
+
+```sentrie
+let numbers: list[number] = [1, 2, 3, 4, 5]
+let has_even: bool = any(numbers, (num, idx) => {
+  yield num % 2 == 0
+})
+
+let scores: list[number] = [85, 92, 78, 96, 85]
+let has_perfect_score: bool = any(scores, (score) => {
+  yield score == 100
+})
+
+shape User {
+  name!: string
+  age: number
+  role!: string
+}
+
+let users: list[User] = [
+  { name: "Alice", age: 25, role: "admin" },
+  { name: "Bob", age: 30, role: "user" }
+]
+
+let has_admin: bool = any(users, (user) => {
+  yield user.role == "admin"
+})
+```
+
+### `all(list, predicate)`
+
+Returns whether **every** element satisfies the predicate.
+
+```sentrie
+all(list, (element) => { yield expression })
+all(list, (element, index) => { yield expression })
+```
+
+```sentrie
+let numbers: list[number] = [2, 4, 6, 8, 10]
+let all_even: bool = all(numbers, (num) => {
+  yield num % 2 == 0
+})
+
+let scores: list[number] = [85, 92, 78, 96, 85]
+let all_passing: bool = all(scores, (score) => {
+  yield score >= 80
+})
+```
+
+### `filter(list, predicate)`
+
+Returns a new list of elements for which the predicate is **truthy**.
+
+```sentrie
+filter(list, (element) => { yield expression })
+filter(list, (element, index) => { yield expression })
+```
+
+```sentrie
+let numbers: list[number] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+let evens: list[number] = filter(numbers, (num) => {
+  yield num % 2 == 0
+})
+
+let even_indexed: list[number] = filter(numbers, (num, idx) => {
+  yield idx % 2 == 0
+})
+
+shape Employee {
+  name!: string
+  department!: string
+  salary!: number
+}
+
+let employees: list[Employee] = [
+  { name: "Alice", department: "Engineering", salary: 95000.0 },
+  { name: "Bob", department: "Marketing", salary: 75000.0 }
+]
+
+let engineers: list[Employee] = filter(employees, (emp) => {
+  yield emp.department == "Engineering"
+})
+```
+
+### `first(list, predicate)`
+
+Returns the **first** element that satisfies the predicate, or **`undefined`** if none match.
+
+```sentrie
+first(list, (element) => { yield expression })
+first(list, (element, index) => { yield expression })
+```
+
+```sentrie
+let numbers: list[number] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+let first_even: number = first(numbers, (num) => {
+  yield num % 2 == 0
+})
+
+let first_negative: number = first(numbers, (num) => {
+  yield num < 0
+})
+-- Result: undefined
+```
+
+### `collect(list, fn)`
+
+Applies a function to each element and returns a new list.
+
+```sentrie
+collect(list, (element) => { yield expression })
+collect(list, (element, index) => { yield expression })
+```
+
+```sentrie
+let numbers: list[number] = [1, 2, 3, 4, 5]
+
+let doubled: list[number] = collect(numbers, (num) => {
+  yield num * 2
+})
+
+let fruits: list[string] = ["apple", "banana", "cherry"]
+let indexed_fruits: list[string] = collect(fruits, (fruit, idx) => {
+  yield (idx + 1).toString() + ". " + fruit
+})
+
+shape User {
+  name!: string
+  age: number
+}
+
+let users: list[User] = [
+  { name: "Alice", age: 25 },
+  { name: "Bob", age: 30 }
+]
+
+let names: list[string] = collect(users, (user) => {
+  yield user.name
+})
+
+let scores: dict[number] = {"alice": 95, "bob": 87}
+let doubled2: list[number] = collect([1, 2, 3], (n) => { yield n * 2 })
+```
+
+### `reduce(list, initial, reducer)`
+
+Folds a list with an **initial accumulator** and a **reducer** lambda. Each `yield` produces the accumulator for the next step.
+
+```sentrie
+reduce(list, initial, (accumulator, element) => { yield expression })
+reduce(list, initial, (accumulator, element, index) => { yield expression })
+```
+
+```sentrie
+let numbers: list[number] = [1, 2, 3, 4, 5]
+
+let sum: number = reduce(numbers, 0, (acc, num, idx) => {
+  yield acc + num
+})
+
+let max: number = reduce(numbers, numbers[0], (acc, num) => {
+  yield num > acc ? num : acc
+})
+
+let words: list[string] = ["Hello", "World", "Sentrie"]
+let sentence: string = reduce(words, "", (acc, word, idx) => {
+  yield acc + (idx == 0 ? "" : " ") + word
+})
+
+shape Sale {
+  product!: string
+  quantity!: number
+  price!: number
+}
+
+let sales: list[Sale] = [
+  { product: "Laptop", quantity: 2, price: 999.99 },
+  { product: "Mouse", quantity: 5, price: 29.99 }
+]
+
+let total_revenue: number = reduce(sales, 0.0, (acc, sale) => {
+  yield acc + (sale.quantity * sale.price)
+})
+
+let max_line_total: number = reduce(sales, 0.0, (acc, sale) => {
+  let line: number = sale.quantity * sale.price
+  yield line > acc ? line : acc
+})
+```
+
+### `distinct(list)` / `distinct(list, keyFn)`
+
+**One argument:** removes duplicates using a stable scalar fingerprint of each element.
+
+```sentrie
+distinct(list)
+```
+
+```sentrie
+let numbers: list[number] = [1, 2, 2, 3, 3, 3, 4, 5]
+let unique_numbers: list[number] = distinct(numbers)
+```
+
+**Two arguments:** the second is a key function; the key must evaluate to a supported scalar.
+
+```sentrie
+distinct(list, (element) => { yield keyExpression })
+distinct(list, (element, index) => { yield keyExpression })
+```
+
+```sentrie
+shape Person {
+  name!: string
+  age: number
+}
+
+let people: list[Person] = [
+  { name: "Alice", age: 25 },
+  { name: "Bob", age: 30 },
+  { name: "Alice", age: 25 }
+]
+
+let unique_by_name: list[Person] = distinct(people, (p) => {
+  yield p.name
+})
+```
+
+### Chaining list builtins
+
+Nest builtins for multi-step transforms. Intermediate `let` bindings often read more clearly than deep nesting.
+
+```sentrie
+shape Employee {
+  name!: string
+  age: number
+  department!: string
+  salary!: number
+  years_experience: number
+}
+
+let employees: list[Employee] = [
+  { name: "Alice", age: 25, department: "Engineering", salary: 95000.0, years_experience: 5 },
+  { name: "Bob", age: 17, department: "Engineering", salary: 75000.0, years_experience: 3 },
+  { name: "Charlie", age: 30, department: "Marketing", salary: 110000.0, years_experience: 8 }
+]
+
+let adults: list[Employee] = filter(employees, (emp) => {
+  yield emp.age >= 18
+})
+
+let engineers: list[Employee] = filter(adults, (emp) => {
+  yield emp.department == "Engineering"
+})
+
+let senior_engineers: list[string] = collect(
+  filter(engineers, (emp) => {
+    yield emp.salary >= 90000.0
+  }),
+  (emp) => {
+    yield emp.name
+  }
+)
+
+let experienced: list[Employee] = filter(employees, (emp) => {
+  yield emp.years_experience >= 5
+})
+
+let total_salary: number = reduce(experienced, 0.0, (acc, emp) => {
+  yield acc + emp.salary
+})
+
+let avg_salary: number = total_salary / count(experienced)
+
+let departments: list[string] = collect(employees, (emp) => {
+  yield emp.department
+})
+
+let unique_departments: list[string] = distinct(departments)
+```
+
+Prefer **`count(filter(...))`** when you only need a count, instead of folding with `reduce`. Use **`distinct`** (one or two arguments) instead of manual duplicate tracking when possible.
+
+```sentrie
+let result: list[string] = collect(
+  filter(
+    filter(users, (user) => {
+      yield user.age >= 18
+    }),
+    (user) => {
+      yield user.department == "Engineering"
+    }
+  ),
+  (user) => {
+    yield user.name
+  }
+)
+```
+
+```sentrie
+let emails: list[string] = collect(
+  filter(users, (user) => {
+    yield user.email is defined
+  }),
+  (user) => {
+    yield user.email
+  }
+)
+```
+
 ### `count(value) => number`
 
 <details>
 <summary>Returns the number of elements in a collection or the length of a string.</summary>
 
-The `count` function accepts a list, map, or string and returns the number of elements or characters.
+The `count` function accepts a list, dict, or string and returns the number of elements or characters.
 
 **Examples:**
 
@@ -242,12 +575,12 @@ let itemCount = count(items)  -- Returns 3
 
 </details>
 
-### `merge(map1, map2) => map[string]any`
+### `merge(dict1, dict2) => dict[string]any`
 
 <details>
-<summary>Recursively merges two maps into a new map.</summary>
+<summary>Recursively merges two dict values into a new dict.</summary>
 
-The `merge` function combines two maps, with values from the second map overwriting values from the first map. Nested maps are merged recursively rather than being replaced entirely.
+The `merge` function combines two dict values, with values from the second dict overwriting values from the first. Nested dicts are merged recursively rather than being replaced entirely.
 
 **Examples:**
 
@@ -392,4 +725,3 @@ Built-in functions are fast and lightweight. While they support memoization synt
 - [Built-in TypeScript Modules](/reference/typescript_modules) - Complete reference for all built-in modules
 - [Intermediate Values](/reference/let) - Learn about `let` declarations where functions are commonly used
 - [Rules](/reference/rules) - Learn how to use functions in rule bodies
-- [Collection Operations](/reference/collection-operations) - Learn about collection-specific operations

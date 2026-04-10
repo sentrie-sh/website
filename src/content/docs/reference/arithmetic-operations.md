@@ -103,7 +103,7 @@ let final_price: number = price - discount_amount
 
 ```sentrie
 let scores: list[number] = [85, 92, 78, 96]
-let total: number = reduce scores from 0 as score, idx { yield score }
+let total: number = reduce(scores, 0, (acc, score) => { yield acc + score })
 let average: number = total / count scores
 -- Result: 87.75
 ```
