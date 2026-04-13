@@ -75,15 +75,14 @@ Sentrie provides comprehensive built-in TypeScript modules under the `@sentrie/*
 namespace com/example/crypto
 
 policy security {
-  use { sha256, md5 } from @sentrie/hash
-  use { now, parse } from @sentrie/time as time
-  use { isValid } from @sentrie/json as json
+  use { sha256 } from @sentrie/hash
+  use { now } from @sentrie/time as time
 
   fact password: string
   fact timestamp: number
 
   rule validatePassword = default false {
-    let hash = sha256(password)
+    let hash = hash.sha256(password)
     let currentTime = time.now()
     yield hash != "" and currentTime > timestamp
   }
