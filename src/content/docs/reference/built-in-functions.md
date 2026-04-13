@@ -170,7 +170,7 @@ These operations return **new lists** (or scalars for `any`, `all`, `reduce`, `f
 
 The **`dict[T]`** type describes JSON-like objects with string keys and values of type `T`. List transforms use the **`collect(...)`** builtin; `dict[...]` is only for types.
 
-### `any(list, predicate)`
+#### `any(list, predicate)`
 
 Returns whether **at least one** element satisfies the predicate.
 
@@ -206,7 +206,7 @@ let has_admin: bool = any(users, (user) => {
 })
 ```
 
-### `all(list, predicate)`
+#### `all(list, predicate)`
 
 Returns whether **every** element satisfies the predicate.
 
@@ -227,7 +227,7 @@ let all_passing: bool = all(scores, (score) => {
 })
 ```
 
-### `filter(list, predicate)`
+#### `filter(list, predicate)`
 
 Returns a new list of elements for which the predicate is **truthy**.
 
@@ -263,7 +263,7 @@ let engineers: list[Employee] = filter(employees, (emp) => {
 })
 ```
 
-### `first(list, predicate)`
+#### `first(list, predicate)`
 
 Returns the **first** element that satisfies the predicate, or **`undefined`** if none match.
 
@@ -285,7 +285,7 @@ let first_negative: number = first(numbers, (num) => {
 -- Result: undefined
 ```
 
-### `collect(list, fn)`
+#### `collect(list, fn)`
 
 Applies a callable to each element and returns a new list.
 
@@ -324,7 +324,7 @@ let scores: dict[number] = {"alice": 95, "bob": 87}
 let doubled2: list[number] = collect([1, 2, 3], (n) => { yield n * 2 })
 ```
 
-### `reduce(list, initial, reducer)`
+#### `reduce(list, initial, reducer)`
 
 Folds a list with an **initial accumulator** and a **reducer** callable. Each `yield` produces the accumulator for the next step.
 
@@ -370,7 +370,7 @@ let max_line_total: number = reduce(sales, 0.0, (acc, sale) => {
 })
 ```
 
-### `distinct(list)` / `distinct(list, keyFn)`
+#### `distinct(list)` / `distinct(list, keyFn)`
 
 **One argument:** removes duplicates using a stable scalar fingerprint of each element.
 
@@ -407,7 +407,7 @@ let unique_by_name: list[Person] = distinct(people, (p) => {
 })
 ```
 
-### Chaining list builtins
+#### Chaining list builtins
 
 Nest builtins for multi-step transforms. Intermediate `let` bindings often read more clearly than deep nesting.
 
