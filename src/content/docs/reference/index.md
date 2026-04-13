@@ -12,6 +12,7 @@ This is the complete reference for the Sentrie policy language. It covers all la
 - [Policies](#policies)
 - [Rules](#rules)
 - [Expressions](#expressions)
+- [Lambdas](#lambdas) - Callable syntax (`=>`) for passing functions as values to builtins
 - [Primitives, Collections, Shapes, and Aliases](#primitives-collections-shapes-and-aliases)
 - [Literals](#literals)
 - [Operators](#operators)
@@ -238,6 +239,80 @@ age >= 18 ? "adult" : "minor"
   yield result
 }
 ```
+
+## Lambdas
+
+A **lambda** is an expression that evaluates to a **callable** value: a function with a fixed parameter list and a block body. Lambdas are how you pass predicates and mapping steps to builtins such as `filter`, `collect`, `reduce`, and `distinct` (with a key function).
+
+### Syntax
+
+```sentrie
+( parameterList ) => block
+```
+
+- **`parameterList`** is a comma-separated list of identifiers, or empty.
+- **`=>`** is the fat arrow (followed by a `{` block body).
+- **`block`** is a normal block expression: statements and a **`yield`** that produces the result for each invocation.
+
+### Forms
+
+```sentrie
+-- No parameters (arity 0)
+() => {
+  yield 1
+}
+
+-- One parameter
+(x) => {
+  yield x * 2
+}
+
+-- Two parameters (common for list index)
+(item, idx) => {
+  yield item + idx
+}
+```
+
+Parameter names must be **identifiers**. **Duplicate** parameter names in the same list are rejected at parse time.
+
+:::note[Grouped expressions vs lambdas]
+
+After `(`, the parser decides between a **parenthesized expression** and a **lambda** by looking for a lambda signature: identifiers (and commas) up to `) =>`. If that pattern does not match, the `(` is treated as grouping for an inner expression.
+
+:::
+
+### Callables and builtins
+
+A lambda’s value is a **callable**. You pass it to builtins that expect a function, for example:
+
+```sentrie
+let nums: list[number] = [1, 2, 3]
+let doubled: list[number] = collect(nums, (n) => {
+  yield n * 2
+})
+
+let sum: number = reduce(nums, 0, (acc, n) => {
+  yield acc + n
+})
+```
+
+Which builtin you use determines how many parameters the lambda should take (its **arity**), for example:
+
+- **`any`**, **`all`**, **`filter`**, **`first`**, **`collect`**: arity **1** (element only) or **2** (element and index).
+- **`reduce`**: arity **2** (accumulator, element) or **3** (accumulator, element, index).
+- **`distinct`**, two-argument form: arity **1** or **2** for the key function.
+
+If arity does not match what the builtin expects, evaluation fails with an error.
+
+For builtin names, signatures, and more examples, see [Built-in Functions](/reference/built-in-functions).
+
+### Lexical environment
+
+Lambdas **capture** the surrounding execution context: names visible where the lambda is written remain visible when the callable runs (for example `user`, `let` bindings in the same block, and facts). In the current language version, that capture uses the **parent execution context by reference**, so later changes to captured bindings can affect a lambda that runs afterward.
+
+### Boundaries
+
+Callable values are **not** ordinary JSON-like data. They cannot be passed through every runtime boundary that expects plain data (for example some module or interop paths that materialize `[]any` or JSON). Prefer keeping lambdas and callables inside policy evaluation; if you need to pass data out, convert to plain values first.
 
 ## Primitives, Collections, Shapes, and Aliases
 

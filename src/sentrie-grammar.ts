@@ -19,7 +19,7 @@ export const sentrieGrammar = {
     // Keywords - Higher-order operations
     {
       name: 'keyword.control.higher-order.sentrie',
-      match: /\b(any|all|filter|collect|distinct|reduce|cast|count)\b/
+      match: /\b(any|all|filter|first|collect|distinct|reduce|cast|count)\b/
     },
 
     // Keywords - Boolean operators

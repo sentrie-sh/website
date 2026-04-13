@@ -93,5 +93,6 @@
       - #Emptiness
       - #Ternary Operator
     - Using Functions
-      - List builtins (any, all, filter, first, collect, reduce, distinct)
-      - count, merge, error, list helpers
+      - Call syntax, TypeScript imports, memoization
+    - Built-in Functions
+      - count, merge, error, list normalization, list transforms (any, all, filter, first, collect, reduce, distinct)

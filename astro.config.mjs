@@ -154,6 +154,10 @@ export default defineConfig({
               slug: "reference/functions",
             },
             {
+              label: "Built-in Functions",
+              slug: "reference/built-in-functions",
+            },
+            {
               label: "Using TypeScript",
               slug: "reference/using-typescript",
             },
