@@ -7,7 +7,7 @@ Sentrie provides a set of built-in functions that are always available without a
 
 Some builtins take extra arguments that are **callables**—values you write inline, such as `(param) => { ... }` or `(param, index) => { ... }`, using `yield` for each step's result. That is the same idea as passing any other value; see [Lambdas](/reference/#lambdas) for callable syntax and arity rules.
 
-### `count(value) => number`
+## `count(value) => number`
 
 Returns the number of elements in a collection or the length of a string.
 
@@ -24,7 +24,7 @@ let items: list[string] = ["apple", "banana", "cherry"]
 let itemCount = count(items)  -- Returns 3
 ```
 
-### `merge(dict1, dict2) => dict[string]any`
+## `merge(dict1, dict2) => dict[string]any`
 
 Recursively merges two dict values into a new dict.
 
@@ -42,7 +42,7 @@ let combined = merge(userData, additionalData)
 -- Returns {"name": "Alice", "age": 31, "role": "admin"}
 ```
 
-### `error(format, args...) => error`
+## `error(format, args...) => error`
 
 Short-circuits execution and returns an error with a formatted message.
 
@@ -54,15 +54,10 @@ The `error` function immediately stops execution and returns an error. It suppor
 - `error("Invalid value: %v", value)`
 
 ```sentrie
-rule validateAccess = default false when user.role is defined {
-  if user.role is not defined {
-    error("user role must be provided")
-  }
-  yield true
-}
+let role = user.role is defined ? user.role : error("user role must be provided")
 ```
 
-#### `undefined` vs `error`
+### `undefined` vs `error`
 
 When the `error` function is called, it immediately stops the evaluation of the current policy and returns an error result. This mechanism is intended for situations where continuing evaluation no longer makes sense due to invalid, unexpected, or strictly disallowed conditions—such as missing required input, encountering data corruption, or detecting an explicit policy violation.
 
@@ -74,7 +69,7 @@ In summary:
 - `undefined` means “no value available” but may allow further evaluation or fallback via `elvis` or `ternary` operators.  
 - `error` signals a non-recoverable state where the policy cannot safely proceed and must abort immediately.
 
-### `as_list(value) => list[any]`
+## `as_list(value) => list[any]`
 
 Normalizes "one-or-many" inputs by wrapping non-list values in a single-element list.
 
@@ -96,7 +91,7 @@ let unchanged = as_list(already_list)  -- Returns [1, 2, 3]
 
 **Note:** If the input contains `undefined` values, the function returns `undefined`.
 
-### `flatten(list, depth?) => list[any]`
+## `flatten(list, depth?) => list[any]`
 
 Flattens nested lists to a controlled depth.
 
@@ -119,7 +114,7 @@ let flattened_deep = flatten(deeply_nested, 2)  -- Returns [1, 2, 3, 4]
 
 **Note:** If the input contains `undefined` values, the function returns `undefined`.
 
-### `flatten_deep(list) => list[any]`
+## `flatten_deep(list) => list[any]`
 
 Recursively flattens nested lists to arbitrary depth.
 
@@ -137,7 +132,7 @@ let fully_flattened = flatten_deep(deeply_nested)  -- Returns [1, 2, 3, 4, 5, 6]
 
 **Note:** If the input contains `undefined` values, the function returns `undefined`.
 
-### `normalise_list(value) => list[any]`
+## `normalise_list(value) => list[any]`
 
 Normalizes messy list inputs with one level of nesting.
 
@@ -157,7 +152,7 @@ let normalized = normalise_list(mixed_input)  -- Returns [1, 2, 3, 4, 5]
 
 **Note:** If the input contains `undefined` values, the function returns `undefined`.
 
-### List builtins
+## List builtins
 
 Builtins `any`, `all`, `filter`, `first`, `collect`, `reduce`, and `distinct` work on **lists**. They take a list as the first argument (except `reduce`, which also takes an initial accumulator, and `distinct`, which can take an optional second argument that is a callable).
 
@@ -170,7 +165,7 @@ These operations return **new lists** (or scalars for `any`, `all`, `reduce`, `f
 
 The **`dict[T]`** type describes JSON-like objects with string keys and values of type `T`. List transforms use the **`collect(...)`** builtin; `dict[...]` is only for types.
 
-#### `any(list, predicate)`
+### `any(list, predicate)`
 
 Returns whether **at least one** element satisfies the predicate.
 
@@ -206,7 +201,7 @@ let has_admin: bool = any(users, (user) => {
 })
 ```
 
-#### `all(list, predicate)`
+### `all(list, predicate)`
 
 Returns whether **every** element satisfies the predicate.
 
@@ -227,7 +222,7 @@ let all_passing: bool = all(scores, (score) => {
 })
 ```
 
-#### `filter(list, predicate)`
+### `filter(list, predicate)`
 
 Returns a new list of elements for which the predicate is **truthy**.
 
@@ -263,7 +258,7 @@ let engineers: list[Employee] = filter(employees, (emp) => {
 })
 ```
 
-#### `first(list, predicate)`
+### `first(list, predicate)`
 
 Returns the **first** element that satisfies the predicate, or **`undefined`** if none match.
 
@@ -285,7 +280,7 @@ let first_negative: number = first(numbers, (num) => {
 -- Result: undefined
 ```
 
-#### `collect(list, fn)`
+### `collect(list, fn)`
 
 Applies a callable to each element and returns a new list.
 
@@ -324,7 +319,7 @@ let scores: dict[number] = {"alice": 95, "bob": 87}
 let doubled2: list[number] = collect([1, 2, 3], (n) => { yield n * 2 })
 ```
 
-#### `reduce(list, initial, reducer)`
+### `reduce(list, initial, reducer)`
 
 Folds a list with an **initial accumulator** and a **reducer** callable. Each `yield` produces the accumulator for the next step.
 
@@ -370,7 +365,7 @@ let max_line_total: number = reduce(sales, 0.0, (acc, sale) => {
 })
 ```
 
-#### `distinct(list)` / `distinct(list, keyFn)`
+### `distinct(list)` / `distinct(list, keyFn)`
 
 **One argument:** removes duplicates using a stable scalar fingerprint of each element.
 
@@ -407,7 +402,7 @@ let unique_by_name: list[Person] = distinct(people, (p) => {
 })
 ```
 
-#### Chaining list builtins
+### Chaining list builtins
 
 Nest builtins for multi-step transforms. Intermediate `let` bindings often read more clearly than deep nesting.
 
