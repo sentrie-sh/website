@@ -16,6 +16,7 @@ This is the complete reference for the Sentrie policy language. It covers all la
 - [Literals](#literals)
 - [Operators](#operators)
 - [Control Flow](#control-flow)
+- [Pipeline Operator](/reference/pipeline-operator) - Detailed reference for pipeline syntax, desugaring, precedence, and memoization
 - [TypeScript Modules](#typescript-modules)
 - [Facts and Variables](#facts-and-variables)
 - [Exports and Imports](#exports-and-imports)
@@ -408,42 +409,7 @@ null        -- Null value
 |>          -- Pipe left expression into callable target on the right
 ```
 
-Pipeline desugaring rules:
-
-```text
-lhs |> ident            => ident(lhs)
-lhs |> alias.fn         => alias.fn(lhs)
-lhs |> ident(a, b)      => ident(lhs, a, b)
-lhs |> alias.fn(a, b)   => alias.fn(lhs, a, b)
-```
-
-Pipeline memoization rules:
-
-```text
-lhs |> ident!           => memoized ident(lhs)
-lhs |> alias.fn!30      => memoized alias.fn(lhs) with 30s TTL
-lhs |> ident(a)!60      => memoized ident(lhs, a) with 60s TTL
-```
-
-Right-hand side validity:
-
-- Allowed: identifiers, module-qualified field access, and calls on those targets
-- Rejected: grouped/infix/ternary/list/map/index targets, or field access rooted in non-identifiers
-
-```text
--- Valid
-value |> len
-value |> str.trim
-value |> str.replaceAll(" ", "-")
-
--- Invalid
-value |> (a + b)
-value |> foo ? bar : baz
-value |> foo[0]
-value |> foo().bar
-```
-
-`value |> trim` can parse because `trim` is an identifier form, but parse-time acceptance does not guarantee name resolution at runtime.
+For complete rules and examples, see [Pipeline Operator (`|>`)](/reference/pipeline-operator).
 
 ### Comparison Operators
 
