@@ -7,18 +7,19 @@ Operator precedence defines which operations are performed first when multiple o
 
 ## Precedence Table (highest to lowest)
 
-| Precedence | Operators                                         | Description                                                 |
-| ---------- | ------------------------------------------------- | ----------------------------------------------------------- |
+| Precedence | Operators                                         | Description                                                  |
+| ---------- | ------------------------------------------------- | ------------------------------------------------------------ |
 | 1          | `()`, `[]`, `.`                                   | Primary expressions (literals, identifiers, function calls) |
-| 2          | `not`, `!`, `+`, `-`                              | Unary operators                                             |
-| 3          | `*`, `/`, `%`                                     | Multiplicative arithmetic                                   |
-| 4          | `+`, `-`                                          | Additive arithmetic                                         |
-| 5          | `<`, `<=`, `>`, `>=`, `in`, `matches`, `contains` | Comparison operators                                        |
-| 6          | `==`, `!=`, `is`, `is not`                        | Equality operators                                          |
-| 7          | `and`                                             | Logical AND                                                 |
-| 8          | `xor`                                             | Logical XOR                                                 |
-| 9          | `or`                                              | Logical OR                                                  |
-| 10         | `? :`                                             | Ternary conditional                                         |
+| 2          | `not`, `!`, `+`, `-`                              | Unary operators                                              |
+| 3          | `*`, `/`, `%`                                     | Multiplicative arithmetic                                    |
+| 4          | `+`, `-`                                          | Additive arithmetic                                          |
+| 5          | `<`, `<=`, `>`, `>=`, `in`, `matches`, `contains` | Comparison operators                                         |
+| 6          | `==`, `!=`, `is`, `is not`                        | Equality operators                                           |
+| 7          | `and`                                             | Logical AND                                                  |
+| 8          | `xor`                                             | Logical XOR                                                  |
+| 9          | `or`                                              | Logical OR                                                   |
+| 10         | `? :`                                             | Ternary conditional                                          |
+| 11         | `|>`                                              | Pipeline operator (lowest precedence)                        |
 
 ## Examples
 
@@ -48,6 +49,21 @@ let mixed: bool = 5 > 3 and 2 < 4           -- Result: true
 ```sentrie
 let value: number = 5 > 3 ? 10 : 20                       -- Result: 10
 let nested: string = true ? (false ? "A" : "B") : "C"  -- Result: "B"
+```
+
+### Pipeline Precedence and Associativity
+
+The pipeline operator has the lowest precedence and associates from left to right.
+
+```sentrie
+let a = value |> len |> math.abs
+-- Equivalent to: math.abs(len(value))
+
+let b = a + b |> len
+-- Equivalent to: len(a + b)
+
+let c = cond ? x : y |> len
+-- Equivalent to: len(cond ? x : y)
 ```
 
 ## Using Parentheses

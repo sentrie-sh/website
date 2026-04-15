@@ -182,6 +182,7 @@ Sentrie has a rich expression language with multiple operator types and preceden
 8. **Logical XOR**: `xor`
 9. **Logical OR**: `or`
 10. **Ternary**: `? :`
+11. **Pipeline**: `|>` (lowest precedence)
 
 ### Primary Expressions
 
@@ -206,6 +207,10 @@ config.maxRetries
 time.now()
 hash.sha256("data")
 json.parse("{}")
+
+-- Pipeline calls
+value |> len
+value |> str.trim |> len
 
 -- Index access
 users[0]
@@ -397,6 +402,49 @@ null        -- Null value
 %           -- Modulo
 ```
 
+### Pipeline Operator
+
+```text
+|>          -- Pipe left expression into callable target on the right
+```
+
+Pipeline desugaring rules:
+
+```text
+lhs |> ident            => ident(lhs)
+lhs |> alias.fn         => alias.fn(lhs)
+lhs |> ident(a, b)      => ident(lhs, a, b)
+lhs |> alias.fn(a, b)   => alias.fn(lhs, a, b)
+```
+
+Pipeline memoization rules:
+
+```text
+lhs |> ident!           => memoized ident(lhs)
+lhs |> alias.fn!30      => memoized alias.fn(lhs) with 30s TTL
+lhs |> ident(a)!60      => memoized ident(lhs, a) with 60s TTL
+```
+
+Right-hand side validity:
+
+- Allowed: identifiers, module-qualified field access, and calls on those targets
+- Rejected: grouped/infix/ternary/list/map/index targets, or field access rooted in non-identifiers
+
+```text
+-- Valid
+value |> len
+value |> str.trim
+value |> str.replaceAll(" ", "-")
+
+-- Invalid
+value |> (a + b)
+value |> foo ? bar : baz
+value |> foo[0]
+value |> foo().bar
+```
+
+`value |> trim` can parse because `trim` is an identifier form, but parse-time acceptance does not guarantee name resolution at runtime.
+
 ### Comparison Operators
 
 ```text
@@ -479,6 +527,8 @@ use { function1, function2 } from @sentrie/module as alias
 **Note:** Built-in `@sentrie/*` modules do not use quotes. Local TypeScript files use quotes for relative paths.
 
 The `as` clause is optional. If omitted, the default alias is the last part of the module path (e.g., `time` for `@sentrie/time`).
+
+`use` semantics do not change with pipelines: imported names are not injected into local scope, and module-qualified calls remain the canonical form.
 
 ### Built-in Modules
 

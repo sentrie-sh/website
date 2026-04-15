@@ -55,6 +55,80 @@ use { sha256 } from @sentrie/hash
 
 :::
 
+### Pipeline Operator (`|>`)
+
+Sentrie supports a pipeline operator for readability when chaining transformations. The value on the left is passed as the first argument to the callable on the right.
+
+```sentrie
+let slug = input
+  |> str.trim
+  |> str.toLower
+  |> str.replaceAll(" ", "-")
+```
+
+This is equivalent to:
+
+```sentrie
+let slug = str.replaceAll(
+  str.toLower(
+    str.trim(input),
+  ),
+  " ",
+  "-",
+)
+```
+
+#### Supported pipeline targets
+
+The right-hand side of a pipeline must be one of:
+
+- A built-in identifier, for example `value |> count`
+- A module-qualified field access, for example `value |> str.trim`
+- A call expression whose callee is one of the two forms above, for example `value |> str.replaceAll(" ", "-")`
+
+#### Pipeline memoization
+
+Pipeline targets support memoization suffixes with the same semantics as ordinary calls:
+
+```sentrie
+value |> count!30
+value |> str.trim!10
+value |> str.replaceAll(" ", "-")!60
+```
+
+- `!` enables memoization with default TTL.
+- `!<seconds>` enables memoization with an explicit TTL in seconds.
+- This works for identifier targets, module-qualified field-access targets, and call targets.
+
+#### Rejected pipeline targets
+
+The right-hand side is rejected when its callable root is not an identifier or a module-qualified field access. For example:
+
+```sentrie
+value |> (a + b)
+value |> foo ? bar : baz
+value |> foo[0]
+value |> foo().bar
+```
+
+#### Parse-time vs resolution-time
+
+`value |> trim` is valid syntax because `trim` is an identifier target form. However, parse-time acceptance does not imply that `trim` resolves successfully at runtime. Name resolution rules remain unchanged.
+
+#### `use` behavior does not change
+
+Pipelines do not inject imported symbols into local scope. `use` still binds module aliases only.
+
+```sentrie
+use { trim } from @sentrie/string as str
+
+-- Valid: module-qualified call through alias
+let a = value |> str.trim
+
+-- Parses as syntax, but does not become resolvable just because of `use`
+let b = value |> trim
+```
+
 ## TypeScript Module Functions
 
 Sentrie allows you to import and use functions from TypeScript modules, including built-in `@sentrie/*` modules and your own local TypeScript files. This provides extensive functionality for cryptography, data manipulation, time operations, and more.
