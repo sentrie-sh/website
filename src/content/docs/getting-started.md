@@ -212,7 +212,7 @@ policy pricing {
 
 **Invalid JSON**: Ensure your request body is valid JSON and matches the expected structure.
 
-**Server won't start**: Check that port 7529 is available, or use `--port` to specify a different port.
+**Server won't start**: Check that port 7529 is available, or use `--http-port` to specify a different port.
 
 ### Getting Help
 
