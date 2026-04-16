@@ -31,7 +31,7 @@ let slug = input
 ```
 
 ::::note
-The parser desugars `lhs |> rhs(...)` by inserting `lhs` as the **first positional** argument of the call on the right. Any further arguments are exactly what you write after the callee, for example `|> str.replaceAll(" ", "-")`.
+When a pipeline call target has **no** `#` placeholders, the parser inserts `lhs` as the **first positional** argument on the right.
 ::::
 
 The pipeline example above is the same as this nested-call shape (parentheses show the order of application):
@@ -55,9 +55,48 @@ lhs |> ident            => ident(lhs)
 lhs |> alias.fn         => alias.fn(lhs)
 lhs |> ident(a, b)      => ident(lhs, a, b)
 lhs |> alias.fn(a, b)   => alias.fn(lhs, a, b)
+lhs |> fn(a, #, b)      => fn(a, lhs, b)
 ```
 
 Pipelines are parser sugar only. They do not introduce new runtime call semantics.
+
+## Placeholder (`#`) for Non-First Arguments
+
+Use `#` inside a pipeline call target when the piped value should go somewhere other than argument 0.
+
+```sentrie
+let replaceChar = "..."
+let out = replaceChar |> str.replace(input, #, "$$")
+```
+
+This lowers to:
+
+```sentrie
+let out = str.replace(input, replaceChar, "$$")
+```
+
+When `#` is present in the RHS argument list, the parser does not auto-prepend the piped value as argument 0.
+
+### Multiple placeholders
+
+All `#` placeholders in the same RHS call bind to the same piped value:
+
+```sentrie
+x |> f(#, #)
+```
+
+Lowers to:
+
+```sentrie
+f(x, x)
+```
+
+### Style
+
+- Prefer straight chaining for sequential flow: `x |> g |> f`.
+- Use `#` for non-first argument placement when needed.
+- Avoid readability regressions like `x |> f(g(#))` when `x |> g |> f` expresses the same logic more clearly.
+- `%` remains modulo in Sentrie and is unrelated to pipeline placeholders.
 
 ## Supported Targets
 
