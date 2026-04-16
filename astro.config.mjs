@@ -158,6 +158,10 @@ export default defineConfig({
               slug: "reference/functions",
             },
             {
+              label: "Function chaining",
+              slug: "reference/function-chaining",
+            },
+            {
               label: "Using TypeScript",
               slug: "reference/using-typescript",
             },

@@ -214,7 +214,7 @@ let normalized = input
   |> str.toLower
 ```
 
-This is equivalent to nested calls such as `str.toLower(str.trim(input))`. See the [Policy Language Reference](/reference) and [Precedence](/reference/precedence) pages for full rules and constraints.
+This is equivalent to nested calls such as `str.toLower(str.trim(input))`. See [Function chaining](/reference/function-chaining), the [Policy Language Reference](/reference), and [Precedence](/reference/precedence) for full rules and constraints.
 
 ## Troubleshooting
 

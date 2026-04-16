@@ -1,11 +1,27 @@
 ---
-title: Pipeline Operator (`|>`)
-description: Use the pipeline operator for readable transformation chains, with precise rules for targets, desugaring, precedence, and memoization.
+title: Function chaining
+description: Chain calls with the `|>` pipeline operator—readable top-to-bottom flows, with rules for targets, desugaring, precedence, and memoization.
 ---
 
-The pipeline operator (`|>`) improves readability for expression chains by passing the left-hand expression as the first argument to the callable target on the right.
+When nested function calls pile up, it gets harder to see the data flow. You can always expand `g(f(x))` into separate `let` bindings, but that adds noise when the intermediate names are not the point.
 
-## Basic Syntax
+**Function chaining** in Sentrie uses the pipeline operator (`|>`) so the computation reads top-to-bottom: each step takes the value from the line above and passes it into the next call.
+
+### Nested calls
+
+```sentrie
+let slug = str.replaceAll(str.toLower(str.trim(input)), " ", "-")
+```
+
+### Intermediate values
+
+```sentrie
+let t1 = str.trim(input)
+let t2 = str.toLower(t1)
+let slug = str.replaceAll(t2, " ", "-")
+```
+
+### Pipeline
 
 ```sentrie
 let slug = input
@@ -14,7 +30,11 @@ let slug = input
   |> str.replaceAll(" ", "-")
 ```
 
-Equivalent nested-call form:
+::::note
+The parser desugars `lhs |> rhs(...)` by inserting `lhs` as the **first positional** argument of the call on the right. Any further arguments are exactly what you write after the callee, for example `|> str.replaceAll(" ", "-")`.
+::::
+
+The pipeline example above is the same as this nested-call shape (parentheses show the order of application):
 
 ```sentrie
 let slug = str.replaceAll(

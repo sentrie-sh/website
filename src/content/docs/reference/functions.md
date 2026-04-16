@@ -55,11 +55,11 @@ use { sha256 } from @sentrie/hash
 
 :::
 
-### Pipeline Operator (`|>`)
+### Function chaining (`|>`)
 
 Use `|>` to build readable transformation chains by passing the left value as the first argument to the callable on the right.
 
-See [Pipeline Operator (`|>`)](/reference/pipeline-operator).
+See [Function chaining](/reference/function-chaining).
 
 ## TypeScript Module Functions
 

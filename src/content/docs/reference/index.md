@@ -16,7 +16,7 @@ This is the complete reference for the Sentrie policy language. It covers all la
 - [Literals](#literals)
 - [Operators](#operators)
 - [Control Flow](#control-flow)
-- [Pipeline Operator](/reference/pipeline-operator) - Detailed reference for pipeline syntax, desugaring, precedence, and memoization
+- [Function chaining](/reference/function-chaining) - Pipeline operator (`|>`), desugaring, precedence, and memoization
 - [TypeScript Modules](#typescript-modules)
 - [Facts and Variables](#facts-and-variables)
 - [Exports and Imports](#exports-and-imports)
@@ -409,7 +409,7 @@ null        -- Null value
 |>          -- Pipe left expression into callable target on the right
 ```
 
-For complete rules and examples, see [Pipeline Operator (`|>`)](/reference/pipeline-operator).
+For complete rules and examples, see [Function chaining](/reference/function-chaining).
 
 ### Comparison Operators
 
