@@ -188,7 +188,7 @@ Avoid memoization for functions that:
 - Have side effects that must execute each time
   :::
 
-### Function chaining (`|>`)
+## Function chaining (`|>`)
 
 The pipeline operator `|>` passes the left value into the next function call, allowing clear, top-to-bottom transformation chains:
 
