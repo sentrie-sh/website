@@ -55,12 +55,6 @@ use { sha256 } from @sentrie/hash
 
 :::
 
-### Function chaining (`|>`)
-
-Use `|>` to build readable transformation chains by passing the left value as the first argument to the callable on the right.
-
-See [Function chaining](/reference/function-chaining).
-
 ## TypeScript Module Functions
 
 Sentrie allows you to import and use functions from TypeScript modules, including built-in `@sentrie/*` modules and your own local TypeScript files. This provides extensive functionality for cryptography, data manipulation, time operations, and more.
@@ -193,6 +187,19 @@ Avoid memoization for functions that:
 - Need to return fresh data on every call
 - Have side effects that must execute each time
   :::
+
+### Function chaining (`|>`)
+
+The pipeline operator `|>` passes the left value into the next function call, allowing clear, top-to-bottom transformation chains:
+
+```sentrie
+let slug = input
+  |> str.trim()
+  |> str.toLower()
+  |> str.replaceAll(" ", "-")
+```
+
+Use `#` in the right-hand call to put the piped value anywhere in the argument list. See [Function chaining](/reference/function-chaining) for all details.
 
 ## Using Functions in Rules and Let Declarations
 
