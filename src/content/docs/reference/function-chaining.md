@@ -30,10 +30,6 @@ let slug = input
   |> str.replaceAll(" ", "-")
 ```
 
-::::note
-When a pipeline call target has **no** `#` placeholders, the parser inserts `lhs` as the **first positional** argument on the right.
-::::
-
 The pipeline example above is the same as this nested-call shape (parentheses show the order of application):
 
 ```sentrie
@@ -75,7 +71,9 @@ This lowers to:
 let out = str.replace(input, replaceChar, "$$")
 ```
 
-When `#` is present in the RHS argument list, the parser does not auto-prepend the piped value as argument 0.
+::::note
+When a pipeline call target has **no** `#` placeholders, the parser inserts `lhs` as the **first positional** argument on the right.
+::::
 
 ### Multiple placeholders
 
