@@ -50,6 +50,8 @@ Built-in modules: `@sentrie/module` (no quotes). Default alias is the last path 
 
 **Returns:** N/A (import). Function return types are per module; see linked pages.
 
+The [@sentrie/collection](./sentrie/collection) module provides list and map manipulation utilities. Functions are prefixed with `list_` for array operations and `map_` for map (object) operations.
+
 ## Examples in Action
 
 - `list_includes`, `list_sort`, `list_unique`, `list_chunk`
@@ -208,7 +210,7 @@ Functions for generating UUIDs (Universally Unique Identifiers).
 
 | Module                                      | Description                                                  | Category           |
 | ------------------------------------------- | ------------------------------------------------------------ | ------------------ |
-| [@sentrie/collection](./sentrie/collection) | List and map manipulation utilities                          | Data Manipulation  |
+| [@sentrie/collection](./sentrie/collection) | List and dict manipulation utilities                          | Data Manipulation  |
 | [@sentrie/crypto](./sentrie/crypto)         | Cryptographic functions (SHA-256)                            | Cryptography       |
 | [@sentrie/encoding](./sentrie/encoding)     | Base64, Hex, and URL encoding/decoding                       | Encoding           |
 | [@sentrie/hash](./sentrie/hash)             | Hash functions (MD5, SHA-1, SHA-256, SHA-512, HMAC)          | Cryptography       |

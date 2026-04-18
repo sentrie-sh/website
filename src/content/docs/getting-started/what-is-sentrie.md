@@ -57,9 +57,9 @@ rule access = default false when user.role is defined {
 
 -- Collection operations
 rule hasAdminUsers = default false {
-  yield any users as user {
+  yield any(users, (user) => {
     yield user.roles contains "admin"
-  }
+  })
 }
 
 -- Complex data transformations

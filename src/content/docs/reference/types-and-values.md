@@ -94,3 +94,77 @@ Before you implement this, keep a few boundaries in mind:
 - **Map keys:** Must be strings. Access with `[index]`: numeric index for list/record, string key for map. Dot access for maps only when the key is a [valid identifier](/reference/identifiers).
 - **Division by zero:** Aborts evaluation. [Constraint](/reference/constraints) failure also aborts evaluation.
 - **Cast:** Validates against the target type and any constraints; failure aborts evaluation. Not all type combinations may be supported; see implementation for allowed conversions.
+
+## Collection Types
+
+Collections allow you to work with groups of related values:
+
+| Type                  | Description                                 |
+| --------------------- | ------------------------------------------- |
+| `list[T]`             | Lists of type `T`                           |
+| `map[T]`              | Maps with `string` keys and type `T` values |
+| `record[T1, T2, ...]` | Tuples with specific types                  |
+
+### Declaring a Collection Type
+
+```text
+let u: list[number] = [1, 2, 3]
+```
+
+```text
+let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+```
+
+```text
+let u: record[string, number, bool] = ["one", 1, true]
+```
+
+:::caution
+Map keys must be strings.
+:::
+
+:::note
+The type is optional for `let` statements. When undeclared, the value is not validated against any type constraints.
+However, it is recommended to declare the type for better readability and to avoid surprises where the type is not what you expect.
+:::
+
+### Accessing Collection Elements
+
+You can access collection elements using the `[index]` syntax. The index must be a `string` for maps and a `number` for lists and records.
+
+```text
+let u: list[number] = [1, 2, 3]
+let first: number = u[0]
+```
+
+```text
+let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+let first: number = u["one"]
+```
+
+For maps, you can also access elements using the `.` syntax.
+
+```text
+let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+let first: number = u.one
+```
+
+## Converting Types
+
+You can convert between types using the `cast .. as` construct. The result is validated against the new type constraints before returning the result.
+
+```text
+let u: number = cast "50" as number
+```
+
+```text
+let u: string = cast 50 as string
+```
+
+```text
+let u: bool = cast "true" as bool
+```
+
+```text
+let u: document = cast { "name": "John", "age": 30 } as document
+```

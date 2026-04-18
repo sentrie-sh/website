@@ -155,12 +155,12 @@ export default defineConfig({
               slug: "reference/membership-operations",
             },
             {
-              label: "Collection Operations",
-              slug: "reference/collection-operations",
-            },
-            {
               label: "Using Functions",
               slug: "reference/functions",
+            },
+            {
+              label: "Built-in Functions",
+              slug: "reference/built-in-functions",
             },
             {
               label: "Function chaining",

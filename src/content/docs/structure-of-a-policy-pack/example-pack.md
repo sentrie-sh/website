@@ -146,7 +146,7 @@ shape Request {
   method: string        -- HTTP method (GET, POST, etc.)
   path: string          -- Request path (e.g., "/api/users")
   ip: string            -- Client IP address
-  headers: map[string]  -- HTTP headers as key-value pairs
+  headers: dict[string]  -- HTTP headers as key-value pairs
 }
 
 -- This shape represents a user

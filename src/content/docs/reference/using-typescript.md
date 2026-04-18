@@ -213,7 +213,7 @@ export function User() {
 Sentrie provides a comprehensive set of built-in TypeScript libraries for common operations:
 
 - **[JavaScript Globals](/reference/typescript_modules/sentrie/js)** - JavaScript globals (Math, String, Number, Date, JSON, Array)
-- **[Collection](/reference/typescript_modules/sentrie/collection)** - List and map manipulation utilities
+- **[Collection](/reference/typescript_modules/sentrie/collection)** - List and dict (object) manipulation utilities
 - **[Crypto](/reference/typescript_modules/sentrie/crypto)** - Cryptographic functions (SHA-256)
 - **[Encoding](/reference/typescript_modules/sentrie/encoding)** - Base64, Hex, and URL encoding/decoding
 - **[Hash](/reference/typescript_modules/sentrie/hash)** - MD5, SHA-1, SHA-256, SHA-512, and HMAC

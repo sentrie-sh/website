@@ -92,8 +92,7 @@
       - #Defined
       - #Emptiness
       - #Ternary Operator
-    - Collection Operations
-      - #Map
-      - #Distinct
-      - #Reduce
-      - #Count
+    - Using Functions
+      - Call syntax, TypeScript imports, memoization
+    - Built-in Functions
+      - count, merge, error, list normalization, list transforms (any, all, filter, first, collect, reduce, distinct)

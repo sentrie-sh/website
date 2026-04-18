@@ -85,7 +85,7 @@ fact name?: string as userName default "anonymous"
 fact permissions: list[string] as userPermissions
 
 -- Optional collection facts with defaults
-fact metadata?: map[string] as userMetadata default {}
+fact metadata?: dict[string] as userMetadata default {}
 fact coordinates?: record[number, number] as location default [ 0.0, 0.0 ]
 ```
 
@@ -125,6 +125,20 @@ fact config?: document as settings default { "env": "production" }
 fact user: User as currentUser
 fact request: Request as req
 fact options?: Options as opts default {}
+
+-- String defaults (optional facts)
+fact name?: string as userName default "anonymous"
+
+-- Numeric defaults (optional facts)
+fact count?: number as itemCount default 0
+fact rate?: number as interestRate default 0.05
+
+-- Boolean defaults (optional facts)
+fact enabled?: bool as isEnabled default true
+
+-- Collection defaults (optional facts)
+fact tags?: list[string] as itemTags default []
+fact config?: map[string]any as settings default {}
 ```
 
 ## Good to Know

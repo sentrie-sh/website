@@ -19,7 +19,7 @@ export const sentrieGrammar = {
     // Keywords - Higher-order operations
     {
       name: 'keyword.control.higher-order.sentrie',
-      match: /\b(any|all|filter|map|distinct|reduce|cast|count)\b/
+      match: /\b(any|all|filter|first|collect|distinct|reduce|cast|count)\b/
     },
 
     // Keywords - Boolean operators
@@ -61,7 +61,7 @@ export const sentrieGrammar = {
     // Types - Collection types
     {
       name: 'storage.type.collection.sentrie',
-      match: /\b(list|map|record)\b/
+      match: /\b(list|dict|record)\b/
     },
 
     // Strings - Double quoted
@@ -107,10 +107,14 @@ export const sentrieGrammar = {
       match: /(\?|:)/
     },
 
-    // Operators - Unary
+    // Operators - Unary and lambda arrow
     {
       name: 'operator.unary.sentrie',
       match: /(!)/
+    },
+    {
+      name: 'keyword.operator.lambda.sentrie',
+      match: /=>/
     },
 
     // Punctuation - Separators

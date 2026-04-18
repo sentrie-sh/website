@@ -73,3 +73,41 @@ Before you implement this, keep a few boundaries in mind:
 - **Operands:** All operands are `number` (float64). Mixed integer/float literals are allowed; there is no separate integer type.
 - **Division:** Result is float (e.g. 7/2 = 3.5). Division by zero aborts evaluation. Use a guard (e.g. ternary or `when`) to avoid dividing by zero.
 - **Modulo:** Remainder after division. Divisor zero aborts evaluation. Behavior for negative numbers is implementation-defined (e.g. Go’s `math.Mod`).
+
+### Statistical Operations
+
+```sentrie
+let scores: list[number] = [85, 92, 78, 96]
+let total: number = reduce(scores, 0, (acc, score) => { yield acc + score })
+let average: number = total / count scores
+-- Result: 87.75
+```
+
+## Best Practices
+
+### Use Explicit Types
+
+```sentrie
+-- Good: Clear type intention
+let precise_result: number = 7 / 3
+
+-- Avoid: Type inference confusion
+let result = 7 / 3
+```
+
+### Handle Division by Zero
+
+```sentrie
+let divisor: number = 0
+let safe_result: number = divisor != 0 ? 10 / divisor : 0.0
+```
+
+### Use Parentheses for Clarity
+
+```sentrie
+-- Good: Clear precedence
+let result: number = (2 + 3) * 4
+
+-- Avoid: Relying on operator precedence
+let result: number = 2 + 3 * 4
+```
