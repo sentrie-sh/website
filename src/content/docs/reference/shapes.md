@@ -1,63 +1,161 @@
 ---
 title: Shapes
-description: Shapes are a way to define type aliases and data models in sentrie.
+description: "Shape syntax (data models, field modifiers, composition, type aliases, export) and validation."
 ---
 
-Shapes are Sentrie's primary mechanism for defining custom data models and type aliases. They provide a powerful way to create reusable, validated types that can be composed together to build complex data models.
+Shapes define structured data (field-based models) or type aliases (a base type plus optional [constraints](/reference/constraints)). They are used as the type of [facts](/reference/facts), [let](/reference/let) bindings, and nested fields. Shape values are validated at runtime when assigned or passed as input.
 
-Shapes help in providing clear contracts for data, thus providing a built in validation layer for data that flows through your policies.
+## Syntax
 
-## What are Shapes?
+### Data model (complex shape)
 
-Shapes serve two main purposes in Sentrie:
+A shape with a body of named, typed fields:
 
-- **Data Models**: Define structured objects with named fields and constraints
-- **Type Aliases**: Create custom names for existing types with additional constraints
-
-## Defining Shapes
-
-### Type Aliases
-
-Shapes can be used to create type aliases for built-in types with additional constraints:
-
-```sentrie
-shape ID string @uuid()
-shape Email string @email()
-shape Username string @minlength(3) @maxlength(20) @alphanumeric()
-shape UserAge number @min(13) @max(120)
+```text
+shape Name {
+  fieldName!: type
+  fieldName?: type
+  fieldName: type
+  fieldName!?: type
+}
 ```
 
-This creates constrained types that can be used throughout your policies:
+Each field has a name, an optional modifier suffix (`!`, `?`, or both in either order), a colon, and a type (any [type or shape](/reference/types-and-values)).
 
-```sentrie
-let id: ID = "123e4567-e89b-12d3-a456-426614174000" -- Valid
-let email: Email = "alice@example.com"              -- Valid
-let username: Username = "alice123"                 -- Valid
-let age: UserAge = 25                               -- Valid
-let invalid_username: Username = "ab"               -- Validation error: too short
+### Type alias (simple shape)
+
+A shape that is an alias for a single type, optionally with constraints:
+
+```text
+shape Name baseType
+shape Name baseType @constraint1 @constraint2
 ```
 
-### Simple Data Models
+Examples: `shape ID string @uuid()`, `shape Score number @min(0) @max(100)`.
 
-The most common use of shapes is to define structured data models:
+### Composition (extending a base shape)
+
+A complex shape can extend exactly one other shape with `with BaseName` before the opening `{`. The base shape must be in scope (same namespace or [exported](/reference/namespaces) from another namespace).
+
+```text
+shape Child with Base {
+  field!: type
+}
+```
+
+The child shape’s effective fields are the union of the base’s fields and the child’s own fields. Duplicate field names between base and child are not allowed.
+
+### Exporting a shape
+
+To make a shape visible to other namespaces (for use in [policy composition](/language-concepts/policy-composition) or as a fact type), declare:
+
+```text
+export shape ShapeName
+```
+
+Only shapes declared in the same file (same namespace) can be exported. The shape name is the identifier used in the same file; other namespaces refer to it by the exported name.
+
+## Configuration & Arguments
+
+### Field modifiers (complex shapes)
+
+Every field in a shape body has two logical properties: whether the field is **required** (must be present in the value) and whether it is **nullable** (may be `null` when present). Modifiers are written as suffixes on the field name.
+
+| Modifier   | Required? | Nullable? | Meaning |
+| :--------- | :-------- | :-------- | :------ |
+| (none)     | Yes       | Yes       | Field must be present; value may be `null`. |
+| `!`        | Yes       | No        | Field must be present and must not be `null`. |
+| `?`        | No        | Yes       | Field may be omitted; if present, value may be `null`. |
+| `!?` or `?!` | No     | No        | Field may be omitted; if present, value must not be `null`. |
+
+- **Required:** If the field is missing from the value at runtime, validation fails.
+- **Nullable:** If the field is present and its value is `null`, validation fails when the field is non-nullable (`!` or `!?`/`?!`).
+
+Field type can be any type reference: primitives (`number`, `string`, `trinary`, `bool`, `document`), collections (`list[T]`, `map[T]`, `record[...]`), or another shape. Constraints on the type are validated when the value is assigned or when the value is supplied as a fact.
+
+### Composition rules
+
+| Aspect | Rule |
+| :----- | :--- |
+| Base shape | Exactly one `with BaseName`. The base must be a complex shape (or a type-alias shape that the implementation treats as a structural base where applicable). |
+| Visibility | Base must be in the same namespace or exported from another namespace. Cross-namespace base requires the base shape to be declared with `export shape BaseName` in its file. |
+| Duplicate fields | A child cannot declare a field with the same name as a field in the base. |
+| Circular composition | Not allowed (e.g. A with B, B with A). |
+
+### Type alias (simple shape) rules
+
+| Aspect | Rule |
+| :----- | :--- |
+| Base type | Any single type: primitive, collection, or shape. |
+| Constraints | Optional; use the same [constraint](/reference/constraints) syntax as on types (e.g. `@min(0)`, `@uuid()`). |
+| Use | The shape name can be used anywhere a type is expected (facts, let, other shape fields, collections). |
+
+**Returns:** N/A (type definition). Values are validated when assigned to a variable or field of that shape, or when passed as facts. Validation failure aborts evaluation.
+
+## Where shapes can be used
+
+- **Facts:** A fact’s type can be a shape (e.g. `fact user: User`). The supplied JSON is validated against the shape’s fields and constraints.
+- **Let bindings:** A let can be typed with a shape (e.g. `let u: User = someExpr`). The expression result is validated against the shape.
+- **Nested types:** A shape field’s type can be another shape or `list[ShapeName]`, `map[ShapeName]`, etc.
+- **Policy composition:** Imported policies can bind facts using shapes defined in another namespace if those shapes are exported.
+
+## Examples in Action
+
+### Data model with all modifier variants
 
 ```sentrie
 shape User {
-  name: string
+  name!: string
   age: number
-  email: string
+  email?: string
+  phone!?: string
 }
 ```
 
-This creates a `User` shape with three fields. You can then use this shape to create and validate user data:
+- `name` must be present and non-null.
+- `age` must be present but may be null.
+- `email` may be omitted; if present, may be null.
+- `phone` may be omitted; if present, must not be null.
+
+### Checking optional fields in rules
+
+Optional or nullable fields should be checked before use. Use `is defined` to test presence (and often combine with a null check if the field is nullable).
 
 ```sentrie
-let user: User = {
-  name: "Alice",
-  age: 28,
-  email: "alice@example.com"
+shape Item { name!: string; price?: number }
+
+rule showPrice = default "n/a" when item.price is defined {
+  yield cast item.price as string
 }
 ```
+
+### Type aliases with constraints
+
+```sentrie
+shape ID string @uuid()
+shape Permission string @one_of("read", "write", "delete")
+shape Percent number @min(0) @max(100)
+```
+
+Use them in facts or let:
+
+```sentrie
+fact userId: ID as id
+let p: Percent = 50
+```
+
+### Composition
+
+```sentrie
+shape Base { id!: string }
+shape Extended with Base { role!: string }
+```
+
+A value of type `Extended` must have both `id` and `role`, and both must be non-null (given `!`).
+
+### Composition with exported base (cross-namespace)
+
+Exported shapes from another file can be used as composition bases. See [Exporting Shapes](#exporting-shapes) and [Policy composition](/language-concepts/policy-composition).
 
 #### Field Nullability and Optionality
 
@@ -130,36 +228,7 @@ let phone_message: string = user.phone is defined ? "Phone: " + user.phone : "No
 
 :::
 
-## Shape Composition
-
-Shapes can be composed from other shapes using the `with` keyword, allowing you to build complex data models.
-
-### Basic Composition
-
-```sentrie
-shape User {
-  name: string
-  age: number
-}
-
-shape AdminUser with User {
-  permissions: list[string]
-  department: string
-}
-```
-
-The `AdminUser` shape includes all fields from `User` and adds additional fields:
-
-```sentrie
-let admin: AdminUser = {
-  name: "John",
-  age: 30,
-  permissions: ["read", "write", "delete"],
-  department: "Engineering"
-}
-```
-
-### Composition Rules
+### Composition rules
 
 - **Composition**: Composed shapes include all fields from base shapes
 - **No Circular Dependencies**: Shapes cannot reference themselves directly or indirectly
@@ -230,7 +299,7 @@ shape User {
   name!: string @minlength(2) @maxlength(100)
   age: number @min(13) @max(120)  -- Can be null if unknown
   contact!: ContactInfo
-  preferences?: dict[string]  -- Optional preferences
+  preferences?: map[string]any  -- Optional preferences
 }
 ```
 
@@ -308,107 +377,29 @@ policy example {
 To make shapes available to other namespaces, use the `export` keyword:
 
 ```sentrie
-// auth/auth.sentrie
 namespace com/example/auth
 
-shape User {
-  id: string @uuid()
-  username: string @minlength(3)
-  email: string @email()
-}
+shape Base { id!: string }
+export shape Base
 
-export shape User
-```
-
-### Importing Shapes
-
-Other namespaces can import and use exported shapes by using the fully qualified name:
-
-```sentrie
-// billing/billing.sentrie
-namespace com/example/billing
-
-policy process_payment {
-  -- Import the User shape using the fully qualified name from auth namespace
-  shape User with com/example/auth/User {
-    billing_address: string
-  }
-
-  let user: User = {
-    id: "123e4567-e89b-12d3-a456-426614174000",
-    username: "alice",
-    email: "alice@example.com",
-    billing_address: "456 Oak Ave"
-  }
+policy P {
+  -- ...
 }
 ```
 
-### Policy Local Shapes
+In another file in a different namespace, a shape can extend `Base` by referencing the exported name (see [Policy composition](/language-concepts/policy-composition) and namespace resolution). The base shape must be exported for cross-namespace composition.
 
-Shapes defined in a policy are only available within that policy and **take precedence** over namespace shapes:
+### Shape literals and field order
 
-```sentrie
-// billing.sentrie
-namespace com/example/billing
+When constructing a value (e.g. in a let or as input), field order in the literal does not affect type checking. All required fields must be present and all constraints must hold.
 
-shape User {
-  id!: string @uuid()
-  email!: string @email()
-}
+## Good to Know
 
-policy process_payment_1 {
-  -- Policy-local shape (most specific)
-  shape User {
-    id!: string @uuid()
-    billing_address!: string
-  }
+Before you implement this, keep a few boundaries in mind:
 
-  -- This resolves to the policy-local `User` shape
-  let user: User = {
-    id: "123e4567-e89b-12d3-a456-426614174000",
-    billing_address: "123 Main St"
-  }
-
-  ...
-}
-
-policy process_payment_2 {
-  -- This resolves to the namespace `User` shape
-  let user: User = {
-    id: "123e4567-e89b-12d3-a456-426614174000",
-    billing_address: "123 Main St"
-  }
-
-  ...
-}
-```
-
-## Best Practices
-
-### Naming Conventions
-
-- Use PascalCase for shape names: `UserProfile`, `PaymentInfo`
-- Use descriptive names that clearly indicate the shape's purpose
-- Avoid generic names like `Data` or `Info` unless they're truly generic
-
-### Organization
-
-- Group related shapes in the same namespace
-- Export only shapes that need to be used by other namespaces
-- Use composition to avoid duplicating common fields
-
-### Best Practices
-
-- Apply appropriate constraints to shape fields
-- Use meaningful constraint messages for better error reporting
-- Use alias shapes for better readability
-
-```sentrie
-shape Category string @one_of("electronics", "clothing", "books", "home")
-shape Product {
-  name!: string @minlength(1) @maxlength(100) @not_empty()
-  price!: number @positive() @range(0.01, 999999.99)
-  category!: Category
-  in_stock: bool
-}
-```
+- **Validation timing:** Shape (and constraint) validation runs when a value is assigned to a variable or field of that shape, or when facts are bound. Failure aborts evaluation.
+- **Optional fields:** Use `is defined` (and null checks if the field is nullable) before using an optional or nullable field in expressions. Accessing a missing optional field yields `unknown` in expressions; the shape validator only checks that required fields are present and non-nullable fields are non-null when present.
+- **Composition:** The composed shape effectively has all base fields plus its own. Circular composition (A with B, B with A, or longer cycles) is not allowed. Duplicate field names between base and child are not allowed.
+- **Export:** Only shapes declared in the same file can be exported with `export shape Name`. Exported shapes are visible to other namespaces for use as types or as base shapes in composition. Unexported shapes are namespace-local.
+- **Field order:** The order of fields in a shape literal does not affect type checking; only presence and types (and constraints) matter.
+- **Naming:** Shape names and field names are [identifiers](/reference/identifiers). The same namespace can contain multiple shapes; policies in that namespace can reference any shape in the same namespace or any exported shape from another namespace (per import/resolution rules).

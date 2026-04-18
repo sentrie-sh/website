@@ -1,11 +1,11 @@
 ---
 title: Policies
-description: Policies are the core organizational unit in Sentrie, containing rules, facts, and business logic.
+description: "Policy syntax, statement order (facts, let, use, rules, export), and evaluation behavior."
 ---
 
-Policies are the fundamental building blocks of Sentrie policy packs. They encapsulate business rules, define input data structures, and export decision outcomes that can be consumed by applications or other policies.
+A policy is a named block inside a [namespace](/reference/namespaces) that groups [facts](/reference/facts), optional [let](/reference/let) bindings, optional [use](/reference/functions) imports, [rules](/reference/rules), and one or more `export decision of` declarations. It defines the inputs and decision logic that the CLI or HTTP API can execute. To be runnable or importable, a policy must have at least one rule and at least one exported decision.
 
-## Policy Structure
+## Syntax
 
 ### Basic Requirements
 
@@ -49,23 +49,34 @@ policy policyName {
 }
 ```
 
-### Complete Example
+- **IDENT:** Policy name (identifier). Must be unique within the namespace (or follow tooling rules for overloads, if any).
+- **Body:** Statements in a fixed order (see Configuration & Arguments). Facts first (if any), then let, use, rules, and finally export declarations.
+
+## Configuration & Arguments
+
+| Statement | Required | Order | Description |
+| :-------- | :------- | :---- | :---------- |
+| `fact` | No | First | Declare input facts. All fact declarations must appear before any `let`, `use`, or `rule`. Only facts (and comments) may precede facts. |
+| `let` | No | After facts | Intermediate values. Scoped to the policy block; visible to all rules in the policy. |
+| `use` | No | After let | Import TypeScript modules (e.g. `use { sha256 } from @sentrie/hash`). See [Functions](/reference/functions). |
+| `rule` | Yes (≥1) | After use | Decision logic. At least one rule must be declared. |
+| `export decision of` | Yes (≥1) | After rules | Expose a rule for execution (CLI/API) or for [import](/language-concepts/policy-composition) from other policies. The identifier after `of` must be the name of a rule in the same policy. |
+
+**Returns:** N/A (container). Evaluation returns the result of the invoked rule (the one targeted by the CLI, API, or import). The policy itself does not “return” a value; the exported rule does.
+
+## Statement order and constraints
+
+- **Facts first:** If the policy has any `fact` declarations, they must come first. Only comments may appear before the first fact. No `let`, `use`, or `rule` may appear before a fact when facts exist.
+- **Let and use:** After all facts, any `let` and `use` statements. Order between multiple `let` or multiple `use` is significant only where one binding references another (e.g. a later `let` may refer to an earlier `let` or to a fact).
+- **Rules:** All rules follow. Rules can reference facts (by name or alias), policy-level `let` bindings, and other rules in the same policy by name. They cannot reference rules in other policies without import.
+- **Export:** Each `export decision of RuleName` exposes that rule. The same rule may be exported once. The CLI and API select which exported rule to run (e.g. by name). For `import decision of` from another policy, the binding (e.g. `with` facts) uses the rule name as the target.
+
+## Examples in Action
+
+### Minimal policy (one fact, one rule, one export)
 
 ```sentrie
-// user-access.sentrie
 namespace com/example/auth
-
-shape User {
-  id!: string
-  role!: string
-  permissions!: list[string]
-}
-
-shape Resource {
-  id!: string
-  type!: string
-  owner!: string
-}
 
 policy userAccess {
   title "User access control"
@@ -80,15 +91,15 @@ policy userAccess {
 
   use { verifySignature, isBusinessHours } from "./auth-utils.ts" as auth
 
-  let isResourceOwner = user.id == resource.owner
-  let hasValidSignature = auth.verifySignature(user.id, resource.id)
+  let isResourceOwner = currentUser.id == currentResource.owner
+  let hasValidSignature = auth.verifySignature(currentUser.id, currentResource.id)
   let isWithinBusinessHours = auth.isBusinessHours()
 
-  rule canRead = default false when (resource.type == "document") {
+  rule canRead = default false when (currentResource.type == "document") {
     yield isResourceOwner and hasValidSignature
   }
 
-  rule canWrite = default false when (resource.type == "document") {
+  rule canWrite = default false when (currentResource.type == "document") {
     yield isResourceOwner and hasValidSignature and isWithinBusinessHours
   }
 
@@ -98,396 +109,43 @@ policy userAccess {
 }
 ```
 
-## Policy Components
-
-### Use Statements
+### Multiple facts, optional fact with default, let, and use
 
 ```sentrie
--- Using TypeScript functions
-use { function1, function2 } from "./utils.ts" as utils
-use { validateEmail } from "./validation.ts" as validators
-```
-
-### Fact Declarations
-
-```sentrie
--- Required facts (default behavior, must be provided)
-fact user: User as currentUser
-fact resource: Resource as currentResource
-
--- Optional facts (marked with ?, can have defaults)
-fact context?: Context as ctx default { "key": "value" }
-fact config?: Config as settings default { "environment": "production" }
-```
-
-:::note[Important]
-
-- Facts are **required by default** - must be provided during execution
-- Use `?` to mark facts as **optional** - can be omitted
-- Only **optional facts** (`?`) can have default values
-- Facts are **always non-nullable** - null values are not allowed
-  :::
-
-:::note
-Read more on facts [here](/reference/facts).
-:::
-
-### Variable Declarations
-
-```sentrie
--- Simple calculations
-let isAdmin = user.role == "admin"
-let totalPrice = item.price * quantity
-
--- Complex logic
-let canAccess = user.active and
-                (user.role == "admin" or user.permissions contains "read")
-```
-
-:::note[Important]
-
-- `let` declarations are **scoped to their immediate block** (`{}`)
-- `let` declarations **cannot be exported** - only rules can be exported
-- `let` declarations are **immutable** - once declared, their value cannot be changed
-- `let` declarations are used for **intermediate calculations** within a policy or rule block
-  :::
-
-:::note
-Read more on let declarations [here](/reference/let).
-:::
-
-### Rule Declarations
-
-```sentrie
--- Basic rule
-rule canRead = default false {
-  yield user.role == "admin"
-}
-
--- Conditional rule
-rule canWrite = default false when (user.active) {
-  yield user.role == "admin" and user.verified
-}
-
--- Composite rule
-rule canAccess = canRead or canWrite
-```
-
-:::note
-Read more on rules [here](/reference/rules).
-:::
-
-### Export Rule outcomes
-
-```sentrie
--- Export rule outcome
-export decision of canAccess
-
--- Export multiple outcomes
-export decision of canRead
-export decision of canWrite
-
--- Export with attachments
-export decision of canAccess
-  attach reason as "Access granted"
-  attach level as user.role
-export decision of canRead
-  attach permissions as user.permissions
-  attach timestamp as currentTime()
-```
-
-:::note
-For a complete guide on exporting and importing rules, see [Exporting and Importing Rules](/reference/exporting-and-importing-rules).
-:::
-
-### Import Rule outcomes of other policies
-
-```sentrie
--- Import rule from another policy
-rule externalRule = import decision of ruleName
-  from com/example/other/policy
-  with factName as expr
-
--- Example
-rule userPermission = import decision of canAccess
-  from com/example/auth/userAccess
-  with user as currentUser
-
--- Accessing attachments from imported rules
-rule authResult = import decision of canAccess
-  from com/example/auth/userAccess
-  with user as currentUser
-let accessReason = authResult.reason         -- Access the 'reason' attachment
-let accessLevel = authResult.level           -- Access the 'level' attachment
-let userPermissions = authResult.permissions -- Access the 'permissions' attachment
-```
-
-:::note
-For detailed information on importing rules, fact injection, and accessing attachments, see [Exporting and Importing Rules](/reference/exporting-and-importing-rules).
-:::
-
-## Rule Attachments
-
-Rule attachments allow you to include additional metadata with exported rule outcomes. This metadata can be accessed when the rule is imported by other policies or executed via the HTTP API.
-
-### Exporting with Decision Attachments
-
-```sentrie
--- Basic attachment syntax
-export decision of ruleName (attach name as expression)*
-
--- Examples
-export decision of canAccess
-  attach reason as "Access granted"
-
-export decision of canRead
-  attach permissions as user.permissions
-  attach timestamp as currentTime()
-
-export decision of canWrite
-  attach level as user.role
-  attach department as user.department
-```
-
-### Importing and Accessing Decision Attachments
-
-```sentrie
--- Import rule with attachments
-rule importedRule = import decision of ruleName
-                           from com/example/policy
-                           with factName as expr
-
--- Access attachments using field accessors
-let attachmentValue = importedRule.attachmentName
-
--- Example
-rule authResult = import decision of canAccess
-  from com/example/auth/userAccess
-  with user as currentUser
-let accessReason = authResult.reason        -- Access the 'reason' attachment
-let accessLevel = authResult.level          -- Access the 'level' attachment
-let userPermissions = authResult.permissions -- Access the 'permissions' attachment
-```
-
-### Practical Use Cases
-
-```sentrie
--- Export with debugging information
-export decision of canAccess attach debugInfo as "User verified" attach timestamp as currentTime()
-
--- Export with business context
-export decision of canApprove attach approverLevel as user.role attach approvalLimit as user.maxAmount
-
--- Export with audit trail
-export decision of canDelete attach auditReason as "Data retention policy" attach retentionDate as item.createdDate
-```
-
-## Best Practices for Attachments
-
-### Use Descriptive Names
-
-```sentrie
--- Good: Clear, descriptive attachment names
-export decision of canAccess
-  attach accessReason as "User has admin role"
-  attach accessLevel as user.role
-
--- Avoid: Generic or unclear names
-export decision of canAccess
-  attach info as "ok"
-  attach data as user.role
-```
-
-### Keep Attachments Relevant
-
-```sentrie
--- Good: Only include necessary metadata
-export decision of canApprove
-  attach approverLevel as user.role
-  attach approvalLimit as user.maxAmount
-
--- Avoid: Including unnecessary or sensitive data
-export decision of canApprove
-  attach approverLevel as user.role
-  attach userPassword as user.password
-```
-
-### Use Consistent Naming Conventions
-
-```sentrie
--- Good: Consistent naming pattern
-export decision of canRead
-  attach readReason as "User has read permission"
-  attach readLevel as user.role
-
-export decision of canWrite
-  attach writeReason as "User has write permission"
-  attach writeLevel as user.role
-
--- Good: Use meaningful prefixes
-export decision of canAccess
-  attach accessReason as "Access granted"
-  attach accessLevel as user.role
-```
-
-### Handle Missing Attachments Gracefully
-
-```sentrie
--- Check if attachment exists before accessing
-rule authResult = import decision of canAccess
-  from com/example/auth/userAccess
-  with user as currentUser
-
-let reason = authResult.reason is defined ? authResult.reason : "No reason provided"
-let level = authResult.level is defined ? authResult.level : "unknown"
-```
-
-### Use Attachments for Debugging
-
-```sentrie
--- Include debugging information in development
-export decision of canAccess
-  attach debugInfo as "User verified: " + user.id
-  attach timestamp as currentTime()
-
--- In production, you might remove or simplify debug attachments
-export decision of canAccess
-  attach timestamp as currentTime()
-```
-
-### Document Attachment Usage
-
-```sentrie
--- Document what attachments are available
 policy userAccess {
-  -- Exports canAccess with attachments:
-  -- - reason: Human-readable explanation
-  -- - level: User's access level
-  -- - timestamp: When decision was made
-  export decision of canAccess
-    attach reason as "Access granted"
-    attach level as user.role
-    attach timestamp as currentTime()
-}
-```
-
-### Avoid Overusing Attachments
-
-```sentrie
--- Good: Focused, essential attachments
-export decision of canAccess
-  attach reason as "Access granted"
-  attach level as user.role
-
--- Avoid: Too many attachments that clutter the interface
-export decision of canAccess
-  attach reason as "Access granted"
-  attach level as user.role
-  attach timestamp as currentTime()
-  attach debugInfo as "User verified"
-  attach sessionId as user.sessionId
-  attach requestId as request.id
-```
-
-### Use Proper Alignment
-
-```sentrie
--- Good: Align attachments for readability
-export decision of canAccess
-  attach reason as "Access granted"
-  attach level as user.role
-  attach timestamp as currentTime()
-
--- Good: Align import statements for readability
-rule authResult = import decision of canAccess
-  from com/example/auth/userAccess
-  with user as currentUser
-
--- Avoid: Single line when it becomes too long
-export decision of canAccess attach reason as "Access granted" attach level as user.role attach timestamp as currentTime() attach debugInfo as "User verified"
-```
-
-## Policy Interactions
-
-### Rule Composition
-
-```sentrie
--- Combine multiple rules
-
-let isBusinessHours = ...
-
-rule canRead = ...
-rule canWrite = ...
-rule complexAccess = { yield canRead and canWrite and isBusinessHours }
-
--- Conditional composition
-rule conditionalAccess = { yield user.role == "admin" ? canAccess : canRead }
-```
-
-### Cross-Policy Dependencies
-
-```sentrie
--- Import from another policy
-rule authResult = import decision of authenticate
-  from com/example/auth/login
-  with user as currentUser
-
--- Use imported result
-rule canProceed = authResult and user.verified
-```
-
-:::note
-Learn more about cross-policy dependencies, sandboxing, and best practices in [Exporting and Importing Rules](/reference/exporting-and-importing-rules).
-:::
-
-## Best Practices
-
-### Clear Naming
-
-```sentrie
--- Good: Descriptive policy and rule names
-policy userAccessControl {
-  rule canReadDocument = default false { /* ... */ }
-  rule canWriteDocument = default false { /* ... */ }
-}
-
--- Avoid: Generic names
-policy policy1 {
-  rule rule1 = default false { /* ... */ }
-}
-```
-
-### Logical Organization
-
-```sentrie
--- Group related rules
-policy documentAccess {
-  rule canRead = default false { /* read logic */ }
-  rule canWrite = default false { /* write logic */ }
-  rule canDelete = default false { /* delete logic */ }
-
-  rule canAccess = canRead or canWrite or canDelete
-}
-```
-
-### Error Handling
-
-```sentrie
--- Provide sensible defaults
-rule canAccess = default false when (user is defined and resource is defined) {
-  yield user.active and user.verified
-}
-```
-
-### Documentation
-
-```sentrie
--- Document complex logic
-policy complexBusinessLogic {
-  -- This rule implements the company's access control policy
-  -- Users must be active, verified, and have appropriate role
-  rule canAccess = default false {
-    yield user.active and user.verified and user.role in ["admin", "manager"]
+  fact user: User as currentUser
+  fact context?: Context as ctx default {}
+  use { sha256 } from @sentrie/hash
+  let adminRoles = ["admin", "super_admin"]
+  rule canRead = default false when currentUser.role is defined {
+    yield currentUser.role in adminRoles
   }
+  rule canWrite = default false when currentUser.role is defined {
+    yield currentUser.role == "admin"
+  }
+  export decision of canRead
+  export decision of canWrite
 }
 ```
+
+### Rules referencing other rules
+
+Rules in the same policy can call each other by name (no import needed):
+
+```sentrie
+policy P {
+  fact user: User
+  rule isAdmin = default false { yield user.role == "admin" }
+  rule canEdit = default false { yield isAdmin }
+  export decision of canEdit
+}
+```
+
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
+
+- **Constraint:** Facts must be declared before rules; only facts or comments may precede fact declarations. At least one rule must be exported for the policy to be executable or importable. Rules in the same policy may reference each other by name without import.
+- **Policy name:** The policy name is an identifier. The same namespace may contain multiple policies. Each has its own facts, let, use, and rules.
+- **Export target:** Exported rule names are the targets for the CLI/API and for `import decision of` from other policies. When importing, the binding (e.g. `with` clause) uses the rule name as defined in the target policy (and fact names/aliases as in that policy).
+- **Evaluation:** When a decision is requested, the runtime evaluates the chosen rule (with facts bound). Only that rule’s body or default is run; other rules are not evaluated unless the chosen rule references them.

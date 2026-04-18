@@ -29,7 +29,7 @@ Computes the MD5 hash of a string.
 
 ```text
 use { md5 } from @sentrie/hash
-let hash = hash.md5("Hello, World!")  // "65a8e27d8879283831b664bd8b7f0ad4"
+let hash = md5("Hello, World!")  // "65a8e27d8879283831b664bd8b7f0ad4"
 ```
 
 ### `sha1(str: string): string`
@@ -105,7 +105,7 @@ Computes HMAC (Hash-based Message Authentication Code) for data using a secret k
 
 ```text
 use { hmac } from @sentrie/hash
-let mac = hash.hmac("sha256", "Hello, World!", "secret-key")
+let mac = hmac("sha256", "Hello, World!", "secret-key")
 ```
 
 ## Complete Example
@@ -137,8 +137,12 @@ policy mypolicy {
 }
 ```
 
-## Security Recommendations
+## Good to Know
 
-1. **Use SHA-256 or SHA-512** for secure hashing instead of MD5 or SHA-1
-2. **Use HMAC** for message authentication with a secret key
-3. **Store hashed passwords** using SHA-256 or SHA-512 with proper salt (consider using HMAC with a secret key)
+Before you implement this, keep a few boundaries in mind:
+
+- All hash functions return hexadecimal-encoded strings. Input is string; HMAC takes algorithm name, message, and secret key.
+- Use SHA-256 or SHA-512 for security; MD5 and SHA-1 are cryptographically broken.
+
+
+- Invalid input (e.g. non-hex for decode) may throw. HMAC algorithm must be supported (e.g. sha256).

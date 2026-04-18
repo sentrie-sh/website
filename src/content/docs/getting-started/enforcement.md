@@ -1,74 +1,73 @@
 ---
 title: Enforcement
-description: Enforcing policies using Sentrie
+description: "Sentrie returns decisions only; enforcement is implemented by the caller."
 ---
 
-## Enforcement is external
+Sentrie is a deterministic policy engine: it takes facts and rules and returns decisions (e.g. true, false, or unknown). It does not block requests, call APIs, or change state. When you need to actually allow/deny, redact, or step up auth, your system (IAM, API gateway, backend) reads the decision and enforces it. That split keeps the engine simple and safe to plug into any stack.
 
-Sentrie is a **deterministic policy decision engine**. It evaluates structured inputs against rules and returns `true`, `false`, or `unknown`. That's it.
+Here is the basic idea:
 
-The engine is **pure** and **side-effect-free**—no mutations, no API calls, no state changes. This makes it safe to embed deep in your stack: IAM systems, API gateways, control planes, multi-tenant services, anywhere you need fast, reliable authorization decisions.
+**CLI:** Decisions are printed to stdout; exit code indicates success or failure. Your script or service interprets the output and enforces.
 
-Because enforcement lives outside the policy, the same rules work across different systems with different enforcement modes - whether you're blocking requests, redacting data, or triggering step-up auth.
+**HTTP:** You POST facts to an endpoint; the response body contains the decision(s). Your service enforces based on that.
 
-:::note[Sentrie makes decisions]
-Sentrie focuses on **decision quality** — your systems handle enforcement.
-:::
-
-## Why Enforcement is External
-
-Different platforms enforce differently:
-
-- **IAM layers** allow, deny, or escalate auth flows
-- **API gateways** throttle, rate-limit, or block routes
-- **Multi-tenant systems** control features and per-org limits
-- **Security layers** trigger reviews or step-up verification
-- **Backend services** serve, redact, or transform data
-
-Keeping the engine pure gives you three guarantees:
-
-- **Determinism** — same input = same output, always
-- **Reproducibility** — decisions are safe to replay and audit
-- **Portability** — runs identically everywhere
-
-This is what makes Sentrie safe for **real-time**, **latency-sensitive** paths.
-
-## How It Works
-
-Call Sentrie's HTTP endpoint with context. Get a decision. **Enforce it**.
-
-```bash
-curl -X POST https://sentrie.host:7529/decision/namespace/policy/rule \
-  -H "Content-Type: application/json" \
-  -d '{
-    "facts": {
-      "user": "...",
-      "org": "...",
-      "roles": ["..."],
-      "plan": "pro"
-    }
-  }'
+```text
+POST /decision/{namespace}/{policy}/{rule}
+Content-Type: application/json
+Request body: { "facts": { "factName": value, ... } }
+Response: decision value(s); see Running as a Service for schema.
 ```
 
-What happens next is up to you:
+## Configuration & Arguments
 
-- Backends accept, reject, or redact responses
-- IAM systems allow, deny, or trigger step-up auth
-- Gateways block, throttle, or downgrade routes
-- Feature gates enable, disable, or shadow-test features
-- Entitlement systems enforce quotas or usage limits
-- Data layers redact fields before returning them
+These concepts clarify how decisions and enforcement relate:
 
-:::note[Philosophy]
-Sentrie supplies truth. Systems apply consequences.
-:::
+| Concept | What it means |
+| :------ | :------------ |
+| Decision | The output of a rule: typically `true`, `false`, or `unknown`. Sentrie only returns this; it does not act on it. |
+| Enforcement | What your system does with the decision: allow/deny, redact, step-up auth, throttle, etc. Implemented in IAM, gateway, backend, or feature flags. |
+| Determinism | Same facts and policy → same decision. No mutable state or side effects inside the engine; safe to replay and audit. |
+| Portability | Same policy runs the same via CLI or HTTP; enforcement logic lives in your integrating system. |
 
-## Why This Works
+**Returns:** Sentrie returns decision value(s). Exit code (CLI) or HTTP status indicates success or failure. Sentrie does not perform enforcement.
 
-Separating decision from action makes Sentrie:
+---
 
-- Safe for critical paths
-- Consistent across systems
-- Easy to test and replay
-- Independently scalable
-- Flexible for different enforcement modes
+## Examples in Action
+
+### Letting the caller enforce from the CLI
+
+You run `sentrie exec` in a script; the script parses stdout and exit code and then allows or denies the operation.
+
+```bash
+result=$(sentrie exec com/example/auth/access/allow --facts '{"user": {"role": "user"}}')
+# Parse $result; if allow is true, proceed; else deny or redirect.
+```
+
+### Letting the caller enforce from the HTTP API
+
+Your backend or gateway calls the Sentrie HTTP endpoint and then enforces based on the response body.
+
+```bash
+curl -s -X POST "https://sentrie.host:7529/decision/com/example/auth/access/allow" \
+  -H "Content-Type: application/json" \
+  -d '{"facts": {"user": {"role": "admin", "status": "active"}}}'
+```
+
+The caller reads the response; if the decision is allow, it allows the request; otherwise it denies, redacts, or escalates.
+
+### Typical enforcement roles
+
+- **IAM / Auth:** Allow, deny, or trigger step-up based on the decision.
+- **API gateway:** Allow, throttle, or block the route based on the decision.
+- **Backend:** Serve full response, redact fields, or return 403 based on the decision.
+- **Feature / entitlement:** Enable, disable, or cap usage based on the decision.
+
+---
+
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
+
+- **Constraint:** Sentrie does not mutate state, call external APIs, or perform enforcement. It only evaluates and returns decisions. The system that calls Sentrie (CLI script, API gateway, backend) must interpret the decision and enforce. Same inputs and policy always produce the same decision; safe for critical paths and replay.
+- **Edge case:** Sentrie does not enforce. Missing or incorrect enforcement is a caller bug. Timeouts, network errors, and auth to the Sentrie endpoint are the caller’s responsibility. For HTTP request/response schema and status codes, see [Running as a Service](/deployment-operations/running-as-service).

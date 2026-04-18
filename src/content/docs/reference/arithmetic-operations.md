@@ -1,103 +1,78 @@
 ---
 title: Arithmetic Operations
-description: Arithmetic operations provide mathematical calculations on numeric values in Sentrie.
+description: "Arithmetic operators (+, -, *, /, %), unary +/-, operand types, and edge cases including division by zero."
 ---
 
-Sentrie supports standard arithmetic operations for working with numeric values. All numeric operations work with the unified `number` type, which is backed by float64.
+Arithmetic operators operate on `number` (float64). All numeric operands are treated as `number`; there is no separate integer type. The result of every arithmetic operation is `number`. Division by zero and modulo by zero abort evaluation with an error.
 
-## Basic Operations
+## Syntax
 
-### Addition (`+`)
+**Binary:** `expr + expr` | `expr - expr` | `expr * expr` | `expr / expr` | `expr % expr`
+
+**Unary:** `+ expr` | `- expr`
+
+## Configuration & Arguments
+
+| Operator | Description | Operands | Result | Edge case |
+| :------- | :---------- | :------- | :----- | :-------- |
+| `+` | Addition | number, number | number | — |
+| `-` | Subtraction | number, number | number | — |
+| `*` | Multiplication | number, number | number | — |
+| `/` | Division | number, number | number | Divisor zero → error; evaluation aborts. |
+| `%` | Modulo (remainder) | number, number | number | Divisor zero → error; evaluation aborts. |
+| unary `+` | Unary plus | number | number | — |
+| unary `-` | Unary minus (negation) | number | number | — |
+
+**Returns:** `number`. Division or modulo by zero aborts evaluation.
+
+## Operand types and conversion
+
+All operands are interpreted as `number`. Mixed integer/float literals are allowed; they are unified as float64. Division is floating-point (e.g. `7 / 2` is `3.5`). Modulo uses the remainder after division; the exact behavior for negative operands follows the implementation (typically Go’s `math.Mod` or similar).
+
+## Examples in Action
+
+### Basic arithmetic
 
 ```sentrie
-let sum: number = 5 + 3        -- Result: 8
-let total: number = 2.5 + 1.5  -- Result: 4.0
+let sum: number = 5 + 3
+let diff: number = 10 - 7
+let prod: number = 4 * 6
+let quot: number = 15 / 3
+let rem: number = 10 % 3
 ```
 
-### Subtraction (`-`)
+### Division and float result
 
 ```sentrie
-let difference: number = 10 - 7    -- Result: 3
-let result: number = 5.5 - 2.5     -- Result: 3.0
+let half: number = 7 / 2   -- 3.5
 ```
 
-### Multiplication (`*`)
+### Unary minus
 
 ```sentrie
-let product: number = 4 * 6     -- Result: 24
-let area: number = 3.75 * 2.0   -- Result: 7.5
+let neg: number = -x
+let pos: number = +y
 ```
 
-### Division (`/`)
+### Guarding against division by zero
 
 ```sentrie
-let quotient: number = 15 / 3    -- Result: 5.0
-let precise: number = 7 / 2      -- Result: 3.5
+let safe: number = divisor != 0 ? 10 / divisor : 0.0
 ```
 
-### Modulo (`%`)
+### Using arithmetic in expressions
 
 ```sentrie
-let remainder: number = 10 % 3    -- Result: 1
-let even_check: number = 8 % 2    -- Result: 0
-```
-
-## Division and Precision
-
-### Integer Division
-
-```sentrie
-let result: number = 8 / 3       -- Result: 2.6666666666666665
-let whole: number = 10 / 2       -- Result: 5.0
-```
-
-Division always returns a numeric result.
-
-### Zero Division
-
-```sentrie
--- This will cause an error
-let invalid: number = 5 / 0     -- Error: division by zero
-```
-
-## Mixed Mode Arithmetic
-
-### Mixed Numeric Operations
-
-```sentrie
-let mixed_add: number = 5 + 2.5      -- Result: 7.5
-let mixed_multiply: number = 3 * 1.5 -- Result: 4.5
-let result: number = 10 - 7.2        -- Result: 2.8
-```
-
-All numeric values are handled uniformly as the `number` type.
-
-## Practical Examples
-
-### Shape Calculations
-
-```sentrie
-shape Rectangle {
-  width!: number
-  height!: number
-}
-
-fact rect: Rectangle
-
 let area: number = rect.width * rect.height
-let perimeter: number = 2 * (rect.width + rect.height)
-let aspect_ratio: number = rect.width / rect.height
 ```
 
-### Percentages and Discounts
+## Good to Know
 
-```sentrie
-let price: number = 100.0
-let discount_percent: number = 15
-let discount_amount: number = price * (discount_percent / 100.0)
-let final_price: number = price - discount_amount
--- Result: 85.0
-```
+Before you implement this, keep a few boundaries in mind:
+
+- **Operands:** All operands are `number` (float64). Mixed integer/float literals are allowed; there is no separate integer type.
+- **Division:** Result is float (e.g. 7/2 = 3.5). Division by zero aborts evaluation. Use a guard (e.g. ternary or `when`) to avoid dividing by zero.
+- **Modulo:** Remainder after division. Divisor zero aborts evaluation. Behavior for negative numbers is implementation-defined (e.g. Go’s `math.Mod`).
 
 ### Statistical Operations
 

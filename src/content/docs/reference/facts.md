@@ -1,35 +1,50 @@
 ---
 title: Facts
-description: Facts are input data declarations that provide external values to policy evaluation.
+description: "Fact declaration syntax (required/optional, type, alias, default) and binding at evaluation."
 ---
 
-Facts are named input values that can be injected into policy evaluation. They serve as the primary mechanism for providing external data to policies, enabling them to make decisions based on runtime information.
+Facts are named, typed inputs to a [policy](/reference/policies). They are declared at the top of the policy (before [let](/reference/let), [use](/reference/functions), and [rules](/reference/rules)). Each fact has a name, a type (shape or primitive), an optional alias used in the policy body, and—only for optional facts—an optional default expression. Required facts must be supplied at evaluation time or evaluation fails. Facts are non-nullable when supplied: null is not allowed as a fact value.
 
 :::note[Note]
 Facts live in the **facts** section of a policy: after optional [metadata](/reference/policy-metadata/) and before any `use`. Comments may appear anywhere. See [Policies](/reference/policies/) for full ordering.
 :::
 
-## Fact Declaration
+## Syntax
 
-### Basic Syntax
-
-```sentrie
--- Required fact (default behavior)
-fact <name>: <type> ('as' <exposed_name>)?
-
--- Optional fact (can have default)
-fact <name>?: <type> ('as' <exposed_name>)? ('default' <default_value>)?
+```text
+fact name : type [ as alias ] [ default expr ]    -- required
+fact name? : type [ as alias ] [ default expr ]  -- optional
 ```
 
-:::note[Note]
-- The `exposed_name` (via `as`) is the name that will be used to reference the fact when the policy is evaluated
-- If no `as` clause is provided, the fact name itself is used as the exposed name
-- The `default` clause is only allowed for optional facts (marked with `?`)
-- Facts are **required by default** - use `?` to make them optional
-- Facts are **always non-nullable** - null values are not allowed
-:::
+- **name / name?:** Identifier. Trailing `?` makes the fact optional; otherwise it is required.
+- **type:** Any type: primitive (`number`, `string`, `trinary`, `bool`, `document`), collection (`list[T]`, `map[T]`, `record[...]`), or a [shape](/reference/shapes). The supplied value is validated against this type (and any constraints) at evaluation.
+- **as alias:** Optional. Identifier used in the policy body to refer to this fact. If omitted, the body uses `name`.
+- **default expr:** Optional. Allowed only for **optional** facts (`name?`). Used when the fact is omitted from the input. The expression is evaluated in the policy context (e.g. can reference other facts or policy-level let if order allows).
 
-### Required vs Optional Facts
+## Configuration & Arguments
+
+| Part | Type | Required | Description |
+| :--- | :--- | :------- | :---------- |
+| `name` | identifier | Yes | Declaration name. Used in `with` bindings when another policy [imports](/language-concepts/policy-composition) this policy: the binding key must match the **alias** (or name if no `as`). |
+| `name?` | - | No | `?` makes the fact optional. Optional facts may be omitted from the input; if omitted, `default expr` is used if present. |
+| `type` | type ref | Yes | Type of the fact value. Can be a shape, primitive, or collection. Validation (and [constraints](/reference/constraints)) runs when the fact is bound. |
+| `as alias` | identifier | No | Name used in the policy body. If absent, body uses `name`. Import `with` must use the alias (or name if no alias). |
+| `default expr` | expression | No | Only for optional facts. Evaluated when the fact is omitted. Type should match the fact type (and constraints). |
+
+**Returns:** N/A (declaration). At evaluation time, the fact name (or alias) is bound to the provided value (or default). The policy body refers to the fact by alias or name.
+
+## Required vs optional
+
+- **Required (`fact name : type`):** The evaluator must receive a value for this fact. If it is missing, evaluation fails (e.g. `ErrRequiredFact`). The value must not be null and must conform to the declared type and constraints.
+- **Optional (`fact name? : type`):** The evaluator may omit this fact. If omitted, the fact is bound to `default expr` if present; otherwise the behavior is tooling-defined (e.g. undefined or a type-specific default). If supplied, the value must be non-null and conform to the type and constraints.
+
+## Import binding (policy composition)
+
+When another policy imports a decision from this policy (e.g. `import decision of RuleName from "ns" with ...`), the `with` clause binds values to the **target policy’s facts**. The key in `with` must be the **alias** of the fact (or the fact name if no `as` was used). The value must match the fact’s type and constraints.
+
+## Examples in Action
+
+### Required fact with alias
 
 ```sentrie
 -- Required fact (must be provided during execution, default behavior)
@@ -85,53 +100,32 @@ shape User {
 
 -- Required shape fact
 fact user: User as currentUser
-
--- Optional shape fact with default
-fact user?: User as currentUser default { "id": "", "role": "guest", "permissions": [] }
 ```
 
-## Fact Modifiers
+In the policy body, use `currentUser`. When importing this policy’s decision, bind with the key `currentUser` (e.g. `with currentUser = someValue`).
 
-### Required Facts (Default)
-
-Facts are **required by default**. They must be provided during policy execution, and they cannot have default values.
+### Optional fact with default
 
 ```sentrie
--- Required fact - must be provided during evaluation
-fact user: User as user
-
--- This will cause an error: required facts cannot have defaults
--- fact user: User as user default { "id": "", "role": "guest" }  -- Error!
+fact context?: Context as ctx default {}
 ```
 
-### Optional Facts (`?`)
+If the caller omits `ctx`, it is bound to `{}`. If provided, it must be non-null and of type `Context`.
 
-Use the `?` operator to mark a fact as optional. Optional facts can be omitted during execution, and they can have default values.
+### Primitive and document facts
 
 ```sentrie
--- Optional fact - can be omitted during evaluation
-fact context?: Context as context
-
--- Optional fact with default value
-fact context?: Context as context default { "key": "value" }
-
--- If not provided, the default value will be used (if specified)
--- If no default is provided and the fact is omitted, it simply won't be available
+fact userId: string as id
+fact config?: document as settings default { "env": "production" }
 ```
 
-:::warning[Important]
-- Facts are **always non-nullable** - Even if a fact is optional, if it is provided, it cannot be null
-- The `!` operator is **not supported** for facts - facts are always non-nullable by design
-- Only **optional facts** (`?`) can have default values
-:::
-
-## Default Values
-
-### Literal Defaults
-
-Default values can only be used with **optional facts** (marked with `?`).
+### Multiple facts, mix of required and optional
 
 ```sentrie
+fact user: User as currentUser
+fact request: Request as req
+fact options?: Options as opts default {}
+
 -- String defaults (optional facts)
 fact name?: string as userName default "anonymous"
 
@@ -144,106 +138,13 @@ fact enabled?: bool as isEnabled default true
 
 -- Collection defaults (optional facts)
 fact tags?: list[string] as itemTags default []
-fact config?: dict[string] as settings default {}
+fact config?: map[string]any as settings default {}
 ```
 
-:::warning[Error]
-Required facts cannot have default values. This will cause a compilation error:
+## Good to Know
 
-```sentrie
--- This will cause an error
-fact name: string as userName default "anonymous"  -- Error: required fact cannot have default
-```
-:::
+Before you implement this, keep a few boundaries in mind:
 
-### Shape Defaults
-
-```sentrie
-shape Product {
-  id!: string
-  name!: string
-  price!: number
-}
-
--- Optional fact with shape default
-fact product?: Product as currentProduct default {
-  "id": "",
-  "name": "Unknown",
-  "price": 0.0
-}
-```
-
-## Fact Injection
-
-### During Policy Import
-
-```sentrie
--- Import policy with fact injection
-rule authResult = import decision of canAccess
-  from com/example/auth/userAccess
-  with user as { "id": "123", "role": "admin", "permissions": ["read", "write"] }
-```
-
-### Multiple Fact Injection
-
-```sentrie
--- Inject multiple facts
-rule result = import decision of processOrder
-  from com/example/orders/orderProcessing
-  with user as currentUser
-  with order as orderData
-  with context as requestContext
-```
-
-## Type Safety
-
-### Runtime Validation
-
-```sentrie
--- Type validation: This will cause a type error
-fact user?: User as user default { "id": 123 }  -- Error: string expected, got number
-
--- Correct usage
-fact user?: User as user default { "id": "123" }
-
--- Null validation: Facts cannot be null
--- This will cause a runtime error if null is provided
-fact user: User as user  -- If null is provided, error: "fact 'user' cannot be null"
-```
-
-## Best Practices
-
-### Use Descriptive Names
-
-```sentrie
--- Good: Clear, descriptive fact names
-fact currentUser?: User as user default { "id": "", "role": "guest" }
-fact orderData?: Order as order default { "id": "", "items": [] }
-
--- Avoid: Generic or unclear names
-fact data?: User as d default { "id": "", "role": "guest" }
-```
-
-### Provide Sensible Defaults
-
-```sentrie
--- Good: Meaningful default values for optional facts
-fact user?: User as user default { "id": "anonymous", "role": "guest", "permissions": [] }
-
--- Avoid: Confusing or invalid defaults
-fact user?: User as user default { "id": "", "role": "invalid", "permissions": null }  -- null not allowed
-```
-
-### Use Required Facts Appropriately
-
-```sentrie
--- Good: Use required facts for data that must always be provided
-fact userId: string as id  -- Must be provided, no default allowed
-
--- Good: Use optional facts with defaults for data that has sensible fallbacks
-fact context?: Context as ctx default { "environment": "production" }
-
--- Avoid: Making everything required when defaults would be appropriate
-fact userId: string as id  -- If this often has a default, consider making it optional
-fact userId?: string as id default "anonymous"  -- Better if default makes sense
-```
+- **Constraint:** Facts must be declared before rules; only facts or comments may precede fact declarations. Required facts must be supplied at evaluation or evaluation fails. Optional facts may be omitted; if supplied they must be non-null. Null is not allowed for any fact. Default is used when an optional fact is omitted.
+- **Import:** When using [policy composition](/language-concepts/policy-composition), the fact name in the `with` clause must match the **alias** (or name if no `as`) in the target policy. The type of the supplied value must match the fact type (and constraints) or evaluation fails.
+- **Order:** Fact declarations may reference only prior facts in their `default expr` (if the implementation allows it); typically defaults are literals or simple expressions.

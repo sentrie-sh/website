@@ -178,3 +178,12 @@ policy mypolicy {
   export decision of encodeData
 }
 ```
+
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
+
+- Base64/hex/URL encode decode; input and output are strings. Invalid Base64/hex input may throw.
+
+
+- base64Url omits padding; URL encoding is percent-encoding. Decode errors throw.

@@ -1,200 +1,86 @@
 ---
 title: Rules
-description: Rules are a way to organize your rules and facts.
+description: "Rule syntax, when/default/body evaluation, outcome type, and cross-references."
 ---
 
-Rules form the core principle of policies in Sentrie. A policy is essentially a collection of rules and their outcome decisions that work together to make business decisions. Understanding how rules function is fundamental to building effective Sentrie policies.
+A rule defines a single named decision: an optional `when` guard, an optional `default` value when the guard is not truthy, and a body that must contain exactly one `yield`. If the `when` expression is truthy, the body is evaluated and its `yield` value is the rule’s outcome; otherwise the outcome is the `default` (or `unknown` if no default is given). Rules are the only construct that can be exported for execution or import.
 
-## The Foundation of Policies
+## Syntax
 
-Since rules are the building blocks that define business logic, every Sentrie policy must contain at least one exported rule.
-
-A rule must be exported to be executed by the runtime or to be imported and used in other policies. This export mechanism enables modular policy design where complex business logic can be broken down into reusable component rules.
-
-## Rule Structure and Evaluation
-
-Rules consist of three essential components:
-
-- a **body** (required)
-- a **default** (optional)
-- a **when predicate** (optional)
-
-The `when` predicate acts as a gatekeeper, determining whether the rule's `body` should be evaluated or if the `default` should be used instead.
-
-When the `when` condition evaluates to [truthy](/reference/trinary), the rule's body is executed to produce the final decision. If the `when` condition is not [truthy](/reference/trinary), the rule falls back to its `default` value. A rule can have one of the three possible outcomes any rule can have: `TRUE`, `FALSE`, or `UNKNOWN`.
-
-```typescript
-is_truthy(when) ? body : default
+```text
+rule IDENT = [ default expr ] [ when expr ] { stmt* yield expr }
 ```
 
-:::note[Remember]
-If no `default` is provided and `when` is not [truthy](/reference/trinary), the rule's outcome falls back to `unknown`.
-:::
+- **IDENT:** Rule name (identifier). Must be unique within the [policy](/reference/policies). Used when exporting (`export decision of IDENT`) and when other rules in the same policy reference it.
+- **default expr:** Optional. Evaluated only when `when` is not truthy; result becomes the rule outcome. If omitted and `when` is not truthy, outcome is `unknown`.
+- **when expr:** Optional. Guard; must evaluate to a [trinary](/reference/trinary) or value treated as truthy/falsy. If omitted, treated as truthy (body always runs). If present and not truthy, body is skipped and `default` (or `unknown`) is used.
+- **Body:** Block of statements ending with exactly one `yield expr`. When the body runs, it must reach that `yield`; the expression’s value is the rule outcome.
 
-### Example Rule
+## Configuration & Arguments
+
+| Part | Type | Required | Description |
+| :--- | :--- | :------- | :---------- |
+| `default expr` | expression | No | Fallback outcome when `when` is not truthy. Type can be any value (e.g. bool, number, string). If omitted, non-truthy `when` yields `unknown`. |
+| `when expr` | expression (trinary/truthy) | No | Guard. Evaluated first. Only if [truthy](/reference/trinary) (i.e. `true` in trinary semantics) is the body evaluated. Default when omitted: treated as true. |
+| body | block | Yes | Statements (e.g. `let`) followed by exactly one `yield expr`. Only the chosen branch (body or default) is evaluated; the other is not. |
+
+**Returns:** When the body runs: the value of `yield expr`. When the guard is not truthy: the value of `default expr`, or `unknown` if there is no default. The rule’s result type is therefore the type of the yielded expression or the default expression (or trinary when outcome is `unknown`).
+
+## Evaluation semantics
+
+1. **Evaluate `when`** (if present). If absent, proceed as if truthy.
+2. **Truthiness:** Only `true` is truthy. `false` and `unknown` are non-truthy. So `when user.role is defined` is truthy only when the expression evaluates to `true`.
+3. **If truthy:** Evaluate the body. The body must contain exactly one `yield expr`; that expression’s value is the rule outcome. Any `let` or other statements in the body are evaluated in order before the `yield`.
+4. **If not truthy:** Do not evaluate the body. The outcome is `default expr` if present, otherwise `unknown`.
+
+## Examples in Action
+
+### Rule with default only (no when)
 
 ```sentrie
-namespace com/example/auth
-
-policy user {
-  rule isAdmin = default false when user.role is defined {
-    yield user.role is "admin" or user.role is "super_admin"
-  }
-  export decision of isAdmin attach role as user.role
-}
+rule allow = default false { yield true }
 ```
 
-:::note[Remember]
+Guard is effectively true; body runs and yields `true`.
 
-- `when` and `default` are optional
-- `when` is `true` by default
-- `default` is `unknown` by default
-- If `when` is not [truthy](/reference/trinary) and no `default` is provided, the rule's outcome is `unknown`
-
-:::
-
-## Sharing Rules Across Policies
-
-Rules can be exported as decisions, making them available for consumption in other policies. This enables powerful policy composition where complex business decisions can be built by combining simpler, focused rules. When exporting a rule as a decision, you can attach named data that callers can access and consume.
-
-Exported rules can include named attachments that provide additional context or metadata about the decision. These attachment values must be proactively consumed by the calling policy, ensuring that important information isn't lost in the decision-making process.
-
-### Example
+### Rule with when and default
 
 ```sentrie
-// auth/auth.sentrie
-namespace com/example/auth
-
-policy base {
-  fact user!:User as u -- alias for the user fact
-
-  rule isAdmin = default false when user.role is defined {
-    yield user.role is "admin" or user.role is "super_admin"
-  }
-  export decision of isAdmin attach role as user.role
+rule isAdmin = default false when user.role is defined {
+  yield user.role == "admin"
 }
 ```
+
+If `user.role` is not defined (or expression is false/unknown), outcome is `false`. Otherwise outcome is the result of `user.role == "admin"`.
+
+### Rule yielding a value (not just bool)
 
 ```sentrie
-// user/user.sentrie
-namespace com/example/user
-
-policy user_access {
-  fact user!:User as user
-
-  rule isAdmin = import decision of isAdmin from com/example/auth/base with u as user
+rule getPrice = default 0 when product.price is defined {
+  let base = product.price
+  let discount = user.isPremium ? 0.1 : 0.05
+  yield base * (1 - discount)
 }
 ```
 
-## Importing and Sandboxing
+Outcome type is number. Default `0` is used when `product.price` is not defined or when the guard is otherwise non-truthy.
 
-Rules can be imported from other policies, but this process involves careful isolation to maintain policy boundaries. When importing a rule decision, you must inject the necessary facts that the imported rule needs to evaluate. Crucially, imported rules are evaluated in their own sandboxed environment, which means they cannot affect or modify the context of the calling policy.
-
-This sandboxing only applies to rules imported from other policies. Rules within the same policy can reference each other directly without import restrictions, allowing for efficient internal policy organization while maintaining security boundaries between different policy modules.
-
-## Practical Examples
-
-Let's explore how these concepts work in practice through various rule patterns and scenarios.
-
-### Basic Rule Patterns
-
-The simplest rule pattern involves explicit boolean outcomes. Here's a rule that always allows login:
+### Rule referencing another rule in the same policy
 
 ```sentrie
-policy auth {
-  rule allow_login = {
-    yield true
-  }
-  export decision of allow_login
-}
+rule isAdmin = default false when user.role is defined { yield user.role == "admin" }
+rule canEdit = default false { yield isAdmin }
+export decision of canEdit
 ```
 
-More sophisticated rules use the `when` predicate to conditionally evaluate expensive operations. Consider a feature flag rule that defaults to false for non-beta users, avoiding unnecessary computation:
+`canEdit`’s body evaluates `isAdmin`, which runs with the same facts. So the outcome of `canEdit` is the outcome of `isAdmin` in this example.
 
-```sentrie
-policy feature {
-  rule enable_feature = default false when user.is_beta == false {
-    yield someExpensiveCheck()
-  }
-  export decision of enable_feature
-}
-```
+## Good to Know
 
-When a rule's `when` condition is false and no `default` is provided, the outcome becomes UNKNOWN. This pattern is useful for gated functionality:
+Before you implement this, keep a few boundaries in mind:
 
-```sentrie
-policy gated {
-  rule gated_rule = when system.ready == false {
-    yield true
-  }
-  export decision of gated_rule
-}
-```
-
-Rules can also leverage truthiness evaluation for cleaner code. This session validation rule returns true if the session ID is non-empty:
-
-```sentrie
-policy auth {
-  rule has_session = default false when true {
-    yield session.id  // Truthy if non-empty string
-  }
-  export decision of has_session
-}
-```
-
-### Policy Composition and Attachments
-
-Rules become powerful when composed across policies. Here's how to export a decision with additional context through attachments:
-
-```sentrie
-// shapes.sentrie
-namespace com/example/auth
-
-shape Account {
-  balance!: number
-}
-
-shape Invoice {
-  total!: number
-}
-```
-
-```sentrie
-// billing.sentrie
-namespace com/example/billing
-
-policy billing {
-  fact account!: Account as account
-  fact invoice!: Invoice as invoice
-
-  let reason = account.balance >= invoice.total ? "insufficient_funds" : "sufficient_funds"
-  let balance = account.balance
-
-  rule payment_ok = default false {
-    yield reason
-  }
-
-  export decision of payment_ok
-    attach reason as reason
-    attach balance as balance
-}
-```
-
-When importing this decision, you inject the necessary facts and receive the decision in a sandboxed environment:
-
-```sentrie
-policy shipping {
-  fact account!: Account as account
-  fact invoice!: Invoice as invoice
-
-  rule payment_reason_consumed = import decision of payment_ok from com/example/billing
-    with account as account
-    with invoice as invoice
-
-  export decision of payment_reason_consumed
-    attach reason as payment_ok.reason   -- access the reason attachment
-    attach balance as payment_ok.balance -- access the balance attachment
-}
-```
-
-This pattern enables rich policy composition where decisions carry not just boolean outcomes but also contextual information that can inform downstream authorization logic.
+- **Evaluation:** Semantics are `is_truthy(when) ? body_result : default`. Truthiness follows [trinary](/reference/trinary) semantics: only `true` is truthy.
+- **Body:** Must contain exactly one `yield expr` when the body is evaluated. Only the chosen branch (body or default) is evaluated; the other is not.
+- **Rules in same policy:** Can reference other rules by name (e.g. `yield isAdmin`). No import needed. Exported rules can be invoked from the CLI/API or [imported](/language-concepts/policy-composition) from other policies.
+- **No default and non-truthy when:** If there is no `default` and `when` is not truthy, the outcome is `unknown`.
+- **Recursion:** Rule evaluation is bounded by the language; unbounded recursion is not allowed.

@@ -1,195 +1,64 @@
 ---
-title: "validate Command"
-description: "Validate a policy pack and its structure."
+title: "sentrie validate"
+description: "Validate pack structure, syntax, and types without executing policies."
 ---
 
-# validate Command
+When you want to catch policy and pack errors before running or deploying (e.g. in CI or before a release), you use `sentrie validate`. It loads the pack and checks structure, syntax, types, and references without executing any rules—so you get fast feedback and no side effects.
 
-The `validate` command validates a policy pack's structure, syntax, and type correctness without executing policies. This is useful for checking that your policies are correctly formatted and can be loaded before deployment.
-
-## Syntax
+Here is the basic syntax:
 
 ```bash
-sentrie validate <FQN> [OPTIONS]
+sentrie validate <TARGET> [ --pack-location <PATH> ] [ --facts <JSON> ]
 ```
 
-## Description
+**TARGET** is required (`namespace/policy` or `namespace/policy/rule`). **--pack-location** and **--facts** are optional; facts are used for type-checking when provided.
 
-The `validate` command performs comprehensive validation of a policy pack:
+## Configuration & Arguments
 
-1. **Pack Loading**: Validates the pack file (`sentrie.pack.toml`) structure
-2. **Program Loading**: Loads and parses all `.sentrie` policy files
-3. **Index Validation**: Validates namespace, policy, and rule references
-4. **Type Checking**: Validates type annotations and constraints
-5. **Executor Creation**: Attempts to create an executor to verify the pack is executable
+You can point validation at a specific policy and pack using the following options:
 
-If validation succeeds, the command exits with code 0. If any validation fails, it exits with a non-zero code and displays error messages.
+| Argument | Type | Required | What it does |
+| :------- | :--- | :------- | :----------- |
+| TARGET | string | Yes | `namespace/policy` or `namespace/policy/rule`. Namespace and policy must exist; rule is optional (used for context). |
+| `--pack-location` | path | No | Directory containing the policy pack. Default: `./`. |
+| `--facts` | JSON string | No | Facts for type checking. Validates that fact types and required/optional match declarations. Default: `{}`. |
 
-## Arguments
+**Returns:** Exit 0 if validation succeeds; non-zero with error messages if pack loading, parsing, type checking, or executor creation fails. No decision output; validation only.
 
-### `FQN` (required)
+---
 
-The Fully Qualified Name (FQN) that identifies the namespace and policy to validate. The rule component is optional but can be included for reference.
+## Examples in Action
 
-**Format:** `namespace/policy` or `namespace/policy/rule`
+### Validating a policy in the current directory
 
-**Examples:**
-- `user_management/user_access` - Validate the `user_access` policy
-- `com/example/auth/access_control` - Validate a policy in a nested namespace
-- `com/example/auth/access_control/check_permission` - Validate with rule reference (rule is not validated, only used for context)
-
-## Options
-
-### `--pack-location`
-
-Specifies the directory containing the policy pack to validate.
+You have just edited a policy and want to confirm it loads and type-checks before committing.
 
 ```bash
-sentrie validate user_management/user_access --pack-location ./my-policy-pack
+sentrie validate com/example/user_management/user_access
 ```
 
-**Default:** `./` (current directory)
+### Validating from a specific pack path
 
-**Examples:**
-- `--pack-location ./policies` - Validate policies from `./policies` directory
-- `--pack-location /path/to/policy-pack` - Validate policies from absolute path
-
-### `--facts`
-
-Provides facts as a JSON string for type checking. This helps validate that fact declarations match expected types.
+Your pack lives in a different directory (e.g. a monorepo subfolder).
 
 ```bash
-sentrie validate user_management/user_access --facts '{"user":{"role":"admin","status":"active"}}'
+sentrie validate com/example/auth/access_control --pack-location ./policy-pack
 ```
 
-**Default:** `{}` (empty object)
+### Type-checking facts against policy declarations
 
-**Note:** The `--facts` flag is primarily used for type checking. The validation process will verify that:
-- Fact types match their declarations
-- Required facts are present
-- Optional facts are correctly marked
-- Shape constraints are satisfied
-
-## Examples
-
-### Validate a policy pack in the current directory
+You want to ensure that the fact shapes and required/optional flags match the JSON you plan to send at runtime.
 
 ```bash
-sentrie validate user_management/user_access
-```
-
-### Validate a policy pack from a specific location
-
-```bash
-sentrie validate com/example/auth/access_control \
-  --pack-location ./policy-pack
-```
-
-### Validate with facts for type checking
-
-```bash
-sentrie validate user_management/user_access \
+sentrie validate com/example/user_management/user_access \
   --facts '{"user":{"role":"admin","status":"active"}}'
 ```
 
-### Validate a nested namespace policy
+---
 
-```bash
-sentrie validate com/example/billing/pricing \
-  --pack-location ./policies
-```
+## Good to Know
 
-## What Gets Validated
+Before you rely on this in CI, keep a few boundaries in mind:
 
-The `validate` command checks:
-
-### 1. Pack File Structure
-- Validates `sentrie.pack.toml` exists and is correctly formatted
-- Checks pack metadata (name, version, schema version)
-
-### 2. Policy File Syntax
-- Parses all `.sentrie` files in the pack
-- Validates namespace declarations
-- Checks policy and rule syntax
-- Verifies shape definitions
-
-### 3. Type System
-- Validates type annotations on facts, variables, and expressions
-- Checks shape field types and constraints
-- Verifies constraint validations (min, max, length, etc.)
-
-### 4. References
-- Validates namespace, policy, and rule references
-- Checks that imported rules exist
-- Verifies exported shapes are accessible
-- Validates rule imports and exports
-
-### 5. Executor Creation
-- Attempts to create a runtime executor
-- Validates that all TypeScript modules can be loaded
-- Checks that all dependencies are resolvable
-
-## Exit Codes
-
-- **0** - Validation succeeded
-- **1** - Validation failed (with error messages)
-
-## Error Messages
-
-Common validation errors include:
-
-- **Pack loading errors**: Invalid pack file structure or missing pack file
-- **Syntax errors**: Invalid policy syntax or grammar violations
-- **Type errors**: Type mismatches or invalid type annotations
-- **Reference errors**: Missing namespaces, policies, or rules
-- **Constraint violations**: Values that don't satisfy shape constraints
-- **Module errors**: Missing or invalid TypeScript modules
-
-## Use Cases
-
-### Pre-deployment Validation
-
-Validate policies before deploying to production:
-
-```bash
-sentrie validate com/example/auth/access_control \
-  --pack-location ./policies
-```
-
-### CI/CD Integration
-
-Use in CI/CD pipelines to catch errors early:
-
-```bash
-#!/bin/bash
-if ! sentrie validate com/example/auth/access_control; then
-  echo "Validation failed!"
-  exit 1
-fi
-```
-
-### Type Checking
-
-Validate that facts match expected types:
-
-```bash
-sentrie validate user_management/user_access \
-  --facts '{"user":{"role":"admin","status":"active"}}'
-```
-
-## Differences from `exec`
-
-| Feature | `validate` | `exec` |
-|---------|-----------|--------|
-| Executes policies | ❌ No | ✅ Yes |
-| Validates structure | ✅ Yes | ✅ Yes |
-| Validates types | ✅ Yes | ✅ Yes |
-| Shows results | ❌ No | ✅ Yes |
-| Output format | Text errors | Table/JSON |
-| Use case | Pre-deployment | Testing/Execution |
-
-## See Also
-
-- [CLI Reference](/cli-reference) - Complete CLI documentation
-- [Policy Language Reference](/reference) - Learn about writing policies
-- [Structure of a Policy Pack](/structure-of-a-policy-pack/overview) - Learn about pack structure
+- **Constraint:** Validation checks pack file structure, policy parsing and syntax, namespace/policy/rule references, type annotations and shape constraints, and executor creation (including TypeScript module loading). It does not execute rules. When `--facts` is provided, it validates that fact types and required/optional match declarations and that values satisfy shapes. Errors are printed to stderr; no table or JSON decision output.
+- **Edge case:** Invalid or missing TARGET (unknown namespace/policy) → error. Pack load failure, parse error, type error, or reference error → non-zero exit. `--facts` must be valid JSON; invalid JSON → error. Unlike `exec`, validate does not run policies or produce decision output; use [sentrie exec](/cli-reference/exec) for execution.

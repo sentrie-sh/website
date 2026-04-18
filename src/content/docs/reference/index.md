@@ -1,11 +1,11 @@
 ---
-title: "Policy Language Reference"
-description: "Complete reference for the Sentrie policy language syntax and features."
+title: Policy Language Reference
+description: "Reference for Sentrie language syntax, types, operators, and constructs."
 ---
 
-This is the complete reference for the Sentrie policy language. It covers all language features, syntax, and semantics.
+This section is a reference for the Sentrie policy language: syntax, types, operators, and constructs. Pages include syntax variants, options and arguments in tables, where each feature applies, edge cases, and examples. For conceptual overviews and “how it works,” see [Language Concepts](/language-concepts/type-system-shapes).
 
-## Table of Contents
+## Program structure
 
 - [Program Structure](#program-structure)
 - [Namespaces](#namespaces)
@@ -54,46 +54,52 @@ Namespaces organize your policies and shapes hierarchically and prevent naming c
 
 ```text
 namespace FQN
+policy IDENT { fact ... let ... use ... rule ... export decision of IDENT }
+shape IDENT { ... } | shape IDENT baseType @constraint
+export shape IDENT
 ```
 
-Where `FQN` (Fully Qualified Name) is a slash-separated identifier:
+## Reference Pages
 
-```text
-namespace com/example/auth
-namespace com/example/billing/v2
-namespace mycompany/policies/security
-```
+### Core
 
-### Namespace statements
+- **[Namespaces](/reference/namespaces):** One namespace per file, FQN syntax, placement, visibility of shapes and policies, cross-namespace reference.
+- **[Policies](/reference/policies):** Policy block, statement order (facts, let, use, rules, export), evaluation.
+- **[Rules](/reference/rules):** Rule syntax, when/default/body, outcome type, truthiness, cross-references.
+- **[Facts](/reference/facts):** Required/optional facts, type, alias, default, binding at evaluation, import binding.
+- **[Intermediate values (let)](/reference/let):** let syntax, scoping, immutability, type validation.
+- **[Identifiers](/reference/identifiers):** What counts as a valid identifier (characters, reserved keywords).
 
-A namespace can contain:
+### Types
 
-- **policies**: `policy IDENT { ... }`
-- **shapes**: `shape IDENT { ... }`
-- **shape exports**: `export shape IDENT`
+- **[Types and values](/reference/types-and-values):** Primitives, collections, indexing, cast, validation.
+- **[Constraints](/reference/constraints):** Constraint syntax, full tables per type (number, string, list, trinary), when checked, collection and cast behavior.
+- **[Trinary](/reference/trinary):** true/false/unknown, truthiness, Kleene AND/OR/NOT, use in when and conditionals.
+- **[Shapes](/reference/shapes):** Data models, field modifiers (required/optional, nullable), composition, type aliases, export.
 
-### Rules
+### Operations
 
-- Namespaces must be declared at the top of the file (only comments can be placed before the namespace declaration)
-- Only one namespace per file
-- Namespace names must be valid identifiers
-- Use slash-separated (`/`) hierarchical names for organization
-- Multiple root namespaces are allowed in a policy pack
-- Namespace forms the visibility boundary for unexported shapes
+- **[Arithmetic](/reference/arithmetic-operations):** +, -, *, /, %, unary +/-, types, division by zero.
+- **[Boolean](/reference/boolean-operations):** and, or, xor, not, comparison, matches, ternary, Elvis.
+- **[Built-in Functions](/reference/built-in-functions):** List helpers (`any`, `all`, `filter`, …), `count`, `merge`, and related builtins.
+- **[Functions](/reference/functions):** Function calls, use (import), aliasing, memoization.
+- **[Precedence](/reference/precedence):** Operator precedence table, associativity, parentheses.
+- **[Membership](/reference/membership-operations):** in, contains (list, map, string).
 
-## Policies
+### Other
+
+- **[Security and permissions](/reference/security-and-permissions):** Pack permissions (fs_read, net, env), defaults, configuration.
 
 Policies are containers for rules, facts, and other declarations. See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`, and for the required **metadata → facts → uses → body** ordering.
 
-### Syntax
+### TypeScript
 
-```text
-policy IDENT {
-  policyStatement*
-}
-```
+- **[Built-in TypeScript modules](/reference/typescript_modules/):** Overview and per-module reference.
 
-### Policy Statements
+### Composition and extensibility
+
+- **[Policy composition](/language-concepts/policy-composition):** Export/import of rules and facts.
+- **[Writing custom TypeScript modules](/extensibility/writing-custom-typescript-modules):** Custom modules and use.
 
 A policy can contain (in grouped order; comments anywhere):
 

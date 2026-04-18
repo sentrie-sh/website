@@ -194,3 +194,12 @@ policy mypolicy {
 - Relative URLs (starting with `"/"`) are supported
 - The `parse` function provides comprehensive URL parsing with all components
 - The `join` function properly resolves relative paths against base URLs
+
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
+
+- parse returns ParsedURL; getHost/getPath/getQuery work on string URLs. Encoding/decoding is in @sentrie/encoding.
+
+
+- Invalid URL may throw or return invalid result. isValid checks format. Relative URLs (starting with /) supported.
