@@ -202,6 +202,18 @@ policy pricing {
 }
 ```
 
+### Readable Transformation Chains
+
+Use the pipeline operator when you want top-to-bottom transformation flow:
+
+```text
+let normalized = input
+  |> str.trim
+  |> str.toLower
+```
+
+This is equivalent to nested calls such as `str.toLower(str.trim(input))`. See [Function chaining](/reference/function-chaining), the [Policy Language Reference](/reference), and [Precedence](/reference/precedence) for full rules and constraints.
+
 ## Troubleshooting
 
 For a catalog of common problems and fixes, see:
@@ -210,6 +222,12 @@ For a catalog of common problems and fixes, see:
 - [Common Errors](/troubleshooting/common-errors)
 
 You can also:
+
+**Invalid JSON**: Ensure your request body is valid JSON and matches the expected structure.
+
+**Server won't start**: Check that port 7529 is available, or use `--http-port` to specify a different port.
+
+### Getting Help
 
 - Check the [Language Reference](/reference) for syntax help
 - Look at the [CLI Reference](/cli-reference) for command options

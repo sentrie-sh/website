@@ -75,19 +75,73 @@ export default defineConfig({
           ],
         },
         {
-          label: "Language Reference",
+          label: "Running Sentrie",
           items: [
-            { label: "Overview", slug: "reference" },
-            { label: "Identifiers", slug: "reference/identifiers" },
-            { label: "Namespaces", slug: "reference/namespaces" },
-            { label: "Policies", slug: "reference/policies" },
-            { label: "Rules", slug: "reference/rules" },
-            { label: "Facts", slug: "reference/facts" },
-            { label: "Intermediate Values (let)", slug: "reference/let" },
-            { label: "Types and Values", slug: "reference/types-and-values" },
-            { label: "Constraints", slug: "reference/constraints" },
-            { label: "Trinary Values", slug: "reference/trinary" },
-            { label: "Shapes", slug: "reference/shapes" },
+            {
+              label: "Executing Policies",
+              slug: "running-sentrie/executing-policies",
+            },
+            {
+              label: "Serving Policies",
+              slug: "running-sentrie/serving-policies",
+            },
+          ],
+        },
+        {
+          label: "Reference",
+          items: [
+            {
+              label: "Overview",
+              slug: "reference",
+            },
+            {
+              label: "Identifiers",
+              slug: "reference/identifiers",
+            },
+            {
+              label: "Types and Values",
+              slug: "reference/types-and-values",
+            },
+            {
+              label: "Constraints",
+              slug: "reference/constraints",
+            },
+            {
+              label: "Trinary Values",
+              slug: "reference/trinary",
+            },
+            {
+              label: "Shapes",
+              slug: "reference/shapes",
+            },
+            {
+              label: "Namespaces",
+              slug: "reference/namespaces",
+            },
+            {
+              label: "Policies",
+              slug: "reference/policies",
+            },
+            {
+              label: "Policy metadata",
+              slug: "reference/policy-metadata",
+            },
+            {
+              label: "Facts",
+              slug: "reference/facts",
+            },
+            {
+              label: "Rules",
+              slug: "reference/rules",
+            },
+            {
+              label: "Exporting and Importing Rules",
+              slug: "reference/exporting-and-importing-rules",
+            },
+            {
+              label: "Intermediate Values",
+              slug: "reference/let",
+            },
             {
               label: "Arithmetic Operations",
               slug: "reference/arithmetic-operations",
@@ -104,9 +158,26 @@ export default defineConfig({
               label: "Collection Operations",
               slug: "reference/collection-operations",
             },
-            { label: "Functions", slug: "reference/functions" },
-            { label: "Precedence", slug: "reference/precedence" },
-            { label: "Errors", slug: "reference/errors" },
+            {
+              label: "Using Functions",
+              slug: "reference/functions",
+            },
+            {
+              label: "Function chaining",
+              slug: "reference/function-chaining",
+            },
+            {
+              label: "Using TypeScript",
+              slug: "reference/using-typescript",
+            },
+            {
+              label: "Precedence",
+              slug: "reference/precedence",
+            },
+            {
+              label: "Errors",
+              slug: "reference/errors",
+            },
             {
               label: "Security and Permissions",
               slug: "reference/security-and-permissions",

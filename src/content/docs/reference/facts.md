@@ -5,6 +5,10 @@ description: "Fact declaration syntax (required/optional, type, alias, default) 
 
 Facts are named, typed inputs to a [policy](/reference/policies). They are declared at the top of the policy (before [let](/reference/let), [use](/reference/functions), and [rules](/reference/rules)). Each fact has a name, a type (shape or primitive), an optional alias used in the policy body, and—only for optional facts—an optional default expression. Required facts must be supplied at evaluation time or evaluation fails. Facts are non-nullable when supplied: null is not allowed as a fact value.
 
+:::note[Note]
+Facts live in the **facts** section of a policy: after optional [metadata](/reference/policy-metadata/) and before any `use`. Comments may appear anywhere. See [Policies](/reference/policies/) for full ordering.
+:::
+
 ## Syntax
 
 ```text
@@ -43,6 +47,58 @@ When another policy imports a decision from this policy (e.g. `import decision o
 ### Required fact with alias
 
 ```sentrie
+-- Required fact (must be provided during execution, default behavior)
+fact user: User as user
+
+-- Optional fact (can be omitted, marked with ?)
+fact context?: Context as context default { "key": "value" }
+```
+
+:::note[Important]
+- **Facts are required by default** - If no modifier is specified, the fact must be provided during execution
+- **Use `?` to mark facts as optional** - Optional facts can be omitted, but if provided, they must be non-null
+- **Facts are always non-nullable** - Null values are not allowed for facts
+- **Required facts cannot have default values** - Only optional facts can have defaults
+- **Facts before uses:** If a policy has both `fact` and `use` statements, every `fact` must appear before the first `use`. A policy may have **uses with no facts** (skip the facts block).
+
+:::
+
+## Fact Types and Constraints
+
+### Primitive Types
+
+```sentrie
+-- Required facts (must be provided)
+fact userId: string as id
+fact isActive: bool as active
+
+-- Optional facts with defaults
+fact score?: number as points default 0
+fact price?: number as cost default 0.0
+fact name?: string as userName default "anonymous"
+```
+
+### Collection Types
+
+```sentrie
+-- Required collection facts
+fact permissions: list[string] as userPermissions
+
+-- Optional collection facts with defaults
+fact metadata?: map[string] as userMetadata default {}
+fact coordinates?: record[number, number] as location default [ 0.0, 0.0 ]
+```
+
+### Shape Types
+
+```sentrie
+shape User {
+  id!: string
+  role!: string
+  permissions!: list[string]
+}
+
+-- Required shape fact
 fact user: User as currentUser
 ```
 

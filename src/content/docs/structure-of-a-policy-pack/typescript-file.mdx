@@ -52,9 +52,9 @@ Use relative paths from the policy file location:
 namespace com/example/auth
 
 policy userAccess {
-  use { calculateAge, validateEmail } from "./utils.ts" as utils
-
   fact user!: User
+
+  use { calculateAge, validateEmail } from "./utils.ts" as utils
 
   rule checkAccess = {
     yield utils.calculateAge(user.birthDate) >= 18
@@ -79,9 +79,9 @@ Use `@local` prefix for paths relative to the pack root ([sentrie.pack.toml](/st
 namespace com/example/auth
 
 policy userAccess {
-  use { calculateAge } from "@local/utils/helpers" as helpers
-
   fact user!: User
+
+  use { calculateAge } from "@local/utils/helpers" as helpers
 
   rule checkAccess = {
     yield helpers.calculateAge(user.birthDate) >= 18
@@ -292,11 +292,11 @@ shape User {
 }
 
 policy userAccess {
-  // Only functions can be imported via 'use' statement
-  use { calculateAge, verifyPassword, isValidUser } from "./utils/user-helpers.ts" as userUtils
-
   fact user!: User
   fact passwordInput!: string
+
+  // Only functions can be imported via 'use' statement
+  use { calculateAge, verifyPassword, isValidUser } from "./utils/user-helpers.ts" as userUtils
 
   rule allowAccess = {
     yield userUtils.isValidUser(user)

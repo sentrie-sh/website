@@ -143,9 +143,10 @@ let parts = regex.split("\\s+", "hello   world  test")  // ["hello", "world", "t
 namespace com/example/validation
 
 policy mypolicy {
-  use { match, find, replaceAll } from @sentrie/regex
   fact email!: string
   fact phoneNumber!: string
+
+  use { match, find, replaceAll } from @sentrie/regex
 
   rule validateEmail = default false {
     let emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"

@@ -31,10 +31,10 @@ Computes the SHA-256 hash of a string. This function uses a streaming hash imple
 namespace com/example/auth
 
 policy mypolicy {
-  use { sha256 } from @sentrie/crypto
-
   fact passwordInput!: string
   fact expectedHash!: string
+
+  use { sha256 } from @sentrie/crypto
 
   rule verifyPassword = default false {
     let hash = sha256(passwordInput)

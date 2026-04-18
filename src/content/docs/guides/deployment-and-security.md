@@ -1,6 +1,6 @@
 ---
 title: Deployment and Security
-description: Running Sentrie safely in production: HTTP service, network exposure, and pack permissions.
+description: "Running Sentrie safely in production: HTTP service, network exposure, and pack permissions."
 ---
 
 Sentrie is a deterministic policy engine that evaluates rules and returns decisions. In production you typically run it as a separate service and call it over HTTP or from automation. This guide covers security-focused aspects of that setup.
@@ -10,7 +10,7 @@ Sentrie is a deterministic policy engine that evaluates rules and returns decisi
 Use `sentrie serve` to start the HTTP API:
 
 ```bash
-sentrie serve --pack-location /etc/sentrie/policies --listen 0.0.0.0 --port 8080
+sentrie serve --pack-location /etc/sentrie/policies --http-listen 0.0.0.0 --http-port 8080
 ```
 
 Key points:

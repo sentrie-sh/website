@@ -7,7 +7,19 @@ Operators are evaluated in order of precedence: higher precedence binds first. W
 
 ## Syntax
 
-Expressions combine operators; precedence determines how the expression is grouped when parentheses are not used. There is no separate “precedence” keyword; the table below defines the ordering.
+| Precedence | Operators                                         | Description                                                  |
+| ---------- | ------------------------------------------------- | ------------------------------------------------------------ |
+| 1          | `()`, `[]`, `.`                                   | Primary expressions (literals, identifiers, function calls) |
+| 2          | `not`, `!`, `+`, `-`                              | Unary operators                                              |
+| 3          | `*`, `/`, `%`                                     | Multiplicative arithmetic                                    |
+| 4          | `+`, `-`                                          | Additive arithmetic                                          |
+| 5          | `<`, `<=`, `>`, `>=`, `in`, `matches`, `contains` | Comparison operators                                         |
+| 6          | `==`, `!=`, `is`, `is not`                        | Equality operators                                           |
+| 7          | `and`                                             | Logical AND                                                  |
+| 8          | `xor`                                             | Logical XOR                                                  |
+| 9          | `or`                                              | Logical OR                                                   |
+| 10         | `? :`                                             | Ternary conditional                                          |
+| 11         | `|>`                                              | Pipeline operator (lowest precedence)                        |
 
 ## Configuration & Arguments (precedence table)
 
@@ -22,7 +34,8 @@ Expressions combine operators; precedence determines how the expression is group
 | 7 | | `and` | Logical AND. |
 | 8 | | `xor` | Logical XOR. |
 | 9 | | `or` | Logical OR. |
-| 10 | Lowest | `? :` | Ternary conditional. **Right-associative.** |
+| 10 | | `? :` | Ternary conditional. **Right-associative.** |
+| 11 | Lowest | `|>` | Pipeline: left operand is piped into the next call. **Left-associative.** |
 
 **Returns:** N/A (ordering rule). The result type is the type of the top-level expression after all operators are applied.
 
@@ -65,6 +78,23 @@ Without parentheses, `a ? b : c ? d : e` is parsed as `a ? b : (c ? d : e)`.
 let safe: bool = (user.role == "admin") and (age >= 18)
 let sum: number = (a + b) * (c + d)
 ```
+
+### Pipeline Precedence and Associativity
+
+The pipeline operator has the lowest precedence and associates from left to right.
+
+```sentrie
+let a = value |> len |> math.abs
+-- Equivalent to: math.abs(len(value))
+
+let b = a + b |> len
+-- Equivalent to: len(a + b)
+
+let c = cond ? x : y |> len
+-- Equivalent to: len(cond ? x : y)
+```
+
+For pipeline syntax, valid targets, and memoization, see [Function chaining](/reference/function-chaining).
 
 ## Good to Know
 

@@ -59,15 +59,12 @@ policy billing {
 
 ### Policy structure
 
-A `policy` statement is a container for related:
+A `policy` statement is a container for related declarations in this **order** (comments allowed between lines). See [Policy metadata](/reference/policy-metadata/) for syntax, validation, and how metadata is indexed.
 
-- facts
-- variables
-- rule declarations
-- decision imports
-- decision exports
-- `use` declarations
-- shape declarations
+- optional **metadata** (`title`, `description`, `version`, repeatable `tag`)
+- optional **facts** (all `fact` before any `use`)
+- optional **`use`** imports
+- **body**: `let`, `rule`, `export`, and policy-local `shape` declarations
 
 ```hcl
 namespace com/example/myauth
@@ -77,12 +74,18 @@ shape User {
 }
 
 policy auth {
-  use { calculateAge } from "./utils.ts" as utils
-  use { hash } from @sentrie/crypto -- will alias to crypto by default
+  title "Authentication"
+  description "Password and age checks for sign-in."
+  version "1.0.0"
+  tag "pack" = "myauth"
+  tag "surface" = "sign_in"
 
   fact user: User
   fact passwordInput: string
   fact userAge: number
+
+  use { calculateAge } from "./utils.ts" as utils
+  use { hash } from @sentrie/crypto -- will alias to crypto by default
 
   let isPasswordValid = crypto.md5(passwordInput) == user.passwordHash
   let calculatedUserAge = utils.calculateAge(user.birthDate)
@@ -99,6 +102,7 @@ policy auth {
 }
 
 ```
+
 
 ## File Organization
 

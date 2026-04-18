@@ -36,8 +36,36 @@ let bad = jsonUtil.isValid('{"name": "John", "age":}')
 ```text
 use { isValid } from @sentrie/json as jsonUtil
 use { parse, stringify } from @sentrie/js as json
-rule processData = default false {
-  yield jsonUtil.isValid(data) and json.parse(data) != null
+
+let obj = json.parse('{"name": "John", "age": 30}')
+let str = json.stringify({"name": "John", "age": 30})
+```
+
+See the [@sentrie/js](/reference/typescript_modules/sentrie/js) documentation for more information.
+
+## Complete Example
+
+```text
+namespace com/example/mypolicy
+
+policy mypolicy {
+  fact data!: string
+
+  use { isValid } from @sentrie/json as jsonUtil
+  use { parse, stringify } from @sentrie/js as json
+
+  rule processData = default false {
+    let isValid = jsonUtil.isValid(data)
+    if isValid {
+      let parsed = json.parse(data)
+      let serialized = json.stringify(parsed)
+      yield serialized != ""
+    } else {
+      yield false
+    }
+  }
+
+  export decision of processData
 }
 ```
 

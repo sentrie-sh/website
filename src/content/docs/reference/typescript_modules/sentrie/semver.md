@@ -198,10 +198,11 @@ let noMeta = semver.metadata("1.2.3")  // null
 namespace com/example/version
 
 policy mypolicy {
-  use { compare, satisfies, major, minor, patch } from @sentrie/semver
   fact currentVersion!: string
   fact requiredVersion!: string
   fact versionConstraint!: string
+
+  use { compare, satisfies, major, minor, patch } from @sentrie/semver
 
   rule checkVersion = default false {
     let comparison = semver.compare(currentVersion, requiredVersion)
