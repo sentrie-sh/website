@@ -50,9 +50,9 @@ sentrie serve [OPTIONS]
 
 | Option            | Type     | Default     | Description                       |
 | ----------------- | -------- | ----------- | --------------------------------- |
-| `--port`          | int      | `7529`      | Port to listen on                 |
+| `--http-port`     | int      | `7529`      | Port to listen on                 |
 | `--pack-location` | string   | `./`        | Directory containing policy files |
-| `--listen`        | []string | `["local"]` | Address(es) to listen on          |
+| `--http-listen`   | []string | `["local"]` | Address(es) to listen on          |
 
 #### Examples
 
@@ -61,13 +61,13 @@ sentrie serve [OPTIONS]
 sentrie serve
 
 # Start server on custom port
-sentrie serve --port 8080
+sentrie serve --http-port 8080
 
 # Start server with custom pack location
 sentrie serve --pack-location /path/to/policies
 
 # Start server on specific addresses
-sentrie serve --listen 0.0.0.0 --listen 127.0.0.1
+sentrie serve --http-listen 0.0.0.0 --http-listen 127.0.0.1
 
 # Start server with debug logging
 sentrie serve --debug --log-level DEBUG
@@ -174,6 +174,7 @@ Execute a policy or rule. The `{target...}` path parameter contains the full pat
 - `/decision/{namespace}/{policy}` - Execute all exported rules in a policy
 
 The path is resolved to extract:
+
 - `namespace`: The namespace (all segments except the last two)
 - `policy`: The policy name (second to last segment)
 - `rule`: The rule name (last segment, optional)
@@ -231,6 +232,7 @@ Query parameters are parsed as run configuration (currently parsed but not used 
 Errors are returned using RFC 9457 Problem Details format with `Content-Type: application/problem+json`:
 
 **400 Bad Request**
+
 ```json
 {
   "type": "https://sentrie.sh/problems/400",
@@ -242,6 +244,7 @@ Errors are returned using RFC 9457 Problem Details format with `Content-Type: ap
 ```
 
 **404 Not Found**
+
 ```json
 {
   "type": "https://sentrie.sh/problems/404",
@@ -253,6 +256,7 @@ Errors are returned using RFC 9457 Problem Details format with `Content-Type: ap
 ```
 
 **405 Method Not Allowed**
+
 ```json
 {
   "type": "https://sentrie.sh/problems/405",
@@ -367,7 +371,7 @@ sentrie serve
 ```bash
 # Error: port 7529 is already in use
 # Solution: Use a different port
-sentrie serve --port 8080
+sentrie serve --http-port 8080
 ```
 
 #### Policy Not Found
@@ -472,7 +476,7 @@ sentrie = "0.1.0"
 4. **Start the server**:
 
 ```bash
-sentrie serve --pack-location . --port 8080
+sentrie serve --pack-location . --http-port 8080
 ```
 
 5. **Test the policy**:
