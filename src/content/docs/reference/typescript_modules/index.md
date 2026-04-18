@@ -13,13 +13,13 @@ Import and use built-in modules in your policies:
 namespace com/example/mypolicy
 
 policy mypolicy {
+  fact data!: string
+  fact timestamp!: number
+
   use { now } from @sentrie/time
   use { sha256 } from @sentrie/hash
   use { parse } from @sentrie/js as json
   use { isValid } from @sentrie/json as jsonUtil
-
-  fact data!: string
-  fact timestamp!: number
 
   rule processData = default false {
     let hash = sha256(data)
@@ -221,14 +221,14 @@ Functions for generating UUIDs (Universally Unique Identifiers).
 namespace com/example/auth
 
 policy authentication {
-  use { sha256, hmac } from @sentrie/hash
-  use { decode, verify } from @sentrie/jwt
-  use { base64Decode } from @sentrie/encoding
-
   fact token!: string
   fact secretKey!: string
   fact passwordInput!: string
   fact expectedHash!: string
+
+  use { sha256, hmac } from @sentrie/hash
+  use { decode, verify } from @sentrie/jwt
+  use { base64Decode } from @sentrie/encoding
 
   rule verifyToken = default false {
     let isValid = jwt.verify(token, secretKey)
@@ -251,12 +251,12 @@ policy authentication {
 namespace com/example/validation
 
 policy validation {
+  fact email!: string
+  fact jsonData!: string
+
   use { match } from @sentrie/regex
   use { length } from @sentrie/js as str
   use { isValid } from @sentrie/json as jsonUtil
-
-  fact email!: string
-  fact jsonData!: string
 
   rule validateEmail = default false {
     let emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
@@ -279,12 +279,12 @@ policy validation {
 namespace com/example/network
 
 policy network {
-  use { cidrContains, isPrivate, parseIP } from @sentrie/net
-  use { getHost, isValid } from @sentrie/url
-
   fact clientIp!: string
   fact allowedCidr!: string
   fact requestUrl!: string
+
+  use { cidrContains, isPrivate, parseIP } from @sentrie/net
+  use { getHost, isValid } from @sentrie/url
 
   rule checkAccess = default false {
     let ip = net.parseIP(clientIp)
@@ -310,10 +310,10 @@ policy network {
 namespace com/example/time
 
 policy time {
-  use { now, isBefore, addDuration, format } from @sentrie/time
-
   fact tokenExpiry!: number
   fact sessionStart!: number
+
+  use { now, isBefore, addDuration, format } from @sentrie/time
 
   rule checkTokenExpiry = default false {
     let currentTime = time.now()

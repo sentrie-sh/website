@@ -21,24 +21,24 @@ The `serve` command starts an HTTP server that provides a REST API for evaluatin
 
 | Option            | Type     | Default     | Description                       |
 | ----------------- | -------- | ----------- | --------------------------------- |
-| `--port`          | int      | `7529`      | Port to listen on                 |
+| `--http-port`     | int      | `7529`      | Port to listen on                 |
 | `--pack-location` | string   | `./`        | Directory containing policy files |
-| `--listen`        | []string | `["local"]` | Address(es) to listen on          |
+| `--http-listen`   | []string | `["local"]` | Address(es) to listen on          |
 
-### --port
+### --http-port
 
 Specifies the port number for the HTTP server to listen on.
 
 ```bash
-sentrie serve --port 8080
+sentrie serve --http-port 8080
 ```
 
 **Default**: `7529` (PLCY on a phone keypad)
 
 **Examples**:
 
-- `--port 8080` - Listen on port 8080
-- `--port 3000` - Listen on port 3000
+- `--http-port 8080` - Listen on port 8080
+- `--http-port 3000` - Listen on port 3000
 
 ### --pack-location
 
@@ -61,22 +61,22 @@ sentrie serve --pack-location /path/to/policies
 - Directory must contain `.sentrie` policy files
 - Optional `sentrie.pack.toml` file for pack metadata
 
-### --listen
+### --http-listen
 
 Specifies the network addresses to listen on.
 
 ```bash
-sentrie serve --listen 0.0.0.0 --listen 127.0.0.1
+sentrie serve --http-listen 0.0.0.0 --http-listen 127.0.0.1
 ```
 
 **Default**: `["local"]` (localhost only)
 
 **Examples**:
 
-- `--listen local` - Listen on localhost only
-- `--listen 0.0.0.0` - Listen on all interfaces
-- `--listen 127.0.0.1` - Listen on localhost
-- `--listen 192.168.1.100` - Listen on specific IP
+- `--http-listen local` - Listen on localhost only
+- `--http-listen 0.0.0.0` - Listen on all interfaces
+- `--http-listen 127.0.0.1` - Listen on localhost
+- `--http-listen 192.168.1.100` - Listen on specific IP
 
 **Security Note**: Listening on `0.0.0.0` makes the server accessible from any network interface. Use with caution in production environments.
 
@@ -99,7 +99,7 @@ The `serve` command respects these environment variables:
 sentrie serve
 
 # Start server on custom port
-sentrie serve --port 8080
+sentrie serve --http-port 8080
 
 # Start server with custom pack location
 sentrie serve --pack-location ./my-policies
@@ -111,7 +111,7 @@ sentrie serve --pack-location ./my-policies
 # Production setup with environment variables
 export SENTRIE_LOG_LEVEL=WARN
 export SENTRIE_PORT=8080
-sentrie serve --pack-location /etc/sentrie/policies --listen 0.0.0.0
+sentrie serve --pack-location /etc/sentrie/policies --http-listen 0.0.0.0
 ```
 
 ### Development Setup
@@ -125,7 +125,7 @@ sentrie serve --debug --log-level DEBUG --pack-location ./policies
 
 ```bash
 # Listen on multiple addresses
-sentrie serve --listen 127.0.0.1 --listen 192.168.1.100 --port 8080
+sentrie serve --http-listen 127.0.0.1 --http-listen 192.168.1.100 --http-port 8080
 ```
 
 ## Server Behavior
@@ -195,7 +195,7 @@ curl -X POST "http://localhost:7529/decision/com/example/auth/user/allow" \
 ```bash
 # Error: port 7529 is already in use
 # Solution: Use a different port
-sentrie serve --port 8080
+sentrie serve --http-port 8080
 ```
 
 #### Policy Not Found
@@ -379,7 +379,7 @@ sentrie = "0.1.0"
 4. **Start the server**:
 
 ```bash
-sentrie serve --pack-location . --port 8080
+sentrie serve --pack-location . --http-port 8080
 ```
 
 5. **Test the policy**:
@@ -398,8 +398,8 @@ export SENTRIE_LOG_LEVEL=WARN
 export SENTRIE_PORT=8080
 sentrie serve \
   --pack-location /etc/sentrie/policies \
-  --listen 0.0.0.0 \
-  --port 8080
+  --http-listen 0.0.0.0 \
+  --http-port 8080
 ```
 
 ### Development Setup
@@ -410,5 +410,5 @@ sentrie serve \
   --debug \
   --log-level DEBUG \
   --pack-location ./policies \
-  --port 3000
+  --http-port 3000
 ```

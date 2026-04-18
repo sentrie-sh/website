@@ -29,10 +29,10 @@ Functions imported from TypeScript modules are called using the module alias fol
 namespace com/example/auth
 
 policy mypolicy {
+  fact data: string
+
   use { sha256, now } from @sentrie/hash as hash
   use { parse } from @sentrie/json as json
-
-  fact data: string
 
   rule processData = default false {
     let hashValue = hash.sha256(data)
@@ -75,11 +75,12 @@ Sentrie provides comprehensive built-in TypeScript modules under the `@sentrie/*
 namespace com/example/crypto
 
 policy security {
-  use { sha256 } from @sentrie/hash
-  use { now } from @sentrie/time as time
-
   fact password: string
   fact timestamp: number
+
+  use { sha256, md5 } from @sentrie/hash
+  use { now, parse } from @sentrie/time as time
+  use { isValid } from @sentrie/json as json
 
   rule validatePassword = default false {
     let hash = hash.sha256(password)
@@ -99,9 +100,9 @@ You can also import functions from your own TypeScript files:
 namespace com/example/utils
 
 policy processing {
-  use { calculateAge, validateEmail } from "./utils.ts" as utils
-
   fact user: User
+
+  use { calculateAge, validateEmail } from "./utils.ts" as utils
 
   rule validateUser = default false {
     yield utils.calculateAge(user.birthDate) >= 18
@@ -155,10 +156,10 @@ let result = expensiveFunction(data)!3600  -- Cached for 1 hour
 namespace com/example/processing
 
 policy dataProcessing {
+  fact data: string
+
   use { sha256 } from @sentrie/hash
   use { complexCalculation } from "./heavy-compute.ts" as compute
-
-  fact data: string
 
   rule processData = default false {
     -- Memoize expensive computation for 10 minutes
@@ -187,6 +188,19 @@ Avoid memoization for functions that:
 - Have side effects that must execute each time
   :::
 
+## Function chaining (`|>`)
+
+The pipeline operator `|>` passes the left value into the next function call, allowing clear, top-to-bottom transformation chains:
+
+```sentrie
+let slug = input
+  |> str.trim()
+  |> str.toLower()
+  |> str.replaceAll(" ", "-")
+```
+
+Use `#` in the right-hand call to put the piped value anywhere in the argument list. See [Function chaining](/reference/function-chaining) for all details.
+
 ## Using Functions in Rules and Let Declarations
 
 Functions can be used anywhere expressions are allowed, including in `let` declarations and rule bodies:
@@ -195,11 +209,11 @@ Functions can be used anywhere expressions are allowed, including in `let` decla
 namespace com/example/complex
 
 policy example {
+  fact userData: map[string]any
+  fact items: list[string]
+
   use { sha256 } from @sentrie/hash
   use { now } from @sentrie/time as time
-
-  fact userData: dict[string]any
-  fact items: list[string]
 
   -- Policy-level let with function calls
   let itemCount = count(items)

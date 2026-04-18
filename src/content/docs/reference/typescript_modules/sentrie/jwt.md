@@ -104,9 +104,10 @@ let header = jwt.getHeader(token)
 namespace com/example/auth
 
 policy mypolicy {
-  use { decode, verify } from @sentrie/jwt
   fact token!: string
   fact secretKey!: string
+
+  use { decode, verify } from @sentrie/jwt
 
   rule verifyToken = default false {
     let isValid = jwt.verify(token, secretKey)

@@ -342,10 +342,10 @@ rule complexCalculation = default 0 {
 namespace com/example/utils
 
 policy processing {
+  fact data: string as inputData
+
   use { sha256, now } from @sentrie/hash as hash
   use { parse } from @sentrie/json as json
-
-  fact data: string as inputData
 
   rule processData = default false {
     let timestamp = hash.now()

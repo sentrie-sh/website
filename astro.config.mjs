@@ -126,6 +126,10 @@ export default defineConfig({
               slug: "reference/policies",
             },
             {
+              label: "Policy metadata",
+              slug: "reference/policy-metadata",
+            },
+            {
               label: "Facts",
               slug: "reference/facts",
             },
@@ -156,6 +160,10 @@ export default defineConfig({
             {
               label: "Built-in Functions",
               slug: "reference/built-in-functions",
+            },
+            {
+              label: "Function chaining",
+              slug: "reference/function-chaining",
             },
             {
               label: "Using TypeScript",

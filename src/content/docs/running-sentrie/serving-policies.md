@@ -17,9 +17,9 @@ sentrie serve <policy-pack>
 
 ### Command Options
 
-- `--port` (default: `7529`): Port number to listen on
+- `--http-port` (default: `7529`): Port number to listen on
 - `--pack-location` (default: `./`): Directory containing the policy pack to serve
-- `--listen` (default: `["local"]`): Address(es) to listen on. Can be specified multiple times. Accepts:
+- `--http-listen` (default: `["local"]`): Address(es) to listen on. Can be specified multiple times. Accepts:
   - `local` - Listen on localhost (127.0.0.1)
   - `all` - Listen on all interfaces (0.0.0.0)
   - Comma-separated list of specific IP addresses or hostnames
@@ -31,16 +31,16 @@ sentrie serve <policy-pack>
 sentrie serve .
 
 # Serve a specific pack on a custom port
-sentrie serve --port 8080 /path/to/policy-pack
+sentrie serve --http-port 8080 /path/to/policy-pack
 
 # Listen on all interfaces
-sentrie serve --listen all --port 8080 .
+sentrie serve --http-listen all --http-port 8080 .
 
 # Listen on localhost only
-sentrie serve --listen local --port 8080 .
+sentrie serve --http-listen local --http-port 8080 .
 
 # Listen on multiple interfaces
-sentrie serve --listen 192.168.1.100,192.168.100.101 --port 8080 .
+sentrie serve --http-listen 192.168.1.100,192.168.100.101 --http-port 8080 .
 ```
 
 ## API Endpoints
