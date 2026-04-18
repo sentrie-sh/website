@@ -15,11 +15,27 @@ Policies are the fundamental building blocks of Sentrie policy packs. They encap
 
 ### Core Components
 
-- **Facts**: Declare input data declarations with types and defaults with `fact` statements
+Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts** → optional **uses** → **body** (`let`, `rule`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
+
+- **Metadata** (optional): `title`, `description`, `version`, `tag` — static strings for docs and tooling
+- **Facts**: Input data with `fact` statements (**all facts before any `use`**)
+- **Use**: External TypeScript functions via `use` statements (after facts, if any)
 - **Variables**: Intermediate calculations using `let` statements
 - **Rules**: Decision logic with conditions and outcomes with `rule` statements
-- **Use**: External TypeScript functions via `use` statements
 - **Exports**: Rule outcomes for external consumption with `export` statements
+
+## Policy body ordering (required)
+
+Ignoring comments, statements inside a policy must follow this **grouped** order:
+
+1. **Metadata block** (optional): any of `title`, `description`, `version`, `tag*`, grouped together at the top.
+2. **Facts block** (optional): `fact*` — all facts before any `use`.
+3. **Uses block** (optional): `use*`.
+4. **Body**: `rule`, `export` (rule export), `let`, `shape`, etc.
+
+**Comments** may appear anywhere and do **not** break these groups. **Metadata** may be separated only by comments and still count as one contiguous metadata block.
+
+**Shapes** in a policy are **body** statements. Putting `shape` (or any body statement) before the header sections is invalid if you still need `fact` / `use` / metadata after it.
 
 ## Declaring Policies
 
@@ -52,11 +68,17 @@ shape Resource {
 }
 
 policy userAccess {
-  use { verifySignature, isBusinessHours } from "./auth-utils.ts" as auth
+  title "User access control"
+  description "Read/write access for documents based on ownership and auth signals"
+  version "1.0.0"
+  tag "domain" = "authz"
+  tag "cloud" = "aws"
 
   fact user: User as currentUser
   fact resource: Resource as currentResource
   fact context?: Context as ctx default { "environment": "production" }
+
+  use { verifySignature, isBusinessHours } from "./auth-utils.ts" as auth
 
   let isResourceOwner = user.id == resource.owner
   let hasValidSignature = auth.verifySignature(user.id, resource.id)

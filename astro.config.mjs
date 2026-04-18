@@ -126,6 +126,10 @@ export default defineConfig({
               slug: "reference/policies",
             },
             {
+              label: "Policy metadata",
+              slug: "reference/policy-metadata",
+            },
+            {
               label: "Facts",
               slug: "reference/facts",
             },

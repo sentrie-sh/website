@@ -114,12 +114,13 @@ let mac = hash.hmac("sha256", "Hello, World!", "secret-key")
 namespace com/example/auth
 
 policy mypolicy {
-  use { sha256, hmac } from @sentrie/hash
   fact passwordInput!: string
   fact expectedHash!: string
   fact secretKey!: string
   fact message!: string
   fact expectedMac!: string
+
+  use { sha256, hmac } from @sentrie/hash
 
   rule verifyPassword = default false {
     let hash = hash.sha256(passwordInput)

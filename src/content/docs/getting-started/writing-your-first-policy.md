@@ -3,7 +3,7 @@ title: Writing your first Policy
 description: Learn how to write your first Sentrie policy
 ---
 
-This guide will walk you through creating your first Sentrie policy step by step.
+This guide will walk you through creating your first Sentrie policy step by step. For full syntax, validation, and how multiple **`tag`** lines are indexed, see the [Policy metadata](/reference/policy-metadata/) reference.
 
 ## Basic Policy Structure
 
@@ -12,18 +12,19 @@ A Sentrie policy file consists of exactly one namespace and at least one policy:
 - **Namespace**: A container for related policies.
 - **Policy**: A named collection of rules.
 
-A policy consists of:
+A policy consists of (in this order; see [Policy metadata](/reference/policy-metadata/) and [Policies](/reference/policies/)):
 
+- **Metadata** (optional): `title`, `description`, `version`, and one or more `tag` string literals for humans and tooling—they do not affect evaluation.
+- **Facts**: Input data for the policy (before any `use` if you import modules).
 - **Rules**: Individual decision logic.
-- **Facts**: Input data for the policy.
 - **Exports**: Rules that are exported to make them available for external evaluation.
 
 ## Create a Policy Pack
 
 ```sh
 mkdir my-first-policy-pack
-cd example-policy-pack
-sentrie init example-policy-pack
+cd my-first-policy-pack
+sentrie init my-first-policy-pack
 ```
 
 ## Define a Namespace
@@ -69,6 +70,32 @@ policy user_access {
 
 ```
 
+## Optional policy metadata
+
+You can document the policy for registries, search, and teammates with **metadata** lines at the **top** of the policy body (still inside `policy { ... }`). Values are plain string literals only; they are **not** used when rules run. You can repeat **`tag`** with different keys. See [Policy metadata](/reference/policy-metadata/) for ordering with `fact`, `use`, and the rest of the body.
+
+```diff lang=sentrie
+// first-policy.sentrie
+namespace com/example/user_management
+
+shape User {
+  role: string
+  status: string
+}
+
+policy user_access {
+-  -- policy content goes here
++  title "User access"
++  description "Admin and active-user access for the user management example."
++  version "1.0.0"
++  tag "domain" = "user_management"
++  tag "tier" = "example"
++
++  -- facts and rules go below
+}
+```
+
+
 ## Add Facts
 
 :::note
@@ -86,6 +113,12 @@ shape User {
 }
 
 policy user_access {
+  title "User access"
+  description "Admin and active-user access for the user management example."
+  version "1.0.0"
+  tag "domain" = "user_management"
+  tag "tier" = "example"
+
 +  fact user: User as currentUser
 +  fact context?: Context as ctx default {"environment": "production"}
 }
@@ -112,6 +145,12 @@ shape User {
 }
 
 policy user_access {
+  title "User access"
+  description "Admin and active-user access for the user management example."
+  version "1.0.0"
+  tag "domain" = "user_management"
+  tag "tier" = "example"
+
   fact user: User as currentUser
   fact context?: Context as ctx default {"environment": "production"}
 
@@ -133,7 +172,14 @@ shape User {
 }
 
 policy user_access {
+  title "User access"
+  description "Admin and active-user access for the user management example."
+  version "1.0.0"
+  tag "domain" = "user_management"
+  tag "tier" = "example"
+
   fact user: User as currentUser
+  fact context?: Context as ctx default {"environment": "production"}
 
   rule allow_admin = {
     yield user.role == "admin"
@@ -159,7 +205,14 @@ shape User {
 }
 
 policy user_access {
+  title "User access"
+  description "Admin and active-user access for the user management example."
+  version "1.0.0"
+  tag "domain" = "user_management"
+  tag "tier" = "example"
+
   fact user: User as currentUser
+  fact context?: Context as ctx default {"environment": "production"}
 
   rule allow_admin = {
     yield user.role == "admin"
@@ -188,7 +241,14 @@ shape User {
 }
 
 policy user_access {
+  title "User access"
+  description "Admin and active-user access for the user management example."
+  version "1.0.0"
+  tag "domain" = "user_management"
+  tag "tier" = "example"
+
   fact user: User as currentUser
+  fact context?: Context as ctx default {"environment": "production"}
 
   rule allow_admin = {
     yield user.role == "admin"
@@ -221,8 +281,14 @@ shape User {
 }
 
 policy user_access {
+  title "User access"
+  description "Admin and active-user access for the user management example."
+  version "1.0.0"
+  tag "domain" = "user_management"
+  tag "tier" = "example"
 
   fact user: User as currentUser
+  fact context?: Context as ctx default {"environment": "production"}
 
   rule allow_admin = {
     yield user.role == "admin"

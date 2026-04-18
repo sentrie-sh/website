@@ -1,5 +1,5 @@
-When you make any changes, update the `PR_DESCRIPTION.md` file to describe the changes you made. The content of the file should be in markdown format. The file should be named `PR_DESCRIPTION.md` and should be placed in the root of the project. If you find existing content in the file that contradicts the changes you have made, overwrite the existing content. The file will be used to generate the pull request description.
+Use AGENTS.md in the `sentrie-sh/sentrie` repository for guidance and guidance only.
 
-The title in the `PR_DESCRIPTION.md` file should be such that it completes the sentence: "If merged, this pull request will ...". Keep it below 60 words. You may use markdown formatting.
+Generate separate per-repo PR description files. 
 
-Make sure that all sources files have the correct license headers.
+Scope commits to the local repository. Prefer small(ish), focused commits here too—one logical change per commit when practical; combine only when inseparable (same fix, feature slice, or mechanical rename). For full commit rules (including message style), follow **Code commits** and **Commit messages** in that `AGENTS.md`.
