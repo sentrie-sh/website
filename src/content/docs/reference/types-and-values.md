@@ -46,7 +46,7 @@ Collections allow you to work with groups of related values:
 | Type                  | Description                                 |
 | --------------------- | ------------------------------------------- |
 | `list[T]`             | Lists of type `T`                           |
-| `map[T]`              | Maps with `string` keys and type `T` values |
+| `dict[T]`             | Maps with `string` keys and type `T` values |
 | `record[T1, T2, ...]` | Tuples with specific types                  |
 
 ### Declaring a Collection Type
@@ -56,7 +56,7 @@ let u: list[number] = [1, 2, 3]
 ```
 
 ```text
-let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 ```
 
 ```text
@@ -74,7 +74,7 @@ However, it is recommended to declare the type for better readability and to avo
 
 ### Accessing Collection Elements
 
-You can access collection elements using the `[index]` syntax. The index must be a `string` for maps and a `number` for lists and records.
+You can access collection elements using the `[index]` syntax. The index must be a `string` for dicts and a `number` for lists and records.
 
 ```text
 let u: list[number] = [1, 2, 3]
@@ -82,14 +82,14 @@ let first: number = u[0]
 ```
 
 ```text
-let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 let first: number = u["one"]
 ```
 
-For maps, you can also access elements using the `.` syntax.
+For dicts, you can also access elements using the `.` syntax.
 
 ```text
-let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 let first: number = u.one
 ```
 

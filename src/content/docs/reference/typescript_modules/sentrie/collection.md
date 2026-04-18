@@ -1,9 +1,9 @@
 ---
 title: "@sentrie/collection"
-description: List and map manipulation utilities
+description: List and dict manipulation utilities
 ---
 
-The `@sentrie/collection` module provides utilities for both list/array and map/object manipulation and operations. Functions are prefixed with `list_` for list operations and `map_` for map operations.
+The `@sentrie/collection` module provides utilities for both list/array and dict (plain object) manipulation. Functions are prefixed with `list_` for list operations and `map_` for dict operations.
 
 ## Usage
 

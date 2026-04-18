@@ -39,7 +39,7 @@ policy mypolicy {
 
 #### [Collection](./sentrie/collection)
 
-List and map manipulation utilities. Functions are prefixed with `list_` for array operations and `map_` for object operations.
+List and dict manipulation utilities. Functions are prefixed with `list_` for array operations and `map_` for plain-object (dict) operations.
 
 **Key Functions:**
 
@@ -199,7 +199,7 @@ Functions for generating UUIDs (Universally Unique Identifiers).
 
 | Module                                      | Description                                                  | Category           |
 | ------------------------------------------- | ------------------------------------------------------------ | ------------------ |
-| [@sentrie/collection](./sentrie/collection) | List and map manipulation utilities                          | Data Manipulation  |
+| [@sentrie/collection](./sentrie/collection) | List and dict manipulation utilities                          | Data Manipulation  |
 | [@sentrie/crypto](./sentrie/crypto)         | Cryptographic functions (SHA-256)                            | Cryptography       |
 | [@sentrie/encoding](./sentrie/encoding)     | Base64, Hex, and URL encoding/decoding                       | Encoding           |
 | [@sentrie/hash](./sentrie/hash)             | Hash functions (MD5, SHA-1, SHA-256, SHA-512, HMAC)          | Cryptography       |

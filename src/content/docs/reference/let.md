@@ -289,7 +289,7 @@ let count: number = 10
 let name: string = "example"
 let isActive: bool = true
 let items: list[number] = [1, 2, 3]
-let scores: map[number] = {"alice": 95, "bob": 87}
+let scores: dict[number] = {"alice": 95, "bob": 87}
 
 let invalid: number = "10" -- This will cause a type error
 ```
@@ -360,9 +360,9 @@ policy processing {
 }
 ```
 
-## Using Let with Reduce Expressions
+## Using Let with `reduce`
 
-`let` declarations can be used with `reduce` expressions for aggregations:
+`let` declarations can use the `reduce` builtin with a list, an initial accumulator, and a reducer lambda:
 
 ```sentrie
 namespace com/example/aggregation
@@ -371,17 +371,17 @@ policy calculations {
   fact numbers: list[number] as values
 
   rule calculateSum = default 0 {
-    let sum: number = reduce values from 0 as acc, num, idx {
+    let sum: number = reduce(values, 0, (acc, num, idx) => {
       yield acc + num
-    }
+    })
 
     yield sum
   }
 
   rule calculateMax = default 0 {
-    let max: number = reduce values from values[0] as acc, num, idx {
+    let max: number = reduce(values, values[0], (acc, num, idx) => {
       yield num > acc ? num : acc
-    }
+    })
 
     yield max
   }
@@ -431,7 +431,7 @@ rule calculatePrice = default 0 {
 -- Good: Explicit types make code clearer
 let count: number = 10
 let items: list[string] = ["item1", "item2"]
-let config: map[string] = {"key": "value"}
+let config: dict[string] = {"key": "value"}
 
 -- Acceptable: Type inference works, but explicit types are clearer
 let count = 10

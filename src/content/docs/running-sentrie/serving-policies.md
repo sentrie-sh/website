@@ -137,7 +137,7 @@ The `{target...}` parameter is the full path after `/decision/`:
   - `decision`: The decision result object containing:
     - `state`: The decision state as a string: `"TRUE"`, `"FALSE"`, or `"UNKNOWN"`
     - `value`: The actual value of the decision (any JSON-serializable type)
-  - `attachments`: Any attachments exported by the rule (map of string to any)
+  - `attachments`: Any attachments exported by the rule (dict of string to any)
   - `trace`: Execution trace information (object, optional)
 - `error`: Error message if execution failed (omitted if empty/absent)
 

@@ -230,7 +230,7 @@ shape User {
   name!: string @minlength(2) @maxlength(100)
   age: number @min(13) @max(120)  -- Can be null if unknown
   contact!: ContactInfo
-  preferences?: map[string]  -- Optional preferences
+  preferences?: dict[string]  -- Optional preferences
 }
 ```
 

@@ -12,6 +12,7 @@ This is the complete reference for the Sentrie policy language. It covers all la
 - [Policies](#policies)
 - [Rules](#rules)
 - [Expressions](#expressions)
+- [Lambdas](#lambdas) - Callable syntax (`=>`) for passing functions as values to builtins
 - [Primitives, Collections, Shapes, and Aliases](#primitives-collections-shapes-and-aliases)
 - [Literals](#literals)
 - [Operators](#operators)
@@ -246,6 +247,80 @@ age >= 18 ? "adult" : "minor"
 }
 ```
 
+## Lambdas
+
+A **lambda** is an expression that evaluates to a **callable** value: a function with a fixed parameter list and a block body. Lambdas are how you pass predicates and mapping steps to builtins such as `filter`, `collect`, `reduce`, and `distinct` (with a key function).
+
+### Syntax
+
+```sentrie
+( parameterList ) => block
+```
+
+- **`parameterList`** is a comma-separated list of identifiers, or empty.
+- **`=>`** is the fat arrow (followed by a `{` block body).
+- **`block`** is a normal block expression: statements and a **`yield`** that produces the result for each invocation.
+
+### Forms
+
+```sentrie
+-- No parameters (arity 0)
+() => {
+  yield 1
+}
+
+-- One parameter
+(x) => {
+  yield x * 2
+}
+
+-- Two parameters (common for list index)
+(item, idx) => {
+  yield item + idx
+}
+```
+
+Parameter names must be **identifiers**. **Duplicate** parameter names in the same list are rejected at parse time.
+
+:::note[Grouped expressions vs lambdas]
+
+After `(`, the parser decides between a **parenthesized expression** and a **lambda** by looking for a lambda signature: identifiers (and commas) up to `) =>`. If that pattern does not match, the `(` is treated as grouping for an inner expression.
+
+:::
+
+### Callables and builtins
+
+A lambda’s value is a **callable**. You pass it to builtins that expect a function, for example:
+
+```sentrie
+let nums: list[number] = [1, 2, 3]
+let doubled: list[number] = collect(nums, (n) => {
+  yield n * 2
+})
+
+let sum: number = reduce(nums, 0, (acc, n) => {
+  yield acc + n
+})
+```
+
+Which builtin you use determines how many parameters the lambda should take (its **arity**), for example:
+
+- **`any`**, **`all`**, **`filter`**, **`first`**, **`collect`**: arity **1** (element only) or **2** (element and index).
+- **`reduce`**: arity **2** (accumulator, element) or **3** (accumulator, element, index).
+- **`distinct`**, two-argument form: arity **1** or **2** for the key function.
+
+If arity does not match what the builtin expects, evaluation fails with an error.
+
+For builtin names, signatures, and more examples, see [Built-in Functions](/reference/built-in-functions).
+
+### Lexical environment
+
+Lambdas **capture** the surrounding execution context: names visible where the lambda is written remain visible when the callable runs (for example `user`, `let` bindings in the same block, and facts). In the current language version, that capture uses the **parent execution context by reference**, so later changes to captured bindings can affect a lambda that runs afterward.
+
+### Boundaries
+
+Callable values are **not** ordinary JSON-like data. They cannot be passed through every runtime boundary that expects plain data (for example some module or interop paths that materialize `[]any` or JSON). Prefer keeping lambdas and callables inside policy evaluation; if you need to pass data out, convert to plain values first.
+
 ## Primitives, Collections, Shapes, and Aliases
 
 Sentrie provides primitives, collections, shapes, and aliases for defining data structures.
@@ -261,7 +336,7 @@ Sentrie provides primitives, collections, shapes, and aliases for defining data 
 ### Collections
 
 - `list[T]` - Lists of primitive T
-- `map[T]` - Maps with string keys and primitive T values
+- `dict[T]` - Dicts with string keys and primitive T values
 - `record[T1, T2, ...]` - Tuples with specific primitives
 
 ### Shape Definitions
@@ -324,7 +399,7 @@ shape User {
 }
 
 let numbers: list[number] = [1, 2, 3]
-let scores: map[number @min(0) @max(100)] = {"alice": 95, "bob": 87}
+let scores: dict[number @min(0) @max(100)] = {"alice": 95, "bob": 87}
 ```
 
 ### Aliases
@@ -374,7 +449,7 @@ unknown     -- Trinary unknown (neither true nor false)
 ["hello", "world"]
 [true, false, unknown]
 
--- Maps
+-- Dicts
 {"name": "Alice", "age": 30}
 {"key1": "value1", "key2": 42}
 
@@ -454,16 +529,20 @@ is not empty -- Check if not empty
 is          -- Shape checking
 ```
 
-### Quantifier Operators
+### Collection builtins
+
+These builtins operate on lists. Predicate and mapping steps use inline lambdas: `(param) => { ... }` or `(param, index) => { ... }`.
 
 ```text
-any         -- Any element satisfies condition
-all         -- All elements satisfy condition
-filter      -- Filter elements
-map         -- Transform elements
-distinct    -- Remove duplicates
-reduce      -- Reduce collection to single value
-count       -- Count elements
+any(list, predicate)       -- True if any element satisfies the predicate
+all(list, predicate)       -- True if every element satisfies the predicate
+filter(list, predicate)    -- New list of elements where the predicate is truthy
+first(list, predicate)     -- First matching element, or undefined
+collect(list, fn)          -- New list from mapping each element
+distinct(list)             -- Unique elements (by scalar identity)
+distinct(list, keyFn)      -- Unique elements by a scalar key from each item
+reduce(list, initial, fn)  -- Left fold with an accumulator
+count(value)               -- Length of list, dict, or string
 ```
 
 ### Casting
@@ -547,7 +626,7 @@ policy mypolicy {
 
 ### Available Built-in Modules
 
-- `@sentrie/collection` - List and map manipulation utilities
+- `@sentrie/collection` - List and dict (object) manipulation utilities
 - `@sentrie/crypto` - Cryptographic functions (SHA-256)
 - `@sentrie/encoding` - Base64, Hex, and URL encoding/decoding
 - `@sentrie/hash` - Hash functions (MD5, SHA-1, SHA-256, SHA-512, HMAC)
@@ -605,7 +684,7 @@ let maxRetries = 3
 let adminRoles = ["admin", "super_admin"]
 let userAge = user.birthDate ? calculateAge(user.birthDate) : 0
 let numbers: list[number] = [1, 2, 3]
-let scores: map[number @min(0) @max(100)] = {"alice": 95}
+let scores: dict[number @min(0) @max(100)] = {"alice": 95}
 ```
 
 Variables can have:
@@ -624,20 +703,20 @@ Variables can have:
 Read more on let declarations [here](/reference/let).
 :::
 
-### Reduce Expressions
+### `reduce`
 
-Variables can be computed using `reduce` expressions:
+Variables can be computed with the `reduce` builtin and a reducer lambda:
 
 ```text
 let numbers: list[number] = [1, 2, 3, 4, 5]
 
-let sum: number = reduce numbers from 0 as acc, num, idx {
+let sum: number = reduce(numbers, 0, (acc, num, idx) => {
   yield acc + num
-}
+})
 
-let max: number = reduce numbers from numbers[0] as acc, num, idx {
+let max: number = reduce(numbers, numbers[0], (acc, num, idx) => {
   yield num > acc ? num : acc
-}
+})
 ```
 
 ## Exports and Imports
@@ -660,7 +739,7 @@ export decision of allow_admin
   attach the_float as (10 + 5) * (5 - 2) / 2
   attach the_number as 8 / 6
   attach the_list as [1, 2, 3]
-  attach the_map as {"key": "value"}
+  attach the_dict as {"key": "value"}
   attach the_string as "hello"
   attach the_bool as true
   attach the_null as null

@@ -1,9 +1,9 @@
 ---
 title: Using Functions
-description: How to call and use functions in Sentrie, including built-in functions and TypeScript module functions.
+description: How to call functions in Sentrie, import TypeScript modules, and use function memoization.
 ---
 
-Functions are a fundamental part of Sentrie that allow you to perform operations, transform data, and extend functionality. Sentrie supports two types of functions: built-in functions that are always available, and TypeScript module functions that you import using the `use` statement.
+Functions are a fundamental part of Sentrie that allow you to perform operations, transform data, and extend functionality. Sentrie supports **built-in functions** (see [Built-in Functions](/reference/built-in-functions)) that are always available without imports, and **TypeScript module functions** that you import using the `use` statement.
 
 Functions in Sentrie enable you to:
 
@@ -83,7 +83,7 @@ policy security {
   use { isValid } from @sentrie/json as json
 
   rule validatePassword = default false {
-    let hash = sha256(password)
+    let hash = hash.sha256(password)
     let currentTime = time.now()
     yield hash != "" and currentTime > timestamp
   }
@@ -233,176 +233,12 @@ policy example {
 
 ## Built-in Functions
 
-Sentrie provides a set of built-in functions that are always available without any imports. These functions are optimized for performance and are commonly used operations.
-
-### `count(value) => number`
-
-<details>
-<summary>Returns the number of elements in a collection or the length of a string.</summary>
-
-The `count` function accepts a list, map, or string and returns the number of elements or characters.
-
-**Examples:**
-
-- `count([1, 2, 3])` → `3`
-- `count("hello")` → `5`
-- `count({"a": 1, "b": 2})` → `2`
-
-```sentrie
-let items: list[string] = ["apple", "banana", "cherry"]
-let itemCount = count(items)  -- Returns 3
-```
-
-</details>
-
-### `merge(map1, map2) => map[string]any`
-
-<details>
-<summary>Recursively merges two maps into a new map.</summary>
-
-The `merge` function combines two maps, with values from the second map overwriting values from the first map. Nested maps are merged recursively rather than being replaced entirely.
-
-**Examples:**
-
-- `merge({"a": 1}, {"b": 2})` → `{"a": 1, "b": 2}`
-- `merge({"a": {"x": 1}}, {"a": {"y": 2}})` → `{"a": {"x": 1, "y": 2}}`
-
-```sentrie
-let userData = {"name": "Alice", "age": 30}
-let additionalData = {"age": 31, "role": "admin"}
-let combined = merge(userData, additionalData)
--- Returns {"name": "Alice", "age": 31, "role": "admin"}
-```
-
-</details>
-
-### `error(format, args...) => error`
-
-<details>
-<summary>Short-circuits execution and returns an error with a formatted message.</summary>
-
-The `error` function immediately stops execution and returns an error. It supports format strings similar to `fmt.Printf` in Go. If only one argument is provided, it's treated as the error message directly.
-
-**Examples:**
-
-- `error("Access denied")`
-- `error("Invalid value: %v", value)`
-- `error("User %s not found", username)`
-
-```sentrie
-rule validateAccess = default false when user.role is defined {
-  if user.role != "admin" {
-    error("Access denied: user must be admin")
-  }
-  yield true
-}
-```
-
-</details>
-
-### `as_list(value) => list[any]`
-
-<details>
-<summary>Normalizes "one-or-many" inputs by wrapping non-list values in a single-element list.</summary>
-
-The `as_list` function takes a single value and ensures it's a list. If the input is already a list, it returns it unchanged. If the input is not a list, it wraps it in a single-element list.
-
-**Examples:**
-
-- `as_list(42)` → `[42]`
-- `as_list("hello")` → `["hello"]`
-- `as_list([1, 2, 3])` → `[1, 2, 3]`
-
-```sentrie
-let single_value = 42
-let as_list_value = as_list(single_value)  -- Returns [42]
-
-let already_list = [1, 2, 3]
-let unchanged = as_list(already_list)  -- Returns [1, 2, 3]
-```
-
-**Note:** If the input contains `undefined` values, the function returns `undefined`.
-
-</details>
-
-### `flatten(list, depth?) => list[any]`
-
-<details>
-<summary>Flattens nested lists to a controlled depth.</summary>
-
-The `flatten` function takes a list and optionally a depth parameter, and flattens nested lists up to the specified depth. The default depth is 1 if not specified.
-
-**Examples:**
-
-- `flatten([[1, 2], [3, 4]])` → `[1, 2, 3, 4]` (default depth 1)
-- `flatten([[1, 2], [3, 4]], 1)` → `[1, 2, 3, 4]`
-- `flatten([[[1, 2]], [[3, 4]]], 2)` → `[1, 2, 3, 4]`
-- `flatten([1, 2, 3], 0)` → `[1, 2, 3]` (no flattening)
-
-```sentrie
-let nested = [[1, 2], [3, 4], [5]]
-let flattened = flatten(nested)  -- Returns [1, 2, 3, 4, 5]
-
-let deeply_nested = [[[1, 2]], [[3, 4]]]
-let flattened_deep = flatten(deeply_nested, 2)  -- Returns [1, 2, 3, 4]
-```
-
-**Note:** If the input contains `undefined` values, the function returns `undefined`.
-
-</details>
-
-### `flatten_deep(list) => list[any]`
-
-<details>
-<summary>Recursively flattens nested lists to arbitrary depth.</summary>
-
-The `flatten_deep` function takes a list and recursively flattens all nested lists, regardless of nesting depth.
-
-**Examples:**
-
-- `flatten_deep([[1, 2], [3, [4, 5]]])` → `[1, 2, 3, 4, 5]`
-- `flatten_deep([[[1]], [[2, 3]], [4]])` → `[1, 2, 3, 4]`
-
-```sentrie
-let deeply_nested = [[1, [2, [3, 4]]], [5, 6]]
-let fully_flattened = flatten_deep(deeply_nested)  -- Returns [1, 2, 3, 4, 5, 6]
-```
-
-**Note:** If the input contains `undefined` values, the function returns `undefined`.
-
-</details>
-
-### `normalise_list(value) => list[any]`
-
-<details>
-<summary>Normalizes messy list inputs with one level of nesting.</summary>
-
-The `normalise_list` function first applies `as_list` to wrap non-list values, then flattens exactly one level of nesting. It errors if the input contains deeper than one level of nesting.
-
-**Examples:**
-
-- `normalise_list(42)` → `[42]` (wrapped, then no flattening needed)
-- `normalise_list([1, 2, 3])` → `[1, 2, 3]` (already flat)
-- `normalise_list([[1, 2], [3, 4]])` → `[1, 2, 3, 4]` (one level flattened)
-- `normalise_list([[[1, 2]]])` → Error (deeper than one level)
-
-```sentrie
-let mixed_input = [[1, 2], 3, [4, 5]]
-let normalized = normalise_list(mixed_input)  -- Returns [1, 2, 3, 4, 5]
-```
-
-**Note:** If the input contains `undefined` values, the function returns `undefined`.
-
-</details>
-
-:::note
-Built-in functions are fast and lightweight. While they support memoization syntax (see [Function Memoization](#function-memoization)), they are not actually memoized as caching would provide minimal benefit for these operations.
-:::
+Sentrie provides builtins such as `count`, `merge`, and list helpers (`any`, `all`, `filter`, `first`, `collect`, `reduce`, `distinct`). For names, signatures, and examples, see [Built-in Functions](/reference/built-in-functions).
 
 ## See Also
 
+- [Built-in Functions](/reference/built-in-functions) - Reference for list helpers, `count`, `merge`, and related builtins
 - [Using TypeScript](/reference/using-typescript) - Learn how to import and use TypeScript modules
 - [Built-in TypeScript Modules](/reference/typescript_modules) - Complete reference for all built-in modules
 - [Intermediate Values](/reference/let) - Learn about `let` declarations where functions are commonly used
 - [Rules](/reference/rules) - Learn how to use functions in rule bodies
-- [Collection Operations](/reference/collection-operations) - Learn about collection-specific operations
