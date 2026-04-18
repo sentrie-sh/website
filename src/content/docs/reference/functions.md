@@ -188,6 +188,19 @@ Avoid memoization for functions that:
 - Have side effects that must execute each time
   :::
 
+## Function chaining (`|>`)
+
+The pipeline operator `|>` passes the left value into the next function call, allowing clear, top-to-bottom transformation chains:
+
+```sentrie
+let slug = input
+  |> str.trim()
+  |> str.toLower()
+  |> str.replaceAll(" ", "-")
+```
+
+Use `#` in the right-hand call to put the piped value anywhere in the argument list. See [Function chaining](/reference/function-chaining) for all details.
+
 ## Using Functions in Rules and Let Declarations
 
 Functions can be used anywhere expressions are allowed, including in `let` declarations and rule bodies:

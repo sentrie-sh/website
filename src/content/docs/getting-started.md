@@ -204,6 +204,18 @@ policy pricing {
 }
 ```
 
+### Readable Transformation Chains
+
+Use the pipeline operator when you want top-to-bottom transformation flow:
+
+```text
+let normalized = input
+  |> str.trim
+  |> str.toLower
+```
+
+This is equivalent to nested calls such as `str.toLower(str.trim(input))`. See [Function chaining](/reference/function-chaining), the [Policy Language Reference](/reference), and [Precedence](/reference/precedence) for full rules and constraints.
+
 ## Troubleshooting
 
 ### Common Issues

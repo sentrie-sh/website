@@ -16,6 +16,7 @@ This is the complete reference for the Sentrie policy language. It covers all la
 - [Literals](#literals)
 - [Operators](#operators)
 - [Control Flow](#control-flow)
+- [Function chaining](/reference/function-chaining) - Pipeline operator (`|>`), desugaring, precedence, and memoization
 - [TypeScript Modules](#typescript-modules)
 - [Facts and Variables](#facts-and-variables)
 - [Exports and Imports](#exports-and-imports)
@@ -183,6 +184,7 @@ Sentrie has a rich expression language with multiple operator types and preceden
 8. **Logical XOR**: `xor`
 9. **Logical OR**: `or`
 10. **Ternary**: `? :`
+11. **Pipeline**: `|>` (lowest precedence)
 
 ### Primary Expressions
 
@@ -207,6 +209,10 @@ config.maxRetries
 time.now()
 hash.sha256("data")
 json.parse("{}")
+
+-- Pipeline calls
+value |> len
+value |> str.trim |> len
 
 -- Index access
 users[0]
@@ -398,6 +404,14 @@ null        -- Null value
 %           -- Modulo
 ```
 
+### Pipeline Operator
+
+```text
+|>          -- Pipe left expression into callable target on the right
+```
+
+For complete rules and examples, see [Function chaining](/reference/function-chaining).
+
 ### Comparison Operators
 
 ```text
@@ -480,6 +494,8 @@ use { function1, function2 } from @sentrie/module as alias
 **Note:** Built-in `@sentrie/*` modules do not use quotes. Local TypeScript files use quotes for relative paths.
 
 The `as` clause is optional. If omitted, the default alias is the last part of the module path (e.g., `time` for `@sentrie/time`).
+
+`use` semantics do not change with pipelines: imported names are not injected into local scope, and module-qualified calls remain the canonical form.
 
 ### Built-in Modules
 
