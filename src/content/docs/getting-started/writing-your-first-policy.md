@@ -130,7 +130,7 @@ policy user_access {
 - Facts are **required by default** - they must be provided during execution
 - Use `?` to mark facts as **optional** - optional facts can be omitted
 - Only **optional facts** (`?`) can have default values
-- Facts are **always non-nullable** - null values are not allowed
+- Facts can use nullable types (`T?`) when explicit `null` values are allowed
   :::
 
 ## Add your first rule

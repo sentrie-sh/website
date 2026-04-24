@@ -343,26 +343,28 @@ Sentrie provides primitives, collections, shapes, and aliases for defining data 
 
 Shapes define structured data with fields and constraints.
 
-**Field Modifiers:**
+**Field Contract Matrix:**
 
-- `!` - Non-nullable (required field)
-- `?` - Optional field
-- No modifier - Default field (required by default)
+- `field: T` - required, non-null
+- `field?: T` - optional, if present non-null
+- `field: T?` - required, nullable
+- `field?: T?` - optional, nullable
 
 ```text
 shape User {
-  id!: string           -- Required field (non-nullable)
-  name!: string         -- Required field (non-nullable)
-  email?: string        -- Optional field
-  age?: number          -- Optional field
-  roles: list[string]   -- Required field (default)
-  metadata: document    -- Required field (default)
+  id: string
+  name: string
+  email?: string
+  middle_name: string?
+  nickname?: string?
+  roles: list[string]
+  metadata: document
 }
 
 shape Product {
-  id!: string
-  name!: string
-  price!: number
+  id: string
+  name: string
+  price: number
   tags?: list[string]
   dimensions: record[number, number, number]  -- width, height, depth
 }
@@ -374,8 +376,8 @@ Shapes can be composed from other shapes using the `with` keyword:
 
 ```text
 shape BaseUser {
-  id!: string
-  name!: string
+  id: string
+  name: string
 }
 
 shape AdminUser with BaseUser {
@@ -584,7 +586,7 @@ Built-in modules are prefixed with `@sentrie/`:
 namespace com/example/auth
 
 policy mypolicy {
-  fact data!: string
+  fact data: string
 
   use { now } from @sentrie/time as time
   use { sha256 } from @sentrie/hash
@@ -609,7 +611,7 @@ You can import TypeScript files from your policy pack using relative paths:
 namespace com/example/auth
 
 policy mypolicy {
-  fact user!: User
+  fact user: User
 
   use { calculateAge, validateEmail } from "./utils.ts" as utils
 
@@ -671,7 +673,7 @@ Facts can have:
 
 - Facts are **required by default** - must be provided during execution
 - Use `?` to mark facts as **optional** - can be omitted
-- Facts are **always non-nullable** - null values are not allowed
+- Facts can also use nullable types with `T?` when explicit `null` is valid
 - Only **optional facts** (`?`) can have default values
   :::
 
@@ -865,9 +867,9 @@ rule validateUser = default false when user is defined {
 
 ```text
 shape User {
-  id!: string
-  name!: string
-  role!: string
+  id: string
+  name: string
+  role: string
 }
 
 rule processUser = default false when user is User {
