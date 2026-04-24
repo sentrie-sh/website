@@ -51,9 +51,9 @@ let can_access: bool = user_role == "admin" ? true : false
 
 ```sentrie
 shape Product {
-  name!: string
-  price!: number
-  category!: string
+  name: string
+  price: number
+  category: string
   in_stock: bool
 }
 
@@ -402,7 +402,7 @@ let list_is_not_empty: bool = non_empty_list is not empty
 
 ```sentrie
 shape User {
-  name!: string
+  name: string
   email?: string
   phone?: string
 }
@@ -436,7 +436,7 @@ value is not defined
 
 ```sentrie
 shape User {
-  name!: string
+  name: string
   email?: string
   phone?: string
 }
@@ -463,8 +463,8 @@ let display_email: string = user.email is defined ? user.email : "No email provi
 
 ```sentrie
 shape Order {
-  id!: string
-  customer_name!: string
+  id: string
+  customer_name: string
   customer_email?: string
   customer_phone?: string
   shipping_address?: string
@@ -500,9 +500,9 @@ let contact_method: string = order.customer_email is defined ?
 
 ```sentrie
 shape User {
-  id!: string
-  username!: string
-  role!: string
+  id: string
+  username: string
+  role: string
   age: number
   email?: string
   active: bool
@@ -510,8 +510,8 @@ shape User {
 }
 
 shape Resource {
-  id!: string
-  name!: string
+  id: string
+  name: string
   required_role: string
   min_age: number
   required_permissions: list[string]
@@ -552,9 +552,9 @@ let can_access: bool = user.active and
 use {length} from @sentrie/js as str
 
 shape RegistrationData {
-  username!: string
+  username: string
   email?: string
-  password!: string
+  password: string
   age: number
   terms_accepted: bool
 }

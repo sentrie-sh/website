@@ -38,8 +38,8 @@ shape User {
 }
 
 policy mypolicy {
-  fact user!: User
-  fact passwordInput!: string
+  fact user: User
+  fact passwordInput: string
 
   use { now } from @sentrie/time
   use { sha256 } from @sentrie/hash
@@ -95,9 +95,9 @@ shape User {
 }
 
 policy mypolicy {
-  fact user!: User
-  fact passwordInput!: string
-  fact userAge!: number
+  fact user: User
+  fact passwordInput: string
+  fact userAge: number
 
   use { md5, sha256 } from @sentrie/hash
   use { now } from @sentrie/time

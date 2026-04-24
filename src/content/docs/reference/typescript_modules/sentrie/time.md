@@ -211,7 +211,7 @@ Examples:
 namespace com/example/access
 
 policy mypolicy {
-  fact tokenExpiry!: number
+  fact tokenExpiry: number
 
   use { now, isBefore, addDuration, format } from @sentrie/time
 

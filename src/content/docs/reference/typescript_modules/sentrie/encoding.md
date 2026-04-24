@@ -164,7 +164,7 @@ let decoded = encoding.urlDecode("Hello%2C%20World%21")  // "Hello, World!"
 namespace com/example/mypolicy
 
 policy mypolicy {
-  fact data!: string
+  fact data: string
 
   use { base64Encode, base64Decode, urlEncode, urlDecode } from @sentrie/encoding
 

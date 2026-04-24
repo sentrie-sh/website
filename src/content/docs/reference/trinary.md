@@ -99,7 +99,7 @@ let result4 = g or h  -- unknown
 
 ```sentrie
 shape User {
-  name!: string
+  name: string
   email?: string
   age?: number
 }
@@ -130,7 +130,7 @@ let is_verified: trinary = user.email is defined and
 
 ```sentrie
 shape Account {
-  username!: string
+  username: string
   email?: string
   verified: bool
 }

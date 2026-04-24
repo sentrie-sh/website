@@ -186,9 +186,9 @@ let has_perfect_score: bool = any(scores, (score) => {
 })
 
 shape User {
-  name!: string
+  name: string
   age: number
-  role!: string
+  role: string
 }
 
 let users: list[User] = [
@@ -243,9 +243,9 @@ let even_indexed: list[number] = filter(numbers, (num, idx) => {
 })
 
 shape Employee {
-  name!: string
-  department!: string
-  salary!: number
+  name: string
+  department: string
+  salary: number
 }
 
 let employees: list[Employee] = [
@@ -302,7 +302,7 @@ let indexed_fruits: list[string] = collect(fruits, (fruit, idx) => {
 })
 
 shape User {
-  name!: string
+  name: string
   age: number
 }
 
@@ -345,9 +345,9 @@ let sentence: string = reduce(words, "", (acc, word, idx) => {
 })
 
 shape Sale {
-  product!: string
-  quantity!: number
-  price!: number
+  product: string
+  quantity: number
+  price: number
 }
 
 let sales: list[Sale] = [
@@ -387,7 +387,7 @@ distinct(list, (element, index) => { yield keyExpression })
 
 ```sentrie
 shape Person {
-  name!: string
+  name: string
   age: number
 }
 
@@ -408,10 +408,10 @@ Nest builtins for multi-step transforms. Intermediate `let` bindings often read 
 
 ```sentrie
 shape Employee {
-  name!: string
+  name: string
   age: number
-  department!: string
-  salary!: number
+  department: string
+  salary: number
   years_experience: number
 }
 

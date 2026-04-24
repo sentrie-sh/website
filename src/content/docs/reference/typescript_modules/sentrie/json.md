@@ -54,7 +54,7 @@ See the [@sentrie/js](/reference/typescript_modules/sentrie/js) documentation fo
 namespace com/example/mypolicy
 
 policy mypolicy {
-  fact data!: string
+  fact data: string
 
   use { isValid } from @sentrie/json as jsonUtil
   use { parse, stringify } from @sentrie/js as json

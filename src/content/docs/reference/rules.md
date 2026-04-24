@@ -66,7 +66,7 @@ Exported rules can include named attachments that provide additional context or 
 namespace com/example/auth
 
 policy base {
-  fact user!:User as u -- alias for the user fact
+  fact user: User as u -- alias for the user fact
 
   rule isAdmin = default false when user.role is defined {
     yield user.role is "admin" or user.role is "super_admin"
@@ -80,7 +80,7 @@ policy base {
 namespace com/example/user
 
 policy user_access {
-  fact user!:User as user
+  fact user: User as user
 
   rule isAdmin = import decision of isAdmin from com/example/auth/base with u as user
 }
@@ -151,11 +151,11 @@ Rules become powerful when composed across policies. Here's how to export a deci
 namespace com/example/auth
 
 shape Account {
-  balance!: number
+  balance: number
 }
 
 shape Invoice {
-  total!: number
+  total: number
 }
 ```
 
@@ -164,8 +164,8 @@ shape Invoice {
 namespace com/example/billing
 
 policy billing {
-  fact account!: Account as account
-  fact invoice!: Invoice as invoice
+  fact account: Account as account
+  fact invoice: Invoice as invoice
 
   let reason = account.balance >= invoice.total ? "insufficient_funds" : "sufficient_funds"
   let balance = account.balance
@@ -184,8 +184,8 @@ When importing this decision, you inject the necessary facts and receive the dec
 
 ```sentrie
 policy shipping {
-  fact account!: Account as account
-  fact invoice!: Invoice as invoice
+  fact account: Account as account
+  fact invoice: Invoice as invoice
 
   rule payment_reason_consumed = import decision of payment_ok from com/example/billing
     with account as account
