@@ -82,7 +82,7 @@ let uuid = uuid.v7()  // Time-ordered UUID with Unix timestamp
 namespace com/example/resources
 
 policy mypolicy {
-  fact resourceType!: string
+  fact resourceType: string
 
   use { v4, v7 } from @sentrie/uuid
 

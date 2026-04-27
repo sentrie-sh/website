@@ -63,6 +63,23 @@ let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 let u: record[string, number, bool] = ["one", 1, true]
 ```
 
+## Nullable Types
+
+Sentrie supports type-level nullability with a `?` suffix on type references.
+
+- `string?` -> value may be `null` or a string
+- `list[string]?` -> list itself may be `null`
+- `dict[string?]` -> dict values may be `null`
+- `Person?` -> shape value may be `null`
+
+```text
+let middleName: string? = null
+let tags: list[string]? = null
+let attrs: dict[string?] = {"nickname": null}
+```
+
+`T?` means **nullable value**. This is different from optional bindings (for example, `field?` in shapes/facts), which control whether a key may be absent.
+
 :::caution
 Map keys must be strings.
 :::

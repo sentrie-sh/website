@@ -78,8 +78,8 @@ All numeric values are handled uniformly as the `number` type.
 
 ```sentrie
 shape Rectangle {
-  width!: number
-  height!: number
+  width: number
+  height: number
 }
 
 fact rect: Rectangle

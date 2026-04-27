@@ -56,15 +56,15 @@ policy policyName {
 namespace com/example/auth
 
 shape User {
-  id!: string
-  role!: string
-  permissions!: list[string]
+  id: string
+  role: string
+  permissions: list[string]
 }
 
 shape Resource {
-  id!: string
-  type!: string
-  owner!: string
+  id: string
+  type: string
+  owner: string
 }
 
 policy userAccess {
@@ -125,7 +125,7 @@ fact config?: Config as settings default { "environment": "production" }
 - Facts are **required by default** - must be provided during execution
 - Use `?` to mark facts as **optional** - can be omitted
 - Only **optional facts** (`?`) can have default values
-- Facts are **always non-nullable** - null values are not allowed
+- Facts can use nullable types (`T?`) when explicit `null` values are allowed
   :::
 
 :::note

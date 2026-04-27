@@ -26,7 +26,7 @@ fact <name>?: <type> ('as' <exposed_name>)? ('default' <default_value>)?
 - If no `as` clause is provided, the fact name itself is used as the exposed name
 - The `default` clause is only allowed for optional facts (marked with `?`)
 - Facts are **required by default** - use `?` to make them optional
-- Facts are **always non-nullable** - null values are not allowed
+- Facts can use nullable types with `T?` when explicit `null` is allowed
 :::
 
 ### Required vs Optional Facts
@@ -41,8 +41,8 @@ fact context?: Context as context default { "key": "value" }
 
 :::note[Important]
 - **Facts are required by default** - If no modifier is specified, the fact must be provided during execution
-- **Use `?` to mark facts as optional** - Optional facts can be omitted, but if provided, they must be non-null
-- **Facts are always non-nullable** - Null values are not allowed for facts
+- **Use `?` to mark facts as optional** - Optional facts can be omitted
+- **Use `T?` to allow null values** - Bare `T` remains non-null by default
 - **Required facts cannot have default values** - Only optional facts can have defaults
 - **Facts before uses:** If a policy has both `fact` and `use` statements, every `fact` must appear before the first `use`. A policy may have **uses with no facts** (skip the facts block).
 
@@ -78,9 +78,9 @@ fact coordinates?: record[number, number] as location default [ 0.0, 0.0 ]
 
 ```sentrie
 shape User {
-  id!: string
-  role!: string
-  permissions!: list[string]
+  id: string
+  role: string
+  permissions: list[string]
 }
 
 -- Required shape fact
@@ -120,8 +120,8 @@ fact context?: Context as context default { "key": "value" }
 ```
 
 :::warning[Important]
-- Facts are **always non-nullable** - Even if a fact is optional, if it is provided, it cannot be null
-- The `!` operator is **not supported** for facts - facts are always non-nullable by design
+- `T?` allows explicit `null` values for facts
+- Legacy `!` syntax is not supported
 - Only **optional facts** (`?`) can have default values
 :::
 
@@ -160,9 +160,9 @@ fact name: string as userName default "anonymous"  -- Error: required fact canno
 
 ```sentrie
 shape Product {
-  id!: string
-  name!: string
-  price!: number
+  id: string
+  name: string
+  price: number
 }
 
 -- Optional fact with shape default
@@ -206,9 +206,9 @@ fact user?: User as user default { "id": 123 }  -- Error: string expected, got n
 -- Correct usage
 fact user?: User as user default { "id": "123" }
 
--- Null validation: Facts cannot be null
--- This will cause a runtime error if null is provided
-fact user: User as user  -- If null is provided, error: "fact 'user' cannot be null"
+-- Null validation depends on type nullability
+fact user: User as user   -- null is invalid
+fact user: User? as user  -- null is valid
 ```
 
 ## Best Practices
@@ -231,7 +231,7 @@ fact data?: User as d default { "id": "", "role": "guest" }
 fact user?: User as user default { "id": "anonymous", "role": "guest", "permissions": [] }
 
 -- Avoid: Confusing or invalid defaults
-fact user?: User as user default { "id": "", "role": "invalid", "permissions": null }  -- null not allowed
+fact user?: User as user default { "id": "", "role": "invalid", "permissions": null }  -- invalid because permissions is list[string]
 ```
 
 ### Use Required Facts Appropriately

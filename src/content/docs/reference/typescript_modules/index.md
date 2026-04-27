@@ -13,8 +13,8 @@ Import and use built-in modules in your policies:
 namespace com/example/mypolicy
 
 policy mypolicy {
-  fact data!: string
-  fact timestamp!: number
+  fact data: string
+  fact timestamp: number
 
   use { now } from @sentrie/time
   use { sha256 } from @sentrie/hash
@@ -221,10 +221,10 @@ Functions for generating UUIDs (Universally Unique Identifiers).
 namespace com/example/auth
 
 policy authentication {
-  fact token!: string
-  fact secretKey!: string
-  fact passwordInput!: string
-  fact expectedHash!: string
+  fact token: string
+  fact secretKey: string
+  fact passwordInput: string
+  fact expectedHash: string
 
   use { sha256, hmac } from @sentrie/hash
   use { decode, verify } from @sentrie/jwt
@@ -251,8 +251,8 @@ policy authentication {
 namespace com/example/validation
 
 policy validation {
-  fact email!: string
-  fact jsonData!: string
+  fact email: string
+  fact jsonData: string
 
   use { match } from @sentrie/regex
   use { length } from @sentrie/js as str
@@ -279,9 +279,9 @@ policy validation {
 namespace com/example/network
 
 policy network {
-  fact clientIp!: string
-  fact allowedCidr!: string
-  fact requestUrl!: string
+  fact clientIp: string
+  fact allowedCidr: string
+  fact requestUrl: string
 
   use { cidrContains, isPrivate, parseIP } from @sentrie/net
   use { getHost, isValid } from @sentrie/url
@@ -310,8 +310,8 @@ policy network {
 namespace com/example/time
 
 policy time {
-  fact tokenExpiry!: number
-  fact sessionStart!: number
+  fact tokenExpiry: number
+  fact sessionStart: number
 
   use { now, isBefore, addDuration, format } from @sentrie/time
 

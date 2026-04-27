@@ -59,56 +59,69 @@ let user: User = {
 }
 ```
 
-#### Field Nullability and Optionality
+#### Field Optionality and Nullability
 
-Shapes support different field requirements using special markers:
+Sentrie models field contracts on two independent axes:
 
-- **Required fields** (default): Field must be present and can be null
-- **Required non-null fields** (`!`): Field must be present and cannot be null
-- **Optional fields** (`?`): Field may be omitted entirely
+- `field?` controls **presence** (whether the field may be absent)
+- `T?` controls **value nullability** (whether the present value may be `null`)
+
+The canonical shape field matrix is:
+
+- `field: T` -> required, non-null
+- `field?: T` -> optional, if present non-null
+- `field: T?` -> required, nullable
+- `field?: T?` -> optional, nullable
 
 ```sentrie
-shape User {
-  name!: string           -- Required, cannot be null
-  age: number                -- Required, can be null
-  email?: string          -- Optional, can be omitted
-  phone!?: string         -- Optional, but if present cannot be null
+shape Person {
+  name: string
+  age: number
+  gender?: string
+  middle_name: string?
+  nickname?: string?
 }
 ```
 
-Examples of valid and invalid usage:
+Examples:
 
 ```sentrie
--- Valid: all required fields present, optional field omitted
-let user1: User = {
+-- Valid: required fields are present and non-null
+let p1: Person = {
   name: "Alice",
-  age: 25
+  age: 25,
 }
 
--- Valid: all fields present, including optional
-let user2: User = {
+-- Valid: nullable required field present as null
+let p2: Person = {
   name: "Bob",
   age: 30,
-  email: "bob@example.com"
+  middle_name: null
 }
 
--- Valid: required field can be null
-let user3: User = {
+-- Valid: optional nullable field omitted
+let p3: Person = {
   name: "Charlie",
-  age: null
+  age: 32,
 }
 
--- Invalid: required non-null field is null
-let user4: User = {
-  name: null,  -- Error: name cannot be null
-  age: 25
+-- Invalid: required non-null field cannot be null
+let bad1: Person = {
+  name: null,
+  age: 22
 }
 
--- Invalid: required field is missing
-let user5: User = {
-  age: 25  -- Error: name is required
+-- Invalid: required field cannot be absent
+let bad2: Person = {
+  age: 22
 }
 ```
+
+Migration note:
+
+- `field!: T` -> `field: T`
+- `field!?: T` / `field?!: T` -> `field?: T?`
+- if old `field: T` relied on nullable behavior, write `field: T?`
 
 :::note[Checking Optional Fields]
 You can check if optional fields are defined using the `is defined` operator:
@@ -123,6 +136,7 @@ let user: User = {
 -- You can also use this in boolean expressions
 let has_phone: bool = user.phone is defined
 let contact_info: string = user.phone is defined ? user.phone : "No phone available"
+let display_gender: string = user.gender ?: "unknown"
 
 -- Check if optional fields exist using ternary operator
 let phone_message: string = user.phone is defined ? "Phone: " + user.phone : "No phone number provided"
@@ -214,23 +228,23 @@ Shapes excel at modeling complex, nested data models with proper nullability han
 
 ```sentrie
 shape Address {
-  street!: string @not_empty()
-  city!: string @not_empty()
-  state!: string @length(2) @uppercase()
-  zip!: string @regexp("^[0-9]{5}(-[0-9]{4})?$")
+  street: string @not_empty()
+  city: string @not_empty()
+  state: string @length(2) @uppercase()
+  zip: string @regexp("^[0-9]{5}(-[0-9]{4})?$")
 }
 
 shape ContactInfo {
-  email!: string @email()
-  phone?: string @regexp("^\\+?[1-9]\\d{1,14}$")  -- Optional phone
-  address?: Address  -- Optional address
+  email: string @email()
+  phone?: string @regexp("^\\+?[1-9]\\d{1,14}$")
+  address?: Address
 }
 
 shape User {
-  name!: string @minlength(2) @maxlength(100)
-  age: number @min(13) @max(120)  -- Can be null if unknown
-  contact!: ContactInfo
-  preferences?: dict[string]  -- Optional preferences
+  name: string @minlength(2) @maxlength(100)
+  age: number? @min(13) @max(120)
+  contact: ContactInfo
+  preferences?: dict[string]
 }
 ```
 
@@ -260,7 +274,7 @@ let user1: User = {
 -- User with minimal required fields (optional fields omitted)
 let user2: User = {
   name: "Jane Smith",
-  age: null,  -- Age unknown
+  age: null,  -- Age is nullable
   contact: {
     email: "jane@example.com"
     -- phone and address are optional, so omitted
@@ -352,15 +366,15 @@ Shapes defined in a policy are only available within that policy and **take prec
 namespace com/example/billing
 
 shape User {
-  id!: string @uuid()
-  email!: string @email()
+  id: string @uuid()
+  email: string @email()
 }
 
 policy process_payment_1 {
   -- Policy-local shape (most specific)
   shape User {
-    id!: string @uuid()
-    billing_address!: string
+    id: string @uuid()
+    billing_address: string
   }
 
   -- This resolves to the policy-local `User` shape
@@ -406,9 +420,9 @@ policy process_payment_2 {
 ```sentrie
 shape Category string @one_of("electronics", "clothing", "books", "home")
 shape Product {
-  name!: string @minlength(1) @maxlength(100) @not_empty()
-  price!: number @positive() @range(0.01, 999999.99)
-  category!: Category
+  name: string @minlength(1) @maxlength(100) @not_empty()
+  price: number @positive() @range(0.01, 999999.99)
+  category: Category
   in_stock: bool
 }
 ```

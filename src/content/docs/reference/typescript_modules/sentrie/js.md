@@ -453,8 +453,8 @@ let newArray = arr.of(1, 2, 3)  // [1, 2, 3]
 namespace com/example/mypolicy
 
 policy mypolicy {
-  fact price!: number
-  fact data!: string
+  fact price: number
+  fact data: string
 
   use { round, floor, ceil, max, min } from @sentrie/js as math
   use { length, fromCharCode } from @sentrie/js as str
