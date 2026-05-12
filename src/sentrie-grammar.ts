@@ -16,12 +16,6 @@ export const sentrieGrammar = {
       match: /\b(namespace|policy|rule|fact|let|export|import|use|from|as|default|when|yield|shape|attach|decision|of|with)\b/
     },
 
-    // Keywords - Higher-order operations
-    {
-      name: 'keyword.control.higher-order.sentrie',
-      match: /\b(any|all|filter|first|collect|distinct|reduce|cast|count)\b/
-    },
-
     // Keywords - Boolean operators
     {
       name: 'keyword.operator.boolean.sentrie',
