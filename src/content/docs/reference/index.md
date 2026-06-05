@@ -311,6 +311,8 @@ let sum: number = reduce(nums, 0, (acc, n) => {
 })
 ```
 
+Single-parameter **derives** can also be passed by name to `any`, `all`, `filter`, `first`, `collect`, and the two-argument `distinct` form — see [Derives](/reference/derives#callbacks-for-higher-order-builtins).
+
 Which builtin you use determines how many parameters the lambda should take (its **arity**), for example:
 
 - **`any`**, **`all`**, **`filter`**, **`first`**, **`collect`**: arity **1** (element only) or **2** (element and index).
