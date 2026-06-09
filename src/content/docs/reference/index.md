@@ -549,15 +549,17 @@ count(value)               -- Length of list, dict, or string
 
 ### Casting
 
+Postfix `expr as Type` converts a value and validates it against `Type` (including shape constraints).
+
 ```text
-cast        -- Casting between primitives
+as          -- Postfix cast: expr as Type (see Types and values)
 ```
 
 Example:
 
 ```text
 let y = "99"
-let x: number = cast y as number
+let x: number = y as number
 ```
 
 The converted value is checked against the target type and constraints. Failure is an evaluation error, not a silent zero.
