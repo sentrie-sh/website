@@ -13,6 +13,7 @@ This is the complete reference for the Sentrie policy language. It covers all la
 - [Rules](#rules)
 - [Expressions](#expressions)
 - [Lambdas](#lambdas) - Callable syntax (`=>`) for passing functions as values to builtins
+- [Derives](/reference/derives) - Named pure functions (`derive`) and export rules
 - [Primitives, Collections, Shapes, and Aliases](#primitives-collections-shapes-and-aliases)
 - [Literals](#literals)
 - [Operators](#operators)
@@ -28,7 +29,7 @@ This is the complete reference for the Sentrie policy language. It covers all la
 A Sentrie program consists of:
 
 1. **Namespace declaration** (required)
-2. **Top-level declarations** (policies, shapes)
+2. **Top-level declarations** (policies, shapes, derives, exports)
 3. **Comments** (anywhere)
 
 ```text
@@ -43,7 +44,12 @@ shape User {
   -- shape definition
 }
 
+derive helper = (x: number) => {
+  yield x + 1
+}
+
 export shape User -- export shapes to allow visibility to other namespaces
+export derive helper
 ```
 
 ## Namespaces
@@ -70,7 +76,9 @@ A namespace can contain:
 
 - **policies**: `policy IDENT { ... }`
 - **shapes**: `shape IDENT { ... }`
+- **derives**: `derive IDENT = LAMBDA`
 - **shape exports**: `export shape IDENT`
+- **derive exports**: `export derive IDENT`
 
 ### Rules
 
@@ -303,6 +311,8 @@ let sum: number = reduce(nums, 0, (acc, n) => {
 })
 ```
 
+Single-parameter **derives** can also be passed by name to `any`, `all`, `filter`, `first`, `collect`, and the two-argument `distinct` form — see [Derives](/reference/derives#callbacks-for-higher-order-builtins).
+
 Which builtin you use determines how many parameters the lambda should take (its **arity**), for example:
 
 - **`any`**, **`all`**, **`filter`**, **`first`**, **`collect`**: arity **1** (element only) or **2** (element and index).
@@ -320,6 +330,22 @@ Lambdas **capture** the surrounding execution context: names visible where the l
 ### Boundaries
 
 Callable values are **not** ordinary JSON-like data. They cannot be passed through every runtime boundary that expects plain data (for example some module or interop paths that materialize `[]any` or JSON). Prefer keeping lambdas and callables inside policy evaluation; if you need to pass data out, convert to plain values first.
+
+### Typed parameters and return types
+
+You can annotate lambda parameters and the return value:
+
+```sentrie
+(a: number, b?: string): number => {
+  yield a + (count(b) as number)
+}
+```
+
+Optional parameters use `?` after the name (for example `b?`). A required parameter cannot follow an optional one; that ordering is rejected at parse time.
+
+## Derives
+
+**Derives** are named pure functions at namespace or policy scope. They reuse lambda syntax and are documented in the dedicated [Derives](/reference/derives) page (calling rules, FQN slash callees, builtin whitelist, and exports).
 
 ## Primitives, Collections, Shapes, and Aliases
 
@@ -471,6 +497,14 @@ null        -- Null value
 
 ## Operators
 
+### Elvis operator (`?:`)
+
+```text
+a ?: b
+```
+
+If `a` is **`null`** or **`undefined`**, the expression evaluates to **`b`** (and `b` is evaluated). For any other value of `a` (including `0`, `""`, or `false`), the result is **`a`** and **`b` is not evaluated**. This matches common “default for missing” patterns for facts and optional parameters.
+
 ### Arithmetic Operators
 
 ```text
@@ -549,15 +583,17 @@ count(value)               -- Length of list, dict, or string
 
 ### Casting
 
+Postfix `expr as Type` converts a value and validates it against `Type` (including shape constraints).
+
 ```text
-cast        -- Casting between primitives
+as          -- Postfix cast: expr as Type (see Types and values)
 ```
 
 Example:
 
 ```text
 let y = "99"
-let x: number = cast y as number
+let x: number = y as number
 ```
 
 ## TypeScript Modules
