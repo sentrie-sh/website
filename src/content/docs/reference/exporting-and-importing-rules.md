@@ -135,6 +135,7 @@ Imported rules are executed in a **sandboxed environment**:
 - **Isolated Execution**: The imported rule runs with only the facts you provide via `with` clauses
 - **No Side Effects**: The imported rule cannot access or modify the calling policy's context
 - **Type Safety**: Facts are validated against the target policy's type requirements
+- **Required facts**: If the target policy requires a fact you did not supply in `with` (and it has no default), the import **errors**. It does not panic the evaluator.
 - **Recursion Protection**: Sentrie prevents infinite recursion in rule imports
 
 **Example:**
@@ -404,14 +405,14 @@ rule canProceed = default false {
 - Check the namespace and policy names are correct
 - Ensure the rule name matches exactly (case-sensitive)
 
-### Fact Not Found
+### Fact Not Found / Required Fact Missing
 
-**Error**: `Fact 'factName' not found in policy 'namespace/policy'`
+**Error**: `required fact not found: <alias>` (or a similar invalid-invocation detail)
 
 **Solutions:**
-- Verify the fact name in the `with` clause matches the target policy's fact alias
+- Verify the fact name in the `with` clause matches the target policy's **alias**, not its declared name
 - Check that the fact is declared in the target policy
-- Remember: use the fact's alias, not its original name
+- Supply the fact, or give it a default on the target policy; omitting a required fact fails the import as an error
 
 ### Type Mismatch
 

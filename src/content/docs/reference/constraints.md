@@ -110,7 +110,7 @@ In the above example, the value of `y` is validated against the constraints befo
 
 ## Type Conversion with Constraints
 
-When converting between types using the `cast .. as` construct, the result is validated against the new type constraints before returning the result.
+When converting between types using the `cast .. as` construct, the result is validated against the target type and its constraints before it is returned. If validation fails, evaluation errors - it does not yield an unchecked value.
 
 ```text
 let u: number = cast "50" as number

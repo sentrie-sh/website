@@ -53,8 +53,8 @@ mycompany
 
 ## Rules
 
-- Namespaces must be declared at the top of the file (only comments can be placed before the namespace declaration)
-- Only one namespace per file
+- Namespaces must be declared at the top of the file (only comments can be placed before the namespace declaration; those comments do not drop later declarations)
+- Only one namespace per file (a second `namespace` statement is an error)
 - Namespace names must be valid identifiers
 - Use slash-separated (`/`) hierarchical names for organization
 - Multiple root namespaces are allowed in a policy pack
