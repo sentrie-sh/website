@@ -232,7 +232,7 @@ Query parameters are parsed as run configuration (currently parsed but not used 
 
 Errors are returned using RFC 9457 Problem Details format with `Content-Type: application/problem+json`:
 
-**400 Bad Request** — malformed JSON, missing path, or a caller-side evaluation problem (for example a missing required fact):
+**400 Bad Request** - malformed JSON, missing path, or a caller-side evaluation problem (for example a missing required fact):
 
 ```json
 {
@@ -244,7 +244,7 @@ Errors are returned using RFC 9457 Problem Details format with `Content-Type: ap
 }
 ```
 
-**500 Internal Server Error** — evaluation failed for an internal reason. Same Problem Details shape with `"status": 500`.
+**500 Internal Server Error** - evaluation failed for an internal reason. Same Problem Details shape with `"status": 500`.
 
 **404 Not Found**
 

@@ -127,7 +127,7 @@ The `{target...}` parameter is the full path after `/decision/`:
 }
 ```
 
-A successful evaluation is HTTP **200** with a `decisions` array and **no** `error` field. Failures do not return 200 with an error string — they use [Problem Details](#error-responses) below.
+A successful evaluation is HTTP **200** with a `decisions` array and **no** `error` field. Failures do not return 200 with an error string - they use [Problem Details](#error-responses) below.
 
 **Response Fields:**
 
@@ -202,7 +202,7 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 **Common HTTP Status Codes:**
 
 - `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` only.
-- `400 Bad Request`: Invalid request — malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact (`InvalidInvocation`)
+- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact (`InvalidInvocation`)
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
 - `500 Internal Server Error`: Evaluation failed for an internal reason

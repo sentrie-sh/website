@@ -152,7 +152,7 @@ The `@local` prefix indicates paths relative to the pack root. These paths are n
 - `@local/utils/helper` evaluates to `$PACKROOT/utils/helper.ts`
 - `@local/something` evaluates to `$PACKROOT/something.ts`
 
-`@local/…` and `require("@local/…")` are confined to the pack root. Paths that resolve outside it — including `..` segments and symlinks that leave the pack — are rejected. Relative imports (`./`, `../`) use the same containment check.
+`@local/…` and `require("@local/…")` are confined to the pack root. Paths that resolve outside it - including `..` segments and symlinks that leave the pack - are rejected. Relative imports (`./`, `../`) use the same containment check.
 
 ### JavaScript `null` and `undefined`
 

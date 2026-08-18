@@ -24,7 +24,7 @@ fact <name>?: <type> ('as' <exposed_name>)? ('default' <default_value>)?
 :::note[Note]
 - The `exposed_name` (via `as`) is the name that will be used to reference the fact when the policy is evaluated
 - If no `as` clause is provided, the fact name itself is used as the exposed name
-- Caller-supplied facts and omitted defaults are both stored under that **alias**. For `fact userRole: string as role default "guest"`, inject `role` (or omit it and the default binds as `role`) — not `userRole`.
+- Caller-supplied facts and omitted defaults are both stored under that **alias**. For `fact userRole: string as role default "guest"`, inject `role` (or omit it and the default binds as `role`) - not `userRole`.
 - The `default` clause is only allowed for optional facts (marked with `?`)
 - Facts are **required by default** - use `?` to make them optional
 - Facts can use nullable types with `T?` when explicit `null` is allowed
