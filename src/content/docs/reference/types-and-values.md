@@ -112,7 +112,7 @@ let first: number = u.one
 
 ## Converting Types
 
-You can convert between types using the `cast .. as` construct. The result is validated against the new type constraints before returning the result.
+You can convert between types using the `cast .. as` construct. The result is validated against the target type and its constraints before it is returned. A failed conversion or constraint check is an **error** (with a trace node), not a silent zero value.
 
 ```text
 let u: number = cast "50" as number

@@ -218,10 +218,11 @@ The response is a JSON object containing an array of decisions:
       },
       "trace": { ... }
     }
-  ],
-  "error": ""
+  ]
 }
 ```
+
+Success is HTTP **200** with `decisions` only. Evaluation and request failures use RFC 9457 Problem Details (see below), not a 200 body with an `error` string.
 
 ##### Query Parameters
 
@@ -231,7 +232,7 @@ Query parameters are parsed as run configuration (currently parsed but not used 
 
 Errors are returned using RFC 9457 Problem Details format with `Content-Type: application/problem+json`:
 
-**400 Bad Request**
+**400 Bad Request** — malformed JSON, missing path, or a caller-side evaluation problem (for example a missing required fact):
 
 ```json
 {
@@ -242,6 +243,8 @@ Errors are returned using RFC 9457 Problem Details format with `Content-Type: ap
   "instance": "request-id-12345"
 }
 ```
+
+**500 Internal Server Error** — evaluation failed for an internal reason. Same Problem Details shape with `"status": 500`.
 
 **404 Not Found**
 

@@ -123,10 +123,11 @@ The `{target...}` parameter is the full path after `/decision/`:
       },
       "trace": { ... }
     }
-  ],
-  "error": ""
+  ]
 }
 ```
+
+A successful evaluation is HTTP **200** with a `decisions` array and **no** `error` field. Failures do not return 200 with an error string — they use [Problem Details](#error-responses) below.
 
 **Response Fields:**
 
@@ -139,7 +140,6 @@ The `{target...}` parameter is the full path after `/decision/`:
     - `value`: The actual value of the decision (any JSON-serializable type)
   - `attachments`: Any attachments exported by the rule (dict of string to any)
   - `trace`: Execution trace information (object, optional)
-- `error`: Error message if execution failed (omitted if empty/absent)
 
 **Decision States:**
 
@@ -201,11 +201,13 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 
 **Common HTTP Status Codes:**
 
-- `200 OK`: Request successful
-- `400 Bad Request`: Invalid request (e.g., malformed JSON, missing required path)
+- `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` only.
+- `400 Bad Request`: Invalid request — malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact (`InvalidInvocation`)
 - `404 Not Found`: Policy, namespace, or rule not found
-- `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for decision endpoint)
-- `500 Internal Server Error`: Server error during policy evaluation
+- `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
+- `500 Internal Server Error`: Evaluation failed for an internal reason
+
+A failed single-rule evaluation does not include a `null` entry in `decisions`; the handler returns Problem Details instead.
 
 ## CORS Support
 
@@ -234,6 +236,6 @@ Please refer to the latest codebase for the most current implementation details.
 
 1. **Use Specific Rules**: When possible, evaluate specific rules rather than entire policies for better performance and clearer results
 2. **Validate Facts**: Ensure facts match the expected types and shapes defined in your policies
-3. **Handle Errors**: Always check the `error` field in responses and handle error cases appropriately
+3. **Handle Errors**: Treat non-200 responses as failures and parse the Problem Details body. A 200 response has no `error` field.
 4. **Use Health Checks**: Monitor the `/health` endpoint to ensure the server is running
 5. **Secure Connections**: In production, use HTTPS and implement proper authentication/authorization
