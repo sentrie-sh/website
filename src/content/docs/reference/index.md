@@ -562,7 +562,7 @@ is defined  -- Check if defined
 is not defined -- Check if not defined
 is empty    -- Check if empty
 is not empty -- Check if not empty
-is          -- Shape checking
+is T        -- Shape or type check (see Shapes)
 ```
 
 ### Collection builtins

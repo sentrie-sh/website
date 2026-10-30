@@ -117,6 +117,8 @@ For details on trinary logic, see the [Kleene's three-valued logic](/reference/t
 
 Both `==` and `is` operators check if two values are equal.
 
+When the right-hand side of `is` is a shape or a type, such as `user is User`, it checks the value against that shape or type instead. See [Checking a Value Against a Shape](/reference/shapes#checking-a-value-against-a-shape).
+
 #### Syntax
 
 ```sentrie
