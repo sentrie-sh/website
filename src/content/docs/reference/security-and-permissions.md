@@ -9,11 +9,13 @@ Permissions are the security permissions and capabilities that can be used in a 
 
 Permissions are used to define the security permissions and capabilities that can be used in a policy pack. This includes access to the filesystem and network. Permissions are defined in the `sentrie.pack.toml` file in the `permissions` section.
 
-By default, policies and it's modules have access to
+By default, policies and their modules have access to
 
 - the filesystem rooted at the policy pack root
 - no network access.
 - no access to the environment variables.
+
+Pack-supplied TypeScript is not allowed to read outside that root. `use` / `require` of `@local/…` (and relative paths normalized to `@local`) reject `..` escapes and symlinks that leave the pack.
 
 ## Syntax
 

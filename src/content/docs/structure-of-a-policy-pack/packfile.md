@@ -125,7 +125,7 @@ custom_field = "custom_value"
 **How paths work:**
 
 - All absolute paths are resolved relative to the pack file location
-- `@local` prefix in `use` statements resolves to the pack file directory
+- `@local` prefix in `use` statements resolves to the pack file directory and cannot leave the pack root
 - Enables consistent imports regardless of where files are located within the pack
 
 ## Examples

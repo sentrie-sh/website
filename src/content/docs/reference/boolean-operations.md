@@ -354,15 +354,16 @@ let has_read: bool = "read" in user_permissions and user_permissions["read"] == 
 
 ```
 
-#### Negating `in` and `contains`
+#### Negating `in`, `contains`, and `matches`
 
-`in` and `contains` can be negated by prefixing the operator with `not`, such as `not contains` and `not in`. This is equivalent to wrapping the expression in a unary `not` but results in a more readable form.
+`in`, `contains`, and `matches` can be negated by prefixing the operator with `not`: `not in`, `not contains`, and `not matches`. Each form desugars to a unary `not` wrapping the positive infix, so `9 not in [1, 2, 3]` is the same tree as `not (9 in [1, 2, 3])`.
 
 #### Syntax
 
 ```sentrie
 value not in collection
 collection not contains value
+value not matches pattern
 ```
 
 ## State Checking Operations

@@ -560,6 +560,8 @@ let y = "99"
 let x: number = cast y as number
 ```
 
+The converted value is checked against the target type and constraints. Failure is an evaluation error, not a silent zero.
+
 ## TypeScript Modules
 
 Sentrie supports importing functions from TypeScript modules, including built-in `@sentrie/*` modules and local TypeScript files.
@@ -624,7 +626,7 @@ policy mypolicy {
 }
 ```
 
-**Note:** All relative paths are normalized to `@local` paths internally. The `@local` prefix indicates paths relative to the pack root. For example, `@local/user/id` evaluates to `$PACKROOT/user/id.ts`.
+**Note:** All relative paths are normalized to `@local` paths internally. The `@local` prefix indicates paths relative to the pack root. For example, `@local/user/id` evaluates to `$PACKROOT/user/id.ts`. Specifiers that resolve outside the pack root (including `..` and outbound symlinks) are rejected.
 
 ### Available Built-in Modules
 
