@@ -297,6 +297,147 @@ let user3: User = {
 }
 ```
 
+## Checking a Value Against a Shape
+
+The `is` operator checks whether a value conforms to a shape or type. The result is `true` when the value validates against it and `false` when it does not. A value that does not conform is never an error, so a policy can branch on the shape of its input.
+
+```sentrie
+value is T
+value is not T
+```
+
+`T` can be any of:
+
+- A primitive type: `string`, `number`, `boolean`, `trinary` or `document`
+- A collection type: `list[T]`, `dict[T]` or `record[...]`
+- A shape name, either bare (`User`) or qualified (`com/example/auth/User`)
+
+Any of these can be followed by `?` to accept `null`, and by constraints such as `@minlength(3)`:
+
+```sentrie
+namespace com/example/orders
+
+shape Order {
+  id: string
+  total: number
+}
+
+shape Email string @email()
+
+policy checkout {
+  fact payload: document
+
+  rule results = {
+    let a = payload is Order
+    let b = "alice@example.com" is Email
+    let c = [1, "x"] is list[number]
+    let d = "hello" is string@minlength(3)
+    let e = null is string?
+    let f = null is string
+    yield { "a": a, "b": b, "c": c, "d": d, "e": e, "f": f }
+  }
+
+  export decision of results
+}
+```
+
+With `{"id": "o1", "total": 50}` as `payload`, `a` is `true`, `b` is `true`, `c` is `false`, `d` is `true`, `e` is `true` and `f` is `false`.
+
+### Results
+
+| Value | `value is T` |
+| --- | --- |
+| Conforms to `T` | `true` |
+| Does not conform to `T` | `false` |
+| Undefined | `false` |
+| `null`, and `T` is nullable (`T?`) | `true` |
+| `null`, and `T` is not nullable | `false` |
+
+`is not` is the negation of each row.
+
+The check fails with an error, rather than returning `false`, only when the check itself cannot be made:
+
+- A constraint is given invalid arguments, such as `@minlength("x")` (constraint arguments must be literals)
+- A field of the shape names another shape that is not visible from where the check runs
+
+### Shape or Value
+
+The same syntax is also equality: `name is "Alice"` compares two values. When the right-hand side is a bare name, Sentrie decides what it means when the pack is validated:
+
+- If the name is a shape, `is` checks the value against that shape.
+- If the name is a value in scope, such as a `let` or a fact, `is` compares for equality.
+- If the name is both, or neither, validation fails. Rename one of them, or use `==` to compare values.
+
+A shape that is unknown, or that belongs to another namespace and is not exported, is reported the same way when the pack is validated.
+
+Because this is settled at validation time, adding a shape or a `let` can never silently turn one kind of check into the other, and a misspelt shape name is reported before any rule runs.
+
+Inside a `derive`, shape names resolve in the derive's own scope, not the caller's.
+
+### Nullable Types and the Ternary Operator
+
+`?` also starts the ternary operator, so `is` has to tell the two apart. In `x is T`, a `?` right after the type is the ternary operator when the next token can start an expression (`x is string ? "a" : "b"`). Otherwise it marks the type nullable (`x is string?`).
+
+Two further cases:
+
+- After a type keyword, a `?` before `{` is also nullable, so `when x is string? { ... }` works.
+- After a shape name, which could also be a value, `? {` stays a ternary: `x is y ? {...} : {...}`.
+
+So a nullable shape in front of a rule body needs parentheses, `when (x is User?) { ... }`. Or leave the `?` off: a non-null value that conforms to `User?` also conforms to `User`.
+
+### Gating a Rule on a Shape
+
+Use `is` in a `when` clause so that a rule only runs for input of the right shape:
+
+```sentrie
+namespace com/example/events
+
+shape Purchase {
+  kind: string
+  amount: number @min(0)
+  currency: string @length(3)
+}
+
+policy classify {
+  fact event: document
+
+  rule big = default false when event is Purchase {
+    yield event.amount >= 1000
+  }
+
+  export decision of big
+}
+```
+
+If `event` is not a valid `Purchase`, the rule falls back to its default of `false`. It does not raise an error, and `event.amount` is never read.
+
+### Heterogeneous Input
+
+When a fact can arrive in more than one form, check each form in turn:
+
+```sentrie
+shape Click {
+  kind: string
+  x: number
+  y: number
+}
+
+policy classify {
+  ...
+
+  rule label = default "other" {
+    yield event is Purchase ? "purchase" : (event is Click ? "click" : "other")
+  }
+}
+```
+
+This extends the `classify` policy above, next to the `Purchase` shape. A purchase with a negative `amount` fails the `Purchase` check, so it is labeled `"other"` rather than raising an error.
+
+### Limits
+
+- `dict[T]` is checked only for being a dictionary. The values are not checked against `T`, so `{"k": "s"} is dict[number]` is `true`.
+- Inside a `derive`, `is` resolves shapes in the derive's scope, but casts, typed parameters and return types in a derive still validate against the caller's policy.
+
 ## Shape Management
 
 ### Local Availability
