@@ -138,6 +138,10 @@ export default defineConfig({
               slug: "reference/rules",
             },
             {
+              label: "Derives",
+              slug: "reference/derives",
+            },
+            {
               label: "Exporting and Importing Rules",
               slug: "reference/exporting-and-importing-rules",
             },

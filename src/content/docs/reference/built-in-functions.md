@@ -163,6 +163,8 @@ Builtins `any`, `all`, `filter`, `first`, `collect`, `reduce`, and `distinct` wo
 
 These operations return **new lists** (or scalars for `any`, `all`, `reduce`, `first`) and do not mutate the input.
 
+For `any`, `all`, `filter`, `first`, `collect`, and the two-argument `distinct` form, the callable may be an inline lambda or a **single-parameter derive** passed by name (for example `filter(items, is_valid)`). See [Derives](/reference/derives#callbacks-for-higher-order-builtins).
+
 The **`dict[T]`** type describes JSON-like objects with string keys and values of type `T`. List transforms use the **`collect(...)`** builtin; `dict[...]` is only for types.
 
 ### `any(list, predicate)`

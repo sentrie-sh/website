@@ -112,20 +112,31 @@ let first: number = u.one
 
 ## Converting Types
 
-You can convert between types using the `cast .. as` construct. The result is validated against the new type constraints before returning the result.
+You can convert between types with a **cast expression**: `expr as Type`. The result is validated against the new type constraints before it is returned.
+
+The `as` operator binds to the expression on its left, similar to unary operators in other languages. It does **not** apply to a whole arithmetic expression unless you add parentheses:
 
 ```text
-let u: number = cast "50" as number
+-- `as` applies to `b`, not to `a + b`
+let x = a + b as number
+-- same as: a + (b as number)
+
+-- convert the summed value instead
+let y = (a + b) as number
 ```
 
 ```text
-let u: string = cast 50 as string
+let u: number = "50" as number
 ```
 
 ```text
-let u: bool = cast "true" as bool
+let u: string = 50 as string
 ```
 
 ```text
-let u: document = cast { "name": "John", "age": 30 } as document
+let u: bool = "true" as bool
+```
+
+```text
+let u: document = { "name": "John", "age": 30 } as document
 ```

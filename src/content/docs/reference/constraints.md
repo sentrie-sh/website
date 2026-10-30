@@ -110,20 +110,20 @@ In the above example, the value of `y` is validated against the constraints befo
 
 ## Type Conversion with Constraints
 
-When converting between types using the `cast .. as` construct, the result is validated against the new type constraints before returning the result.
+When converting between types with a postfix cast expression (`expr as Type`), the result is validated against the new type constraints before it is returned.
 
 ```text
-let u: number = cast "50" as number
+let u: number = "50" as number
 ```
 
 ```text
-let u: string = cast 50 as string
+let u: string = 50 as string
 ```
 
 ```text
-let u: bool = cast "true" as bool
+let u: bool = "true" as bool
 ```
 
 ```text
-let u: document = cast { "name": "John", "age": 30 } as document
+let u: document = { "name": "John", "age": 30 } as document
 ```
