@@ -39,7 +39,7 @@ jobs:
         run: npm run build
 
       - name: Install Surge
-        run: npm install --global surge
+        run: npm install --global surge@0.53.0
 
       - name: Deploy to Surge
         env:
@@ -49,8 +49,7 @@ jobs:
           PREVIEW_DOMAIN="sentrie-pr-${{ github.event.pull_request.number }}.surge.sh"
           for i in {1..10}; do
             if surge --project . \
-              --domain "$PREVIEW_DOMAIN" \
-              -y; then
+              --domain "$PREVIEW_DOMAIN"; then
               echo "Surge deploy succeeded!"
               break
             fi
