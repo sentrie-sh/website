@@ -534,6 +534,8 @@ For complete rules and examples, see [Function chaining](/reference/function-cha
 >=          -- Greater than or equal
 ```
 
+`<`, `<=`, `>` and `>=` compare two numbers numerically or two strings by byte order. See [Ordering strings](/reference/boolean-operations#ordering-strings).
+
 ### Logical Operators
 
 ```text
