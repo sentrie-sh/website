@@ -186,6 +186,20 @@ curl -X POST "http://localhost:7529/decision/com/example/auth/user/allow" \
   -d '{"user": {"role": "admin"}}'
 ```
 
+### Health Endpoints
+
+**GET** `/health` is a liveness probe and always returns `200 OK`:
+
+```bash
+curl http://localhost:7529/health
+```
+
+```json
+{"check_id":"DGCLX53IVFPHMGJKCA65FXONN5","status":"healthy","time":"2026-10-31T09:15:57Z"}
+```
+
+**GET** `/health/deep` is a readiness probe. It reports the status of the `index`, `executor`, `js_runtime` and `pack` components and an `errors` array, and returns `503 Service Unavailable` when any component is unhealthy (`200 OK` otherwise). Both endpoints are unauthenticated, like the rest of the API. See [Serving Policies](/running-sentrie/serving-policies#deep-health-check) for the full response format.
+
 ## Troubleshooting
 
 ### Common Issues
