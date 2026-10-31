@@ -90,6 +90,33 @@ fact user: User as currentUser
 fact user?: User as currentUser default { "id": "", "role": "guest", "permissions": [] }
 ```
 
+### Union and `any` Types
+
+A fact can accept more than one type with a [union](/reference/types-and-values#union-types), or any value with [`any`](/reference/types-and-values#the-any-type):
+
+```sentrie
+namespace com/example/facts
+
+policy inputs {
+  fact id: string | number
+  fact nick: string | number?
+  fact meta?: any default {}
+
+  rule summary = {
+    yield { "id": id, "nick": nick, "meta": meta }
+  }
+
+  export decision of summary
+}
+```
+
+- `{"id": "u1", "nick": null}` yields `{"id": "u1", "nick": null, "meta": {}}`. `nick` accepts `null` because its number member is nullable.
+- `{"id": 5, "nick": "n", "meta": [1]}` yields `{"id": 5, "nick": "n", "meta": [1]}`.
+- `{"id": null, "nick": 1}` is rejected with `fact 'id' cannot be null`, because neither member of `string | number` accepts `null`.
+- `{"id": true, "nick": 1}` is rejected with `value true is not string | number`.
+
+A fact typed `any` accepts `null` as well as every other value. It still has to be provided unless it is optional (`fact meta?: any`).
+
 ## Fact Modifiers
 
 ### Required Facts (Default)
