@@ -294,6 +294,16 @@ let scores: dict[number] = {"alice": 95, "bob": 87}
 let invalid: number = "10" -- This will cause a type error
 ```
 
+A union type accepts any one of its members, and `any` accepts every defined value:
+
+```sentrie
+let id: string | number = "u-42"
+let ids: list[string | number] = [1, "two", 3]
+let anything: any = { "k": true }
+```
+
+See [Types and Values](/reference/types-and-values#union-types) for how unions are checked.
+
 ### Type Annotations with Constraints
 
 ```sentrie
