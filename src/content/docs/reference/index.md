@@ -358,12 +358,22 @@ Sentrie provides primitives, collections, shapes, and aliases for defining data 
 - `trinary` - Trinary values (true/false/unknown)
   - `bool` - Boolean values (true/false) - a special case of `trinary`
 - `document` - JSON-like objects
+- `any` - every defined value, `null` included (see [Types and Values](/reference/types-and-values#the-any-type))
 
 ### Collections
 
 - `list[T]` - Lists of primitive T
 - `dict[T]` - Dicts with string keys and primitive T values
 - `record[T1, T2, ...]` - Tuples with specific primitives
+
+### Unions
+
+`T1 | T2 | ...` accepts a value that matches any member, in any type position (facts, `let`, shape fields, derive parameters and returns, casts, `is`). `?` and constraints bind to the member they follow: `string | number?` is `string | (number?)`. See [Union Types](/reference/types-and-values#union-types).
+
+```text
+let id: string | number = "u-42"
+let ids: list[string | number] = [1, "two", 3]
+```
 
 ### Shape Definitions
 
@@ -562,7 +572,7 @@ is defined  -- Check if defined
 is not defined -- Check if not defined
 is empty    -- Check if empty
 is not empty -- Check if not empty
-is T        -- Shape or type check (see Shapes)
+is T        -- Shape or type check, T may be a union or any (see Shapes)
 ```
 
 ### Collection builtins
