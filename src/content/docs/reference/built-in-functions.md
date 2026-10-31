@@ -1,6 +1,6 @@
 ---
 title: Built-in Functions
-description: Reference for Sentrie builtins—collections, list transforms, and helpers—available without TypeScript imports.
+description: Reference for Sentrie builtins covering collections, list transforms, glob matching, object utilities, unit parsing and helpers, available without TypeScript imports.
 ---
 
 Sentrie provides a set of built-in functions that are always available without any imports. These functions are optimized for performance and are commonly used operations. For call syntax, TypeScript imports, and memoization, see [Using Functions](/reference/functions).
@@ -484,6 +484,163 @@ let emails: list[string] = collect(
     yield user.email
   }
 )
+```
+
+## Glob, object and unit builtins
+
+These builtins are pure: they depend only on their arguments, so they can be called from rules, `let` bindings and [derives](/reference/derives). Their names are snake_case, like `as_list` and `flatten_deep`.
+
+They share one rule for missing input: if an argument is **undefined**, the result is undefined. A `null` argument, or an argument of the wrong kind, is an error. The one exception is `object_get`, which returns its default for an undefined or `null` object. Because a `document` fact is always a dict, it can be passed anywhere a dict is expected.
+
+### `glob_match(pattern, delimiters, value) => boolean`
+
+Reports whether `value` matches the glob `pattern`. `delimiters` is a non-empty list of single-character strings that separate segments, such as `["/"]` for paths or `["."]` for host names.
+
+| Pattern | Matches |
+| --- | --- |
+| `*` | Any run of characters that are not delimiters (stays inside one segment) |
+| `**` | Any run of characters, including delimiters |
+| `?` | One character that is not a delimiter |
+| `[a-z]` | One character in the range |
+| `[!a-z]` | One character outside the range |
+| `\` followed by a character | That character literally (for example `\*`) |
+
+**Examples:**
+
+- `glob_match("/repos/*/issues", ["/"], "/repos/acme/issues")` → `true`
+- `glob_match("/repos/*/issues", ["/"], "/repos/acme/web/issues")` → `false`
+- `glob_match("/repos/**", ["/"], "/repos/acme/web/issues")` → `true`
+- `glob_match("*.example.com", ["."], "api.example.com")` → `true`
+- `glob_match("*.example.com", ["."], "a.b.example.com")` → `false`
+- `glob_match("v?.[0-3]", ["."], "v1.2")` → `true`
+- `glob_match("v?.[!0-3]", ["."], "v1.2")` → `false`
+
+```sentrie
+fact path: string as path
+
+rule can_read_issues = default false {
+  yield glob_match("/repos/*/issues", ["/"], path)
+}
+```
+
+With `path` set to `"/repos/acme/issues"` the rule yields `true`; with `"/repos/acme/web/issues"` it yields `false`.
+
+Notes:
+
+- `{a,b}` alternation is not supported. An unescaped `{` or `}` is an error; escape it with a backslash to match a literal brace (in a Sentrie string literal, write `"a\\{b"`).
+- An empty delimiter list is an error. Other policy engines may guess a default delimiter for an empty list; Sentrie asks you to say which delimiter you mean.
+- A `[...]` class never matches a delimiter, even when the delimiter is inside the range.
+- The pattern is limited to 1024 characters and the value to 8192 characters; longer input is an error. Matching does not backtrack, so a pathological pattern cannot cause a blow-up.
+
+### `object_get(object, path, default) => any`
+
+Reads a nested value from a dict (or list) by path, and returns `default` when any step of the path does not exist.
+
+`path` is a list of segments, or a single segment. A string segment selects a dict key; a non-negative integer segment selects a list element. A key that is present with a `null` value is returned as `null`, not replaced by the default.
+
+**Examples:**
+
+- `object_get({"a": {"b": [10, 20]}}, ["a", "b", 1], "none")` → `20`
+- `object_get({"a": {"b": [10, 20]}}, ["a", "c"], "none")` → `"none"`
+- `object_get({"a": 1}, "a", 0)` → `1`
+
+```sentrie
+fact config: dict[any] as config
+
+let cpu = object_get(config, ["limits", "cpu"], 1)
+```
+
+With `config` set to `{"limits": {"cpu": 2}}`, `cpu` is `2`; with `{}` it is `1`.
+
+### `object_keys(object) => list[string]`
+
+Returns the keys of a dict as a list of strings in ascending order, so the result is deterministic.
+
+**Examples:**
+
+- `object_keys({"b": 1, "a": 2, "c": 3})` → `["a", "b", "c"]`
+
+### `object_remove(object, keys) => dict[string]any`
+
+Returns a copy of a dict without the listed top-level keys. `keys` is a list of strings.
+
+**Examples:**
+
+- `object_remove({"a": 1, "b": 2, "c": 3}, ["a", "c"])` → `{"b": 2}`
+
+### `object_filter(object, keys) => dict[string]any`
+
+Returns a copy of a dict holding only the listed top-level keys. `keys` is a list of strings; keys that are not in the dict are ignored.
+
+**Examples:**
+
+- `object_filter({"a": 1, "b": 2, "c": 3}, ["a", "c"])` → `{"a": 1, "c": 3}`
+
+### `object_union(first, second) => dict[string]any`
+
+Deep-merges two dicts into a new dict. Where both have the same key, the value from `second` wins. Nested dicts are merged recursively; any other value, including a list, is replaced rather than combined. This is the same merge as [`merge`](#mergedict1-dict2--dictstringany).
+
+**Examples:**
+
+- `object_union({"a": {"x": 1}}, {"a": {"y": 2}})` → `{"a": {"x": 1, "y": 2}}`
+- `object_union({"t": [1, 2]}, {"t": [3]})` → `{"t": [3]}`
+
+```sentrie
+let defaults = {"limits": {"cpu": 1, "memory": 2}, "tags": ["a"]}
+let merged = object_union(defaults, {"limits": {"memory": 4}, "tags": ["b", "c"]})
+-- Returns {"limits": {"cpu": 1, "memory": 4}, "tags": ["b", "c"]}
+```
+
+### `parse_quantity(value) => number`
+
+Parses a Kubernetes-style quantity string into a number. The conversion is exact, so `"1Ki"` is exactly `1024`.
+
+| Suffix | Multiplier |
+| --- | --- |
+| `n`, `u`, `m` | 10^-9, 10^-6, 10^-3 (nano, micro, milli) |
+| `k`, `M`, `G`, `T`, `P`, `E` | 10^3, 10^6, 10^9, 10^12, 10^15, 10^18 |
+| `Ki`, `Mi`, `Gi`, `Ti`, `Pi`, `Ei` | 2^10, 2^20, 2^30, 2^40, 2^50, 2^60 |
+| `e3`, `E-2` | A decimal exponent (10^3, 10^-2) |
+
+A plain number such as `"128974848"` is returned as is. A sign and fractions (`"1.5k"`) are accepted. Anything else, including `"K"`, `"10GB"` and strings with spaces, is an error. The input is limited to 128 characters. The value is parsed exactly and then rounded to the nearest number Sentrie can hold; a quantity too large or too small to hold (such as `"1e-400"`) is an error.
+
+**Examples:**
+
+- `parse_quantity("10Gi")` → `10737418240`
+- `parse_quantity("500m")` → `0.5`
+- `parse_quantity("1.5k")` → `1500`
+- `parse_quantity("2e3")` → `2000`
+
+```sentrie
+fact memory: string as memory
+
+rule within_limit = default false {
+  yield parse_quantity(memory) <= parse_quantity("10Gi")
+}
+```
+
+### `parse_duration(value) => number`
+
+Parses a duration string into a number of **seconds**, the same unit that `now()` uses. The syntax is Go's duration syntax: a number with a unit of `ns`, `us` (or `µs`), `ms`, `s`, `m` (minutes) or `h`, optionally combined and optionally signed. Days and weeks are not units, so `"2d"` is an error.
+
+**Examples:**
+
+- `parse_duration("2h")` → `7200`
+- `parse_duration("1h30m")` → `5400`
+- `parse_duration("250ms")` → `0.25`
+- `parse_duration("1.5s")` → `1.5`
+
+:::caution
+The same text means different things to the two parsers: `"500m"` is `0.5` for `parse_quantity` (milli) but 30000 seconds (500 minutes) for `parse_duration`.
+:::
+
+```sentrie
+fact issued_at: number as issued_at
+fact max_age: string as max_age
+
+rule fresh = default false {
+  yield now() - issued_at <= parse_duration(max_age)
+}
 ```
 
 :::note
