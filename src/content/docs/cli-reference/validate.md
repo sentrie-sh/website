@@ -117,6 +117,7 @@ The `validate` command checks:
 - Validates type annotations on facts, variables, and expressions
 - Checks shape field types and constraints
 - Verifies constraint validations (min, max, length, etc.)
+- Checks every constraint's arguments: their number, their kinds, and arguments that can never work, such as a pattern that does not compile or `@multiple_of(0)`. See [Constraint Arguments](/reference/constraints#constraint-arguments).
 
 ### 4. References
 - Validates namespace, policy, and rule references
