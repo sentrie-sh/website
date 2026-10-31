@@ -500,7 +500,7 @@ For production deployment:
 3. **Set up monitoring** and logging
 4. **Configure load balancing** for high availability
 5. **Use environment variables** for configuration
-6. **Set up health checks** for the API
+6. **Set up health checks** for the API (`/health` for liveness, `/health/deep` for readiness)
 
 ### Docker Deployment
 

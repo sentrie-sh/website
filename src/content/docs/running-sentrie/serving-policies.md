@@ -19,10 +19,15 @@ sentrie serve <policy-pack>
 
 - `--http-port` (default: `7529`): Port number to listen on
 - `--pack-location` (default: `./`): Directory containing the policy pack to serve
-- `--http-listen` (default: `["local"]`): Address(es) to listen on. Can be specified multiple times. Accepts:
-  - `local` - Listen on localhost (127.0.0.1)
-  - `all` - Listen on all interfaces (0.0.0.0)
-  - Comma-separated list of specific IP addresses or hostnames
+- `--http-listen` (default: `["local"]`): Address(es) to listen on. Can be specified multiple times. Accepts one of the predefined values below, or one or more comma-separated IP addresses or hostnames:
+  - `local` - Listen on `localhost`
+  - `local4` - Listen on the IPv4 loopback address (127.0.0.1)
+  - `local6` - Listen on the IPv6 loopback address (`::1`)
+  - `network` - Listen on all network interfaces, IPv4 and IPv6
+  - `network4` - Listen on all IPv4 interfaces (0.0.0.0)
+  - `network6` - Listen on all IPv6 interfaces (`::`)
+
+  A predefined value must be the only `--http-listen` value.
 
 ### Examples
 
@@ -34,9 +39,9 @@ sentrie serve .
 sentrie serve --http-port 8080 /path/to/policy-pack
 
 # Listen on all interfaces
-sentrie serve --http-listen all --http-port 8080 .
+sentrie serve --http-listen network --http-port 8080 .
 
-# Listen on localhost only
+# Listen on localhost only (the default)
 sentrie serve --http-listen local --http-port 8080 .
 
 # Listen on multiple interfaces
@@ -49,16 +54,135 @@ sentrie serve --http-listen 192.168.1.100,192.168.100.101 --http-port 8080 .
 
 **GET** `/health`
 
-Returns the health status of the server.
+A liveness probe. It answers `200 OK` whenever the server can handle a request, and does not inspect the pack, the index or the executor.
 
 **Response:**
 
 ```json
 {
+  "check_id": "DGCLX53IVFPHMGJKCA65FXONN5",
   "status": "healthy",
-  "time": "2024-01-15T10:30:00Z"
+  "time": "2026-10-31T09:15:57Z"
 }
 ```
+
+- `check_id`: A fresh random value on every call, so a caller can tell a live answer from a cached one.
+- `status`: Always `healthy`.
+- `time`: The server time in RFC 3339 format (UTC).
+
+### Deep Health Check
+
+**GET** `/health/deep`
+
+A readiness probe. It checks the components the server depends on and reports a status for each one.
+
+| Component    | What it reports                                                                                                              |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `index`      | Whether the pack was validated and committed, any failure, and the number of namespaces, policies, programs, rules and shapes |
+| `executor`   | Whether the executor was initialized                                                                                         |
+| `js_runtime` | Whether the JavaScript registry was initialized and which built-in `@sentrie/*` modules are registered                       |
+| `pack`       | The pack `name` and `version`, and whether the pack directory can still be read                                              |
+
+The top-level `status` is `healthy` when every component is healthy and `unhealthy` otherwise. The HTTP status code follows it: `200 OK` when healthy, `503 Service Unavailable` when any component is unhealthy. Each unhealthy component also adds an entry to `errors`, which is an empty array when everything is healthy.
+
+**Healthy response (200):**
+
+```json
+{
+  "status": "healthy",
+  "time": "2026-10-31T09:15:57Z",
+  "components": {
+    "index": {
+      "status": "healthy",
+      "validated": true,
+      "committed": true,
+      "validation_error": null,
+      "commit_error": null,
+      "statistics": {
+        "namespaces": 1,
+        "policies": 1,
+        "programs": 1,
+        "rules": 1,
+        "shapes": 0
+      }
+    },
+    "executor": {
+      "status": "healthy",
+      "initialized": true
+    },
+    "js_runtime": {
+      "status": "healthy",
+      "registry_initialized": true,
+      "builtin_modules": {
+        "registered": 15,
+        "modules": ["@sentrie/collection", "@sentrie/crypto", "@sentrie/encoding", "@sentrie/hash", "@sentrie/js", "@sentrie/json", "@sentrie/jwt", "@sentrie/math", "@sentrie/net", "@sentrie/regex", "@sentrie/semver", "@sentrie/string", "@sentrie/time", "@sentrie/url", "@sentrie/uuid"]
+      }
+    },
+    "pack": {
+      "status": "healthy",
+      "loaded": true,
+      "name": "example-pack",
+      "version": "1.2.3",
+      "accessible": true
+    }
+  },
+  "errors": []
+}
+```
+
+**Unhealthy response (503):**
+
+This is the response when the pack directory is removed while the server is running. The `index`, `executor` and `js_runtime` components are the same as above and are left out here.
+
+```json
+{
+  "status": "unhealthy",
+  "time": "2026-10-31T09:16:05Z",
+  "components": {
+    "pack": {
+      "status": "unhealthy",
+      "loaded": true,
+      "name": "example-pack",
+      "version": "1.2.3",
+      "accessible": false,
+      "error": "pack directory is not accessible"
+    }
+  },
+  "errors": [
+    {
+      "component": "pack",
+      "message": "pack directory is not accessible"
+    }
+  ]
+}
+```
+
+Notes on both endpoints:
+
+- Only `GET` (and `HEAD`) is accepted. Other methods return `405 Method Not Allowed`.
+- Responses carry `Cache-Control: no-store`.
+- Like the rest of the server, they are unauthenticated.
+- When the index fails validation or commit, the response contains only a fixed message (`index validation failed` or `index commit failed`). The details are written to the server's debug log, and the response never includes a filesystem path.
+- The checks read the server's live state. They never validate or commit the index themselves.
+
+Because `/health` does not depend on the pack and `/health/deep` returns `503` when a component is unhealthy, they map onto container probes. For example, in Kubernetes:
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 7529
+readinessProbe:
+  httpGet:
+    path: /health/deep
+    port: 7529
+```
+
+Start the server with `--http-listen network` (or `network4` for IPv4 only) so the probes can reach it from outside the container.
+
+:::caution
+The API has no authentication (see [sentrie-sh/sentrie#115](https://github.com/sentrie-sh/sentrie/issues/115)). Keep it behind a cluster-internal Service or a NetworkPolicy, and never expose it publicly.
+:::
 
 ### Decision Evaluation
 
@@ -235,5 +359,5 @@ Please refer to the latest codebase for the most current implementation details.
 1. **Use Specific Rules**: When possible, evaluate specific rules rather than entire policies for better performance and clearer results
 2. **Validate Facts**: Ensure facts match the expected types and shapes defined in your policies
 3. **Handle Errors**: Always check the `error` field in responses and handle error cases appropriately
-4. **Use Health Checks**: Monitor the `/health` endpoint to ensure the server is running
+4. **Use Health Checks**: Monitor `/health` to ensure the server is running, and `/health/deep` to ensure it is ready to evaluate policies
 5. **Secure Connections**: In production, use HTTPS and implement proper authentication/authorization
