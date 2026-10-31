@@ -450,6 +450,25 @@ let score: Positive100 = 50
 "line 1\nline 2"
 ```
 
+### Heredoc Strings
+
+A heredoc writes a multi-line string without escapes. It opens with `<<<` and a tag, and ends at a line that holds only that tag:
+
+```text
+let query = <<<SQL
+select "name"
+  from users
+SQL
+```
+
+The value of `query` is `select "name"\n  from users\n`.
+
+- **Tag:** letters, digits and underscores, starting with a letter or underscore, written directly after `<<<`. Only whitespace may follow it on the opening line.
+- **Body:** every line between the opening line and the terminator, taken as written. Quotes and backslashes are not escapes, leading indentation is kept, and every body line ends with a newline.
+- **Terminator:** a line whose text is exactly the tag. Trailing spaces or tabs after the tag are allowed. Indenting the tag does not end the heredoc, and neither does a line that contains the tag along with other text.
+- **Line endings:** files with Windows (CRLF) line endings work the same as LF files. The `\r` at the end of each line is dropped, so the value always has LF line endings.
+- **Errors:** a heredoc with no terminator line is reported at its `<<<`, with the tag it was looking for.
+
 ### Numeric Literals
 
 ```text
