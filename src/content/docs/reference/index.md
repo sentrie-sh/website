@@ -581,6 +581,21 @@ reduce(list, initial, fn)  -- Left fold with an accumulator
 count(value)               -- Length of list, dict, or string
 ```
 
+### Glob, object and unit builtins
+
+```text
+glob_match(pattern, delimiters, value)  -- Glob match; * stays in a segment, ** crosses delimiters
+object_get(obj, path, default)          -- Nested lookup by path, or the default
+object_keys(obj)                        -- Sorted keys of a dict
+object_remove(obj, keys)                -- Copy of a dict without the listed keys
+object_filter(obj, keys)                -- Copy of a dict with only the listed keys
+object_union(a, b)                      -- Deep merge, second wins, lists replaced
+parse_quantity(string)                  -- "10Gi", "500m" to a number (exact)
+parse_duration(string)                  -- "2h", "1h30m" to seconds
+```
+
+See [Built-in Functions](/reference/built-in-functions) for details and examples.
+
 ### Casting
 
 Postfix `expr as Type` converts a value and validates it against `Type` (including shape constraints).

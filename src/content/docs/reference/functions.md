@@ -233,7 +233,7 @@ policy example {
 
 ## Built-in Functions
 
-Sentrie provides builtins such as `count`, `merge`, and list helpers (`any`, `all`, `filter`, `first`, `collect`, `reduce`, `distinct`). For names, signatures, and examples, see [Built-in Functions](/reference/built-in-functions).
+Sentrie provides builtins such as `count`, `merge`, list helpers (`any`, `all`, `filter`, `first`, `collect`, `reduce`, `distinct`), `glob_match`, object utilities (`object_get`, `object_keys`, `object_remove`, `object_union`, `object_filter`) and unit parsers (`parse_quantity`, `parse_duration`). For names, signatures, and examples, see [Built-in Functions](/reference/built-in-functions).
 
 ## See Also
 
