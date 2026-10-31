@@ -48,6 +48,26 @@ let c:Positive100 = y
 In the above example, the value of `y` is validated against the constraints before being assigned to `c`.
 :::
 
+## Constraint Arguments
+
+Constraint arguments are literals, and they are checked when the pack is loaded, not when a value first reaches them. Sentrie checks:
+
+- the number of arguments each constraint takes;
+- the kind of each argument, for example a number for `@min` and a string for `@regexp`;
+- arguments that can never work, such as a pattern that does not compile, `@multiple_of(0)`, or a `@range` whose minimum is above its maximum.
+
+The check covers every place a type can be written: facts, `let`s, shape fields and aliases, derive and lambda parameter and return types, casts, `is` checks, and element types inside `list`, `dict` and `record`. `sentrie validate` reports a broken argument at the constraint's position, and `sentrie exec` fails with the same error before it evaluates anything:
+
+```text
+let v: string @regexp("[") = "a"
+```
+
+```text
+invalid argument to constraint 'regexp': invalid regexp pattern: error parsing regexp: missing closing ]: `[`
+```
+
+At runtime, a constraint's arguments are also checked before the value's kind. A broken argument is an error for every value, so `x is not string @regexp("[")` fails instead of quietly returning `true` for a value that is not a string.
+
 ## Available Constraints
 
 ### Numeric Constraints (`number`)
