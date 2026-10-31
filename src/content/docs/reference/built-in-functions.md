@@ -1,6 +1,6 @@
 ---
 title: Built-in Functions
-description: Reference for Sentrie builtins—collections, list transforms, and helpers—available without TypeScript imports.
+description: Reference for Sentrie builtins - collections, list transforms, sets, and helpers - available without TypeScript imports.
 ---
 
 Sentrie provides a set of built-in functions that are always available without any imports. These functions are optimized for performance and are commonly used operations. For call syntax, TypeScript imports, and memoization, see [Using Functions](/reference/functions).
@@ -485,6 +485,92 @@ let emails: list[string] = collect(
   }
 )
 ```
+
+## Set builtins
+
+Builtins `set`, `union`, `intersection`, `difference`, `is_subset` and `is_superset` work with [sets](/reference/types-and-values#sets). A set is a collection of distinct values that is always written out in sorted order.
+
+`union`, `intersection`, `difference`, `is_subset` and `is_superset` take two operands. Each operand may be a **set or a plain list**, so a fact that arrives as a JSON array can be used directly without calling `set` first. A list operand has its duplicates dropped. `union`, `intersection` and `difference` return a set; `is_subset` and `is_superset` return a boolean.
+
+All of them are strict about their inputs: an operand that is `null` or not a list is an error, as with `merge` and `distinct`. They are also allowed inside [derives](/reference/derives#pure-builtin-whitelist).
+
+### `set(list) => set[any]`
+
+Builds a set from a list: duplicates are removed and the elements are sorted.
+
+**Examples:**
+
+- `set([3, 1, 2, 3])` → `[1, 2, 3]`
+- `set(["b", "a", "b"])` → `["a", "b"]`
+- `set([])` → `[]`
+
+```sentrie
+let roles = set(["editor", "admin", "editor"])
+-- Returns ["admin", "editor"]
+```
+
+### `union(a, b) => set[any]`
+
+Returns the set of elements that are in either operand.
+
+```sentrie
+let all_roles = union(["admin"], ["editor", "admin"])
+-- Returns ["admin", "editor"]
+```
+
+### `intersection(a, b) => set[any]`
+
+Returns the set of elements that are in both operands.
+
+```sentrie
+let shared = intersection([1, 2, 3], [2, 3, 4])
+-- Returns [2, 3]
+```
+
+### `difference(a, b) => set[any]`
+
+Returns the set of elements in the first operand that are **not** in the second.
+
+```sentrie
+let remaining = difference([1, 2, 3], [2])
+-- Returns [1, 3]
+```
+
+### `is_subset(a, b) => boolean` / `is_superset(a, b) => boolean`
+
+`is_subset(a, b)` returns whether every element of `a` is in `b`. `is_superset(a, b)` returns whether every element of `b` is in `a`. The empty set is a subset of every set.
+
+**Examples:**
+
+- `is_subset([1, 2], [1, 2, 3])` → `true`
+- `is_subset([1, 4], [1, 2, 3])` → `false`
+- `is_subset([], [1])` → `true`
+- `is_superset([1, 2, 3], [1, 2])` → `true`
+- `is_superset([1], [1, 2])` → `false`
+
+### Example: required roles
+
+```sentrie
+namespace com/example/auth
+
+policy access {
+  fact user_roles: set[string]
+  fact required_roles: list[string]
+
+  let missing = difference(required_roles, user_roles)
+
+  rule allowed = {
+    yield is_subset(required_roles, user_roles) ? "allow" : "deny"
+  }
+
+  rule missing_roles = { yield missing }
+
+  export decision of allowed
+  export decision of missing_roles
+}
+```
+
+With `{"user_roles": ["viewer", "editor"], "required_roles": ["editor", "billing"]}`, `allowed` yields `"deny"` and `missing_roles` yields `["billing"]`. With `{"user_roles": ["viewer", "editor", "billing"], "required_roles": ["editor", "billing"]}`, `allowed` yields `"allow"` and `missing_roles` yields `[]` (an empty collection is falsy, so the rule's state is `false`).
 
 :::note
 Built-in functions are fast and lightweight. While they support memoization syntax (see [Function Memoization](/reference/functions#function-memoization)), they are not actually memoized as caching would provide minimal benefit for these operations.
