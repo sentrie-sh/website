@@ -309,7 +309,7 @@ value is not T
 `T` can be any of:
 
 - A primitive type: `string`, `number`, `boolean`, `trinary` or `document`
-- A collection type: `list[T]`, `dict[T]` or `record[...]`
+- A collection type: `list[T]`, `dict[T]`, `set[T]` or `record[...]`
 - A shape name, either bare (`User`) or qualified (`com/example/auth/User`)
 
 Any of these can be followed by `?` to accept `null`, and by constraints such as `@minlength(3)`:
