@@ -39,6 +39,37 @@ let u: bool = true
 let u: document = { "name": "John", "age": 30 }
 ```
 
+### Number Literals
+
+A number literal is a run of digits, optionally followed by a fraction and an exponent:
+
+```text
+42          -- Integer
+3.14        -- Decimal
+1e5         -- 100000
+1E5         -- Same as 1e5
+1e+5        -- Same as 1e5
+2.5e-3      -- 0.0025
+```
+
+An exponent is `e` or `E`, an optional `+` or `-`, and at least one digit. A literal with an exponent is a float. Exponent literals work everywhere a number literal does, including [constraint](/reference/constraints/) arguments:
+
+```text
+shape Reading {
+  value: number @min(1e-3) @max(1.5E+3)
+}
+```
+
+Malformed number literals are errors when the pack is loaded:
+
+| Literal            | Error                                              |
+| ------------------ | -------------------------------------------------- |
+| `1e`, `1e+`, `1ex` | the exponent needs at least one digit              |
+| `1.e5`             | a digit must follow the decimal point              |
+| `1e400`            | value out of range (a number must fit in a 64-bit float) |
+
+Because `e` right after a number always starts an exponent, separate a number from a following word with a space.
+
 ## Collection Types
 
 Collections allow you to work with groups of related values:
