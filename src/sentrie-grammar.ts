@@ -13,7 +13,7 @@ export const sentrieGrammar = {
     // Keywords - Program Structure
     {
       name: 'keyword.control.sentrie',
-      match: /\b(namespace|policy|rule|fact|let|export|import|use|from|as|default|when|yield|shape|attach|decision|of|with)\b/
+      match: /\b(namespace|policy|rule|fact|let|export|import|use|from|as|default|when|yield|shape|attach|decision|of|with|contribute)\b/
     },
 
     // Keywords - Boolean operators
