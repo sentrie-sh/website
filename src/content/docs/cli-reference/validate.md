@@ -123,6 +123,7 @@ The `validate` command checks:
 - Checks that imported rules exist
 - Verifies exported shapes are accessible
 - Validates rule imports and exports
+- Detects reference cycles between the rules and lets of a policy, whatever expression the reference sits in: operators, calls, index access, casts, transforms, list and map literals (keys as well as values), lambda bodies and import `with` values. A cycle fails with `infinite recursion: a -> b -> a`, the error `exec` would otherwise hit on the first evaluation. A rule that refers directly to itself (`rule r = { yield r }`) is not caught yet ([sentrie#155](https://github.com/sentrie-sh/sentrie/issues/155)).
 
 ### 5. Executor Creation
 - Attempts to create a runtime executor
