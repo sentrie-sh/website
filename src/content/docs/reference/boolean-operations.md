@@ -274,6 +274,48 @@ let is_limited: bool = quantity <= 10
 -- Result: true
 ```
 
+### Ordering Strings
+
+The ordering operators `<`, `<=`, `>`, and `>=` also work on two strings. Strings are compared by byte order, which is the same as comparing their UTF-8 bytes one by one. The comparison is not locale-aware and does not fold case.
+
+#### Examples
+
+```sentrie
+let upper_first: bool = "Z" < "a"
+-- Result: true (uppercase letters sort before lowercase)
+
+let by_prefix: bool = "app" < "apple"
+-- Result: true (a shorter string sorts before a longer one it prefixes)
+
+let digits: bool = "10" < "9"
+-- Result: true (strings are not compared as numbers)
+
+let same: bool = "a" <= "a"
+-- Result: true
+```
+
+Because the comparison is by byte order, ISO-8601 timestamps in the same format and time zone sort chronologically. This makes a time window check a plain string comparison:
+
+```sentrie
+namespace billing
+
+policy invoices {
+  fact created_at: string
+
+  rule in_2024 = created_at >= "2024-01-01T00:00:00Z" and created_at < "2025-01-01T00:00:00Z"
+
+  export decision of in_2024
+}
+```
+
+With `created_at` set to `"2024-06-01T12:00:00Z"` the rule is `true`. With `"2023-12-31T23:59:59Z"` or `"2025-01-01T00:00:00Z"` it is `false`.
+
+:::caution[Strings and numbers do not mix]
+Both operands must be strings, or both must be numbers. Comparing a string with a number, such as `created_at < 5`, fails with `left operand is not a number`. Convert one side first, for example with `as number`, if you want a numeric comparison.
+:::
+
+If either operand is `undefined`, the comparison is `undefined`, as for numbers; a rule that yields it resolves to `unknown`.
+
 ## Pattern Matching Operations
 
 ### Regular Expression Matching (`matches`)
