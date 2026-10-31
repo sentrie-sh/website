@@ -363,6 +363,7 @@ Sentrie provides primitives, collections, shapes, and aliases for defining data 
 
 - `list[T]` - Lists of primitive T
 - `dict[T]` - Dicts with string keys and primitive T values
+- `set[T]` - Distinct values of type T, written out in sorted order
 - `record[T1, T2, ...]` - Tuples with specific primitives
 
 ### Shape Definitions
@@ -579,6 +580,19 @@ distinct(list)             -- Unique elements (by scalar identity)
 distinct(list, keyFn)      -- Unique elements by a scalar key from each item
 reduce(list, initial, fn)  -- Left fold with an accumulator
 count(value)               -- Length of list, dict, or string
+```
+
+### Set builtins
+
+These builtins build and combine [sets](/reference/types-and-values#sets). The two-operand builtins accept a set or a plain list for each operand.
+
+```text
+set(list)                  -- Distinct elements of a list, sorted
+union(a, b)                -- Elements in either operand
+intersection(a, b)         -- Elements in both operands
+difference(a, b)           -- Elements of a that are not in b
+is_subset(a, b)            -- True if every element of a is in b
+is_superset(a, b)          -- True if every element of b is in a
 ```
 
 ### Casting
