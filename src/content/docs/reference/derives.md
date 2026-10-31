@@ -84,6 +84,7 @@ Derive bodies are validated statically and enforced at runtime. A derive must be
 
 - **TypeScript module calls** (`alias.fn(...)`) — including modules imported with `use`
 - **Facts** — fact identifiers are not available inside a derive
+- **Pack data**: `data` aliases are not available inside a derive. Pass the value in as an argument instead (see [Pack data](/reference/facts/#pack-data))
 - **Rules** — rules cannot be referenced or dispatched from inside a derive
 - **Callable return values** — a derive cannot `yield` a lambda or other callable value
 - **Non-whitelisted builtins** — builtins outside the pure set cannot be used from a derive

@@ -107,6 +107,7 @@ A policy can contain (in grouped order; comments anywhere):
 
 - **Metadata** (optional): `title`, `description`, `version`, `tag "key" = "value"`
 - **Facts**: `fact IDENT ('?'?) : primitive/shape ('as' IDENT)? ('default' expr)?`
+- **Pack data**: `data IDENT (':' primitive/shape)? ('as' IDENT)?`
 - **Use statements**: `use { function1, function2 } from source as alias`
 - **Rules**: `rule IDENT = ...`
 - **Shapes**: `shape IDENT { ... }` (policy-local; body section)
