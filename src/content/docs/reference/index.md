@@ -108,7 +108,8 @@ A policy can contain (in grouped order; comments anywhere):
 - **Metadata** (optional): `title`, `description`, `version`, `tag "key" = "value"`
 - **Facts**: `fact IDENT ('?'?) : primitive/shape ('as' IDENT)? ('default' expr)?`
 - **Use statements**: `use { function1, function2 } from source as alias`
-- **Rules**: `rule IDENT = ...`
+- **Rules**: `rule IDENT (: type)? = ...`
+- **Contributions**: `contribute IDENT (when expr)? { ... }`, adding to a rule declared with a `list[T]`, `boolean` or `trinary` type
 - **Shapes**: `shape IDENT { ... }` (policy-local; body section)
 - **Variables**: `let IDENT : primitive/shape = expr`
 - **Exports**: `export decision of IDENT`
@@ -140,12 +141,12 @@ Rules are the core of Sentrie policies. They define what decisions to make based
 ### Syntax
 
 ```text
-rule IDENT = (default expr)? (when expr)? blockExpr
+rule IDENT (: type)? = (default expr)? (when expr)? blockExpr
 ```
 
 ### Components
 
-1. **Name**: `rule IDENT`
+1. **Name**: `rule IDENT`, with an optional declared type, `rule IDENT: type`
 2. **Default** (optional): `default expr` - value when `when` is false or rule body doesn't yield
 3. **When** (optional): `when expr` - condition that must be true
 4. **Body**: `blockExpr` - block expression that must contain a `yield` statement
@@ -176,6 +177,17 @@ rule calculateDiscount = default 0 {
   yield finalPrice
 }
 ```
+
+### Contributions
+
+A rule declared as `list[T]`, `boolean` or `trinary` can be added to with `contribute`. See [Rules](/reference/rules#contributing-to-a-rule).
+
+```text
+rule deny: list[string] = []
+contribute deny when user.disabled { yield "user disabled" }
+```
+
+`contribute` is a reserved keyword, so it cannot be used as an identifier, a namespace segment or a field name after a `.`.
 
 ## Expressions
 

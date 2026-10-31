@@ -15,13 +15,14 @@ Policies are the fundamental building blocks of Sentrie policy packs. They encap
 
 ### Core Components
 
-Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts** → optional **uses** → **body** (`let`, `rule`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
+Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts** → optional **uses** → **body** (`let`, `rule`, `contribute`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
 
 - **Metadata** (optional): `title`, `description`, `version`, `tag` — static strings for docs and tooling
 - **Facts**: Input data with `fact` statements (**all facts before any `use`**)
 - **Use**: External TypeScript functions via `use` statements (after facts, if any)
 - **Variables**: Intermediate calculations using `let` statements
 - **Rules**: Decision logic with conditions and outcomes with `rule` statements
+- **Contributions**: Additions to a rule's result, made with `contribute` statements
 - **Exports**: Rule outcomes for external consumption with `export` statements
 
 ## Policy body ordering (required)
@@ -31,7 +32,7 @@ Ignoring comments, statements inside a policy must follow this **grouped** order
 1. **Metadata block** (optional): any of `title`, `description`, `version`, `tag*`, grouped together at the top.
 2. **Facts block** (optional): `fact*` — all facts before any `use`.
 3. **Uses block** (optional): `use*`.
-4. **Body**: `rule`, `export` (rule export), `let`, `shape`, etc.
+4. **Body**: `rule`, `contribute`, `export` (rule export), `let`, `shape`, etc.
 
 **Comments** may appear anywhere and do **not** break these groups. **Metadata** may be separated only by comments and still count as one contiguous metadata block.
 
@@ -171,6 +172,10 @@ rule canWrite = default false when (user.active) {
 
 -- Composite rule
 rule canAccess = canRead or canWrite
+
+-- Rule with a declared type, which other statements can contribute to
+rule deny: list[string] = []
+contribute deny when not user.active { yield "inactive" }
 ```
 
 :::note
