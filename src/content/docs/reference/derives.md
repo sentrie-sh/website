@@ -69,6 +69,48 @@ A rule in `com/ex/polB` cannot call `com/ex/polA/secret()` even when both polici
 
 Resolution order for an unqualified name in a policy prefers a **policy-local** derive over a namespace derive with the same name.
 
+### Shapes named inside a derive
+
+Every type written in a derive is resolved where the derive is declared, never where it is called from:
+
+- the parameter types and the return type;
+- casts (`v as Item`) and typed `let`s (`let i: Item = v`) in the body;
+- `x is Item` checks in the body;
+- the parameter and return types of a lambda written in the body.
+
+For a namespace-scoped derive that is its namespace; for a policy-scoped derive it is its policy. An exported derive therefore checks against its own shapes from any caller. A caller that declares a shape with the same name does not change the check, and a caller that has no such shape does not make it fail:
+
+```sentrie
+namespace com/example/catalog
+
+shape Item {
+  sku: string
+  price: number
+}
+
+derive priceOf = (item: Item): number => {
+  yield item.price
+}
+
+export derive priceOf
+```
+
+```sentrie
+namespace com/example/shop
+
+shape Item {
+  name: string
+}
+
+policy cart {
+  fact line: document as line
+  rule total = { yield com/example/catalog/priceOf(line) }
+  export decision of total
+}
+```
+
+`line` is checked against `com/example/catalog`'s `Item` (`sku` and `price`), not the shop's. `{"sku": "a", "price": 3}` gives `3`; `{"name": "x"}` fails with `derive argument "item": field sku is required`. A lambda written in a policy and passed into a derive keeps using its own policy's shapes.
+
 ## Purity rules
 
 Derive bodies are validated statically and enforced at runtime. A derive must be **deterministic within a single policy execution**.
