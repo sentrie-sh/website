@@ -20,6 +20,12 @@ let u: number @min(0) @max(100) = 101  -- This will fail validation
 
 :::
 
+A number argument to a constraint can use [exponent notation](/reference/types-and-values/#number-literals):
+
+```text
+let rate: number @min(1e-3) @max(1.5E+3) = 0.5
+```
+
 ## Collection Constraints
 
 You can apply constraints to elements within collections:

@@ -461,6 +461,8 @@ let score: Positive100 = 50
 1.5e-3      -- Scientific notation with negative exponent
 ```
 
+See [Types and Values](/reference/types-and-values/#number-literals) for the exact number literal forms.
+
 ### Boolean and Trinary Literals
 
 ```text
