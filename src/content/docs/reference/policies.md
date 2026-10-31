@@ -15,10 +15,11 @@ Policies are the fundamental building blocks of Sentrie policy packs. They encap
 
 ### Core Components
 
-Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts** → optional **uses** → **body** (`let`, `rule`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
+Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts and pack data** → optional **uses** → **body** (`let`, `rule`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
 
 - **Metadata** (optional): `title`, `description`, `version`, `tag` — static strings for docs and tooling
 - **Facts**: Input data with `fact` statements (**all facts before any `use`**)
+- **Pack data**: Static reference data from the pack's `[data]` table with `data` statements (same block as facts; see [Pack data](/reference/facts/#pack-data))
 - **Use**: External TypeScript functions via `use` statements (after facts, if any)
 - **Variables**: Intermediate calculations using `let` statements
 - **Rules**: Decision logic with conditions and outcomes with `rule` statements
@@ -29,7 +30,7 @@ Statements inside a policy follow a **fixed grouped order** (comments may appear
 Ignoring comments, statements inside a policy must follow this **grouped** order:
 
 1. **Metadata block** (optional): any of `title`, `description`, `version`, `tag*`, grouped together at the top.
-2. **Facts block** (optional): `fact*` — all facts before any `use`.
+2. **Facts block** (optional): `fact` and `data` statements in any order. Every `fact` comes before any `use`; a `data` statement may also sit among the uses, but before the body.
 3. **Uses block** (optional): `use*`.
 4. **Body**: `rule`, `export` (rule export), `let`, `shape`, etc.
 
