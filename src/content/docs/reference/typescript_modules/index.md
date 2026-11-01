@@ -33,6 +33,10 @@ policy mypolicy {
 }
 ```
 
+## Numbers and Module Calls
+
+A Sentrie `number` can be an exact 64-bit integer, but JavaScript numbers are floats. An integer beyond `Number.MAX_SAFE_INTEGER` (2^53-1) in magnitude cannot be passed to a module function: it raises an error instead of being rounded. See [Numbers Passed to TypeScript Modules](/reference/using-typescript#numbers-passed-to-typescript-modules).
+
 ## Module Categories
 
 ### Data Manipulation
