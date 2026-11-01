@@ -41,7 +41,7 @@ Typed parameters, optional parameters (`?`), and return types use the same lambd
 
 ### Unqualified name
 
-`myDerive(arg1, arg2)` resolves **derive → builtin → TypeScript module** in that order. If a derive has the same name as a builtin, the derive wins (shadowing is allowed by design).
+`myDerive(arg1, arg2)` resolves **local value → derive → builtin** in that order, where a local value is a `let`, a lambda parameter, a fact or a rule. If a derive has the same name as a builtin, the derive wins (shadowing is allowed by design). A `let` or parameter with the same name as a derive wins in turn, so `let myDerive = (x) => { ... }` inside a rule makes `myDerive(...)` call the lambda. TypeScript module functions are always written `alias.fn(...)` and never compete for an unqualified name. See [Calling a lambda by name](/reference#calling-a-lambda-by-name).
 
 Inside a **rule** or other non-derive expression, an unqualified derive name is invoked with `(...)`.
 
@@ -77,6 +77,7 @@ Derive bodies are validated statically and enforced at runtime. A derive must be
 
 - Parameters, `let` bindings in the derive body, and pure builtin calls from the whitelist below
 - Calls to other **visible** derives (by name or slash FQN, subject to scope and export rules)
+- Calls to a lambda held by a `let` in the derive body, where the `let` is bound directly to a lambda expression (for example `let inc = (y) => { yield y + 1 }` followed by `inc(x)`)
 - Inline lambdas passed as arguments to pure builtins (for example `filter(items, (x) => { yield x > 0 })`)
 - Single-parameter derives passed as callbacks to higher-order pure builtins (see below)
 
@@ -86,6 +87,7 @@ Derive bodies are validated statically and enforced at runtime. A derive must be
 - **Facts** — fact identifiers are not available inside a derive
 - **Rules** — rules cannot be referenced or dispatched from inside a derive
 - **Callable return values** — a derive cannot `yield` a lambda or other callable value
+- **Calling a parameter**: `derive apply = (fn, x) => { yield fn(x) }` is rejected with `calling parameter "fn" is not permitted inside a derive`, because the caller may pass a lambda defined outside the derive that reads facts or calls modules. A `let` bound to anything other than a lambda expression cannot be called either
 - **Non-whitelisted builtins** — builtins outside the pure set cannot be used from a derive
 
 The `now()` builtin is explicitly allowed: it returns the policy execution start time (`createdAt`), not wall-clock time per call, so it stays deterministic for the run.

@@ -21,6 +21,8 @@ Functions are called using the standard function call syntax with parentheses:
 let name = functionName(argument1, argument2, ...)
 ```
 
+`functionName` can be a builtin, a [derive](/reference/derives), or a lambda held by a `let` or a parameter. A local value shadows a derive or builtin of the same name. See [Calling a lambda by name](/reference#calling-a-lambda-by-name) for the full order and for recursion.
+
 ### Module Functions
 
 Functions imported from TypeScript modules are called using the module alias followed by a dot:
@@ -149,6 +151,7 @@ let result = expensiveFunction(data)!3600  -- Cached for 1 hour
 
 - **TypeScript Module Functions**: Memoization is fully supported and provides performance benefits for expensive operations
 - **Built-in Functions**: While the syntax is supported, built-in functions are not actually memoized as they are already optimized and fast enough that caching provides minimal benefit
+- **Lambdas held by a `let` or parameter**: Not memoizable. `double(n)!` is rejected with `"double" is a local value and cannot be memoized with '!'`
 
 ### Example
 
