@@ -116,6 +116,7 @@ The `validate` command checks:
 ### 3. Type System
 - Validates type annotations on facts, variables, and expressions
 - Checks shape field types and constraints
+- Checks that every shape a type names exists and is visible from where it is written: in facts, `let`s, casts (`as`), `is` checks, shape fields and aliases, derive and lambda parameter and return types, and element types inside `list`, `dict` and `record`. A missing shape, or one another namespace does not export, is reported at its position, even in a `let` no rule uses. Shapes named inside a derive resolve in the derive's scope, and a shape's fields resolve where the shape is declared.
 - Verifies constraint validations (min, max, length, etc.)
 
 ### 4. References
