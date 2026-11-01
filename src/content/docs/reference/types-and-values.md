@@ -11,7 +11,7 @@ Sentrie supports five fundamental primitive types:
 
 | Type       | Description                                                     |
 | ---------- | --------------------------------------------------------------- |
-| `number`   | Numeric values                                                  |
+| `number`   | Numeric values: exact integers and floats                       |
 | `string`   | Text strings                                                    |
 | `trinary`  | Trinary values (`true` / `false` / `unknown`)                   |
 | `bool`     | Boolean values (`true` / `false`) - a special case of `trinary` |
@@ -26,6 +26,26 @@ let u: number = 50
 ```text
 let u: number = 50.5
 ```
+
+### Integers and Floats
+
+A `number` is either an **exact integer** or a **float**:
+
+- A whole number that fits in a signed 64-bit integer (`-9223372036854775808` to `9223372036854775807`) is an exact integer. It keeps every digit through literals, JSON facts, arithmetic, comparison and output, including values above 2^53 (`9007199254740992`).
+- A number with a fractional part or an exponent is a 64-bit float.
+- An integer literal too large for 64 bits is read as a float.
+
+```text
+let id: number = 9007199254740993
+let same: boolean = id == 9007199254740992    -- false: one apart, and still told apart
+let equal: boolean = 5 == 5.0                 -- true: equal values compare equal in either form
+```
+
+Arithmetic on two integers is exact, and a result that does not fit in 64 bits is an overflow error. Dividing two integers gives an integer only when the division is exact (`15 / 3` is `5`, `7 / 2` is `3.5`). An operation that mixes an integer and a float is a float operation. See [Arithmetic Operations](/reference/arithmetic-operations) for the full rules.
+
+The [numeric constraints](/reference/constraints#numeric-constraints-number) compare exactly as well, so `@max`, `@range`, `@multiple_of`, `@even` and `@odd` give the right answer for large IDs.
+
+An integer beyond `Number.MAX_SAFE_INTEGER` (2^53-1) cannot be passed to a [TypeScript module](/reference/using-typescript#numbers-passed-to-typescript-modules): doing so is an error.
 
 ```text
 let u: string = "hello"

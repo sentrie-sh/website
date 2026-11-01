@@ -353,7 +353,7 @@ Sentrie provides primitives, collections, shapes, and aliases for defining data 
 
 ### Primitives
 
-- `number` - Numeric values (backed by float64)
+- `number` - Numeric values: exact 64-bit integers and floats (see [Arithmetic Operations](/reference/arithmetic-operations))
 - `string` - Text strings
 - `trinary` - Trinary values (true/false/unknown)
   - `bool` - Boolean values (true/false) - a special case of `trinary`
@@ -453,8 +453,9 @@ let score: Positive100 = 50
 ### Numeric Literals
 
 ```text
-42          -- Number
+42          -- Number (an exact integer)
 -42         -- Negative number
+9007199254740993  -- Integers keep every digit up to 9223372036854775807
 3.14        -- Float
 -3.14       -- Negative float
 1e5         -- Scientific notation
