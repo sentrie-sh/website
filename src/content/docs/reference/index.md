@@ -12,7 +12,7 @@ This is the complete reference for the Sentrie policy language. It covers all la
 - [Policies](#policies)
 - [Rules](#rules)
 - [Expressions](#expressions)
-- [Lambdas](#lambdas) - Callable syntax (`=>`) for passing functions as values to builtins
+- [Lambdas](#lambdas) - Callable syntax (`=>`) for passing functions as values to builtins and for calling them by name
 - [Derives](/reference/derives) - Named pure functions (`derive`) and export rules
 - [Primitives, Collections, Shapes, and Aliases](#primitives-collections-shapes-and-aliases)
 - [Literals](#literals)
@@ -257,7 +257,7 @@ age >= 18 ? "adult" : "minor"
 
 ## Lambdas
 
-A **lambda** is an expression that evaluates to a **callable** value: a function with a fixed parameter list and a block body. Lambdas are how you pass predicates and mapping steps to builtins such as `filter`, `collect`, `reduce`, and `distinct` (with a key function).
+A **lambda** is an expression that evaluates to a **callable** value: a function with a fixed parameter list and a block body. Lambdas are how you pass predicates and mapping steps to builtins such as `filter`, `collect`, `reduce`, and `distinct` (with a key function). A lambda held by a `let` or a parameter can also be called by name, and may recurse.
 
 ### Syntax
 
@@ -323,6 +323,149 @@ If arity does not match what the builtin expects, evaluation fails with an error
 
 For builtin names, signatures, and more examples, see [Built-in Functions](/reference/built-in-functions).
 
+### Calling a lambda by name
+
+A lambda held by a `let`, or received as a parameter, is called by writing its name followed by arguments, the same way you call a builtin:
+
+```sentrie
+namespace com/example/lambdas
+
+policy calls {
+  fact n: number
+
+  let double = (x) => { yield x * 2 }
+
+  -- call a let-bound lambda by name
+  rule doubled = { yield double(n) }
+
+  -- call a lambda received as a parameter
+  rule applied = {
+    let apply = (fn, v) => { yield fn(v) + 1 }
+    yield apply(double, n)
+  }
+
+  export decision of doubled
+  export decision of applied
+}
+```
+
+With `n` set to `5`, `doubled` yields `10` and `applied` yields `11`.
+
+A call through a name follows the same arity rules as a lambda passed to a builtin: optional parameters (`y?`) may be omitted, and too few or too many arguments are an error. A lambda is an ordinary value, so you can hand it to another lambda, as `apply(double, n)` does above.
+
+#### Which name a call uses
+
+A call resolves its name from the innermost scope outward:
+
+1. a **local value**: a `let`, a lambda parameter, a fact, or a rule
+2. a **derive**
+3. a **builtin**
+4. a **module function**, written `alias.fn(...)`
+
+A local value therefore shadows a derive or a builtin of the same name, exactly as it does when you refer to it without calling it:
+
+```sentrie
+namespace com/example/lambdas
+
+derive twice = (x) => { yield x * 2 }
+
+policy shadowing {
+  fact n: number
+
+  -- `count` is also a builtin; inside this policy the let wins
+  let count = (x) => { yield x + 100 }
+
+  rule shadowed = { yield count(n) }
+
+  -- `twice` is also a derive; inside this rule the let wins
+  rule inner = {
+    let twice = (x) => { yield x * 3 }
+    yield twice(n)
+  }
+
+  export decision of shadowed
+  export decision of inner
+}
+```
+
+With `n` set to `5`, `shadowed` yields `105` (the builtin `count` is not called) and `inner` yields `15`. A name that is not shadowed still reaches the derive or builtin, so `twice(n)` in a rule without that `let` yields `10`.
+
+:::caution[A let named like a builtin takes over calls to it]
+
+A `let` named like a builtin or derive takes over every call to that name in its scope, including the call in its own initializer. `let first = first(xs, (x) => { yield x > 0 })` refers to itself, and fails with `'first' references itself: infinite recursion`. Rename the `let` if you want the builtin.
+
+:::
+
+#### Errors for calls that cannot work
+
+`sentrie validate`, and any command that loads the pack, rejects these calls before anything runs:
+
+- A name that is not a let, parameter, fact, derive or builtin in scope: `unknown function "nope": it is not a let, parameter, fact, derive or builtin in scope`.
+- A name that holds a value that is not a function: `cannot call "v": it is a number value, not a function`.
+- A call to a let-bound lambda with the wrong number of arguments: `"double" takes at most 1 argument(s), got 2` or `"add" takes at least 2 argument(s), got 1`.
+- A memoized call through a local name, such as `double(n)!`: `"double" is a local value and cannot be memoized with '!'`. Memoization applies to derives, builtins and module functions.
+
+A lambda received as a parameter can hold anything, so its arity is checked when it runs, for example `failed to call function 'f': too many arguments: want at most 1, got 2`.
+
+#### Recursion
+
+A lambda held by a `let` can call itself, and two let lambdas can call each other. A recursive lambda needs a base case that stops it:
+
+```sentrie
+namespace com/example/lambdas
+
+policy recursion {
+  fact n: number
+
+  -- direct recursion with a base case
+  let factorial = (k) => {
+    yield k <= 1 ? 1 : k * factorial(k - 1)
+  }
+
+  -- mutual recursion
+  let isEven = (k) => { yield k == 0 ? true : isOdd(k - 1) }
+  let isOdd = (k) => { yield k == 0 ? false : isEven(k - 1) }
+
+  rule product = { yield factorial(n) }
+  rule even = { yield isEven(n) }
+
+  export decision of product
+  export decision of even
+}
+```
+
+With `n` set to `5`, `product` yields `120` and `even` yields `false`. With `n` set to `0`, `product` yields `1` and `even` yields `true`.
+
+A cycle through `let` values, such as `let x = y + 1` with `let y = x + 1`, is still rejected with `infinite recursion`, because each value needs the other to exist first. A lambda body is not run when its `let` is evaluated, so a lambda that names itself is not such a cycle.
+
+The engine cannot tell in advance whether a recursion ends. A lambda with no base case passes validation and is stopped at run time with an ordinary error:
+
+```sentrie
+namespace com/example/lambdas
+
+policy runaway {
+  fact n: number
+
+  let loop = (k) => { yield loop(k + 1) }
+
+  rule r = { yield loop(n) }
+  export decision of r
+}
+```
+
+Executing `r` fails with:
+
+```text
+Error: lambda call depth exceeded (limit 1000)
+```
+
+Two limits apply to every execution:
+
+- **Call depth**: at most **1000** lambda calls may be nested. Past that, the error is `lambda call depth exceeded (limit 1000)`.
+- **Evaluation depth**: at most **50000** expressions may be nested while evaluating. A recursion whose body is itself deeply nested can reach this first, with `evaluation depth exceeded (limit 50000 nested evaluations)`.
+
+A recursion with a base case that stays within these limits, such as `factorial` above, is not affected.
+
 ### Lexical environment
 
 Lambdas **capture** the surrounding execution context: names visible where the lambda is written remain visible when the callable runs (for example `user`, `let` bindings in the same block, and facts). In the current language version, that capture uses the **parent execution context by reference**, so later changes to captured bindings can affect a lambda that runs afterward.
@@ -330,6 +473,8 @@ Lambdas **capture** the surrounding execution context: names visible where the l
 ### Boundaries
 
 Callable values are **not** ordinary JSON-like data. They cannot be passed through every runtime boundary that expects plain data (for example some module or interop paths that materialize `[]any` or JSON). Prefer keeping lambdas and callables inside policy evaluation; if you need to pass data out, convert to plain values first.
+
+In particular, a lambda cannot be passed to a TypeScript module function. Doing so fails at run time, for example with `cannot pass callable value to module function json.isValid`. Call the lambda in Sentrie and pass its result instead.
 
 ### Typed parameters and return types
 
