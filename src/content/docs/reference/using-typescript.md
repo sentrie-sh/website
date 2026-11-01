@@ -208,6 +208,39 @@ export function User() {
 >
 > The `import` can also be written as `import { something } from "./something.ts"`.
 
+## Numbers Passed to TypeScript Modules
+
+Sentrie numbers can be exact 64-bit integers, but a JavaScript number is a 64-bit float. It can hold an integer exactly only up to `Number.MAX_SAFE_INTEGER` (2^53-1, `9007199254740991`). Beyond that, neighbouring integers collapse into the same value, so two different IDs could look equal inside the module.
+
+Sentrie does not let that happen silently. An integer whose magnitude is beyond `Number.MAX_SAFE_INTEGER` raises an error when it is passed to a TypeScript module, wherever it sits in the arguments: on its own, inside a list, or inside a dict or shape. `9007199254740992` (2^53) is already refused, because `9007199254740993` would round onto it.
+
+```typescript
+export function double(n: number): number {
+  return n * 2;
+}
+```
+
+```sentrie
+use { double } from "./helpers.ts" as helpers
+
+rule doubled = { yield helpers.double(id) }
+```
+
+With `id` set to `9007199254740991` the call returns `18014398509481982`. With `9007199254740993` (or `-9007199254740993`) it stops with:
+
+```text
+failed to call function 'helpers.double': integer 9007199254740993 is outside the JavaScript safe integer range and cannot cross into JavaScript without losing precision
+```
+
+A few things to keep in mind:
+
+- **Passing a whole fact object** that contains a large ID to a module fails, even when the module never reads that field. Pass only the fields the module needs.
+- **Floats cross unchanged.** Only integers outside the safe range are refused, so a value written as a float, such as `9007199254740993.0`, is passed as the float it is.
+- **Compare large IDs in Sentrie**, not in TypeScript. Operators such as `==` and `>` are exact there, and the IDs never need to cross the boundary.
+- **Keep IDs beyond 2^53 as strings** if a module has to handle them. Strings cross without any change.
+
+See [Integers and Floats](/reference/types-and-values#integers-and-floats) for how Sentrie numbers behave.
+
 ## Built-in Libraries
 
 Sentrie provides a comprehensive set of built-in TypeScript libraries for common operations:

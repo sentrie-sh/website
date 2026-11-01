@@ -146,6 +146,15 @@ sentrie exec user_management/user_access --facts '{"user":{"role":"admin","statu
 
 **Default:** `{}` (empty object)
 
+Integers that fit in 64 bits are read exactly, in `--facts` and in `--fact-file`, so a large ID keeps every digit:
+
+```bash
+sentrie exec docs/ids/accounts/echo \
+  --facts '{"id": 9007199254740993, "other": 9007199254740992}'
+```
+
+A number outside the float range, such as `1e400`, fails with `facts: number 1e400 is out of range` (`fact file: ...` for `--fact-file`). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).
+
 **Fact Merging:**
 If both `--fact-file` and `--facts` are provided, the facts from `--facts` will override any conflicting keys from the file. This allows you to use a base fact file and override specific values on the command line.
 
