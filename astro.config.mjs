@@ -260,6 +260,10 @@ export default defineConfig({
               slug: "cli-reference/exec",
             },
             {
+              label: "bench",
+              slug: "cli-reference/bench",
+            },
+            {
               label: "serve",
               slug: "cli-reference/serve",
             },
