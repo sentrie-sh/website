@@ -358,7 +358,7 @@ With `{"id": "o1", "total": 50}` as `payload`, `a` is `true`, `b` is `true`, `c`
 The check fails with an error, rather than returning `false`, only when the check itself cannot be made:
 
 - A constraint is given invalid arguments, such as `@minlength("x")` (constraint arguments must be literals)
-- A field of the shape names another shape that is not visible from where the check runs
+- A field of the shape names another shape that is not visible from where the shape is declared (see [Where a Shape's Fields Resolve](#where-a-shapes-fields-resolve))
 
 ### Shape or Value
 
@@ -537,6 +537,47 @@ policy process_payment_2 {
   ...
 }
 ```
+
+### Where a Shape's Fields Resolve
+
+The shapes named in a shape's fields and alias resolve where the shape is declared, not where a value is checked against it. An exported shape therefore checks its fields against its own namespace's shapes from any caller, and a caller that declares a shape with the same name does not change the check:
+
+```sentrie
+namespace com/example/catalog
+
+shape Price {
+  amount: number
+}
+
+shape Item {
+  sku: string
+  price: Price
+}
+
+export shape Item
+```
+
+```sentrie
+namespace com/example/shop
+
+shape Price {
+  cents: number
+}
+
+policy cart {
+  fact line: document as line
+  rule ok = { yield line is com/example/catalog/Item }
+  export decision of ok
+}
+```
+
+`price` is checked against `com/example/catalog`'s `Price`, so `{"sku": "a", "price": {"amount": 1}}` gives `true` and `{"sku": "a", "price": {"cents": 1}}` gives `false`.
+
+The same holds for:
+
+- A field a shape takes in through `with`: it resolves in the shape that declared it.
+- A namespace shape whose field names a shape declared only inside a policy: the field's shape is not visible from the namespace, so checking a value against it fails with an error naming the missing shape, even when the check runs in that policy. Declare the field's shape in the namespace instead.
+- A policy-local shape: its fields resolve in its policy, so they can name that policy's shapes.
 
 ## Best Practices
 
