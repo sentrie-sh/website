@@ -69,6 +69,18 @@ In the above example, the value of `y` is validated against the constraints befo
 | `@non_negative()`     | Value must be non-negative (≥ 0)                |
 | `@non_positive()`     | Value must be non-positive (≤ 0)                |
 
+Numeric constraints compare exact values. For integers that fit in 64 bits, `@eq`, `@neq`, `@gt`, `@lt`, `@in`, `@not_in` and `@range` do not round, and `@multiple_of`, `@even` and `@odd` use integer arithmetic, so they stay correct beyond 2^53 (`9007199254740992`):
+
+```sentrie
+shape AccountId number @min(0) @multiple_of(2)
+shape Cap number @max(9007199254740993)
+
+-- 9007199254740994 passes @multiple_of(2), 9007199254740993 fails it
+-- 9007199254740993 passes @max(9007199254740993), 9007199254740994 fails it
+```
+
+See [Integers and Floats](/reference/types-and-values#integers-and-floats).
+
 ### Number-Specific Constraints
 
 | Constraint    | Description            |
