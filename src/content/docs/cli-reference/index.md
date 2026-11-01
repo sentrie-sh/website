@@ -30,6 +30,38 @@ Execute a policy or rule from a policy pack.
 
 See the [exec command documentation](./exec) for details.
 
+### `bench`
+
+Measure how long it takes to evaluate a policy or rule.
+
+#### Syntax
+
+```bash
+sentrie bench <FQN> [OPTIONS]
+```
+
+#### Options
+
+| Option            | Type   | Default | Description                                                     |
+| ----------------- | ------ | ------- | --------------------------------------------------------------- |
+| `--pack-location` | string | `.`     | Directory containing policy files                               |
+| `--facts`         | string | `{}`    | Facts to evaluate the target with                               |
+| `--fact-file`     | string | -       | JSON file to load facts from                                    |
+| `--benchtime`     | string | `1s`    | Measure for a duration (`1s`) or an exact count (`200x`)        |
+| `--count`         | int    | `1`     | Repeat the measurement this many times, one line per run        |
+| `--eval-timeout`  | string | `10s`   | Deadline for evaluating one decision; `0` disables it           |
+| `--capabilities`  | string | -       | Capabilities file limiting builtins and modules                 |
+
+#### Examples
+
+```bash
+sentrie bench user_management/user_access/allow_admin \
+  --facts '{"user":{"role":"admin","status":"active"}}' \
+  --benchtime 200x --count 3
+```
+
+See the [bench command documentation](./bench) for details.
+
 ### `init`
 
 Initialize a new policy pack.

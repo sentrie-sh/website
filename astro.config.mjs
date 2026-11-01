@@ -264,6 +264,10 @@ export default defineConfig({
               slug: "cli-reference/fmt",
             },
             {
+              label: "bench",
+              slug: "cli-reference/bench",
+            },
+            {
               label: "serve",
               slug: "cli-reference/serve",
             },
