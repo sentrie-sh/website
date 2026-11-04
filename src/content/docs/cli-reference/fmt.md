@@ -10,21 +10,34 @@ The `fmt` command rewrites `.sentrie` files in one canonical style. It keeps eve
 ## Syntax
 
 ```bash
-sentrie fmt [paths...] [--check] [--diff]
+sentrie fmt <pattern> [--check] [--diff]
 ```
 
-## Arguments
+The pattern is required and follows `go fmt`. Put the flags after it: `sentrie fmt ./... --check`.
 
-### `paths` (optional)
+## Patterns
 
-Any number of files and directories. With no paths, `fmt` works on the current directory.
+| Pattern    | Files formatted                                                  |
+| ---------- | ---------------------------------------------------------------- |
+| `./...`    | Every `*.sentrie` file below the current directory               |
+| `dir/...`  | Every `*.sentrie` file below `dir`                               |
+| `...`      | The same as `./...`                                              |
+| `.`        | The `*.sentrie` files directly in the current directory only     |
+| `dir`      | The `*.sentrie` files directly in `dir`, not in subdirectories   |
+| `file`     | That file, whatever its extension                                |
 
-- **A directory** is searched recursively for `*.sentrie` files. Hidden directories (names starting with `.`) and symlinks met during the walk are skipped.
-- **A file named directly** is formatted whatever its extension. A symlink named directly, to a file or to a directory, is followed.
+When a pattern recurses, hidden directories (names starting with `.`) and symlinks met during the walk are skipped. A symlinked root, such as `link/...`, is followed.
 
-A file reached through more than one name is formatted once.
+These are errors:
+
+- No pattern at all.
+- A second pattern.
+- `file/...`, where `file` is not a directory.
+- A bare `/...`, which has no directory before the ellipsis.
 
 ## Options
+
+Flags go after the pattern. A flag placed before it takes the next word as its value, so `sentrie fmt --check ./...` fails instead of checking.
 
 ### `--check`
 
@@ -56,7 +69,7 @@ export decision of allow
 ### See what would change
 
 ```bash
-sentrie fmt --diff access.sentrie
+sentrie fmt access.sentrie --diff
 ```
 
 ```diff
@@ -88,23 +101,38 @@ sentrie fmt --diff access.sentrie
 
 ### Check a pack in CI
 
+Suppose the pack has the unformatted file above plus another one, `sub/ugly.sentrie`, in a subdirectory.
+
 ```bash
-sentrie fmt --check .
+sentrie fmt ./... --check
 ```
 
 ```text
 access.sentrie
+sub/ugly.sentrie
+Error: 2 file(s) are not formatted
 ```
 
-The command printed the one file that would change and exited with status 1. Once the files are formatted, `--check` prints nothing and exits with status 0.
+The command exited with status 1. Without the recursive pattern only the files directly in the directory are covered:
+
+```bash
+sentrie fmt . --check
+```
+
+```text
+access.sentrie
+Error: 1 file(s) are not formatted
+```
+
+Once the files are formatted, `--check` prints nothing and exits with status 0.
 
 ### Format in place
 
 ```bash
-sentrie fmt
+sentrie fmt ./...
 ```
 
-With no paths, this walks the current directory and rewrites `access.sentrie` as:
+This rewrites `access.sentrie` as:
 
 ```text
 namespace com/example/auth
@@ -122,6 +150,62 @@ policy user {
 ```
 
 Both comments, including the one after the opening brace, are still there.
+
+### Mistakes
+
+```bash
+sentrie fmt
+```
+
+```text
+Error: missing at least one required argument. need '1' - got '0'
+```
+
+```bash
+sentrie fmt a b
+```
+
+```text
+Error: fmt takes one pattern, got extra arguments: b
+```
+
+```bash
+sentrie fmt access.sentrie/...
+```
+
+```text
+Error: access.sentrie is not a directory, so "access.sentrie/..." is not a valid pattern
+```
+
+```bash
+sentrie fmt /...
+```
+
+```text
+Error: pattern "/..." has no directory before the ellipsis
+```
+
+A flag before the pattern is rejected:
+
+```bash
+sentrie fmt --check ./...
+```
+
+```text
+Error: failed to set flag 'check': strconv.ParseBool: parsing "./...": invalid syntax
+```
+
+If the word after the flag happens to read as a boolean, such as a directory named `f` or `1`, `fmt` stops with a hint instead of guessing:
+
+```bash
+sentrie fmt --check f sub
+```
+
+```text
+Error: --check takes no value (got "f"); put flags after the pattern, e.g. sentrie fmt ./... --check
+```
+
+All of these exit with status 1 and write nothing. The one exception is a literal `true` or `false` after a flag, which is read as the flag's value: `sentrie fmt --check false sub` formats `sub` in place.
 
 ## How files are written
 
@@ -154,6 +238,7 @@ Error: 1 file(s) could not be formatted
 | `--check` and at least one file would change       | 1           |
 | `--diff --check` and at least one file would change | 1          |
 | A file or path could not be read, parsed or formatted | 1        |
+| Wrong usage (missing or extra pattern, bad flag)   | 1           |
 
 ## The canonical style
 
