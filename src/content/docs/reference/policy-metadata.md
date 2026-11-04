@@ -38,7 +38,7 @@ When indexing reports an error, messages include the source location. Typical ca
 |-----------|---------------------|
 | Metadata after facts or uses (but before body) | `title, description, version, and tag may only appear in one contiguous block at the top of the policy, before all fact and use statements.` |
 | `fact` after a `use` | `fact statements must appear before any use statements.` |
-| `fact`, `use`, or metadata after body has started | `'<keyword>' must appear before rules, exports, lets, and shapes.` |
+| `fact`, `use`, or metadata after body has started | `'<keyword>' must appear before rules, exports, lets, derives, and shapes.` |
 | Duplicate `title` / `description` / `version` | `conflict: policy …` (with both locations) |
 | Empty / whitespace-only `title` | `policy title must not be empty or whitespace-only.` |
 | Empty / whitespace-only tag key | `tag key must not be empty or whitespace-only.` |
