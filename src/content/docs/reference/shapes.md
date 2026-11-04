@@ -435,7 +435,6 @@ This extends the `classify` policy above, next to the `Purchase` shape. A purcha
 
 ### Limits
 
-- `dict[T]` is checked only for being a dictionary. The values are not checked against `T`, so `{"k": "s"} is dict[number]` is `true`.
 - Inside a `derive`, `is` resolves shapes in the derive's scope, but casts, typed parameters and return types in a derive still validate against the caller's policy.
 
 ## Shape Management
