@@ -79,6 +79,7 @@ Derive bodies are validated statically and enforced at runtime. A derive must be
 - Calls to other **visible** derives (by name or slash FQN, subject to scope and export rules)
 - Inline lambdas passed as arguments to pure builtins (for example `filter(items, (x) => { yield x > 0 })`)
 - Single-parameter derives passed as callbacks to higher-order pure builtins (see below)
+- Line comments (`-- ...`) anywhere in the body, including between `let` bindings and inside nested blocks and lambdas
 
 ### Not allowed
 
