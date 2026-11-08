@@ -143,8 +143,8 @@ let parts = regex.split("\\s+", "hello   world  test")  // ["hello", "world", "t
 namespace com/example/validation
 
 policy mypolicy {
-  fact email!: string
-  fact phoneNumber!: string
+  fact email: string
+  fact phoneNumber: string
 
   use { match, find, replaceAll } from @sentrie/regex
 

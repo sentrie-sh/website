@@ -13,6 +13,7 @@ This section is a reference for the Sentrie policy language: syntax, types, oper
 - [Rules](#rules)
 - [Expressions](#expressions)
 - [Lambdas](#lambdas) - Callable syntax (`=>`) for passing functions as values to builtins
+- [Derives](/reference/derives) - Named pure functions (`derive`) and export rules
 - [Primitives, Collections, Shapes, and Aliases](#primitives-collections-shapes-and-aliases)
 - [Literals](#literals)
 - [Operators](#operators)
@@ -28,7 +29,7 @@ This section is a reference for the Sentrie policy language: syntax, types, oper
 A Sentrie program consists of:
 
 1. **Namespace declaration** (required)
-2. **Top-level declarations** (policies, shapes)
+2. **Top-level declarations** (policies, shapes, derives, exports)
 3. **Comments** (anywhere)
 
 ```text
@@ -43,7 +44,12 @@ shape User {
   -- shape definition
 }
 
+derive helper = (x: number) => {
+  yield x + 1
+}
+
 export shape User -- export shapes to allow visibility to other namespaces
+export derive helper
 ```
 
 ## Namespaces
@@ -56,7 +62,9 @@ Namespaces organize your policies and shapes hierarchically and prevent naming c
 namespace FQN
 policy IDENT { fact ... let ... use ... rule ... export decision of IDENT }
 shape IDENT { ... } | shape IDENT baseType @constraint
+derive IDENT = LAMBDA
 export shape IDENT
+export derive IDENT
 ```
 
 ## Reference Pages
@@ -68,6 +76,7 @@ export shape IDENT
 - **[Rules](/reference/rules):** Rule syntax, when/default/body, outcome type, truthiness, cross-references.
 - **[Facts](/reference/facts):** Required/optional facts, type, alias, default, binding at evaluation, import binding.
 - **[Intermediate values (let)](/reference/let):** let syntax, scoping, immutability, type validation.
+- **[Derives](/reference/derives):** Named pure functions (`derive`), calling rules, and export.
 - **[Identifiers](/reference/identifiers):** What counts as a valid identifier (characters, reserved keywords).
 
 ### Types
@@ -309,6 +318,8 @@ let sum: number = reduce(nums, 0, (acc, n) => {
 })
 ```
 
+Single-parameter **derives** can also be passed by name to `any`, `all`, `filter`, `first`, `collect`, and the two-argument `distinct` form — see [Derives](/reference/derives#callbacks-for-higher-order-builtins).
+
 Which builtin you use determines how many parameters the lambda should take (its **arity**), for example:
 
 - **`any`**, **`all`**, **`filter`**, **`first`**, **`collect`**: arity **1** (element only) or **2** (element and index).
@@ -326,6 +337,22 @@ Lambdas **capture** the surrounding execution context: names visible where the l
 ### Boundaries
 
 Callable values are **not** ordinary JSON-like data. They cannot be passed through every runtime boundary that expects plain data (for example some module or interop paths that materialize `[]any` or JSON). Prefer keeping lambdas and callables inside policy evaluation; if you need to pass data out, convert to plain values first.
+
+### Typed parameters and return types
+
+You can annotate lambda parameters and the return value:
+
+```sentrie
+(a: number, b?: string): number => {
+  yield a + (count(b) as number)
+}
+```
+
+Optional parameters use `?` after the name (for example `b?`). A required parameter cannot follow an optional one; that ordering is rejected at parse time.
+
+## Derives
+
+**Derives** are named pure functions at namespace or policy scope. They reuse lambda syntax and are documented in the dedicated [Derives](/reference/derives) page (calling rules, FQN slash callees, builtin whitelist, and exports).
 
 ## Primitives, Collections, Shapes, and Aliases
 
@@ -349,26 +376,28 @@ Sentrie provides primitives, collections, shapes, and aliases for defining data 
 
 Shapes define structured data with fields and constraints.
 
-**Field Modifiers:**
+**Field Contract Matrix:**
 
-- `!` - Non-nullable (required field)
-- `?` - Optional field
-- No modifier - Default field (required by default)
+- `field: T` - required, non-null
+- `field?: T` - optional, if present non-null
+- `field: T?` - required, nullable
+- `field?: T?` - optional, nullable
 
 ```text
 shape User {
-  id!: string           -- Required field (non-nullable)
-  name!: string         -- Required field (non-nullable)
-  email?: string        -- Optional field
-  age?: number          -- Optional field
-  roles: list[string]   -- Required field (default)
-  metadata: document    -- Required field (default)
+  id: string
+  name: string
+  email?: string
+  middle_name: string?
+  nickname?: string?
+  roles: list[string]
+  metadata: document
 }
 
 shape Product {
-  id!: string
-  name!: string
-  price!: number
+  id: string
+  name: string
+  price: number
   tags?: list[string]
   dimensions: record[number, number, number]  -- width, height, depth
 }
@@ -380,8 +409,8 @@ Shapes can be composed from other shapes using the `with` keyword:
 
 ```text
 shape BaseUser {
-  id!: string
-  name!: string
+  id: string
+  name: string
 }
 
 shape AdminUser with BaseUser {
@@ -475,6 +504,14 @@ null        -- Null value
 
 ## Operators
 
+### Elvis operator (`?:`)
+
+```text
+a ?: b
+```
+
+If `a` is **`null`** or **`undefined`**, the expression evaluates to **`b`** (and `b` is evaluated). For any other value of `a` (including `0`, `""`, or `false`), the result is **`a`** and **`b` is not evaluated**. This matches common “default for missing” patterns for facts and optional parameters.
+
 ### Arithmetic Operators
 
 ```text
@@ -532,7 +569,7 @@ is defined  -- Check if defined
 is not defined -- Check if not defined
 is empty    -- Check if empty
 is not empty -- Check if not empty
-is          -- Shape checking
+is T        -- Shape or type check (see Shapes)
 ```
 
 ### Collection builtins
@@ -553,16 +590,20 @@ count(value)               -- Length of list, dict, or string
 
 ### Casting
 
+Postfix `expr as Type` converts a value and validates it against `Type` (including shape constraints).
+
 ```text
-cast        -- Casting between primitives
+as          -- Postfix cast: expr as Type (see Types and values)
 ```
 
 Example:
 
 ```text
 let y = "99"
-let x: number = cast y as number
+let x: number = y as number
 ```
+
+The converted value is checked against the target type and constraints. Failure is an evaluation error, not a silent zero.
 
 ## TypeScript Modules
 
@@ -590,7 +631,7 @@ Built-in modules are prefixed with `@sentrie/`:
 namespace com/example/auth
 
 policy mypolicy {
-  fact data!: string
+  fact data: string
 
   use { now } from @sentrie/time as time
   use { sha256 } from @sentrie/hash
@@ -615,7 +656,7 @@ You can import TypeScript files from your policy pack using relative paths:
 namespace com/example/auth
 
 policy mypolicy {
-  fact user!: User
+  fact user: User
 
   use { calculateAge, validateEmail } from "./utils.ts" as utils
 
@@ -628,7 +669,7 @@ policy mypolicy {
 }
 ```
 
-**Note:** All relative paths are normalized to `@local` paths internally. The `@local` prefix indicates paths relative to the pack root. For example, `@local/user/id` evaluates to `$PACKROOT/user/id.ts`.
+**Note:** All relative paths are normalized to `@local` paths internally. The `@local` prefix indicates paths relative to the pack root. For example, `@local/user/id` evaluates to `$PACKROOT/user/id.ts`. Specifiers that resolve outside the pack root (including `..` and outbound symlinks) are rejected.
 
 ### Available Built-in Modules
 
@@ -677,7 +718,7 @@ Facts can have:
 
 - Facts are **required by default** - must be provided during execution
 - Use `?` to mark facts as **optional** - can be omitted
-- Facts are **always non-nullable** - null values are not allowed
+- Facts can also use nullable types with `T?` when explicit `null` is valid
 - Only **optional facts** (`?`) can have default values
   :::
 
@@ -871,9 +912,9 @@ rule validateUser = default false when user is defined {
 
 ```text
 shape User {
-  id!: string
-  name!: string
-  role!: string
+  id: string
+  name: string
+  role: string
 }
 
 rule processUser = default false when user is User {

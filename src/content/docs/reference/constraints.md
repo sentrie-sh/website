@@ -18,7 +18,7 @@ Examples: `number @min(0) @max(100)`, `string @email`, `list[string @one_of("a",
 Constraints are checked:
 
 - When a value is **assigned** to a variable or field (e.g. `let x: number @min(0) = 50` or a shape field).
-- When a value is **cast** to a constrained type (e.g. `cast 50 as number @min(0) @max(100)`).
+- When a value is **cast** to a constrained type (e.g. `50 as number @min(0) @max(100)`).
 - When **facts** are supplied and matched to shape types that have constraints.
 
 If any constraint fails, evaluation aborts with an error. Order of application is defined by the runtime; all specified constraints must pass.
@@ -117,14 +117,14 @@ let permissions: list[Permission] = ["read", "write"]
 
 ## Type conversion with constraints
 
-When converting with `cast expr as type`, the result is validated against the target type and **all constraints** on that type. If validation fails, evaluation aborts.
+When converting with a postfix cast (`expr as type`), the result is validated against the target type and **all constraints** on that type. If validation fails, evaluation errors; it does not yield an unchecked value.
 
 ```text
-let u: number @min(0) @max(100) = cast "50" as number
+let u: number @min(0) @max(100) = "50" as number
 ```
 
 ```text
-let u: string @email = cast "user@example.com" as string
+let u: string @email = "user@example.com" as string
 ```
 
 Casting to a constrained type is equivalent to assigning the cast result to a variable of that type; the same constraint rules apply.

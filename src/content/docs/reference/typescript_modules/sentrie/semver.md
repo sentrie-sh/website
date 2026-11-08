@@ -198,9 +198,9 @@ let noMeta = semver.metadata("1.2.3")  // null
 namespace com/example/version
 
 policy mypolicy {
-  fact currentVersion!: string
-  fact requiredVersion!: string
-  fact versionConstraint!: string
+  fact currentVersion: string
+  fact requiredVersion: string
+  fact versionConstraint: string
 
   use { compare, satisfies, major, minor, patch } from @sentrie/semver
 

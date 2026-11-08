@@ -135,6 +135,10 @@ export default defineConfig({
               slug: "reference/rules",
             },
             {
+              label: "Derives",
+              slug: "reference/derives",
+            },
+            {
               label: "Exporting and Importing Rules",
               slug: "reference/exporting-and-importing-rules",
             },
@@ -247,6 +251,7 @@ export default defineConfig({
           items: [
             { label: "Overview", slug: "cli-reference" },
             { label: "sentrie exec", slug: "cli-reference/exec" },
+            { label: "sentrie fmt", slug: "cli-reference/fmt" },
             { label: "sentrie init", slug: "cli-reference/init" },
             { label: "sentrie serve", slug: "cli-reference/serve" },
             { label: "sentrie validate", slug: "cli-reference/validate" },

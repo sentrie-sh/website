@@ -18,7 +18,7 @@ This page lists common errors you may encounter when authoring or running Sentri
 | Error / symptom | When it happens | How to fix | See also |
 | :-------------- | :-------------- | :--------- | :------- |
 | Missing required fact / `ErrRequiredFact` | Evaluation runs without providing all required facts | Add the missing fact to `--facts`, `--fact-file`, or the HTTP request body; or make the fact optional (`fact name?`) if it is truly optional. | [Facts](/reference/facts), [CLI: exec](/cli-reference/exec) |
-| Type mismatch for fact | Fact value does not match its declared type or shape | Check the JSON structure and field names; ensure it matches the shape and field modifiers (`!`, `?`) defined in the policy. | [Types and Values](/reference/types-and-values), [Shapes](/reference/shapes) |
+| Type mismatch for fact | Fact value does not match its declared type or shape | Check the JSON structure and field names; ensure it matches the shape and field contracts (`field?` for optional, `T?` for nullable) defined in the policy. | [Types and Values](/reference/types-and-values), [Shapes](/reference/shapes) |
 | Constraint validation failed | A value violates a constraint like `@min(0)` or `@uuid()` | Adjust the input value or change the constraint to match what you actually allow; avoid casting into constrained types unless the value really satisfies them. | [Constraints](/reference/constraints) |
 
 ## Execution and HTTP service

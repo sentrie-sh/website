@@ -157,7 +157,7 @@ let invalid = url.isValid("not-a-url")  // false
 namespace com/example/validation
 
 policy mypolicy {
-  fact requestUrl!: string
+  fact requestUrl: string
 
   use { parse, getHost, getPath, isValid } from @sentrie/url
 

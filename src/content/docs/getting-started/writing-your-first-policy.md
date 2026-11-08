@@ -10,7 +10,7 @@ Here is the basic syntax:
 ```text
 namespace SLUG
 
-shape ShapeName { field!: type  field?: type }
+shape ShapeName { field: type  field?: type }
 
 policy IDENT {
   fact name: Type [ as alias ]
@@ -138,7 +138,7 @@ policy user_access {
 - Facts are **required by default** - they must be provided during execution
 - Use `?` to mark facts as **optional** - optional facts can be omitted
 - Only **optional facts** (`?`) can have default values
-- Facts are **always non-nullable** - null values are not allowed
+- Facts can use nullable types (`T?`) when explicit `null` values are allowed
   :::
 
 ## Add your first rule
@@ -274,8 +274,8 @@ Here's a complete policy that checks user access:
 namespace com/example/user_management
 
 shape User {
-  role!: string
-  status!: string
+  role: string
+  status: string
 }
 
 policy user_access {
@@ -304,8 +304,8 @@ You want to reuse one rule inside another (e.g. “admin or active user”) and 
 namespace com/example/user_management
 
 shape User {
-  role!: string
-  status!: string
+  role: string
+  status: string
 }
 
 policy user_access {
@@ -348,4 +348,4 @@ Before you implement this, keep a few boundaries in mind:
 
 - **Constraint:** One namespace per file; namespace must be the first statement. Facts are declared before rules. Required facts must be provided at evaluation time; optional facts may be omitted or use defaults. At least one rule must be exported for the policy to be executable.
 - **Constraint:** Only exported rules are available to `sentrie exec` and the HTTP API. Rules in the same policy may reference each other by name (e.g. `yield allow_admin or ...`).
-- **Edge case:** Namespace slug uses slashes (e.g. `com/example/app`); no leading or trailing slash. Shape: `field!: type` for required, `field?: type` for optional. Fact without `?` is required; missing required fact at evaluation → error. Optional fact (`?`) may have `default expr`. Rule body must yield a value; you can declare `default false` or `default true`.
+- **Edge case:** Namespace slug uses slashes (e.g. `com/example/app`); no leading or trailing slash. Shape: `field: type` for required, `field?: type` for optional. Fact without `?` is required; missing required fact at evaluation → error. Optional fact (`?`) may have `default expr`. Rule body must yield a value; you can declare `default false` or `default true`.

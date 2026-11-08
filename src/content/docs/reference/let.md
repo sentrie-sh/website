@@ -412,7 +412,7 @@ rule calculatePrice = default 0 {
 -- Good: Explicit types make code clearer
 let count: number = 10
 let items: list[string] = ["item1", "item2"]
-let config: map[string]any = {"key": "value"}
+let config: dict[string] = {"key": "value"}
 ```
 
 ## Good to Know

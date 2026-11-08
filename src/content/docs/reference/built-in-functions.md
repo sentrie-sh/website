@@ -163,6 +163,8 @@ Builtins `any`, `all`, `filter`, `first`, `collect`, `reduce`, and `distinct` wo
 
 These operations return **new lists** (or scalars for `any`, `all`, `reduce`, `first`) and do not mutate the input.
 
+For `any`, `all`, `filter`, `first`, `collect`, and the two-argument `distinct` form, the callable may be an inline lambda or a **single-parameter derive** passed by name (for example `filter(items, is_valid)`). See [Derives](/reference/derives#callbacks-for-higher-order-builtins).
+
 The **`dict[T]`** type describes JSON-like objects with string keys and values of type `T`. List transforms use the **`collect(...)`** builtin; `dict[...]` is only for types.
 
 ### `any(list, predicate)`
@@ -186,9 +188,9 @@ let has_perfect_score: bool = any(scores, (score) => {
 })
 
 shape User {
-  name!: string
+  name: string
   age: number
-  role!: string
+  role: string
 }
 
 let users: list[User] = [
@@ -243,9 +245,9 @@ let even_indexed: list[number] = filter(numbers, (num, idx) => {
 })
 
 shape Employee {
-  name!: string
-  department!: string
-  salary!: number
+  name: string
+  department: string
+  salary: number
 }
 
 let employees: list[Employee] = [
@@ -302,7 +304,7 @@ let indexed_fruits: list[string] = collect(fruits, (fruit, idx) => {
 })
 
 shape User {
-  name!: string
+  name: string
   age: number
 }
 
@@ -345,9 +347,9 @@ let sentence: string = reduce(words, "", (acc, word, idx) => {
 })
 
 shape Sale {
-  product!: string
-  quantity!: number
-  price!: number
+  product: string
+  quantity: number
+  price: number
 }
 
 let sales: list[Sale] = [
@@ -387,7 +389,7 @@ distinct(list, (element, index) => { yield keyExpression })
 
 ```sentrie
 shape Person {
-  name!: string
+  name: string
   age: number
 }
 
@@ -408,10 +410,10 @@ Nest builtins for multi-step transforms. Intermediate `let` bindings often read 
 
 ```sentrie
 shape Employee {
-  name!: string
+  name: string
   age: number
-  department!: string
-  salary!: number
+  department: string
+  salary: number
   years_experience: number
 }
 

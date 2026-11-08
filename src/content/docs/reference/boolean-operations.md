@@ -115,6 +115,8 @@ For details on trinary logic, see the [Kleene's three-valued logic](/reference/t
 
 Both `==` and `is` operators check if two values are equal.
 
+When the right-hand side of `is` is a shape or a type, such as `user is User`, it checks the value against that shape or type instead. See [Checking a Value Against a Shape](/reference/shapes#checking-a-value-against-a-shape).
+
 #### Syntax
 
 ```sentrie
@@ -352,15 +354,16 @@ let has_read: bool = "read" in user_permissions and user_permissions["read"] == 
 
 ```
 
-#### Negating `in` and `contains`
+#### Negating `in`, `contains`, and `matches`
 
-`in` and `contains` can be negated by prefixing the operator with `not`, such as `not contains` and `not in`. This is equivalent to wrapping the expression in a unary `not` but results in a more readable form.
+`in`, `contains`, and `matches` can be negated by prefixing the operator with `not`: `not in`, `not contains`, and `not matches`. Each form desugars to a unary `not` wrapping the positive infix, so `9 not in [1, 2, 3]` is the same tree as `not (9 in [1, 2, 3])`.
 
 #### Syntax
 
 ```sentrie
 value not in collection
 collection not contains value
+value not matches pattern
 ```
 
 ## State Checking Operations
@@ -400,7 +403,7 @@ let list_is_not_empty: bool = non_empty_list is not empty
 
 ```sentrie
 shape User {
-  name!: string
+  name: string
   email?: string
   phone?: string
 }
@@ -434,7 +437,7 @@ value is not defined
 
 ```sentrie
 shape User {
-  name!: string
+  name: string
   email?: string
   phone?: string
 }
@@ -461,8 +464,8 @@ let display_email: string = user.email is defined ? user.email : "No email provi
 
 ```sentrie
 shape Order {
-  id!: string
-  customer_name!: string
+  id: string
+  customer_name: string
   customer_email?: string
   customer_phone?: string
   shipping_address?: string
@@ -498,9 +501,9 @@ let contact_method: string = order.customer_email is defined ?
 
 ```sentrie
 shape User {
-  id!: string
-  username!: string
-  role!: string
+  id: string
+  username: string
+  role: string
   age: number
   email?: string
   active: bool
@@ -508,8 +511,8 @@ shape User {
 }
 
 shape Resource {
-  id!: string
-  name!: string
+  id: string
+  name: string
   required_role: string
   min_age: number
   required_permissions: list[string]
@@ -550,9 +553,9 @@ let can_access: bool = user.active and
 use {length} from @sentrie/js as str
 
 shape RegistrationData {
-  username!: string
+  username: string
   email?: string
-  password!: string
+  password: string
   age: number
   terms_accepted: bool
 }

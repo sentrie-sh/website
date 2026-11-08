@@ -23,8 +23,8 @@ The name is a **fully qualified name (FQN)**: one or more [identifiers](/referen
 
 ## Placement and ordering rules
 
-- **First statement:** The namespace declaration must be the first statement in the file. Only comments (line or block) may appear before it.
-- **One per file:** Exactly one namespace per `*.sentrie` file. Multiple files in a pack may declare different namespaces; the pack can therefore contain multiple root namespaces.
+- **First statement:** The namespace declaration must be the first statement in the file. Only comments (line or block) may appear before it, and those comments do not drop later declarations.
+- **One per file:** Exactly one namespace per `*.sentrie` file. A second `namespace` statement in the same file is an error. Multiple files in a pack may declare different namespaces; the pack can therefore contain multiple root namespaces.
 - **No nesting syntax:** The language does not have separate “nested” namespace blocks. Hierarchy is by naming convention: e.g. `a/b/c` is a single FQN; there is no separate declaration for `a` or `a/b`.
 
 ## Visibility and cross-namespace reference

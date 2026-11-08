@@ -18,7 +18,7 @@ See: [Namespaces](/reference/namespaces), [Policies](/reference/policies), [Rule
 ## Designing facts
 
 - **Model real inputs**: Facts should mirror the data your callers already have (e.g. `user`, `request`, `resource`, `context`).
-- **Prefer shapes over `document`**: Use shapes and field modifiers (`!`, `?`, `!?`) to describe required vs optional data precisely. It improves validation and error messages. See [Shapes](/reference/shapes).
+- **Prefer shapes over `document`**: Use shapes and field contracts (`field?` for optional, `T?` for nullable) to describe required, optional and nullable data precisely. It improves validation and error messages. See [Shapes](/reference/shapes).
 - **Use optional facts sparingly**: Make a fact optional (`fact name?`) only when callers truly may omit it. Provide a `default` where it simplifies callers.
 
 See: [Facts](/reference/facts)

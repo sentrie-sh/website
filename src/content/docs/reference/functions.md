@@ -206,7 +206,7 @@ Functions can be used anywhere expressions are allowed, including in `let` decla
 namespace com/example/complex
 
 policy example {
-  fact userData: map[string]any
+  fact userData: dict[string]
   fact items: list[string]
 
   use { sha256 } from @sentrie/hash

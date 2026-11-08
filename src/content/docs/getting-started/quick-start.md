@@ -59,8 +59,8 @@ Add a policy file (e.g. `policy.sentrie`):
 namespace com/example/app
 
 shape User {
-  role!: string
-  status!: string
+  role: string
+  status: string
 }
 
 policy access {

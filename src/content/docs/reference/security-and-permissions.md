@@ -32,7 +32,7 @@ env     = ["VAR1", "VAR2", ...]
 
 ## Default behavior
 
-- **Filesystem:** If `fs_read` is omitted or empty, the default is typically the pack root only. The pack can read files under that root (e.g. `.sentrie` files, local TypeScript modules). Reading outside the allowed set fails.
+- **Filesystem:** If `fs_read` is omitted or empty, the default is typically the pack root only. The pack can read files under that root (e.g. `.sentrie` files, local TypeScript modules). Reading outside the allowed set fails. Pack-supplied TypeScript cannot read outside the pack root: `use` / `require` of `@local/…` (and relative paths normalized to `@local`) reject `..` escapes and symlinks that leave the pack.
 - **Network:** If `net` is omitted or empty, no network access is granted. TypeScript modules or built-ins that perform network I/O will fail unless the required host is listed.
 - **Environment:** If `env` is omitted or empty, no environment variables are exposed. The pack cannot read `process.env` (or equivalent) except for the names explicitly listed.
 

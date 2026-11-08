@@ -13,14 +13,14 @@ A shape with a body of named, typed fields:
 
 ```text
 shape Name {
-  fieldName!: type
-  fieldName?: type
   fieldName: type
-  fieldName!?: type
+  fieldName?: type
+  fieldName: type?
+  fieldName?: type?
 }
 ```
 
-Each field has a name, an optional modifier suffix (`!`, `?`, or both in either order), a colon, and a type (any [type or shape](/reference/types-and-values)).
+Each field has a name, an optional `?` suffix on the name, a colon, and a type (any [type or shape](/reference/types-and-values)). A `?` on the name makes the field optional; a `?` after the type makes its value nullable.
 
 ### Type alias (simple shape)
 
@@ -39,7 +39,7 @@ A complex shape can extend exactly one other shape with `with BaseName` before t
 
 ```text
 shape Child with Base {
-  field!: type
+  field: type
 }
 ```
 
@@ -59,19 +59,20 @@ Only shapes declared in the same file (same namespace) can be exported. The shap
 
 ### Field modifiers (complex shapes)
 
-Every field in a shape body has two logical properties: whether the field is **required** (must be present in the value) and whether it is **nullable** (may be `null` when present). Modifiers are written as suffixes on the field name.
+Every field in a shape body has two independent properties: whether the field is **required** (must be present in the value) and whether it is **nullable** (may be `null` when present). A `?` on the field name controls presence; a `?` after the type controls nullability.
 
-| Modifier   | Required? | Nullable? | Meaning |
-| :--------- | :-------- | :-------- | :------ |
-| (none)     | Yes       | Yes       | Field must be present; value may be `null`. |
-| `!`        | Yes       | No        | Field must be present and must not be `null`. |
-| `?`        | No        | Yes       | Field may be omitted; if present, value may be `null`. |
-| `!?` or `?!` | No     | No        | Field may be omitted; if present, value must not be `null`. |
+| Form         | Required? | Nullable? | Meaning |
+| :----------- | :-------- | :-------- | :------ |
+| `field: T`   | Yes       | No        | Field must be present and must not be `null`. |
+| `field?: T`  | No        | No        | Field may be omitted; if present, value must not be `null`. |
+| `field: T?`  | Yes       | Yes       | Field must be present; value may be `null`. |
+| `field?: T?` | No        | Yes       | Field may be omitted; if present, value may be `null`. |
 
 - **Required:** If the field is missing from the value at runtime, validation fails.
-- **Nullable:** If the field is present and its value is `null`, validation fails when the field is non-nullable (`!` or `!?`/`?!`).
+- **Nullable:** If the field is present and its value is `null`, validation fails unless the type is nullable (`T?`).
+- **Legacy `!`:** The `!` field modifier has been removed. Write `field!: T` as `field: T`, and `field!?: T` or `field?!: T` as `field?: T`. If an old bare `field: T` relied on being nullable, write `field: T?`.
 
-Field type can be any type reference: primitives (`number`, `string`, `trinary`, `bool`, `document`), collections (`list[T]`, `map[T]`, `record[...]`), or another shape. Constraints on the type are validated when the value is assigned or when the value is supplied as a fact.
+Field type can be any type reference: primitives (`number`, `string`, `trinary`, `bool`, `document`), collections (`list[T]`, `dict[T]`, `record[...]`), or another shape. Constraints on the type are validated when the value is assigned or when the value is supplied as a fact.
 
 ### Composition rules
 
@@ -96,7 +97,7 @@ Field type can be any type reference: primitives (`number`, `string`, `trinary`,
 
 - **Facts:** A fact’s type can be a shape (e.g. `fact user: User`). The supplied JSON is validated against the shape’s fields and constraints.
 - **Let bindings:** A let can be typed with a shape (e.g. `let u: User = someExpr`). The expression result is validated against the shape.
-- **Nested types:** A shape field’s type can be another shape or `list[ShapeName]`, `map[ShapeName]`, etc.
+- **Nested types:** A shape field’s type can be another shape or `list[ShapeName]`, `dict[ShapeName]`, etc.
 - **Policy composition:** Imported policies can bind facts using shapes defined in another namespace if those shapes are exported.
 
 ## Examples in Action
@@ -105,10 +106,10 @@ Field type can be any type reference: primitives (`number`, `string`, `trinary`,
 
 ```sentrie
 shape User {
-  name!: string
-  age: number
-  email?: string
-  phone!?: string
+  name: string
+  age: number?
+  email?: string?
+  phone?: string
 }
 ```
 
@@ -122,10 +123,10 @@ shape User {
 Optional or nullable fields should be checked before use. Use `is defined` to test presence (and often combine with a null check if the field is nullable).
 
 ```sentrie
-shape Item { name!: string; price?: number }
+shape Item { name: string; price?: number }
 
 rule showPrice = default "n/a" when item.price is defined {
-  yield cast item.price as string
+  yield item.price as string
 }
 ```
 
@@ -147,64 +148,75 @@ let p: Percent = 50
 ### Composition
 
 ```sentrie
-shape Base { id!: string }
-shape Extended with Base { role!: string }
+shape Base { id: string }
+shape Extended with Base { role: string }
 ```
 
-A value of type `Extended` must have both `id` and `role`, and both must be non-null (given `!`).
+A value of type `Extended` must have both `id` and `role`, and both must be non-null (neither type is nullable).
 
 ### Composition with exported base (cross-namespace)
 
 Exported shapes from another file can be used as composition bases. See [Exporting Shapes](#exporting-shapes) and [Policy composition](/language-concepts/policy-composition).
 
-#### Field Nullability and Optionality
+#### Field Optionality and Nullability
 
-Shapes support different field requirements using special markers:
+Sentrie models field contracts on two independent axes:
 
-- **Required fields** (default): Field must be present and can be null
-- **Required non-null fields** (`!`): Field must be present and cannot be null
-- **Optional fields** (`?`): Field may be omitted entirely
+- `field?` controls **presence** (whether the field may be absent)
+- `T?` controls **value nullability** (whether the present value may be `null`)
+
+The canonical shape field matrix is:
+
+- `field: T` -> required, non-null
+- `field?: T` -> optional, if present non-null
+- `field: T?` -> required, nullable
+- `field?: T?` -> optional, nullable
 
 ```sentrie
-shape User {
-  name!: string           -- Required, cannot be null
-  age: number                -- Required, can be null
-  email?: string          -- Optional, can be omitted
-  phone!?: string         -- Optional, but if present cannot be null
+shape Person {
+  name: string
+  age: number
+  gender?: string
+  middle_name: string?
+  nickname?: string?
 }
 ```
 
-Examples of valid and invalid usage:
+Examples:
 
 ```sentrie
--- Valid: all required fields present, optional field omitted
-let user1: User = {
+-- Valid: required fields are present and non-null
+let p1: Person = {
   name: "Alice",
-  age: 25
+  age: 25,
+  middle_name: "Jane"
 }
 
--- Valid: all fields present, including optional
-let user2: User = {
+-- Valid: nullable required field present as null
+let p2: Person = {
   name: "Bob",
   age: 30,
-  email: "bob@example.com"
+  middle_name: null
 }
 
--- Valid: required field can be null
-let user3: User = {
+-- Valid: optional fields omitted
+let p3: Person = {
   name: "Charlie",
-  age: null
+  age: 32,
+  middle_name: null
 }
 
--- Invalid: required non-null field is null
-let user4: User = {
-  name: null,  -- Error: name cannot be null
-  age: 25
+-- Invalid: required non-null field cannot be null
+let bad1: Person = {
+  name: null,
+  age: 22,
+  middle_name: null
 }
 
--- Invalid: required field is missing
-let user5: User = {
-  age: 25  -- Error: name is required
+-- Invalid: required field cannot be absent
+let bad2: Person = {
+  age: 22,
+  middle_name: null
 }
 ```
 
@@ -221,6 +233,7 @@ let user: User = {
 -- You can also use this in boolean expressions
 let has_phone: bool = user.phone is defined
 let contact_info: string = user.phone is defined ? user.phone : "No phone available"
+let display_gender: string = user.gender ?: "unknown"
 
 -- Check if optional fields exist using ternary operator
 let phone_message: string = user.phone is defined ? "Phone: " + user.phone : "No phone number provided"
@@ -283,23 +296,23 @@ Shapes excel at modeling complex, nested data models with proper nullability han
 
 ```sentrie
 shape Address {
-  street!: string @not_empty()
-  city!: string @not_empty()
-  state!: string @length(2) @uppercase()
-  zip!: string @regexp("^[0-9]{5}(-[0-9]{4})?$")
+  street: string @not_empty()
+  city: string @not_empty()
+  state: string @length(2) @uppercase()
+  zip: string @regexp("^[0-9]{5}(-[0-9]{4})?$")
 }
 
 shape ContactInfo {
-  email!: string @email()
+  email: string @email()
   phone?: string @regexp("^\\+?[1-9]\\d{1,14}$")  -- Optional phone
   address?: Address  -- Optional address
 }
 
 shape User {
-  name!: string @minlength(2) @maxlength(100)
-  age: number @min(13) @max(120)  -- Can be null if unknown
-  contact!: ContactInfo
-  preferences?: map[string]any  -- Optional preferences
+  name: string @minlength(2) @maxlength(100)
+  age: number? @min(13) @max(120)  -- Can be null if unknown
+  contact: ContactInfo
+  preferences?: dict[string]  -- Optional preferences
 }
 ```
 
@@ -352,6 +365,147 @@ let user3: User = {
 }
 ```
 
+## Checking a Value Against a Shape
+
+The `is` operator checks whether a value conforms to a shape or type. The result is `true` when the value validates against it and `false` when it does not. A value that does not conform is never an error, so a policy can branch on the shape of its input.
+
+```sentrie
+value is T
+value is not T
+```
+
+`T` can be any of:
+
+- A primitive type: `string`, `number`, `boolean`, `trinary` or `document`
+- A collection type: `list[T]`, `dict[T]` or `record[...]`
+- A shape name, either bare (`User`) or qualified (`com/example/auth/User`)
+
+Any of these can be followed by `?` to accept `null`, and by constraints such as `@minlength(3)`:
+
+```sentrie
+namespace com/example/orders
+
+shape Order {
+  id: string
+  total: number
+}
+
+shape Email string @email()
+
+policy checkout {
+  fact payload: document
+
+  rule results = {
+    let a = payload is Order
+    let b = "alice@example.com" is Email
+    let c = [1, "x"] is list[number]
+    let d = "hello" is string@minlength(3)
+    let e = null is string?
+    let f = null is string
+    yield { "a": a, "b": b, "c": c, "d": d, "e": e, "f": f }
+  }
+
+  export decision of results
+}
+```
+
+With `{"id": "o1", "total": 50}` as `payload`, `a` is `true`, `b` is `true`, `c` is `false`, `d` is `true`, `e` is `true` and `f` is `false`.
+
+### Results
+
+| Value | `value is T` |
+| --- | --- |
+| Conforms to `T` | `true` |
+| Does not conform to `T` | `false` |
+| Undefined | `false` |
+| `null`, and `T` is nullable (`T?`) | `true` |
+| `null`, and `T` is not nullable | `false` |
+
+`is not` is the negation of each row.
+
+The check fails with an error, rather than returning `false`, only when the check itself cannot be made:
+
+- A constraint is given invalid arguments, such as `@minlength("x")` (constraint arguments must be literals)
+- A field of the shape names another shape that is not visible from where the check runs
+
+### Shape or Value
+
+The same syntax is also equality: `name is "Alice"` compares two values. When the right-hand side is a bare name, Sentrie decides what it means when the pack is validated:
+
+- If the name is a shape, `is` checks the value against that shape.
+- If the name is a value in scope, such as a `let` or a fact, `is` compares for equality.
+- If the name is both, or neither, validation fails. Rename one of them, or use `==` to compare values.
+
+A shape that is unknown, or that belongs to another namespace and is not exported, is reported the same way when the pack is validated.
+
+Because this is settled at validation time, adding a shape or a `let` can never silently turn one kind of check into the other, and a misspelt shape name is reported before any rule runs.
+
+Inside a `derive`, shape names resolve in the derive's own scope, not the caller's.
+
+### Nullable Types and the Ternary Operator
+
+`?` also starts the ternary operator, so `is` has to tell the two apart. In `x is T`, a `?` right after the type is the ternary operator when the next token can start an expression (`x is string ? "a" : "b"`). Otherwise it marks the type nullable (`x is string?`).
+
+Two further cases:
+
+- After a type keyword, a `?` before `{` is also nullable, so `when x is string? { ... }` works.
+- After a shape name, which could also be a value, `? {` stays a ternary: `x is y ? {...} : {...}`.
+
+So a nullable shape in front of a rule body needs parentheses, `when (x is User?) { ... }`. Or leave the `?` off: a non-null value that conforms to `User?` also conforms to `User`.
+
+### Gating a Rule on a Shape
+
+Use `is` in a `when` clause so that a rule only runs for input of the right shape:
+
+```sentrie
+namespace com/example/events
+
+shape Purchase {
+  kind: string
+  amount: number @min(0)
+  currency: string @length(3)
+}
+
+policy classify {
+  fact event: document
+
+  rule big = default false when event is Purchase {
+    yield event.amount >= 1000
+  }
+
+  export decision of big
+}
+```
+
+If `event` is not a valid `Purchase`, the rule falls back to its default of `false`. It does not raise an error, and `event.amount` is never read.
+
+### Heterogeneous Input
+
+When a fact can arrive in more than one form, check each form in turn:
+
+```sentrie
+shape Click {
+  kind: string
+  x: number
+  y: number
+}
+
+policy classify {
+  ...
+
+  rule label = default "other" {
+    yield event is Purchase ? "purchase" : (event is Click ? "click" : "other")
+  }
+}
+```
+
+This extends the `classify` policy above, next to the `Purchase` shape. A purchase with a negative `amount` fails the `Purchase` check, so it is labeled `"other"` rather than raising an error.
+
+### Limits
+
+- `dict[T]` is checked only for being a dictionary. The values are not checked against `T`, so `{"k": "s"} is dict[number]` is `true`.
+- Inside a `derive`, `is` resolves shapes in the derive's scope, but casts, typed parameters and return types in a derive still validate against the caller's policy.
+
 ## Shape Management
 
 ### Local Availability
@@ -379,7 +533,7 @@ To make shapes available to other namespaces, use the `export` keyword:
 ```sentrie
 namespace com/example/auth
 
-shape Base { id!: string }
+shape Base { id: string }
 export shape Base
 
 policy P {

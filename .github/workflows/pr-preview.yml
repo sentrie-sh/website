@@ -11,6 +11,7 @@ permissions:
 
 concurrency:
   group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 env:
   BUILD_PATH: "."
@@ -21,6 +22,7 @@ jobs:
   deploy-preview:
     name: Deploy Preview
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,27 +65,30 @@ jobs:
         working-directory: ${{ env.BUILD_PATH }}
 
       - name: Install Surge
-        run: npm install --global surge
+        run: npm install --global surge@0.53.0
 
       - name: Deploy to Surge
+        timeout-minutes: 12
         env:
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
         run: |
           cd dist
-          for i in {1..10}; do
-            if surge --project . \
-              --domain "${{ env.PREVIEW_HOST }}" \
-              -y; then
+          # A healthy publish of this site takes a few seconds. When Surge
+          # stalls, an upload can hang for minutes before it aborts, so cap
+          # each attempt and back off between them.
+          for i in 1 2 3 4 5; do
+            if timeout 90 surge --project . --domain "${{ env.PREVIEW_HOST }}"; then
               echo "Surge deploy succeeded!"
-              break
+              exit 0
             fi
-            echo "Attempt $i/10 to deploy with Surge failed, retrying in 2 seconds..."
-            sleep 2
-            if [ "$i" -eq 10 ]; then
-              echo "Surge deployment failed after 10 attempts"
-              exit 1
+            echo "Attempt $i/5 to deploy with Surge failed or timed out"
+            if [ "$i" -lt 5 ]; then
+              sleep $((i * 15))
             fi
           done
+          echo "Surge deployment failed after 5 attempts"
+          exit 1
+
 
       - name: Verify deployment
         timeout-minutes: 2

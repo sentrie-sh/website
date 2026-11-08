@@ -3,15 +3,15 @@ title: Types and Values
 description: "Built-in primitive and collection types, type declarations, indexing, cast, and validation."
 ---
 
-Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `document`) and collection types (`list[T]`, `map[T]`, `record[T1,T2,...]`). User-defined [shapes](/reference/shapes) extend these. Types can be used in [let](/reference/let), [facts](/reference/facts), and shape fields. Types may carry [constraints](/reference/constraints) for runtime validation.
+Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `document`) and collection types (`list[T]`, `dict[T]`, `record[T1,T2,...]`). User-defined [shapes](/reference/shapes) extend these. Types can be used in [let](/reference/let), [facts](/reference/facts), and shape fields. Types may carry [constraints](/reference/constraints) for runtime validation.
 
 ## Syntax
 
 **Primitives:** `number` | `string` | `trinary` | `bool` | `document`
 
-**Collections:** `list[T]` | `map[T]` | `record[T1, T2, ...]`
+**Collections:** `list[T]` | `dict[T]` | `record[T1, T2, ...]`
 
-**Cast:** `cast expr as type`
+**Cast:** `expr as type`
 
 **Indexing:**  
 - List/record: `expr[number]` (zero-based index).  
@@ -34,14 +34,14 @@ Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `docume
 | Type | Description | Index type | Notes |
 | :--- | :---------- | :--------- | :---- |
 | `list[T]` | Ordered sequence of values of type `T`. | `number` (zero-based). | Index out of range is an error or undefined behavior per implementation. |
-| `map[T]` | Key-value map; keys are strings, values are type `T`. | `string` or `.key` (identifier). | Keys must be strings. Dot access: `map.key` when key is a [valid identifier](/reference/identifiers). |
+| `dict[T]` | Key-value map; keys are strings, values are type `T`. | `string` or `.key` (identifier). | Keys must be strings. Dot access: `map.key` when key is a [valid identifier](/reference/identifiers). |
 | `record[T1,T2,...]` | Fixed-length tuple with typed positions. | `number` (zero-based position). | Length and types are fixed at type declaration. |
 
 ### Cast
 
-`cast expr as type` converts the value of `expr` to the given type. The result is validated against the type and any [constraints](/reference/constraints) on that type. If conversion or validation fails, evaluation aborts. Supported conversions include string↔number, number↔string, bool↔string, and literal document to `document`.
+The postfix cast `expr as type` converts the value of `expr` to the given type. The result is validated against the type and any [constraints](/reference/constraints) on that type. If conversion or validation fails, evaluation errors; it never yields an unchecked value. `as` binds to the expression on its left, so write `(a + b) as number` to cast a sum. Supported conversions include string↔number, number↔string, bool↔string, and literal document to `document`.
 
-**Returns:** N/A for type declarations. For `cast`: the value after conversion and validation; failure aborts evaluation.
+**Returns:** N/A for type declarations. For a cast: the value after conversion and validation; failure is an evaluation error.
 
 ## Indexing and access
 
@@ -65,7 +65,7 @@ let u: number = 50
 let s: string = "hello"
 let b: bool = true
 let arr: list[number] = [1, 2, 3]
-let m: map[number] = { "one": 1, "two": 2 }
+let m: dict[number] = { "one": 1, "two": 2 }
 let r: record[string, number, bool] = ["one", 1, true]
 ```
 
@@ -80,10 +80,10 @@ let oneAlt: number = m.one
 ### Cast
 
 ```text
-let x: number = cast "50" as number
-let y: string = cast 50 as string
-let z: bool = cast "true" as bool
-let doc: document = cast { "name": "John", "age": 30 } as document
+let x: number = "50" as number
+let y: string = 50 as string
+let z: bool = "true" as bool
+let doc: document = { "name": "John", "age": 30 } as document
 ```
 
 ## Good to Know
@@ -102,7 +102,7 @@ Collections allow you to work with groups of related values:
 | Type                  | Description                                 |
 | --------------------- | ------------------------------------------- |
 | `list[T]`             | Lists of type `T`                           |
-| `map[T]`              | Maps with `string` keys and type `T` values |
+| `dict[T]`              | Maps with `string` keys and type `T` values |
 | `record[T1, T2, ...]` | Tuples with specific types                  |
 
 ### Declaring a Collection Type
@@ -112,12 +112,29 @@ let u: list[number] = [1, 2, 3]
 ```
 
 ```text
-let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 ```
 
 ```text
 let u: record[string, number, bool] = ["one", 1, true]
 ```
+
+## Nullable Types
+
+Sentrie supports type-level nullability with a `?` suffix on type references.
+
+- `string?` -> value may be `null` or a string
+- `list[string]?` -> list itself may be `null`
+- `dict[string?]` -> dict values may be `null`
+- `Person?` -> shape value may be `null`
+
+```text
+let middleName: string? = null
+let tags: list[string]? = null
+let attrs: dict[string?] = {"nickname": null}
+```
+
+`T?` means **nullable value**. This is different from optional bindings (for example, `field?` in shapes/facts), which control whether a key may be absent.
 
 :::caution
 Map keys must be strings.
@@ -138,33 +155,44 @@ let first: number = u[0]
 ```
 
 ```text
-let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 let first: number = u["one"]
 ```
 
 For maps, you can also access elements using the `.` syntax.
 
 ```text
-let u: map[number] = { "one": 1, "two": 2, "three": 3 }
+let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 let first: number = u.one
 ```
 
 ## Converting Types
 
-You can convert between types using the `cast .. as` construct. The result is validated against the new type constraints before returning the result.
+You can convert between types with a **cast expression**: `expr as Type`. The result is validated against the target type and its constraints before it is returned. A failed conversion or constraint check is an **error** (with a trace node), not a silent zero value.
+
+The `as` operator binds to the expression on its left, similar to unary operators in other languages. It does **not** apply to a whole arithmetic expression unless you add parentheses:
 
 ```text
-let u: number = cast "50" as number
+-- `as` applies to `b`, not to `a + b`
+let x = a + b as number
+-- same as: a + (b as number)
+
+-- convert the summed value instead
+let y = (a + b) as number
 ```
 
 ```text
-let u: string = cast 50 as string
+let u: number = "50" as number
 ```
 
 ```text
-let u: bool = cast "true" as bool
+let u: string = 50 as string
 ```
 
 ```text
-let u: document = cast { "name": "John", "age": 30 } as document
+let u: bool = "true" as bool
+```
+
+```text
+let u: document = { "name": "John", "age": 30 } as document
 ```

@@ -31,8 +31,8 @@ Computes the SHA-256 hash of a string. This function uses a streaming hash imple
 namespace com/example/auth
 
 policy mypolicy {
-  fact passwordInput!: string
-  fact expectedHash!: string
+  fact passwordInput: string
+  fact expectedHash: string
 
   use { sha256 } from @sentrie/crypto
 

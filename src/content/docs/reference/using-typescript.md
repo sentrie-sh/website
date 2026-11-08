@@ -38,8 +38,8 @@ shape User {
 }
 
 policy mypolicy {
-  fact user!: User
-  fact passwordInput!: string
+  fact user: User
+  fact passwordInput: string
 
   use { now } from @sentrie/time
   use { sha256 } from @sentrie/hash
@@ -95,9 +95,9 @@ shape User {
 }
 
 policy mypolicy {
-  fact user!: User
-  fact passwordInput!: string
-  fact userAge!: number
+  fact user: User
+  fact passwordInput: string
+  fact userAge: number
 
   use { md5, sha256 } from @sentrie/hash
   use { now } from @sentrie/time
@@ -151,6 +151,12 @@ The `@local` prefix indicates paths relative to the pack root. These paths are n
 - `@local/user/id` evaluates to `$PACKROOT/user/id.ts`
 - `@local/utils/helper` evaluates to `$PACKROOT/utils/helper.ts`
 - `@local/something` evaluates to `$PACKROOT/something.ts`
+
+`@local/…` and `require("@local/…")` are confined to the pack root. Paths that resolve outside it - including `..` segments and symlinks that leave the pack - are rejected. Relative imports (`./`, `../`) use the same containment check.
+
+### JavaScript `null` and `undefined`
+
+A module function that returns `null`, `undefined`, or that falls off the end of the function without a `return` maps onto Sentrie null/undefined. Those values follow ordinary trinary rules (`is defined`, Elvis, and so on). They do not panic the evaluator.
 
 ### Built-in Modules
 

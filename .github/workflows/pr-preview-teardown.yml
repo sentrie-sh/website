@@ -11,6 +11,7 @@ permissions:
 jobs:
   teardown-preview:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -18,14 +19,14 @@ jobs:
           node-version: "20"
 
       - name: Install Surge
-        run: npm install --global surge
+        run: npm install --global surge@0.53.0
 
       - name: Teardown Surge deployment
         env:
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
         continue-on-error: true
         run: |
-          surge teardown sentrie-pr-${{ github.event.pull_request.number }}.surge.sh
+          timeout 90 surge teardown sentrie-pr-${{ github.event.pull_request.number }}.surge.sh
 
       - name: Verify teardown
         timeout-minutes: 2

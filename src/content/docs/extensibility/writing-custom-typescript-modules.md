@@ -40,7 +40,7 @@ rule myrule = default false {
 
 ```text
 use { calculateAge, validateEmail } from "../helpers/validation.ts"
-fact user!: utils.User
+fact user: utils.User
 yield utils.calculateAge(user.birthDate) >= 18
 ```
 

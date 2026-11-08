@@ -243,8 +243,8 @@ let isMulti = net.isMulticast("224.0.0.1")  // true
 namespace com/example/network
 
 policy mypolicy {
-  fact clientIp!: string
-  fact allowedCidr!: string
+  fact clientIp: string
+  fact allowedCidr: string
 
   use { cidrContains, parseIP, isPrivate, isPublic } from @sentrie/net
 

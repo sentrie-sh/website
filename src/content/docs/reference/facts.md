@@ -3,7 +3,7 @@ title: Facts
 description: "Fact declaration syntax (required/optional, type, alias, default) and binding at evaluation."
 ---
 
-Facts are named, typed inputs to a [policy](/reference/policies). They are declared at the top of the policy (before [let](/reference/let), [use](/reference/functions), and [rules](/reference/rules)). Each fact has a name, a type (shape or primitive), an optional alias used in the policy body, and—only for optional facts—an optional default expression. Required facts must be supplied at evaluation time or evaluation fails. Facts are non-nullable when supplied: null is not allowed as a fact value.
+Facts are named, typed inputs to a [policy](/reference/policies). They are declared at the top of the policy (before [let](/reference/let), [use](/reference/functions), and [rules](/reference/rules)). Each fact has a name, a type (shape or primitive), an optional alias used in the policy body, and—only for optional facts—an optional default expression. Required facts must be supplied at evaluation time or evaluation fails. A fact of type `T` rejects `null`; declare the type as `T?` when an explicit `null` is a valid value.
 
 :::note[Note]
 Facts live in the **facts** section of a policy: after optional [metadata](/reference/policy-metadata/) and before any `use`. Comments may appear anywhere. See [Policies](/reference/policies/) for full ordering.
@@ -17,7 +17,7 @@ fact name? : type [ as alias ] [ default expr ]  -- optional
 ```
 
 - **name / name?:** Identifier. Trailing `?` makes the fact optional; otherwise it is required.
-- **type:** Any type: primitive (`number`, `string`, `trinary`, `bool`, `document`), collection (`list[T]`, `map[T]`, `record[...]`), or a [shape](/reference/shapes). The supplied value is validated against this type (and any constraints) at evaluation.
+- **type:** Any type: primitive (`number`, `string`, `trinary`, `bool`, `document`), collection (`list[T]`, `dict[T]`, `record[...]`), or a [shape](/reference/shapes). The supplied value is validated against this type (and any constraints) at evaluation.
 - **as alias:** Optional. Identifier used in the policy body to refer to this fact. If omitted, the body uses `name`.
 - **default expr:** Optional. Allowed only for **optional** facts (`name?`). Used when the fact is omitted from the input. The expression is evaluated in the policy context (e.g. can reference other facts or policy-level let if order allows).
 
@@ -28,15 +28,15 @@ fact name? : type [ as alias ] [ default expr ]  -- optional
 | `name` | identifier | Yes | Declaration name. Used in `with` bindings when another policy [imports](/language-concepts/policy-composition) this policy: the binding key must match the **alias** (or name if no `as`). |
 | `name?` | - | No | `?` makes the fact optional. Optional facts may be omitted from the input; if omitted, `default expr` is used if present. |
 | `type` | type ref | Yes | Type of the fact value. Can be a shape, primitive, or collection. Validation (and [constraints](/reference/constraints)) runs when the fact is bound. |
-| `as alias` | identifier | No | Name used in the policy body. If absent, body uses `name`. Import `with` must use the alias (or name if no alias). |
+| `as alias` | identifier | No | Name used in the policy body. If absent, body uses `name`. Caller-supplied values and omitted defaults are both bound under the alias, so `fact userRole: string as role default "guest"` is supplied as `role`, not `userRole`. Import `with` must use the alias (or name if no alias). |
 | `default expr` | expression | No | Only for optional facts. Evaluated when the fact is omitted. Type should match the fact type (and constraints). |
 
 **Returns:** N/A (declaration). At evaluation time, the fact name (or alias) is bound to the provided value (or default). The policy body refers to the fact by alias or name.
 
 ## Required vs optional
 
-- **Required (`fact name : type`):** The evaluator must receive a value for this fact. If it is missing, evaluation fails (e.g. `ErrRequiredFact`). The value must not be null and must conform to the declared type and constraints.
-- **Optional (`fact name? : type`):** The evaluator may omit this fact. If omitted, the fact is bound to `default expr` if present; otherwise the behavior is tooling-defined (e.g. undefined or a type-specific default). If supplied, the value must be non-null and conform to the type and constraints.
+- **Required (`fact name : type`):** The evaluator must receive a value for this fact. If it is missing, evaluation fails (e.g. `ErrRequiredFact`). The value must conform to the declared type and constraints; `null` is accepted only when the type is nullable (`T?`).
+- **Optional (`fact name? : type`):** The evaluator may omit this fact. If omitted, the fact is bound to `default expr` if present; otherwise the behavior is tooling-defined (e.g. undefined or a type-specific default). If supplied, the value must conform to the type and constraints; `null` is accepted only when the type is nullable (`T?`).
 
 ## Import binding (policy composition)
 
@@ -56,8 +56,8 @@ fact context?: Context as context default { "key": "value" }
 
 :::note[Important]
 - **Facts are required by default** - If no modifier is specified, the fact must be provided during execution
-- **Use `?` to mark facts as optional** - Optional facts can be omitted, but if provided, they must be non-null
-- **Facts are always non-nullable** - Null values are not allowed for facts
+- **Use `?` to mark facts as optional** - Optional facts can be omitted
+- **Use `T?` to allow null values** - Bare `T` remains non-null by default
 - **Required facts cannot have default values** - Only optional facts can have defaults
 - **Facts before uses:** If a policy has both `fact` and `use` statements, every `fact` must appear before the first `use`. A policy may have **uses with no facts** (skip the facts block).
 
@@ -93,9 +93,9 @@ fact coordinates?: record[number, number] as location default [ 0.0, 0.0 ]
 
 ```sentrie
 shape User {
-  id!: string
-  role!: string
-  permissions!: list[string]
+  id: string
+  role: string
+  permissions: list[string]
 }
 
 -- Required shape fact
@@ -110,7 +110,7 @@ In the policy body, use `currentUser`. When importing this policy’s decision, 
 fact context?: Context as ctx default {}
 ```
 
-If the caller omits `ctx`, it is bound to `{}`. If provided, it must be non-null and of type `Context`.
+If the caller omits `ctx`, it is bound to `{}`. If provided, it must be of type `Context`, which rejects `null` because the type is not `Context?`.
 
 ### Primitive and document facts
 
@@ -138,13 +138,13 @@ fact enabled?: bool as isEnabled default true
 
 -- Collection defaults (optional facts)
 fact tags?: list[string] as itemTags default []
-fact config?: map[string]any as settings default {}
+fact config?: dict[string] as settings default {}
 ```
 
 ## Good to Know
 
 Before you implement this, keep a few boundaries in mind:
 
-- **Constraint:** Facts must be declared before rules; only facts or comments may precede fact declarations. Required facts must be supplied at evaluation or evaluation fails. Optional facts may be omitted; if supplied they must be non-null. Null is not allowed for any fact. Default is used when an optional fact is omitted.
+- **Constraint:** Facts must be declared before rules; only facts or comments may precede fact declarations. Required facts must be supplied at evaluation or evaluation fails. Optional facts may be omitted. `null` is accepted only for a nullable type (`T?`). Default is used when an optional fact is omitted.
 - **Import:** When using [policy composition](/language-concepts/policy-composition), the fact name in the `with` clause must match the **alias** (or name if no `as`) in the target policy. The type of the supplied value must match the fact type (and constraints) or evaluation fails.
 - **Order:** Fact declarations may reference only prior facts in their `default expr` (if the implementation allows it); typically defaults are literals or simple expressions.

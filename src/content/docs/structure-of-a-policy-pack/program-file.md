@@ -18,7 +18,7 @@ A program file consists of:
 
 A program file can contain:
 
-- Only one namespace.
+- Only one namespace. Comments may appear **before** that declaration; a second `namespace` in the same file is an error.
 - Multiple policy declarations.
 - Multiple shape declarations.
 - Multiple shape exports.
