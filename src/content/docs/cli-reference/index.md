@@ -36,6 +36,12 @@ Initialize a new policy pack.
 
 See the [init command documentation](./init) for details.
 
+### `fmt`
+
+Format `.sentrie` files in one canonical style.
+
+See the [fmt command documentation](./fmt) for details.
+
 ### `serve`
 
 Start the Sentrie HTTP server to evaluate policies.
