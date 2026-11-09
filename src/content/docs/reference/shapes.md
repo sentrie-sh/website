@@ -365,6 +365,42 @@ let user3: User = {
 }
 ```
 
+## Union and `any` Fields
+
+A field, or the whole shape, can be a [union](/reference/types-and-values#union-types) or [`any`](/reference/types-and-values#the-any-type). `?` and constraints bind to the member they follow:
+
+```sentrie
+namespace com/example/orders
+
+shape Address {
+  city: string
+  zip: string | number
+}
+
+shape Order {
+  id: string | number
+  note?: string | number?
+  ship: Address | list[Address]
+  extra: any
+}
+
+shape Scalar string | number?
+
+policy intake {
+  fact payload: any
+
+  rule check = default false when payload is Order {
+    yield true
+  }
+
+  export decision of check
+}
+```
+
+`check` is `true` for `{"id": "o1", "ship": {"city": "Oslo", "zip": "0150"}, "extra": null}` and for `{"id": 7, "note": null, "ship": [{"city": "Oslo", "zip": 150}], "extra": [1, 2]}`. It is `false` when `id` is `true`, when `zip` is `true`, or when `extra` is missing: a required `any` field must be present, although its value can be anything, `null` included.
+
+A shape cannot be named `any`.
+
 ## Checking a Value Against a Shape
 
 The `is` operator checks whether a value conforms to a shape or type. The result is `true` when the value validates against it and `false` when it does not. A value that does not conform is never an error, so a policy can branch on the shape of its input.
@@ -377,10 +413,12 @@ value is not T
 `T` can be any of:
 
 - A primitive type: `string`, `number`, `boolean`, `trinary` or `document`
-- A collection type: `list[T]`, `dict[T]` or `record[...]`
+- A collection type: `list[T]`, `dict[T]`, `set[T]` or `record[...]`
 - A shape name, either bare (`User`) or qualified (`com/example/auth/User`)
+- A union of any of these, such as `string | number` or `Purchase | Click` (see [Union Types](/reference/types-and-values#union-types))
+- `any`, which every defined value conforms to
 
-Any of these can be followed by `?` to accept `null`, and by constraints such as `@minlength(3)`:
+Any of these can be followed by `?` to accept `null`, and by constraints such as `@minlength(3)`. In a union, `?` and constraints apply to the member they follow:
 
 ```sentrie
 namespace com/example/orders
@@ -411,6 +449,31 @@ policy checkout {
 
 With `{"id": "o1", "total": 50}` as `payload`, `a` is `true`, `b` is `true`, `c` is `false`, `d` is `true`, `e` is `true` and `f` is `false`.
 
+### Checking Against a Union
+
+Use a union to branch on which of several types a value has:
+
+```sentrie
+namespace com/example/orders
+
+policy kinds {
+  fact payload: any
+
+  rule results = {
+    let a = payload.id is string | number
+    let b = payload.id is string ? "string" : "number"
+    let c = payload.note is string | number?
+    yield { "a": a, "b": b, "c": c }
+  }
+
+  export decision of results
+}
+```
+
+With `{"id": "o1"}` as `payload`, the result is `{"a": true, "b": "string", "c": false}`. With `{"id": 7, "note": null}` it is `{"a": true, "b": "number", "c": true}`. `c` is `false` in the first case because `note` is undefined, and `is` is `false` for an undefined value whatever the type.
+
+Write `x is any` to test whether a value is defined at all. It is `true` for everything except an undefined value, `null` included.
+
 ### Results
 
 | Value | `value is T` |
@@ -420,17 +483,22 @@ With `{"id": "o1", "total": 50}` as `payload`, `a` is `true`, `b` is `true`, `c`
 | Undefined | `false` |
 | `null`, and `T` is nullable (`T?`) | `true` |
 | `null`, and `T` is not nullable | `false` |
+| `null`, and `T` is `any` or a union with a nullable member | `true` |
+| Defined, and `T` is `any` | `true` |
 
 `is not` is the negation of each row.
 
 The check fails with an error, rather than returning `false`, only when the check itself cannot be made:
 
 - A constraint is given invalid arguments, such as `@minlength("x")` (constraint arguments must be literals)
-- A field of the shape names another shape that is not visible from where the check runs
+- A field of the shape names another shape that is not visible from where the shape is declared (see [Where a Shape's Fields Resolve](#where-a-shapes-fields-resolve))
+- A member of a union cannot be checked, for example `"abc" is string @minlength("x") | number`. A member that matches wins, so `5 is string @minlength("x") | number` is `true`
+
+When the right-hand side of `is` names a shape that is not visible, as in `x is A | Missing`, the pack fails validation (`sentrie validate`) before any rule runs.
 
 ### Shape or Value
 
-The same syntax is also equality: `name is "Alice"` compares two values. When the right-hand side is a bare name, Sentrie decides what it means when the pack is validated:
+The same syntax is also equality: `name is "Alice"` compares two values. When the right-hand side is a bare name, Sentrie decides what it means when the pack is validated. A bare `any` is the exception: it is always the type, so use `==` to compare against a value named `any`.
 
 - If the name is a shape, `is` checks the value against that shape.
 - If the name is a value in scope, such as a `let` or a fact, `is` compares for equality.
@@ -541,6 +609,47 @@ policy P {
 ```
 
 In another file in a different namespace, a shape can extend `Base` by referencing the exported name (see [Policy composition](/language-concepts/policy-composition) and namespace resolution). The base shape must be exported for cross-namespace composition.
+
+### Where a Shape's Fields Resolve
+
+The shapes named in a shape's fields and alias resolve where the shape is declared, not where a value is checked against it. An exported shape therefore checks its fields against its own namespace's shapes from any caller, and a caller that declares a shape with the same name does not change the check:
+
+```sentrie
+namespace com/example/catalog
+
+shape Price {
+  amount: number
+}
+
+shape Item {
+  sku: string
+  price: Price
+}
+
+export shape Item
+```
+
+```sentrie
+namespace com/example/shop
+
+shape Price {
+  cents: number
+}
+
+policy cart {
+  fact line: document as line
+  rule ok = { yield line is com/example/catalog/Item }
+  export decision of ok
+}
+```
+
+`price` is checked against `com/example/catalog`'s `Price`, so `{"sku": "a", "price": {"amount": 1}}` gives `true` and `{"sku": "a", "price": {"cents": 1}}` gives `false`.
+
+The same holds for:
+
+- A field a shape takes in through `with`: it resolves in the shape that declared it.
+- A namespace shape whose field names a shape declared only inside a policy: the field's shape is not visible from the namespace, so checking a value against it fails with an error naming the missing shape, even when the check runs in that policy. Declare the field's shape in the namespace instead.
+- A policy-local shape: its fields resolve in its policy, so they can name that policy's shapes.
 
 ### Shape literals and field order
 

@@ -62,7 +62,7 @@ policy billing {
 A `policy` statement is a container for related declarations in this **order** (comments allowed between lines). See [Policy metadata](/reference/policy-metadata/) for syntax, validation, and how metadata is indexed.
 
 - optional **metadata** (`title`, `description`, `version`, repeatable `tag`)
-- optional **facts** (all `fact` before any `use`)
+- optional **facts** and **pack data** (every `fact` before any `use`; `data` anywhere in the header before the body)
 - optional **`use`** imports
 - **body**: `let`, `rule`, `export`, and policy-local `shape` declarations
 
