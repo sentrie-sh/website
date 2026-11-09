@@ -623,6 +623,13 @@ let score: Positive100 = 50
 "line 1\nline 2"
 ```
 
+A string literal may span lines. A line break inside it is a newline (`\n`) whatever the file's line endings: in a file saved with Windows (CRLF) line endings the carriage return is dropped, so the same policy gives the same value on every platform. An escaped `\r` is kept.
+
+```text
+let s = "line 1
+line 2"   -- equal to "line 1\nline 2" in LF and CRLF files alike
+```
+
 ### Heredoc Strings
 
 A heredoc writes a multi-line string without escapes. It opens with `<<<` and a tag, and ends at a line that holds only that tag:
