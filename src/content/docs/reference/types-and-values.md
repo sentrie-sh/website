@@ -1,33 +1,67 @@
 ---
 title: Types and Values
-description: Sentrie has a comprehensive type system with primitive types, collections, and user-defined shapes.
+description: "Built-in primitive and collection types, type declarations, indexing, cast, and validation."
 ---
 
-Sentrie provides a robust type system that includes primitive types, collection types, and [user-defined shapes](/reference/shapes/). The type system is enhanced by a powerful [constraint system](/reference/constraints) that allows you to validate values against specific rules.
+Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `document`) and collection types (`list[T]`, `dict[T]`, `record[T1,T2,...]`). User-defined [shapes](/reference/shapes) extend these. Types can be used in [let](/reference/let), [facts](/reference/facts), and shape fields. Types may carry [constraints](/reference/constraints) for runtime validation.
 
-## Primitive Types
+## Syntax
 
-Sentrie supports five fundamental primitive types:
+**Primitives:** `number` | `string` | `trinary` | `bool` | `document`
 
-| Type       | Description                                                     |
-| ---------- | --------------------------------------------------------------- |
-| `number`   | Numeric values: exact integers and floats                       |
-| `string`   | Text strings                                                    |
-| `trinary`  | Trinary values (`true` / `false` / `unknown`)                   |
-| `bool`     | Boolean values (`true` / `false`) - a special case of `trinary` |
-| `document` | Arbitrary JSON-like objects                                     |
+**Collections:** `list[T]` | `dict[T]` | `record[T1, T2, ...]`
 
-### Declaring a Primitive Type
+**Cast:** `expr as type`
+
+**Indexing:**  
+- List/record: `expr[number]` (zero-based index).  
+- Map: `expr[string]` or `expr.identifier` (key must be a string; dot form when the key is a [valid identifier](/reference/identifiers)).
+
+## Configuration & Arguments
+
+### Primitive types
+
+| Type | Description | Notes |
+| :--- | :---------- | :---- |
+| `number` | Numeric values: exact 64-bit integers and 64-bit floats. | Whole numbers that fit in a signed 64-bit integer stay exact; see [Integers and floats](#integers-and-floats). |
+| `string` | UTF-8 string. | Literals: double-quoted or backtick. |
+| `trinary` | Three-valued logic: `true`, `false`, `unknown`. | Used for conditions and [boolean operations](/reference/boolean-operations). See [Trinary](/reference/trinary). |
+| `bool` | Two-valued: `true`, `false`. | Subset of trinary; no `unknown` literal for bool, but expressions can produce trinary. |
+| `document` | JSON-like object (string keys, arbitrary values). | Used for untyped or semi-structured data. |
+
+### Number literals
+
+A number literal is a run of digits, optionally followed by a fraction and an exponent:
 
 ```text
-let u: number = 50
+42          -- Integer (exact)
+9007199254740993  -- Integers keep every digit up to 9223372036854775807
+3.14        -- Decimal
+1e5         -- 100000
+1E5         -- Same as 1e5
+1e+5        -- Same as 1e5
+2.5e-3      -- 0.0025
 ```
+
+An exponent is `e` or `E`, an optional `+` or `-`, and at least one digit. A literal with an exponent is a float. Exponent literals work everywhere a number literal does, including [constraint](/reference/constraints/) arguments:
 
 ```text
-let u: number = 50.5
+shape Reading {
+  value: number @min(1e-3) @max(1.5E+3)
+}
 ```
 
-### Integers and Floats
+Malformed number literals are errors when the pack is loaded:
+
+| Literal            | Error                                              |
+| ------------------ | -------------------------------------------------- |
+| `1e`, `1e+`, `1ex` | the exponent needs at least one digit              |
+| `1.e5`             | a digit must follow the decimal point              |
+| `1e400`            | value out of range (a number must fit in a 64-bit float) |
+
+Because `e` right after a number always starts an exponent, separate a number from a following word with a space.
+
+### Integers and floats
 
 A `number` is either an **exact integer** or a **float**:
 
@@ -47,17 +81,71 @@ The [numeric constraints](/reference/constraints#numeric-constraints-number) com
 
 An integer beyond `Number.MAX_SAFE_INTEGER` (2^53-1) cannot be passed to a [TypeScript module](/reference/using-typescript#numbers-passed-to-typescript-modules): doing so is an error.
 
-```text
-let u: string = "hello"
-```
+### Collection types
+
+| Type | Description | Index type | Notes |
+| :--- | :---------- | :--------- | :---- |
+| `list[T]` | Ordered sequence of values of type `T`. | `number` (zero-based). | Index out of range is an error or undefined behavior per implementation. |
+| `dict[T]` | Key-value map; keys are strings, values are type `T`. | `string` or `.key` (identifier). | Keys must be strings. Dot access: `map.key` when key is a [valid identifier](/reference/identifiers). |
+| `record[T1,T2,...]` | Fixed-length tuple with typed positions. | `number` (zero-based position). | Length and types are fixed at type declaration. |
+
+### Cast
+
+The postfix cast `expr as type` converts the value of `expr` to the given type. The result is validated against the type and any [constraints](/reference/constraints) on that type. If conversion or validation fails, evaluation errors; it never yields an unchecked value. `as` binds to the expression on its left, so write `(a + b) as number` to cast a sum. Supported conversions include string↔number, number↔string, bool↔string, and literal document to `document`.
+
+**Returns:** N/A for type declarations. For a cast: the value after conversion and validation; failure is an evaluation error.
+
+## Indexing and access
+
+- **List:** `listExpr[indexExpr]`. `indexExpr` must be a number (or evaluate to a number). Zero-based. Bounds behavior is implementation-defined (error or undefined).
+- **Record:** `recordExpr[indexExpr]`. Same as list; index is the position (0, 1, 2, …).
+- **Map:** `mapExpr[keyExpr]` or `mapExpr.key`. Key must be a string. Dot form is equivalent to bracket form when the key is a [valid identifier](/reference/identifiers) (e.g. `m.one` ≈ `m["one"]`).
+
+## Where types are used
+
+- **Facts:** Fact type is a shape, primitive, or collection (e.g. `fact user: User`, `fact id: string`).
+- **Let:** Optional type annotation: `let x: number = 5`. When present, value is validated at runtime.
+- **Shape fields:** Each field has a type (primitive, collection, or shape).
+- **Constraints:** Types can be constrained (e.g. `number @min(0) @max(100)`). See [Constraints](/reference/constraints).
+
+## Examples in Action
+
+### Primitives and collections
 
 ```text
-let u: bool = true
+let u: number = 50
+let s: string = "hello"
+let b: bool = true
+let arr: list[number] = [1, 2, 3]
+let m: dict[number] = { "one": 1, "two": 2 }
+let r: record[string, number, bool] = ["one", 1, true]
 ```
 
+### Indexing
+
 ```text
-let u: document = { "name": "John", "age": 30 }
+let first: number = arr[0]
+let one: number = m["one"]
+let oneAlt: number = m.one
 ```
+
+### Cast
+
+```text
+let x: number = "50" as number
+let y: string = 50 as string
+let z: bool = "true" as bool
+let doc: document = { "name": "John", "age": 30 } as document
+```
+
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
+
+- **Type annotation on let:** Optional. When omitted, the value is not validated against a type. When present, the value is validated (and constraints apply); failure aborts evaluation.
+- **Map keys:** Must be strings. Access with `[index]`: numeric index for list/record, string key for map. Dot access for maps only when the key is a [valid identifier](/reference/identifiers).
+- **Division by zero:** Aborts evaluation. [Constraint](/reference/constraints) failure also aborts evaluation.
+- **Cast:** Validates against the target type and any constraints; failure aborts evaluation. Not all type combinations may be supported; see implementation for allowed conversions.
 
 ## Collection Types
 
@@ -66,7 +154,7 @@ Collections allow you to work with groups of related values:
 | Type                  | Description                                 |
 | --------------------- | ------------------------------------------- |
 | `list[T]`             | Lists of type `T`                           |
-| `dict[T]`             | Maps with `string` keys and type `T` values |
+| `dict[T]`              | Maps with `string` keys and type `T` values |
 | `record[T1, T2, ...]` | Tuples with specific types                  |
 
 ### Declaring a Collection Type
@@ -78,6 +166,8 @@ let u: list[number] = [1, 2, 3]
 ```text
 let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 ```
+
+Every element of a collection is checked against its element type. A value typed `dict[number]` rejects `{"a": 1, "b": "two"}` with an error naming the key, `value for key "b" is not valid`. When several values fail, the first failing key in sorted order is reported. In an `is` check the mismatch gives `false`: `{"b": "two"} is dict[number]` is `false`.
 
 ```text
 let u: record[string, number, bool] = ["one", 1, true]
@@ -111,7 +201,7 @@ However, it is recommended to declare the type for better readability and to avo
 
 ### Accessing Collection Elements
 
-You can access collection elements using the `[index]` syntax. The index must be a `string` for dicts and a `number` for lists and records.
+You can access collection elements using the `[index]` syntax. The index must be a `string` for maps and a `number` for lists and records.
 
 ```text
 let u: list[number] = [1, 2, 3]
@@ -123,7 +213,7 @@ let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 let first: number = u["one"]
 ```
 
-For dicts, you can also access elements using the `.` syntax.
+For maps, you can also access elements using the `.` syntax.
 
 ```text
 let u: dict[number] = { "one": 1, "two": 2, "three": 3 }

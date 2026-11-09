@@ -234,3 +234,12 @@ Semantic versions follow the format: `MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]`
 - **PATCH** - Incremented for backwards-compatible bug fixes
 - **PRERELEASE** - Optional prerelease identifier (e.g., `alpha`, `beta`, `rc.1`)
 - **BUILD** - Optional build metadata (e.g., `+001`, `+exp.sha.5114f85`)
+
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
+
+- "v" prefix is stripped; compare returns -1, 0, 1. satisfies uses npm-style range. major/minor/patch/prerelease/metadata extract components.
+
+
+- Invalid version string throws. stripPrefix removes leading "v".

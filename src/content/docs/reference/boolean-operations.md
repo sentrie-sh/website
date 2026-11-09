@@ -1,13 +1,15 @@
 ---
 title: Boolean Operations
-description: Boolean operations provide powerful ways to evaluate conditions, compare values, and make decisions in Sentrie.
+description: "Logical (and, or, xor, not), comparison (==, !=, <, <=, >, >=), pattern (matches), and conditional (ternary, Elvis) operators."
 ---
 
-Sentrie provides a comprehensive set of boolean operations that allow you to evaluate conditions, compare values, and make logical decisions in your policies. These operations are essential for creating conditional logic and data validation.
+Boolean operations combine conditions, compare values, and branch on truthiness. Logical and comparison operators use [trinary](/reference/trinary) semantics (true, false, unknown). The pattern operator `matches` works on strings and returns a boolean. The ternary (`? :`) and Elvis (`?:`) operators choose a value based on whether a condition is truthy; only `true` is truthy.
 
-## Overview
+## Syntax
 
-Boolean operations in Sentrie include:
+**Logical (binary):** `and` | `or` | `xor`
+
+**Negation (unary):** `not expr` | `! expr`
 
 - **Trinary Logic**: Three-valued logic with `true`, `false`, and `unknown`
 - **Conditional Operators**: Ternary (`? :`) and Elvis (`?:`) operators for conditional value selection
@@ -17,78 +19,74 @@ Boolean operations in Sentrie include:
 - **Collection builtins and membership**: List quantifiers (`any`, `all`), plus `in` and `contains`
 - **State Checking**: Checking emptiness and definedness
 
-## Conditional Operators
+**Comparison:** `==` | `!=` | `is` | `is not` | `<` | `<=` | `>` | `>=`
 
-Sentrie provides two operators for conditional value selection: the ternary operator and the Elvis operator. The Elvis operator is a shorthand for a common pattern using the ternary operator.
+**Pattern:** `stringExpr matches patternExpr` (both operands strings; right is a regex pattern)
 
-### Ternary Operator (`? :`)
+**Conditional:** `condition ? trueValue : falseValue` | `expr ?: default`
 
-The ternary operator allows you to conditionally select between two values based on a boolean condition.
+## Configuration & Arguments
 
-#### Syntax
+| Operator             | Operands                         | What it does                                                                                                                   | Returns                 |
+| :------------------- | :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
+| `and`                | expr, expr                       | Logical AND (Kleene). Short-circuits: if left is false, right is not evaluated.                                                | trinary                 |
+| `or`                 | expr, expr                       | Logical OR (Kleene). Short-circuits: if left is true, right is not evaluated.                                                  | trinary                 |
+| `xor`                | expr, expr                       | Logical XOR. True when exactly one operand is truthy.                                                                          | trinary                 |
+| `not`, `!`           | expr                             | Logical NOT (unary). One operand; converted to trinary then negated (true↔false; unknown→unknown).                             | trinary                 |
+| `==`, `is`           | expr, expr                       | Equality. Both sides must be comparable.                                                                                       | trinary                 |
+| `!=`, `is not`       | expr, expr                       | Inequality.                                                                                                                    | trinary                 |
+| `<`, `<=`, `>`, `>=` | expr, expr                       | Ordering. Both sides must be comparable (e.g. number, string).                                                                 | trinary                 |
+| `matches`            | string, string                   | Left: value; right: regex pattern (Go [regexp](https://pkg.go.dev/regexp)). Invalid pattern → error.                           | bool                    |
+| `? :`                | condition, trueValue, falseValue | Ternary: if condition is truthy, result is trueValue; else falseValue. Only the chosen branch is evaluated. Right-associative. | type of chosen branch   |
+| `?:`                 | expr, default                    | Elvis: if expr is truthy, result is expr; else result is default. Non-truthy: false, unknown, null, 0, "", empty collection.   | type of expr or default |
 
-```sentrie
-condition ? trueValue : falseValue
-```
+**Returns:** Trinary for logical and comparison; bool for `matches`; type of the chosen value for ternary and Elvis.
 
-#### Examples
+## Truthiness (for ternary and Elvis)
 
-```sentrie
-let age: number = 25
-let status: string = age >= 18 ? "adult" : "minor"
--- Result: "adult"
+Only `true` is truthy. The following are treated as non-truthy: `false`, `unknown`, `null`, `0`, `""`, and empty collections. So `expr ?: default` yields `default` when `expr` is any of these.
 
-let score: number = 85
-let grade: string = score >= 90 ? "A" : score >= 80 ? "B" : score >= 70 ? "C" : "F"
--- Result: "B"
+## Short-circuit and evaluation order
 
-let user_role: string = "admin"
-let can_access: bool = user_role == "admin" ? true : false
--- Result: true
-```
+- **and:** Left-to-right. If the left operand is false, the right is not evaluated.
+- **or:** Left-to-right. If the left operand is true, the right is not evaluated.
+- **? ::** Only the branch selected by the condition is evaluated. The condition is always evaluated first.
 
-#### Complex Ternary Logic
+## Examples in Action
 
-```sentrie
-shape Product {
-  name: string
-  price: number
-  category: string
-  in_stock: bool
-}
-
-fact product: Product
-
--- Complex pricing logic
-let final_price: number = product.in_stock ?
-  (product.category == "Electronics" ? product.price * 0.9 : product.price) :
-  0.0
--- Result: 899.991 (10% discount for electronics)
-
--- Status message
-let status_message: string = product.in_stock ?
-  "Available for $" + product.price.toString() :
-  "Out of stock"
--- Result: "Available for $999.99"
-```
-
-### Elvis Operator (`?:`)
-
-The Elvis operator (`?:`) provides a shorthand way to provide a default value when the left-hand expression is not truthy. It is equivalent to using the ternary operator with the same expression on both sides of the `?`.
-
-When the left-hand expression evaluates to a non-truthy value (including `false`, `null`, `undefined` → `unknown`, `0`, `""`, or empty collections), the default value is used.
-
-#### Syntax
+### Logical and comparison
 
 ```sentrie
-expression ?: defaultValue
+let a: bool = true and false
+let b: bool = age >= 18
+let c: bool = not (user.role in allowed_roles)
 ```
 
-This is equivalent to:
+### Ternary and Elvis
 
 ```sentrie
-expression ? expression : defaultValue
+let d: string = age >= 18 ? "adult" : "minor"
+let e: string = user.name ?: "Anonymous"
 ```
+
+### Pattern matching (regex)
+
+```sentrie
+let g: bool = email matches `^[a-z]+@[a-z]+\\.com$`
+```
+
+Left and right must be strings. The right is interpreted as a Go regexp. Invalid pattern causes an evaluation error.
+
+### Combining conditions
+
+```sentrie
+let f: bool = user.role == "admin" or (user.role == "user" and user.status == "active")
+let h: bool = not (role in ["guest"]) and status == "active"
+```
+
+## Good to Know
+
+Before you wire these into policies, keep a few boundaries in mind:
 
 #### Examples
 
@@ -109,7 +107,7 @@ When `null` or `undefined` values are used with the Elvis operator, they are con
 
 ## Logical Operations
 
-For details on trinary logic, see the [Kleene's three-valued logic](/reference/trinary#kleene-truth-tables) section.
+For details on trinary logic, see the [Kleene's three-valued logic](/reference/trinary#configuration--arguments) section.
 
 ## Comparison Operations
 
@@ -275,6 +273,48 @@ let quantity: number = 10
 let is_limited: bool = quantity <= 10
 -- Result: true
 ```
+
+### Ordering Strings
+
+The ordering operators `<`, `<=`, `>`, and `>=` also work on two strings. Strings are compared by byte order, which is the same as comparing their UTF-8 bytes one by one. The comparison is not locale-aware and does not fold case.
+
+#### Examples
+
+```sentrie
+let upper_first: bool = "Z" < "a"
+-- Result: true (uppercase letters sort before lowercase)
+
+let by_prefix: bool = "app" < "apple"
+-- Result: true (a shorter string sorts before a longer one it prefixes)
+
+let digits: bool = "10" < "9"
+-- Result: true (strings are not compared as numbers)
+
+let same: bool = "a" <= "a"
+-- Result: true
+```
+
+Because the comparison is by byte order, ISO-8601 timestamps in the same format and time zone sort chronologically. This makes a time window check a plain string comparison:
+
+```sentrie
+namespace billing
+
+policy invoices {
+  fact created_at: string
+
+  rule in_2024 = created_at >= "2024-01-01T00:00:00Z" and created_at < "2025-01-01T00:00:00Z"
+
+  export decision of in_2024
+}
+```
+
+With `created_at` set to `"2024-06-01T12:00:00Z"` the rule is `true`. With `"2023-12-31T23:59:59Z"` or `"2025-01-01T00:00:00Z"` it is `false`.
+
+:::caution[Strings and numbers do not mix]
+Both operands must be strings, or both must be numbers. Comparing a string with a number, such as `created_at < 5`, fails with `left operand is not a number`. Convert one side first, for example with `as number`, if you want a numeric comparison.
+:::
+
+If either operand is `undefined`, the comparison is `undefined`, as for numbers; a rule that yields it resolves to `unknown`.
 
 ## Pattern Matching Operations
 
@@ -637,3 +677,10 @@ let is_admin: bool = user.role == "admin"
 -- Use 'in' for collection membership
 let can_read: bool = "read" in user.permissions
 ```
+
+### Boundary conditions
+
+- **not / !:** Unary prefix; one operand. Converted to trinary then negated. `not unknown` yields `unknown`. You can write `not expr` or `! expr` (no space required after `!`).
+- **Short-circuit:** `and` and `or` evaluate left-to-right; the right side may be skipped. The ternary evaluates only the chosen branch.
+- **Comparison:** Both sides must be comparable; result is trinary. Equality with `unknown` yields `unknown`.
+- **matches:** Left and right must be strings. Right is a [Go regexp](https://pkg.go.dev/regexp) pattern. Invalid pattern causes an evaluation error. For membership in collections or substring checks, use [in](/reference/membership-operations) or [contains](/reference/membership-operations).
