@@ -17,7 +17,6 @@ This section is a reference for the Sentrie policy language: syntax, types, oper
 - [Primitives, Collections, Shapes, and Aliases](#primitives-collections-shapes-and-aliases)
 - [Literals](#literals)
 - [Operators](#operators)
-- [Control Flow](#control-flow)
 - [Function chaining](/reference/function-chaining) - Pipeline operator (`|>`), desugaring, precedence, and memoization
 - [TypeScript Modules](#typescript-modules)
 - [Facts and Variables](#facts-and-variables)

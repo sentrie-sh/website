@@ -38,19 +38,19 @@ For `exec` and `validate`, exit 0 when evaluation or validation succeeds; non-ze
 
 Execute a policy or rule from a policy pack.
 
-See the [exec command documentation](./exec) for details.
+See the [exec command documentation](/cli-reference/exec) for details.
 
 ### `init`
 
 Initialize a new policy pack.
 
-See the [init command documentation](./init) for details.
+See the [init command documentation](/cli-reference/init) for details.
 
 ### `fmt`
 
 Format `.sentrie` files in one canonical style.
 
-See the [fmt command documentation](./fmt) for details.
+See the [fmt command documentation](/cli-reference/fmt) for details.
 
 ### `serve`
 
@@ -164,7 +164,7 @@ sentrie validate user_management/user_access --facts '{"user":{"role":"admin"}}'
 sentrie validate com/example/auth/access_control --pack-location ./policies
 ```
 
-See the [validate command documentation](./validate) for details.
+See the [validate command documentation](/cli-reference/validate) for details.
 
 ## HTTP API
 
