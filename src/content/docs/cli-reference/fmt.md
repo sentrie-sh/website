@@ -259,4 +259,4 @@ Because the formatter prints from the parsed program, a few spellings that carry
 ## See Also
 
 - [CLI Reference](/cli-reference) - Complete CLI documentation
-- [validate command](./validate) - Check a pack's structure and types
+- [validate command](/cli-reference/validate) - Check a pack's structure and types

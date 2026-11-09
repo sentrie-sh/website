@@ -1,45 +1,40 @@
 ---
 title: "@sentrie/json"
-description: JSON validation utility
+description: JSON validation. For parse/stringify use @sentrie/js.
 ---
 
-The `@sentrie/json` module provides JSON validation utilities. For JSON parsing and stringification, use the `@sentrie/js` module.
 
-## Usage
+Provides `isValid` to check if a string is valid JSON. For parsing and stringifying use [@sentrie/js](/reference/typescript_modules/sentrie/js).
+
+## Syntax
 
 ```text
-use { isValid } from @sentrie/json
+use { isValid } from @sentrie/json [ as alias ]
+alias.isValid(str)
 ```
 
-## Functions
+## Configuration & Arguments
 
-### `isValid(str: string): boolean`
+| Name  | Type   | Required | Description                 |
+| :---- | :----- | :------- | :-------------------------- |
+| `str` | string | Yes      | String to validate as JSON. |
 
-Validates whether a string is valid JSON.
+**Returns:** `boolean` - true if the string is valid JSON, false otherwise.
 
-**Parameters:**
+## Examples in Action
 
-- `str` - The JSON string to validate
-
-**Returns:** `true` if the string is valid JSON, `false` otherwise
-
-**Example:**
+### Typical use
 
 ```text
-use { isValid } from @sentrie/json
-
-let jsonStr = '{"name": "John", "age": 30}'
-let isValid = json.isValid(jsonStr)  // true
-
-let invalidStr = '{"name": "John", "age":}'
-let isInvalid = json.isValid(invalidStr)  // false
+use { isValid } from @sentrie/json as jsonUtil
+let ok = jsonUtil.isValid('{"name": "John", "age": 30}')
+let bad = jsonUtil.isValid('{"name": "John", "age":}')
 ```
 
-## JSON Parsing and Stringification
-
-For JSON parsing and stringification, use the `@sentrie/js` module:
+### Going further
 
 ```text
+use { isValid } from @sentrie/json as jsonUtil
 use { parse, stringify } from @sentrie/js as json
 
 let obj = json.parse('{"name": "John", "age": 30}')
@@ -73,3 +68,12 @@ policy mypolicy {
   export decision of processData
 }
 ```
+
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
+
+- Only validates syntax; does not parse. Use `@sentrie/js` for `parse` and `stringify`.
+
+
+- Empty string is not valid JSON. Invalid UTF-8 or malformed structure returns false.
