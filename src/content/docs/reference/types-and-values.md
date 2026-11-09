@@ -1,15 +1,19 @@
 ---
 title: Types and Values
-description: "Built-in primitive and collection types, type declarations, indexing, cast, and validation."
+description: "Built-in primitive and collection types, unions, the any type, type declarations, indexing, cast, and validation."
 ---
 
-Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `document`) and collection types (`list[T]`, `dict[T]`, `set[T]`, `record[T1,T2,...]`). User-defined [shapes](/reference/shapes) extend these. Types can be used in [let](/reference/let), [facts](/reference/facts), and shape fields. Types may carry [constraints](/reference/constraints) for runtime validation.
+Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `document`) and collection types (`list[T]`, `dict[T]`, `set[T]`, `record[T1,T2,...]`), [union types](#union-types) and the [`any` type](#the-any-type). User-defined [shapes](/reference/shapes) extend these. Types can be used in [let](/reference/let), [facts](/reference/facts), and shape fields. Types may carry [constraints](/reference/constraints) for runtime validation.
 
 ## Syntax
 
 **Primitives:** `number` | `string` | `trinary` | `bool` | `document`
 
 **Collections:** `list[T]` | `dict[T]` | `set[T]` | `record[T1, T2, ...]`
+
+**Unions:** `T1 | T2 | ...`
+
+**Top type:** `any`
 
 **Cast:** `expr as type`
 
@@ -23,7 +27,7 @@ Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `docume
 
 | Type | Description | Notes |
 | :--- | :---------- | :---- |
-| `number` | 64-bit floating-point (float64). | All numeric literals and arithmetic use this. No separate integer type. |
+| `number` | Numeric values: exact 64-bit integers and 64-bit floats. | Whole numbers that fit in a signed 64-bit integer stay exact; see [Integers and floats](#integers-and-floats). |
 | `string` | UTF-8 string. | Literals: double-quoted or backtick. |
 | `trinary` | Three-valued logic: `true`, `false`, `unknown`. | Used for conditions and [boolean operations](/reference/boolean-operations). See [Trinary](/reference/trinary). |
 | `bool` | Two-valued: `true`, `false`. | Subset of trinary; no `unknown` literal for bool, but expressions can produce trinary. |
@@ -34,7 +38,8 @@ Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `docume
 A number literal is a run of digits, optionally followed by a fraction and an exponent:
 
 ```text
-42          -- Integer
+42          -- Integer (exact)
+9007199254740993  -- Integers keep every digit up to 9223372036854775807
 3.14        -- Decimal
 1e5         -- 100000
 1E5         -- Same as 1e5
@@ -59,6 +64,26 @@ Malformed number literals are errors when the pack is loaded:
 | `1e400`            | value out of range (a number must fit in a 64-bit float) |
 
 Because `e` right after a number always starts an exponent, separate a number from a following word with a space.
+
+### Integers and floats
+
+A `number` is either an **exact integer** or a **float**:
+
+- A whole number that fits in a signed 64-bit integer (`-9223372036854775808` to `9223372036854775807`) is an exact integer. It keeps every digit through literals, JSON facts, arithmetic, comparison and output, including values above 2^53 (`9007199254740992`).
+- A number with a fractional part or an exponent is a 64-bit float.
+- An integer literal too large for 64 bits is read as a float.
+
+```text
+let id: number = 9007199254740993
+let same: boolean = id == 9007199254740992    -- false: one apart, and still told apart
+let equal: boolean = 5 == 5.0                 -- true: equal values compare equal in either form
+```
+
+Arithmetic on two integers is exact, and a result that does not fit in 64 bits is an overflow error. Dividing two integers gives an integer only when the division is exact (`15 / 3` is `5`, `7 / 2` is `3.5`). An operation that mixes an integer and a float is a float operation. See [Arithmetic Operations](/reference/arithmetic-operations) for the full rules.
+
+The [numeric constraints](/reference/constraints#numeric-constraints-number) compare exactly as well, so `@max`, `@range`, `@multiple_of`, `@even` and `@odd` give the right answer for large IDs.
+
+An integer beyond `Number.MAX_SAFE_INTEGER` (2^53-1) cannot be passed to a [TypeScript module](/reference/using-typescript#numbers-passed-to-typescript-modules): doing so is an error.
 
 ### Collection types
 
@@ -124,6 +149,91 @@ policy convert {
 ```
 
 This yields `{"set": [1, 2, 3], "cast": [1, 2, 3]}`.
+
+### Union types
+
+A union type accepts a value that matches **any one** of its members. Join the members with `|`:
+
+```sentrie
+namespace com/example/types
+
+policy unions {
+  let id: string | number = "u-42"
+  let ids: list[string | number] = [1, "two", 3]
+  let name: string @minlength(1) | number @min(0) = "x"
+  let maybe: string | number? = null
+
+  rule values = {
+    yield { "id": id, "ids": ids, "name": name, "maybe": maybe }
+  }
+
+  export decision of values
+}
+```
+
+This yields `{"id": "u-42", "ids": [1, "two", 3], "name": "x", "maybe": null}`.
+
+A union can be written wherever a type can: [facts](/reference/facts), `let` annotations, [shape](/reference/shapes) fields, [derive](/reference/derives) parameters and return types, `as` casts, `is` checks, and inside `list[...]`, `dict[...]` and `record[...]`.
+
+#### How `|` binds
+
+`|` binds looser than everything else in a type, so each member keeps its own `?` and constraints:
+
+- `string | number?` is `string | (number?)`: the number member is nullable, the string member is not.
+- `number @min(0) | string` constrains only the number member.
+- `list[string | number]` is a list whose elements are each a string or a number.
+
+There is no grouping syntax. A union that has a nullable member accepts `null`, whichever member carries the `?`.
+
+#### Null
+
+A union accepts `null` only when one of its members does. With `string | number?`, `null` is valid. With `string | number`, `null` is not:
+
+```sentrie
+let a = null is string | number?  -- true
+let b = null is string | number   -- false
+```
+
+#### Casts
+
+`expr as T1 | T2` only **checks** the value against the union. It does not convert it, so `"50" as string | number` stays the string `"50"`.
+
+#### Derive parameters and returns
+
+```sentrie
+namespace com/example/types
+
+derive normalize = (v: string | number): string => {
+  yield v is string ? v : v as string
+}
+
+policy ids {
+  fact id: string | number
+
+  rule key = { yield normalize(id) }
+  export decision of key
+}
+```
+
+With `{"id": 42}` the rule yields `"42"`, and with `{"id": "u-1"}` it yields `"u-1"`. With `{"id": false}` execution stops with `value false is not string | number`.
+
+### The `any` type
+
+`any` accepts every value that is defined: strings, numbers, booleans, lists, dicts, documents, shapes and `null`.
+
+```sentrie
+let anything: any = [1, "a", { "k": true }]
+let nothing: any = null
+```
+
+Use it for data whose structure you do not want to validate, such as a fact that is later narrowed with [`is`](/reference/shapes#checking-a-value-against-a-shape).
+
+- `any` takes no constraints. `any @min(1)` is rejected when the pack is loaded.
+- `any` does not accept an undefined value, like every other type: undefined means there is no value. An optional fact that was not provided is not `any`, so `m is any` is `false` for it.
+- `any` is not a keyword. The `any(list, predicate)` quantifier and identifiers named `any` keep working.
+- A shape cannot be named `any`. `shape any { ... }` fails with `cannot declare a shape named "any": it is the built-in top type`.
+- On the right of `is`, a bare `any` is always this type. To compare a value to a variable named `any`, use `==`.
+- As a member of a union, `any` makes the union accept every defined value, so `string | any` is the same as `any`.
 
 ### Cast
 
@@ -275,6 +385,37 @@ policy report {
 ```
 
 With `{"admin": true}`, `untyped` yields `{"count": 2, "has_true": false}` and `typed` yields `{"count": 2, "has_true": true}`. With `{"admin": false}`, `typed` fails with `duplicate set element false`, because the imported decision is `false` and so is the second element.
+
+### Unions: when no member matches
+
+If a value matches none of the members, the check fails and reports why. The error names the **closest member**: the first member, in source order, whose outer kind accepts the value (string, number, boolean, list, record, dict, document or a shape, read through shape aliases).
+
+```text
+let v: number @min(10) | string = 5
+-- Error: invalid value for let declaration v: value 5 does not match number | string
+--   at <location>: closest member number: constraint failed: 'min' ...
+```
+
+Here `5` is a number, so `number` is the closest member and its failed `@min` constraint is the reported reason. If no member's kind accepts the value, the error names the whole union instead:
+
+```text
+let v: string | number = true
+-- Error: invalid value for let declaration v: value true is not string | number
+--   at <location> - expected one of its members
+```
+
+If a member itself cannot be checked, such as a shape that does not exist or a constraint with invalid arguments, the check fails with that error rather than skipping the member. This holds for `is` and `is not` too, so a broken member can never make a check pass by accident. For example, `"abc" is string @minlength("x") | number` stops with a `constraint failed: 'minlength'` error instead of returning `false`. A member that matches still wins: `5 is string @minlength("x") | number` is `true`, because the number member matches and the broken string member is never reported.
+
+### Unions: errors found before running
+
+`sentrie validate` and `sentrie exec` report these when the pack is loaded:
+
+- A `|` between two expressions, such as `let x = 1 | 2`: `unexpected '|': only '|>' is supported in an expression; '|' separates the members of a union type`.
+- A union with a missing member, such as `string |`.
+- `shape any`, and constraints on `any`.
+- An `is` check with a union member that names a shape that is not visible, such as `x is string | Missing`. `sentrie validate` rejects it as `shape "Missing" is not visible here`.
+
+An unknown shape in a union written elsewhere, such as `let x: string | Missing = 5`, is not found by `sentrie validate`. It fails when `exec` evaluates it, with `shape 'Missing' not found`, unless another member matches the value.
 
 ## Collection Types
 

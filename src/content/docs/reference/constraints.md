@@ -52,9 +52,21 @@ If any constraint fails, evaluation aborts with an error. Order of application i
 | `@non_negative()`     | 0                    | Value must be non-negative (≥ 0).                                           |
 | `@non_positive()`     | 0                    | Value must be non-positive (≤ 0).                                           |
 
+Numeric constraints compare exact values. For integers that fit in 64 bits, `@eq`, `@neq`, `@gt`, `@lt`, `@in`, `@not_in` and `@range` do not round, and `@multiple_of`, `@even` and `@odd` use integer arithmetic, so they stay correct beyond 2^53 (`9007199254740992`):
+
+```sentrie
+shape AccountId number @min(0) @multiple_of(2)
+shape Cap number @max(9007199254740993)
+
+-- 9007199254740994 passes @multiple_of(2), 9007199254740993 fails it
+-- 9007199254740993 passes @max(9007199254740993), 9007199254740994 fails it
+```
+
+See [Integers and floats](/reference/types-and-values#integers-and-floats).
+
 ### Number-specific constraints (`number`)
 
-Numbers are represented as float64, which can represent ±∞ and NaN. Sentrie **does not produce** these values: there is no infinity literal, and division by zero aborts evaluation. ±∞ and NaN can only appear when a value comes from a TypeScript function (e.g. JS `1/0` → `Infinity`) or from external input. Use these constraints to accept or reject such values:
+A `number` can be an exact integer or a float; floats can represent ±∞ and NaN. Sentrie **does not produce** these values: there is no infinity literal, and division by zero aborts evaluation. ±∞ and NaN can only appear when a value comes from a TypeScript function (e.g. JS `1/0` → `Infinity`) or from external input. Use these constraints to accept or reject such values:
 
 | Constraint    | Arguments | Description                                                                   |
 | :------------ | :-------- | :---------------------------------------------------------------------------- |
@@ -176,7 +188,7 @@ Before you implement this, keep a few boundaries in mind:
 - Constraints are checked at runtime when a value is assigned or cast to the constrained type (and when facts are matched to constrained shape types).
 - Order of application is defined by the runtime. All specified constraints must pass; failure aborts evaluation immediately.
 - Use shapes to reuse constrained types (e.g. `shape ID string @uuid()`) and to name element types in collections.
-- Numeric constraints use float64; `@even` and `@odd` use modulo. `@multiple_of` uses a small epsilon for floating-point remainder checks.
+- Numeric constraints compare exact values. Integers that fit in 64 bits use integer arithmetic (including `@even`, `@odd` and `@multiple_of`); floats use float64 comparisons, and `@multiple_of` uses a small epsilon for floating-point remainder checks.
 - **Infinity and NaN:** The language has no infinity or NaN literal, and division by zero aborts (it does not produce `±∞`). So `@infinite()` and `@nan()` only apply when a number comes from TypeScript or external input (e.g. a JS function returning `Infinity`).
 - String `@regexp` uses Go’s [regexp](https://pkg.go.dev/regexp) semantics. Invalid pattern strings cause an evaluation error.
 - Map types currently have no built-in constraints; only list and element types (e.g. `list[T]` with constrained `T`) are covered above.
