@@ -18,7 +18,7 @@ derive NAME = LAMBDA
 export derive NAME
 ```
 
-Inside a policy body (after metadata, `fact`, and `use`, in the same phase as `let`, `rule`, and `shape`):
+Inside a policy body. A derive starts the body like `let`, `rule` and `shape` do, so it can be the first body statement, and the policy's metadata, `fact` and `use` statements must come before it:
 
 ```text
 derive NAME = LAMBDA
@@ -41,7 +41,7 @@ Typed parameters, optional parameters (`?`), and return types use the same lambd
 
 ### Unqualified name
 
-`myDerive(arg1, arg2)` resolves **derive → builtin → TypeScript module** in that order. If a derive has the same name as a builtin, the derive wins (shadowing is allowed by design).
+`myDerive(arg1, arg2)` resolves **local value → derive → builtin** in that order, where a local value is a `let`, a lambda parameter, a fact or a rule. If a derive has the same name as a builtin, the derive wins (shadowing is allowed by design). A `let` or parameter with the same name as a derive wins in turn, so `let myDerive = (x) => { ... }` inside a rule makes `myDerive(...)` call the lambda. TypeScript module functions are always written `alias.fn(...)` and never compete for an unqualified name. See [Calling a lambda by name](/reference#calling-a-lambda-by-name).
 
 Inside a **rule** or other non-derive expression, an unqualified derive name is invoked with `(...)`.
 
@@ -119,6 +119,7 @@ Derive bodies are validated statically and enforced at runtime. A derive must be
 
 - Parameters, `let` bindings in the derive body, and pure builtin calls from the whitelist below
 - Calls to other **visible** derives (by name or slash FQN, subject to scope and export rules)
+- Calls to a lambda held by a `let` in the derive body, where the `let` is bound directly to a lambda expression (for example `let inc = (y) => { yield y + 1 }` followed by `inc(x)`)
 - Inline lambdas passed as arguments to pure builtins (for example `filter(items, (x) => { yield x > 0 })`)
 - Single-parameter derives passed as callbacks to higher-order pure builtins (see below)
 - Line comments (`-- ...`) anywhere in the body, including between `let` bindings and inside nested blocks and lambdas
@@ -130,6 +131,7 @@ Derive bodies are validated statically and enforced at runtime. A derive must be
 - **Pack data**: `data` aliases are not available inside a derive. Pass the value in as an argument instead (see [Pack data](/reference/facts/#pack-data))
 - **Rules**: rules cannot be referenced or dispatched from inside a derive
 - **Callable return values**: a derive cannot `yield` a lambda or other callable value
+- **Calling a parameter**: `derive apply = (fn, x) => { yield fn(x) }` is rejected with `calling parameter "fn" is not permitted inside a derive`, because the caller may pass a lambda defined outside the derive that reads facts or calls modules. A `let` bound to anything other than a lambda expression cannot be called either
 - **Non-whitelisted builtins**: builtins outside the pure set cannot be used from a derive
 
 The `now()` builtin is explicitly allowed: it returns the policy execution start time (`createdAt`), not wall-clock time per call, so it stays deterministic for the run.
@@ -138,7 +140,7 @@ The `now()` builtin is explicitly allowed: it returns the policy execution start
 
 Derive bodies may call only these builtins (plus other visible derives):
 
-`all`, `any`, `as_list`, `collect`, `count`, `distinct`, `error`, `filter`, `first`, `flatten`, `flatten_deep`, `merge`, `normalise_list`, `now`, `reduce`
+`all`, `any`, `as_list`, `collect`, `count`, `difference`, `distinct`, `error`, `filter`, `first`, `flatten`, `flatten_deep`, `glob_match`, `intersection`, `is_subset`, `is_superset`, `merge`, `normalise_list`, `now`, `object_filter`, `object_get`, `object_keys`, `object_remove`, `object_union`, `parse_duration`, `parse_quantity`, `reduce`, `set`, `union`
 
 Argument and return types are checked at invoke time; type mismatches include the **parameter name** in the error.
 
@@ -156,7 +158,6 @@ derive is_available = (item: number): trinary => {
 }
 
 policy inventory {
-  let _seed = 0
   rule check = {
     yield any([1, 2, 3], is_available)
   }
@@ -184,7 +185,6 @@ derive above = (n: number, min: number): trinary => {
 }
 
 policy pricing {
-  let _seed = 0
   rule ok = { yield above(100, 50) }
   export decision of ok
 }
@@ -196,7 +196,6 @@ Policy-local derive with slash FQN to a sibling in the same policy:
 namespace com/example/shop
 
 policy cart {
-  let _seed = 0
   derive unit = () => { yield 1 }
   derive total = () => { yield com/example/shop/cart/unit() + 1 }
   rule gate = { yield total() == 2 }

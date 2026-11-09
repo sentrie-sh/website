@@ -283,6 +283,16 @@ let scores: dict[number] = {"alice": 95, "bob": 87}
 let invalid: number = "10" -- This will cause a type error
 ```
 
+A union type accepts any one of its members, and `any` accepts every defined value:
+
+```sentrie
+let id: string | number = "u-42"
+let ids: list[string | number] = [1, "two", 3]
+let anything: any = { "k": true }
+```
+
+See [Types and Values](/reference/types-and-values#union-types) for how unions are checked.
+
 ### Type Annotations with Constraints
 
 ```sentrie
@@ -348,6 +358,27 @@ policy processing {
   export decision of processData
 }
 ```
+
+## Using Let with Lambdas
+
+A `let` can hold a lambda, and the name is then called like any other function. The lambda sees the facts and `let` bindings visible where it is written:
+
+```sentrie
+namespace com/example/pricing
+
+policy totals {
+  fact price: number
+  fact quantity: number
+
+  let taxRate = 0.2
+  let withTax = (amount) => { yield amount * (1 + taxRate) }
+
+  rule total = { yield withTax(price * quantity) }
+  export decision of total
+}
+```
+
+A `let` lambda can call itself or another `let` lambda, and a `let` named like a builtin or derive shadows it in calls. See [Calling a lambda by name](/reference#calling-a-lambda-by-name) for the rules, the errors for calls that cannot work, and the recursion limits.
 
 ## Using Let with `reduce`
 

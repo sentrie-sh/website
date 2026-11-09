@@ -17,7 +17,7 @@ fact name? : type [ as alias ] [ default expr ]  -- optional
 ```
 
 - **name / name?:** Identifier. Trailing `?` makes the fact optional; otherwise it is required.
-- **type:** Any type: primitive (`number`, `string`, `trinary`, `bool`, `document`), collection (`list[T]`, `dict[T]`, `record[...]`), or a [shape](/reference/shapes). The supplied value is validated against this type (and any constraints) at evaluation.
+- **type:** Any type: primitive (`number`, `string`, `trinary`, `bool`, `document`), collection (`list[T]`, `dict[T]`, `record[...]`), a [union](/reference/types-and-values#union-types) (`string | number`), [`any`](/reference/types-and-values#the-any-type), or a [shape](/reference/shapes). The supplied value is validated against this type (and any constraints) at evaluation.
 - **as alias:** Optional. Identifier used in the policy body to refer to this fact. If omitted, the body uses `name`.
 - **default expr:** Optional. Allowed only for **optional** facts (`name?`). Used when the fact is omitted from the input. The expression is evaluated in the policy context (e.g. can reference other facts or policy-level let if order allows).
 
@@ -103,6 +103,33 @@ fact user: User as currentUser
 ```
 
 In the policy body, use `currentUser`. When importing this policy’s decision, bind with the key `currentUser` (e.g. `with currentUser = someValue`).
+
+### Union and `any` Types
+
+A fact can accept more than one type with a [union](/reference/types-and-values#union-types), or any value with [`any`](/reference/types-and-values#the-any-type):
+
+```sentrie
+namespace com/example/facts
+
+policy inputs {
+  fact id: string | number
+  fact nick: string | number?
+  fact meta?: any default {}
+
+  rule summary = {
+    yield { "id": id, "nick": nick, "meta": meta }
+  }
+
+  export decision of summary
+}
+```
+
+- `{"id": "u1", "nick": null}` yields `{"id": "u1", "nick": null, "meta": {}}`. `nick` accepts `null` because its number member is nullable.
+- `{"id": 5, "nick": "n", "meta": [1]}` yields `{"id": 5, "nick": "n", "meta": [1]}`.
+- `{"id": null, "nick": 1}` is rejected with `fact 'id' cannot be null`, because neither member of `string | number` accepts `null`.
+- `{"id": true, "nick": 1}` is rejected with `value true is not string | number`.
+
+A fact typed `any` accepts `null` as well as every other value. It still has to be provided unless it is optional (`fact meta?: any`).
 
 ### Optional fact with default
 
