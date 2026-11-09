@@ -1,9 +1,9 @@
 ---
 title: Policy metadata
-description: Static metadata inside policy blocks—title, description, version, and tags—for humans and tooling; no effect on evaluation.
+description: Static metadata inside policy blocks (title, description, version, and tags) for humans and tooling; no effect on evaluation.
 ---
 
-Policy metadata is **optional** information you attach inside a `policy { ... }` block. It is intended for documentation, registries, search, and UIs. Metadata values are **plain string literals only**—no expressions, interpolation, or computed values.
+Policy metadata is **optional** information you attach inside a `policy { ... }` block. It is intended for documentation, registries, search, and UIs. Metadata values are **plain string literals only**, with no expressions, interpolation, or computed values.
 
 Metadata does **not** participate in evaluation and does not change rule outcomes.
 
@@ -48,7 +48,7 @@ Exact wording may evolve slightly; rely on the stable phrases above when writing
 
 ## Conventional tag keys (optional)
 
-The language does **not** restrict tag keys. For interoperability, common conventional keys include: `category`, `domain`, `framework`, `cloud`, `service`, `owner`, `severity`, `status` (e.g. draft/stable/deprecated). These are conventions only—not enforced by the parser.
+The language does **not** restrict tag keys. For interoperability, common conventional keys include: `category`, `domain`, `framework`, `cloud`, `service`, `owner`, `severity`, `status` (e.g. draft/stable/deprecated). These are conventions only, not enforced by the parser.
 
 ## Non-goals
 
@@ -57,5 +57,5 @@ The language does **not** restrict tag keys. For interoperability, common conven
 
 ## See also
 
-- [Policies](/reference/policies/) — overall policy structure and examples
-- [Issue #61](https://github.com/sentrie-sh/sentrie/issues/61) — original design discussion
+- [Policies](/reference/policies/): overall policy structure and examples
+- [Issue #61](https://github.com/sentrie-sh/sentrie/issues/61): original design discussion

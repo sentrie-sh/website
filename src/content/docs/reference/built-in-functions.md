@@ -5,7 +5,7 @@ description: Reference for Sentrie builtins - collections, list transforms, sets
 
 Sentrie provides a set of built-in functions that are always available without any imports. These functions are optimized for performance and are commonly used operations. For call syntax, TypeScript imports, and memoization, see [Using Functions](/reference/functions).
 
-Some builtins take extra arguments that are **callables**—values you write inline, such as `(param) => { ... }` or `(param, index) => { ... }`, using `yield` for each step's result. That is the same idea as passing any other value; see [Lambdas](/reference/#lambdas) for callable syntax and arity rules.
+Some builtins take extra arguments that are **callables**: values you write inline, such as `(param) => { ... }` or `(param, index) => { ... }`, using `yield` for each step's result. That is the same idea as passing any other value; see [Lambdas](/reference/#lambdas) for callable syntax and arity rules.
 
 ## `count(value) => number`
 
@@ -59,11 +59,11 @@ let role = user.role is defined ? user.role : error("user role must be provided"
 
 ### `undefined` vs `error`
 
-When the `error` function is called, it immediately stops the evaluation of the current policy and returns an error result. This mechanism is intended for situations where continuing evaluation no longer makes sense due to invalid, unexpected, or strictly disallowed conditions—such as missing required input, encountering data corruption, or detecting an explicit policy violation.
+When the `error` function is called, it immediately stops the evaluation of the current policy and returns an error result. This mechanism is intended for situations where continuing evaluation no longer makes sense due to invalid, unexpected, or strictly disallowed conditions, such as missing required input, encountering data corruption, or detecting an explicit policy violation.
 
 Deciding between returning `error` or `undefined` depends on intent:
 - Use `error` when the policy must explicitly fail and the issue should be surfaced.
-- Use `undefined` when a missing value or recoverable situation occurs that does not require global failure—so the policy can potentially continue or gracefully handle the absence.
+- Use `undefined` when a missing value or recoverable situation occurs that does not require global failure, so the policy can potentially continue or gracefully handle the absence.
 
 In summary:  
 - `undefined` means “no value available” but may allow further evaluation or fallback via `elvis` or `ternary` operators.  
