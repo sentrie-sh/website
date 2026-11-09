@@ -13,6 +13,12 @@ type @constraint1(args) @constraint2
 
 Examples: `number @min(0) @max(100)`, `string @email`, `list[string @one_of("a","b")]`. Multiple constraints can be chained; all must pass. Constraint arguments use the same literal syntax as the language (numbers, strings, lists where applicable).
 
+A number argument to a constraint can use [exponent notation](/reference/types-and-values/#number-literals):
+
+```text
+let rate: number @min(1e-3) @max(1.5E+3) = 0.5
+```
+
 ## When constraints are checked
 
 Constraints are checked:
