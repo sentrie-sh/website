@@ -11,13 +11,13 @@ Namespaces group [policies](/reference/policies) and [shapes](/reference/shapes)
 namespace fully/qualified/name
 ```
 
-The name is a **fully qualified name (FQN)**: one or more [identifiers](/reference/identifiers) separated by forward slashes (e.g. `com/example/auth`, `mycompany/policies/security`, `app/v1`). No leading or trailing slash. Each segment must be a valid identifier.
+The name is a **fully qualified name (FQN)**: one or more [identifiers](/reference/identifiers) separated by forward slashes (e.g. `com/example/auth`, `mycompany/policies/security`, `app/v1`). No leading or trailing slash. The first segment must be an identifier, not a keyword; later segments may be identifiers or keywords (see [Keyword segments](#keyword-segments)).
 
 ## Configuration & Arguments
 
 | Element | Type | Required | Description |
 | :------ | :--- | :------- | :---------- |
-| FQN | identifier path | Yes | Slash-separated identifiers. Forms the namespace for every declaration (policies, shapes) in this file. |
+| FQN | identifier path | Yes | Slash-separated segments; the first must be an identifier, later ones may be keywords. Forms the namespace for every declaration (policies, shapes) in this file. |
 
 **Returns:** N/A (declaration). The namespace does not produce a value; it attaches a scope to the declarations that follow.
 
@@ -33,6 +33,14 @@ The name is a **fully qualified name (FQN)**: one or more [identifiers](/referen
 - **Exported shapes:** A shape can be exported with `export shape Name`. Exported shapes are visible to other namespaces for use as types (e.g. fact types, [composition](/reference/shapes) base). See [Policy composition](/language-concepts/policy-composition) and [Shapes](/reference/shapes) for how other namespaces refer to them.
 - **Exported rules:** Rules are exported via `export decision of RuleName` inside a policy. Other namespaces can import and call those decisions; the namespace and policy identify the source.
 
+## Keyword segments
+
+The first segment of a namespace name must be an identifier, not a keyword. Later segments may be identifiers or keywords, so `namespace constraints/in` and `namespace text/string` are valid.
+
+A keyword segment works everywhere the namespace is named: `import decision ok from text/string/p`, a shape base (`shape T with text/string/Item`), and any type position (`fact i: text/string/Item`, `x as text/string/Item`). In expressions, a derive call such as `text/string/f(x)` and a check such as `x is text/string/Item` work too.
+
+The exception is a keyword that can start an expression: `not`, `true`, `false`, `unknown`, `null` and `transform`. After a `/` in an expression these keep their usual meaning, so `a/not b` is `a / (not b)` and `a/true` divides by `true`. A namespace with one of these as a segment can still be declared, imported from and used in types, but a slash path through it cannot call its derives or name its shapes in an `is` check.
+
 ## Examples in Action
 
 ### Single-segment and multi-segment namespaces
@@ -41,6 +49,13 @@ The name is a **fully qualified name (FQN)**: one or more [identifiers](/referen
 namespace auth
 namespace com/example/auth
 namespace mycompany/policies/billing/v2
+```
+
+### Keyword as a later segment
+
+```text
+namespace constraints/in
+namespace text/string
 ```
 
 ### Comments before namespace (allowed)
@@ -75,6 +90,6 @@ The pack contains two namespaces. Import and resolution rules determine how one 
 Before you implement this, keep a few boundaries in mind:
 
 - **Constraint:** Only comments may appear before the namespace declaration. One namespace per file. Multiple root namespaces are allowed across the pack (in different files).
-- **Naming:** Each segment of the FQN must be a [valid identifier](/reference/identifiers). No leading or trailing slash. Child “namespaces” (e.g. `a` vs `a/b`) are not separate language constructs; hierarchy is by convention in the FQN string.
+- **Naming:** The first segment of the FQN must be a [valid identifier](/reference/identifiers), not a keyword; later segments may be identifiers or keywords. No leading or trailing slash. Child “namespaces” (e.g. `a` vs `a/b`) are not separate language constructs; hierarchy is by convention in the FQN string.
 - **Resolution:** When another namespace references an exported shape or imports a decision, the full namespace path (and policy name, for rules) is used by the runtime/tooling to resolve the target. See [Policy composition](/language-concepts/policy-composition) for import syntax and behavior.
 - **Files and namespaces:** The relationship between physical files and namespace FQNs is tooling-dependent; typically one file per namespace, but the reference does not forbid multiple files sharing the same namespace if the tooling supports it.
