@@ -1,25 +1,34 @@
 ---
-title: "bench Command"
+title: "sentrie bench"
 description: "Measure how long Sentrie takes to evaluate a policy or rule."
 ---
 
-# bench Command
-
 The `bench` command evaluates a policy or rule over and over and reports how long each evaluation takes, along with how much memory it allocates. Use it to measure the cost of a policy and to compare that cost before and after a change.
-
-## Syntax
-
-```bash
-sentrie bench <FQN> [OPTIONS]
-```
-
-## Description
 
 The `bench` command loads a policy pack, checks that the target evaluates once, and then times repeated evaluations of it with the facts you provide. It prints results in the Go benchmark format, so the output can be compared with [`benchstat`](https://pkg.go.dev/golang.org/x/perf/cmd/benchstat).
 
 The pack is loaded, indexed and validated once, before any timing starts. The measurement is of a warm executor, the same long-lived executor [`serve`](/cli-reference/serve) uses to answer requests: before the timed loop, one untimed evaluation warms it up, and the call-memoization cache and loaded modules then stay in place across iterations. The numbers describe the cost of evaluating a decision in a running server, not the cost of starting the process or loading the pack.
 
-## Arguments
+Here is the basic syntax:
+
+```bash
+sentrie bench <FQN> [OPTIONS]
+```
+
+## Configuration & Arguments
+
+| Argument | Type | Required | What it does |
+| :------- | :--- | :------- | :----------- |
+| FQN | string | Yes | `namespace/policy` (all exported rules) or `namespace/policy/rule` (single rule). |
+| `--pack-location` | path | No | Directory containing the policy pack. Default: `.`. |
+| `--facts` | JSON string | No | Inline facts. Default: `{}`. Overrides same keys from `--fact-file`. |
+| `--fact-file` | path | No | JSON file with a top-level object of facts. |
+| `--benchtime` | string | No | Duration (`1s`) or exact count (`200x`). Default: `1s`. |
+| `--count` | int | No | Repeat the measurement this many times. Default: `1`. |
+| `--eval-timeout` | duration | No | Deadline for one decision; `0` disables it. Default: `10s`. |
+| `--capabilities` | path | No | Capabilities file limiting builtins and modules. Default: allow everything. |
+
+**Returns:** Results in Go benchmark format on stdout (see [Output](#output)); exit 0 on success, 1 on error.
 
 ### `FQN` (required)
 
@@ -29,8 +38,6 @@ The Fully Qualified Name of the rule or policy to measure, in the same format as
 
 - **`namespace/policy`** - Measure evaluating all exported rules in the policy
 - **`namespace/policy/rule`** - Measure evaluating only the specific rule
-
-## Options
 
 ### `--pack-location`
 
@@ -115,6 +122,8 @@ sentrie bench user_management/user_access --capabilities ./capabilities.json
 
 **Default:** (empty - allow everything)
 
+---
+
 ## Output
 
 The output starts with two configuration lines naming the operating system and architecture, followed by one result line per measurement run:
@@ -149,26 +158,9 @@ The numbers depend on your machine, so expect different values from the ones abo
 
 Timing covers only the evaluations. `B/op` and `allocs/op` are measured from the Go runtime across the whole process during the run, so they include anything else the process allocates at that time.
 
-## Comparing Runs with benchstat
+---
 
-Because the output is in the Go benchmark format, you can save the results of two builds or two versions of a policy and compare them with `benchstat`:
-
-```bash
-sentrie bench user_management/user_access/allow_admin \
-  --facts '{"user":{"role":"admin","status":"active"}}' \
-  --benchtime 1000x --count 6 > old.txt
-
-# change the policy or upgrade Sentrie, then measure again
-sentrie bench user_management/user_access/allow_admin \
-  --facts '{"user":{"role":"admin","status":"active"}}' \
-  --benchtime 1000x --count 6 > new.txt
-
-benchstat old.txt new.txt
-```
-
-Use the same target, facts and `--benchtime` for both files, and a `--count` of at least 5 so `benchstat` can tell a real change from noise.
-
-## Examples
+## Examples in Action
 
 ### Measure a single rule
 
@@ -201,7 +193,30 @@ sentrie bench user_management/user_access/allow_admin \
   --fact-file ./facts.json
 ```
 
-## Exit Status
+### Comparing runs with benchstat
+
+```bash
+sentrie bench user_management/user_access/allow_admin \
+  --facts '{"user":{"role":"admin","status":"active"}}' \
+  --benchtime 1000x --count 6 > old.txt
+
+# change the policy or upgrade Sentrie, then measure again
+sentrie bench user_management/user_access/allow_admin \
+  --facts '{"user":{"role":"admin","status":"active"}}' \
+  --benchtime 1000x --count 6 > new.txt
+
+benchstat old.txt new.txt
+```
+
+Use the same target, facts and `--benchtime` for both files, and a `--count` of at least 5 so `benchstat` can tell a real change from noise.
+
+---
+
+## Good to Know
+
+Before you rely on this in scripts or CI, keep a few boundaries in mind:
+
+### Exit status
 
 `bench` exits with status `0` when every run completes, and with status `1` after printing a message starting with `Error:` otherwise. When the failure happens before the first measurement, no result lines are printed, not even `goos:` and `goarch:`, so the only output is the error message.
 
@@ -222,7 +237,7 @@ sentrie bench user_management/user_access/allow_admin --benchtime 10x
 Error: benchmark target "user_management/user_access/allow_admin" failed to evaluate: required fact not found: user: invalid invocation
 ```
 
-## Output Destination
+### Output destination
 
 Results and error messages are both written to **stdout**, as for [`exec`](/cli-reference/exec). If you redirect output to a file, a failed command leaves its error message in that file, so check the exit status in scripts before comparing results.
 
