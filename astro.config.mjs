@@ -252,6 +252,7 @@ export default defineConfig({
             { label: "Overview", slug: "cli-reference" },
             { label: "sentrie exec", slug: "cli-reference/exec" },
             { label: "sentrie fmt", slug: "cli-reference/fmt" },
+            { label: "sentrie bench", slug: "cli-reference/bench" },
             { label: "sentrie init", slug: "cli-reference/init" },
             { label: "sentrie serve", slug: "cli-reference/serve" },
             { label: "sentrie validate", slug: "cli-reference/validate" },
