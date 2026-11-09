@@ -17,13 +17,13 @@ sentrie bench <FQN> [OPTIONS]
 
 The `bench` command loads a policy pack, checks that the target evaluates once, and then times repeated evaluations of it with the facts you provide. It prints results in the Go benchmark format, so the output can be compared with [`benchstat`](https://pkg.go.dev/golang.org/x/perf/cmd/benchstat).
 
-The pack is loaded, indexed and validated once, before any timing starts. The measurement is of a warm executor, the same long-lived executor [`serve`](./serve) uses to answer requests: before the timed loop, one untimed evaluation warms it up, and the call-memoization cache and loaded modules then stay in place across iterations. The numbers describe the cost of evaluating a decision in a running server, not the cost of starting the process or loading the pack.
+The pack is loaded, indexed and validated once, before any timing starts. The measurement is of a warm executor, the same long-lived executor [`serve`](/cli-reference/serve) uses to answer requests: before the timed loop, one untimed evaluation warms it up, and the call-memoization cache and loaded modules then stay in place across iterations. The numbers describe the cost of evaluating a decision in a running server, not the cost of starting the process or loading the pack.
 
 ## Arguments
 
 ### `FQN` (required)
 
-The Fully Qualified Name of the rule or policy to measure, in the same format as [`exec`](./exec).
+The Fully Qualified Name of the rule or policy to measure, in the same format as [`exec`](/cli-reference/exec).
 
 **Format:** `namespace/policy/rule` or `namespace/policy`
 
@@ -63,7 +63,7 @@ sentrie bench user_management/user_access --fact-file ./facts.json
 
 **Default:** (empty - no file)
 
-Facts are merged the same way as for [`exec`](./exec): facts from `--fact-file` are loaded first, then each top-level key in `--facts` replaces the same key from the file. The replacement is of the whole top-level value, so a `user` object in `--facts` replaces the entire `user` object from the file rather than being merged into it.
+Facts are merged the same way as for [`exec`](/cli-reference/exec): facts from `--fact-file` are loaded first, then each top-level key in `--facts` replaces the same key from the file. The replacement is of the whole top-level value, so a `user` object in `--facts` replaces the entire `user` object from the file rather than being merged into it.
 
 ### `--benchtime`
 
@@ -107,7 +107,7 @@ sentrie bench user_management/user_access --eval-timeout 500ms
 
 ### `--capabilities`
 
-Path to a capabilities file that limits the builtins and modules the pack may use. When it is omitted, everything is allowed. This is the same option that [`exec`](./exec) and [`serve`](./serve) accept.
+Path to a capabilities file that limits the builtins and modules the pack may use. When it is omitted, everything is allowed. This is the same option that [`exec`](/cli-reference/exec) and [`serve`](/cli-reference/serve) accept.
 
 ```bash
 sentrie bench user_management/user_access --capabilities ./capabilities.json
@@ -224,10 +224,10 @@ Error: benchmark target "user_management/user_access/allow_admin" failed to eval
 
 ## Output Destination
 
-Results and error messages are both written to **stdout**, as for [`exec`](./exec). If you redirect output to a file, a failed command leaves its error message in that file, so check the exit status in scripts before comparing results.
+Results and error messages are both written to **stdout**, as for [`exec`](/cli-reference/exec). If you redirect output to a file, a failed command leaves its error message in that file, so check the exit status in scripts before comparing results.
 
 ## See Also
 
-- [exec Command](./exec) - Run a policy once and see its decision
-- [serve Command](./serve) - Run the long-lived server whose evaluation cost `bench` measures
+- [exec Command](/cli-reference/exec) - Run a policy once and see its decision
+- [serve Command](/cli-reference/serve) - Run the long-lived server whose evaluation cost `bench` measures
 - [CLI Reference](/cli-reference) - Complete CLI documentation

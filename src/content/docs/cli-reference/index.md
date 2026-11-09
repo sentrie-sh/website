@@ -28,7 +28,7 @@ All Sentrie commands support these global options:
 
 Execute a policy or rule from a policy pack.
 
-See the [exec command documentation](./exec) for details.
+See the [exec command documentation](/cli-reference/exec) for details.
 
 ### `bench`
 
@@ -60,7 +60,7 @@ sentrie bench user_management/user_access/allow_admin \
   --benchtime 200x --count 3
 ```
 
-See the [bench command documentation](./bench) for details.
+See the [bench command documentation](/cli-reference/bench) for details.
 
 ### `init`
 
