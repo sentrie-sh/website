@@ -359,6 +359,27 @@ policy processing {
 }
 ```
 
+## Using Let with Lambdas
+
+A `let` can hold a lambda, and the name is then called like any other function. The lambda sees the facts and `let` bindings visible where it is written:
+
+```sentrie
+namespace com/example/pricing
+
+policy totals {
+  fact price: number
+  fact quantity: number
+
+  let taxRate = 0.2
+  let withTax = (amount) => { yield amount * (1 + taxRate) }
+
+  rule total = { yield withTax(price * quantity) }
+  export decision of total
+}
+```
+
+A `let` lambda can call itself or another `let` lambda, and a `let` named like a builtin or derive shadows it in calls. See [Calling a lambda by name](/reference#calling-a-lambda-by-name) for the rules, the errors for calls that cannot work, and the recursion limits.
+
 ## Using Let with `reduce`
 
 `let` declarations can use the `reduce` builtin with a list, an initial accumulator, and a reducer lambda:
