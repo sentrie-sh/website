@@ -117,6 +117,26 @@ A `number` can be an exact integer or a float; floats can represent ±∞ and Na
 
 **Returns:** N/A. Constraint failure raises an error and aborts evaluation.
 
+### Constraint Arguments
+
+Constraint arguments are literals, and they are checked when the pack is loaded, not when a value first reaches them. Sentrie checks:
+
+- the number of arguments each constraint takes;
+- the kind of each argument, for example a number for `@min` and a string for `@regexp`;
+- arguments that can never work, such as a pattern that does not compile, `@multiple_of(0)`, or a `@range` whose minimum is above its maximum.
+
+The check covers every place a type can be written: facts, `let`s, shape fields and aliases, derive and lambda parameter and return types, casts, `is` checks, and element types inside `list`, `dict` and `record`. `sentrie validate` reports a broken argument at the constraint's position, and `sentrie exec` fails with the same error before it evaluates anything:
+
+```text
+let v: string @regexp("[") = "a"
+```
+
+```text
+invalid argument to constraint 'regexp': invalid regexp pattern: error parsing regexp: missing closing ]: `[`
+```
+
+At runtime, a constraint's arguments are also checked before the value's kind. A broken argument is an error for every value, so `x is not string @regexp("[")` fails instead of quietly returning `true` for a value that is not a string.
+
 ## Collection constraints (element-level)
 
 Constraints can be applied to the **element type** of a list so that each element is validated:
@@ -190,5 +210,5 @@ Before you implement this, keep a few boundaries in mind:
 - Use shapes to reuse constrained types (e.g. `shape ID string @uuid()`) and to name element types in collections.
 - Numeric constraints compare exact values. Integers that fit in 64 bits use integer arithmetic (including `@even`, `@odd` and `@multiple_of`); floats use float64 comparisons, and `@multiple_of` uses a small epsilon for floating-point remainder checks.
 - **Infinity and NaN:** The language has no infinity or NaN literal, and division by zero aborts (it does not produce `±∞`). So `@infinite()` and `@nan()` only apply when a number comes from TypeScript or external input (e.g. a JS function returning `Infinity`).
-- String `@regexp` uses Go’s [regexp](https://pkg.go.dev/regexp) semantics. Invalid pattern strings cause an evaluation error.
+- String `@regexp` uses Go’s [regexp](https://pkg.go.dev/regexp) semantics. An invalid pattern is rejected when the pack is loaded (see [Constraint Arguments](#constraint-arguments)).
 - Map types currently have no built-in constraints; only list and element types (e.g. `list[T]` with constrained `T`) are covered above.
