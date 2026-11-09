@@ -18,7 +18,7 @@ derive NAME = LAMBDA
 export derive NAME
 ```
 
-Inside a policy body (after metadata, `fact`, and `use`, in the same phase as `let`, `rule`, and `shape`):
+Inside a policy body. A derive starts the body like `let`, `rule` and `shape` do, so it can be the first body statement, and the policy's metadata, `fact` and `use` statements must come before it:
 
 ```text
 derive NAME = LAMBDA
@@ -157,7 +157,6 @@ derive is_available = (item: number): trinary => {
 }
 
 policy inventory {
-  let _seed = 0
   rule check = {
     yield any([1, 2, 3], is_available)
   }
@@ -185,7 +184,6 @@ derive above = (n: number, min: number): trinary => {
 }
 
 policy pricing {
-  let _seed = 0
   rule ok = { yield above(100, 50) }
   export decision of ok
 }
@@ -197,7 +195,6 @@ Policy-local derive with slash FQN to a sibling in the same policy:
 namespace com/example/shop
 
 policy cart {
-  let _seed = 0
   derive unit = () => { yield 1 }
   derive total = () => { yield com/example/shop/cart/unit() + 1 }
   rule gate = { yield total() == 2 }
