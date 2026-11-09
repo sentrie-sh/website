@@ -146,6 +146,8 @@ let u: list[number] = [1, 2, 3]
 let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 ```
 
+Every element of a collection is checked against its element type. A value typed `dict[number]` rejects `{"a": 1, "b": "two"}` with an error naming the key, `value for key "b" is not valid`. When several values fail, the first failing key in sorted order is reported. In an `is` check the mismatch gives `false`: `{"b": "two"} is dict[number]` is `false`.
+
 ```text
 let u: record[string, number, bool] = ["one", 1, true]
 ```
