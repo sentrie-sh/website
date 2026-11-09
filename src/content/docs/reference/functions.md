@@ -233,11 +233,11 @@ policy example {
 
 ## Built-in Functions
 
-Sentrie provides builtins such as `count`, `merge`, list helpers (`any`, `all`, `filter`, `first`, `collect`, `reduce`, `distinct`), `glob_match`, object utilities (`object_get`, `object_keys`, `object_remove`, `object_union`, `object_filter`) and unit parsers (`parse_quantity`, `parse_duration`). For names, signatures, and examples, see [Built-in Functions](/reference/built-in-functions).
+Sentrie provides builtins such as `count`, `merge`, list helpers (`any`, `all`, `filter`, `first`, `collect`, `reduce`, `distinct`), set helpers (`set`, `union`, `intersection`, `difference`, `is_subset`, `is_superset`), `glob_match`, object utilities (`object_get`, `object_keys`, `object_remove`, `object_union`, `object_filter`) and unit parsers (`parse_quantity`, `parse_duration`). For names, signatures, and examples, see [Built-in Functions](/reference/built-in-functions).
 
 ## See Also
 
-- [Built-in Functions](/reference/built-in-functions) - Reference for list helpers, `count`, `merge`, and related builtins
+- [Built-in Functions](/reference/built-in-functions) - Reference for list helpers, set helpers, `count`, `merge`, and related builtins
 - [Using TypeScript](/reference/using-typescript) - Learn how to import and use TypeScript modules
 - [Built-in TypeScript Modules](/reference/typescript_modules) - Complete reference for all built-in modules
 - [Intermediate Values](/reference/let) - Learn about `let` declarations where functions are commonly used

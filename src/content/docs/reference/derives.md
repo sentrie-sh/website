@@ -139,7 +139,7 @@ The `now()` builtin is explicitly allowed: it returns the policy execution start
 
 Derive bodies may call only these builtins (plus other visible derives):
 
-`all`, `any`, `as_list`, `collect`, `count`, `distinct`, `error`, `filter`, `first`, `flatten`, `flatten_deep`, `glob_match`, `merge`, `normalise_list`, `now`, `object_filter`, `object_get`, `object_keys`, `object_remove`, `object_union`, `parse_duration`, `parse_quantity`, `reduce`
+`all`, `any`, `as_list`, `collect`, `count`, `difference`, `distinct`, `error`, `filter`, `first`, `flatten`, `flatten_deep`, `glob_match`, `intersection`, `is_subset`, `is_superset`, `merge`, `normalise_list`, `now`, `object_filter`, `object_get`, `object_keys`, `object_remove`, `object_union`, `parse_duration`, `parse_quantity`, `reduce`, `set`, `union`
 
 Argument and return types are checked at invoke time; type mismatches include the **parameter name** in the error.
 

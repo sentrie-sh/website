@@ -413,7 +413,7 @@ value is not T
 `T` can be any of:
 
 - A primitive type: `string`, `number`, `boolean`, `trinary` or `document`
-- A collection type: `list[T]`, `dict[T]` or `record[...]`
+- A collection type: `list[T]`, `dict[T]`, `set[T]` or `record[...]`
 - A shape name, either bare (`User`) or qualified (`com/example/auth/User`)
 - A union of any of these, such as `string | number` or `Purchase | Click` (see [Union Types](/reference/types-and-values#union-types))
 - `any`, which every defined value conforms to
