@@ -9,7 +9,7 @@ This section is a reference for the Sentrie policy language: syntax, types, oper
 
 - [Program Structure](#program-structure)
 - [Namespaces](#namespaces)
-- [Policies](#policies)
+- [Policies](/reference/policies)
 - [Rules](#rules)
 - [Expressions](#expressions)
 - [Lambdas](#lambdas) - Callable syntax (`=>`) for passing functions as values to builtins

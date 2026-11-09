@@ -107,7 +107,7 @@ When `null` or `undefined` values are used with the Elvis operator, they are con
 
 ## Logical Operations
 
-For details on trinary logic, see the [Kleene's three-valued logic](/reference/trinary#kleene-truth-tables) section.
+For details on trinary logic, see the [Kleene's three-valued logic](/reference/trinary#configuration--arguments) section.
 
 ## Comparison Operations
 
