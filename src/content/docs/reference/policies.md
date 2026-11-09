@@ -15,10 +15,11 @@ A policy is a named block inside a [namespace](/reference/namespaces) that group
 
 ### Core Components
 
-Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts** → optional **uses** → **body** (`let`, `rule`, `contribute`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
+Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts and pack data** → optional **uses** → **body** (`let`, `rule`, `contribute`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
 
 - **Metadata** (optional): `title`, `description`, `version`, `tag`: static strings for docs and tooling
 - **Facts**: Input data with `fact` statements (**all facts before any `use`**)
+- **Pack data**: Static reference data from the pack's `[data]` table with `data` statements (same block as facts; see [Pack data](/reference/facts/#pack-data))
 - **Use**: External TypeScript functions via `use` statements (after facts, if any)
 - **Variables**: Intermediate calculations using `let` statements
 - **Rules**: Decision logic with conditions and outcomes with `rule` statements
@@ -30,7 +31,7 @@ Statements inside a policy follow a **fixed grouped order** (comments may appear
 Ignoring comments, statements inside a policy must follow this **grouped** order:
 
 1. **Metadata block** (optional): any of `title`, `description`, `version`, `tag*`, grouped together at the top.
-2. **Facts block** (optional): `fact*`: all facts before any `use`.
+2. **Facts block** (optional): `fact` and `data` statements in any order. Every `fact` comes before any `use`; a `data` statement may also sit among the uses, but before the body.
 3. **Uses block** (optional): `use*`.
 4. **Body**: `rule`, `contribute`, `export` (rule export), `let`, `shape`, etc.
 
@@ -58,6 +59,7 @@ policy policyName {
 | Statement | Required | Order | Description |
 | :-------- | :------- | :---- | :---------- |
 | `fact` | No | First | Declare input facts. All fact declarations must appear before any `let`, `use`, or `rule`. Only facts (and comments) may precede facts. |
+| `data` | No | With facts | Read static reference data from the pack's `[data]` table. Sits in the same block as facts, and may also appear among the `use` statements, but before the body. See [Pack data](/reference/facts/#pack-data). |
 | `let` | No | After facts | Intermediate values. Scoped to the policy block; visible to all rules in the policy. |
 | `use` | No | After let | Import TypeScript modules (e.g. `use { sha256 } from @sentrie/hash`). See [Functions](/reference/functions). |
 | `rule` | Yes (≥1) | After use | Decision logic. At least one rule must be declared. |

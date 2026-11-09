@@ -128,6 +128,7 @@ Derive bodies are validated statically and enforced at runtime. A derive must be
 
 - **TypeScript module calls** (`alias.fn(...)`), including modules imported with `use`
 - **Facts**: fact identifiers are not available inside a derive
+- **Pack data**: `data` aliases are not available inside a derive. Pass the value in as an argument instead (see [Pack data](/reference/facts/#pack-data))
 - **Rules**: rules cannot be referenced or dispatched from inside a derive
 - **Callable return values**: a derive cannot `yield` a lambda or other callable value
 - **Calling a parameter**: `derive apply = (fn, x) => { yield fn(x) }` is rejected with `calling parameter "fn" is not permitted inside a derive`, because the caller may pass a lambda defined outside the derive that reads facts or calls modules. A `let` bound to anything other than a lambda expression cannot be called either

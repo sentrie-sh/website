@@ -14,6 +14,7 @@ The PackFile acts as the central configuration hub that:
 - Enables proper resolution of imports and references
 - Provides versioning and distribution information
 - Declares security permissions and capabilities
+- Bundles static reference data (role tables, allowlists, configuration) with the pack
 
 ## File Location
 
@@ -106,6 +107,41 @@ env = ["AWS_REGION", "AWS_PROFILE"]
 - `net` - Array of network URLs that can be accessed
 - `env` - Array of environment variable names that can be accessed (must match pattern `^[A-Z_][A-Z0-9_]*$`)
 
+### `[data]` (optional)
+
+The data section maps names to JSON files that ship with the pack. Each file is read and decoded once, when the pack is loaded, and policies read the value through a `data` declaration. Refer to [Pack data](/reference/facts/#pack-data) for the policy side.
+
+```toml
+[data]
+roles = "data/roles.json"
+allowlist = "data/allowlist.json"
+```
+
+- Each key is the name a policy uses in `data <name>`. It must be an identifier and cannot be a Sentrie keyword
+- Each value is a non-empty path to a JSON file, relative to the directory that holds `sentrie.pack.toml`
+- A file holds one JSON value, such as an object or an array
+
+**Path rules:**
+
+- The path must be relative. An absolute path is rejected
+- The path must stay inside the pack root. A path that climbs out with `..` is rejected
+- A symbolic link is followed only when it resolves to a file inside the pack root. A link that points outside the root is rejected
+- The path must be a regular file, not a directory
+- Each file may be at most 16 MiB
+- The file must hold exactly one JSON document. Anything after it is an error
+
+Any problem makes the whole pack fail to load, before any policy runs. The error names the entry and the file:
+
+```text
+Error: load pack data: data "roles" (data/nope.json): openat data/nope.json: no such file or directory
+Error: load pack data: data "roles" (/etc/hosts): path must be relative to the pack root
+Error: load pack data: data "roles" (../roles.json): path escapes the pack root
+Error: load pack data: data "roles" (data): not a regular file
+Error: load pack data: data "roles" (data/roles.json): invalid JSON: unexpected EOF
+Error: load pack data: data "roles" (data/roles.json): invalid JSON: unexpected content after the top-level value
+Error: load pack data: data "roles" (data/roles.json): file is 16777217 bytes, larger than the 16777216 byte limit
+```
+
 ### `[metadata]` (optional)
 
 The metadata section allows arbitrary custom metadata for tooling purposes.
@@ -171,6 +207,10 @@ fs_read = ["./data/**", "/etc/ssl/certs/**"]
 net = ["https://api.example.com", "https://sts.amazonaws.com"]
 env = ["AWS_REGION", "AWS_PROFILE"]
 
+[data]
+roles = "data/roles.json"
+allowlist = "data/allowlist.json"
+
 [metadata]
 category = "enterprise"
 maturity = "stable"
@@ -186,10 +226,12 @@ The pack file is validated against the following rules:
 3. **Pack name**: Must be a valid identifier (starts with letter, contains only letters, numbers, underscores, hyphens, and dots)
 4. **Pack version**: Must be a valid semantic version string
 5. **Engine table**: If present, must contain `sentrie` field
-6. **Top-level tables**: Only `schema`, `pack`, `engine`, `permissions`, and `metadata` are allowed
+6. **Data table**: If present, each key must be an identifier and each value a non-empty path string
+7. **Top-level tables**: Only `schema`, `pack`, `engine`, `permissions`, `data`, and `metadata` are allowed
 
 ## See Also
 
 - [Overview](/structure-of-a-policy-pack/overview/) - Learn about policy pack structure
 - [Security and Permissions](/reference/security-and-permissions/) - Detailed information about permissions
+- [Facts: Pack data](/reference/facts/#pack-data) - Read the files in `[data]` from a policy
 - [CLI Reference: init](/cli-reference/init) - Learn how to initialize a new pack
