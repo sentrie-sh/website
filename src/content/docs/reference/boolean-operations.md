@@ -141,6 +141,8 @@ let scores_equal = score1 == score2
 -- Result: true
 ```
 
+Numbers are compared by exact value, whether they are integers or floats. `5 == 5.0` is `true`, and `9007199254740993 == 9007199254740992` is `false` even though both are beyond 2^53. The ordering operators (`<`, `<=`, `>`, `>=`) compare exactly in the same way. See [Comparing Numbers](/reference/arithmetic-operations#comparing-numbers).
+
 ### Inequality (`!=` and `is not`)
 
 Both `!=` and `is not` operators check if two values are not equal.

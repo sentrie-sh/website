@@ -52,6 +52,10 @@ Built-in modules: `@sentrie/module` (no quotes). Default alias is the last path 
 
 The [@sentrie/collection](/reference/typescript_modules/sentrie/collection) module provides list and map manipulation utilities. Functions are prefixed with `list_` for array operations and `map_` for map (object) operations.
 
+## Numbers and module calls
+
+A Sentrie `number` can be an exact 64-bit integer, but JavaScript numbers are floats. An integer beyond `Number.MAX_SAFE_INTEGER` (2^53-1) in magnitude cannot be passed to a module function: it raises an error instead of being rounded. See [Numbers Passed to TypeScript Modules](/reference/using-typescript#numbers-passed-to-typescript-modules).
+
 ## Examples in Action
 
 - `list_includes`, `list_sort`, `list_unique`, `list_chunk`
