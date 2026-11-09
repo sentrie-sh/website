@@ -62,6 +62,15 @@ Your policy pack lives in another directory and you want JSON output for scripti
 sentrie exec com/example/auth/access/allow --pack-location ./policy-pack --facts '{"user":{"role":"admin"}}' --output json
 ```
 
+### Passing large integer IDs in facts
+
+Integers that fit in 64 bits are read exactly, in `--facts` and in `--fact-file`, so a large ID keeps every digit.
+
+```bash
+sentrie exec docs/ids/accounts/echo \
+  --facts '{"id": 9007199254740993, "other": 9007199254740992}'
+```
+
 ---
 
 ## Good to Know
@@ -70,3 +79,4 @@ Before you rely on this in scripts or CI, keep a few boundaries in mind:
 
 - **Constraint:** Required facts must be present (in `--facts` and/or `--fact-file`). Optional facts may be omitted if they have defaults. Keys must match fact names or aliases; types must satisfy declared shapes. Facts from `--fact-file` are loaded first; `--facts` overrides conflicting keys. Table output lists namespace, policy, rules, values, attachments; JSON is an array of decision objects. Decision states are `TRUE`, `FALSE`, or `UNKNOWN`.
 - **Edge case:** Invalid or missing TARGET (unknown namespace/policy/rule) → error; rule must be exported. Missing required fact → evaluation error. Invalid JSON in `--facts` or `--fact-file` → error. `--fact-file` path must exist and be readable. Pack directory must contain loadable `*.sentrie`. For the full HTTP API, see [Running as a Service](/deployment-operations/running-as-service).
+- **Large integers:** Integers that fit in 64 bits are read exactly, so a large ID keeps every digit. A number outside the float range, such as `1e400`, fails with `facts: number 1e400 is out of range` (`fact file: ...` for `--fact-file`). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).

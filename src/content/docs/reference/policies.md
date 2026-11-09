@@ -15,13 +15,14 @@ A policy is a named block inside a [namespace](/reference/namespaces) that group
 
 ### Core Components
 
-Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts** → optional **uses** → **body** (`let`, `rule`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
+Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts** → optional **uses** → **body** (`let`, `rule`, `contribute`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
 
 - **Metadata** (optional): `title`, `description`, `version`, `tag`: static strings for docs and tooling
 - **Facts**: Input data with `fact` statements (**all facts before any `use`**)
 - **Use**: External TypeScript functions via `use` statements (after facts, if any)
 - **Variables**: Intermediate calculations using `let` statements
 - **Rules**: Decision logic with conditions and outcomes with `rule` statements
+- **Contributions**: Additions to a rule's result, made with `contribute` statements (see [Rules](/reference/rules#contributing-to-a-rule))
 - **Exports**: Rule outcomes for external consumption with `export` statements
 
 ## Policy body ordering (required)
@@ -31,7 +32,7 @@ Ignoring comments, statements inside a policy must follow this **grouped** order
 1. **Metadata block** (optional): any of `title`, `description`, `version`, `tag*`, grouped together at the top.
 2. **Facts block** (optional): `fact*`: all facts before any `use`.
 3. **Uses block** (optional): `use*`.
-4. **Body**: `rule`, `export` (rule export), `let`, `shape`, etc.
+4. **Body**: `rule`, `contribute`, `export` (rule export), `let`, `shape`, etc.
 
 **Comments** may appear anywhere and do **not** break these groups. **Metadata** may be separated only by comments and still count as one contiguous metadata block.
 
@@ -60,6 +61,7 @@ policy policyName {
 | `let` | No | After facts | Intermediate values. Scoped to the policy block; visible to all rules in the policy. |
 | `use` | No | After let | Import TypeScript modules (e.g. `use { sha256 } from @sentrie/hash`). See [Functions](/reference/functions). |
 | `rule` | Yes (≥1) | After use | Decision logic. At least one rule must be declared. |
+| `contribute` | No | After the rule it names | Adds to a rule declared with a `list[T]`, `boolean` or `trinary` type. See [Rules](/reference/rules#contributing-to-a-rule). |
 | `export decision of` | Yes (≥1) | After rules | Expose a rule for execution (CLI/API) or for [import](/language-concepts/policy-composition) from other policies. The identifier after `of` must be the name of a rule in the same policy. |
 
 **Returns:** N/A (container). Evaluation returns the result of the invoked rule (the one targeted by the CLI, API, or import). The policy itself does not “return” a value; the exported rule does.
@@ -141,6 +143,13 @@ policy P {
 }
 ```
 
+### Rule with a declared type and contributions
+
+```sentrie
+rule deny: list[string] = []
+contribute deny when not user.active { yield "inactive" }
+```
+
 ## Good to Know
 
 Before you implement this, keep a few boundaries in mind:
@@ -149,3 +158,4 @@ Before you implement this, keep a few boundaries in mind:
 - **Policy name:** The policy name is an identifier. The same namespace may contain multiple policies. Each has its own facts, let, use, and rules.
 - **Export target:** Exported rule names are the targets for the CLI/API and for `import decision of` from other policies. When importing, the binding (e.g. `with` clause) uses the rule name as defined in the target policy (and fact names/aliases as in that policy).
 - **Evaluation:** When a decision is requested, the runtime evaluates the chosen rule (with facts bound). Only that rule’s body or default is run; other rules are not evaluated unless the chosen rule references them.
+- **Contributions:** `contribute` is a reserved keyword, so it cannot be used as an identifier, a namespace segment or a field name after a `.`.

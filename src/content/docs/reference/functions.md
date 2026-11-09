@@ -9,6 +9,8 @@ Functions are a fundamental part of Sentrie that allow you to perform operations
 
 **Call (direct):** `functionName(arg1, arg2, ...)`
 
+`functionName` can be a builtin, a [derive](/reference/derives), or a lambda held by a `let` or a parameter. A local value shadows a derive or builtin of the same name. See [Calling a lambda by name](/reference#calling-a-lambda-by-name) for the full order and for recursion.
+
 **Call (via alias):** `alias.functionName(arg1, arg2, ...)`
 
 **Import:** `use { fn1, fn2, ... } from source [ as alias ]`
@@ -146,6 +148,7 @@ let result = expensiveFunction(data)!3600  -- Cached for 1 hour
 
 - **TypeScript Module Functions**: Memoization is fully supported and provides performance benefits for expensive operations
 - **Built-in Functions**: While the syntax is supported, built-in functions are not actually memoized as they are already optimized and fast enough that caching provides minimal benefit
+- **Lambdas held by a `let` or parameter**: Not memoizable. `double(n)!` is rejected with `"double" is a local value and cannot be memoized with '!'`
 
 ### Example
 
@@ -230,11 +233,11 @@ policy example {
 
 ## Built-in Functions
 
-Sentrie provides builtins such as `count`, `merge`, and list helpers (`any`, `all`, `filter`, `first`, `collect`, `reduce`, `distinct`). For names, signatures, and examples, see [Built-in Functions](/reference/built-in-functions).
+Sentrie provides builtins such as `count`, `merge`, list helpers (`any`, `all`, `filter`, `first`, `collect`, `reduce`, `distinct`), set helpers (`set`, `union`, `intersection`, `difference`, `is_subset`, `is_superset`), `glob_match`, object utilities (`object_get`, `object_keys`, `object_remove`, `object_union`, `object_filter`) and unit parsers (`parse_quantity`, `parse_duration`). For names, signatures, and examples, see [Built-in Functions](/reference/built-in-functions).
 
 ## See Also
 
-- [Built-in Functions](/reference/built-in-functions) - Reference for list helpers, `count`, `merge`, and related builtins
+- [Built-in Functions](/reference/built-in-functions) - Reference for list helpers, set helpers, `count`, `merge`, and related builtins
 - [Using TypeScript](/reference/using-typescript) - Learn how to import and use TypeScript modules
 - [Built-in TypeScript Modules](/reference/typescript_modules) - Complete reference for all built-in modules
 - [Intermediate Values](/reference/let) - Learn about `let` declarations where functions are commonly used

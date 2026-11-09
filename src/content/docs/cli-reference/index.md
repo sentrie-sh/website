@@ -10,6 +10,7 @@ The Sentrie CLI runs policy evaluations, initializes packs, serves the HTTP API,
 | Command | Description |
 | :--- | :--- |
 | [sentrie exec](/cli-reference/exec) | Execute a policy or rule with facts. |
+| [sentrie bench](/cli-reference/bench) | Measure how long a policy or rule takes to evaluate. |
 | [sentrie init](/cli-reference/init) | Create a new policy pack in the current directory. |
 | [sentrie serve](/cli-reference/serve) | Start the HTTP server for policy evaluation. |
 | [sentrie validate](/cli-reference/validate) | Validate pack structure, syntax, and types. |
@@ -39,6 +40,38 @@ For `exec` and `validate`, exit 0 when evaluation or validation succeeds; non-ze
 Execute a policy or rule from a policy pack.
 
 See the [exec command documentation](/cli-reference/exec) for details.
+
+### `bench`
+
+Measure how long it takes to evaluate a policy or rule.
+
+#### Syntax
+
+```bash
+sentrie bench <FQN> [OPTIONS]
+```
+
+#### Options
+
+| Option            | Type   | Default | Description                                                     |
+| ----------------- | ------ | ------- | --------------------------------------------------------------- |
+| `--pack-location` | string | `.`     | Directory containing policy files                               |
+| `--facts`         | string | `{}`    | Facts to evaluate the target with                               |
+| `--fact-file`     | string | -       | JSON file to load facts from                                    |
+| `--benchtime`     | string | `1s`    | Measure for a duration (`1s`) or an exact count (`200x`)        |
+| `--count`         | int    | `1`     | Repeat the measurement this many times, one line per run        |
+| `--eval-timeout`  | string | `10s`   | Deadline for evaluating one decision; `0` disables it           |
+| `--capabilities`  | string | -       | Capabilities file limiting builtins and modules                 |
+
+#### Examples
+
+```bash
+sentrie bench user_management/user_access/allow_admin \
+  --facts '{"user":{"role":"admin","status":"active"}}' \
+  --benchtime 200x --count 3
+```
+
+See the [bench command documentation](/cli-reference/bench) for details.
 
 ### `init`
 
