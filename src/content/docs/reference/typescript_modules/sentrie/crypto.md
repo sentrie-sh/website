@@ -47,4 +47,4 @@ policy mypolicy {
 
 ## See Also
 
-- [@sentrie/hash](./hash) - For additional hash algorithms (MD5, SHA-1, SHA-512, HMAC)
+- [@sentrie/hash](/reference/typescript_modules/sentrie/hash) - For additional hash algorithms (MD5, SHA-1, SHA-512, HMAC)

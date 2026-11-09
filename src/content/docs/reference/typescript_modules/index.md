@@ -37,7 +37,7 @@ policy mypolicy {
 
 ### Data Manipulation
 
-#### [Collection](./sentrie/collection)
+#### [Collection](/reference/typescript_modules/sentrie/collection)
 
 List and dict manipulation utilities. Functions are prefixed with `list_` for array operations and `map_` for plain-object (dict) operations.
 
@@ -46,7 +46,7 @@ List and dict manipulation utilities. Functions are prefixed with `list_` for ar
 - `list_includes`, `list_sort`, `list_unique`, `list_chunk`
 - `map_keys`, `map_values`, `map_get`, `map_merge`
 
-#### [JavaScript Globals](./sentrie/js)
+#### [JavaScript Globals](/reference/typescript_modules/sentrie/js)
 
 Access to JavaScript globals (Math, String, Number, Date, JSON, Array) as individual functions.
 
@@ -59,7 +59,7 @@ Access to JavaScript globals (Math, String, Number, Date, JSON, Array) as indivi
 - **JSON**: `parse`, `stringify`
 - **Array**: `isArray`, `from`, `of`
 
-#### [JSON](./sentrie/json)
+#### [JSON](/reference/typescript_modules/sentrie/json)
 
 JSON validation utility.
 
@@ -69,7 +69,7 @@ JSON validation utility.
 
 ### Cryptography & Security
 
-#### [Hash](./sentrie/hash)
+#### [Hash](/reference/typescript_modules/sentrie/hash)
 
 Comprehensive hash functions including MD5, SHA-1, SHA-256, SHA-512, and HMAC.
 
@@ -79,7 +79,7 @@ Comprehensive hash functions including MD5, SHA-1, SHA-256, SHA-512, and HMAC.
 
 **Security Note:** MD5 and SHA-1 are cryptographically broken. Use SHA-256 or SHA-512 for secure hashing.
 
-#### [Crypto](./sentrie/crypto)
+#### [Crypto](/reference/typescript_modules/sentrie/crypto)
 
 Basic cryptographic utilities including SHA-256 hashing.
 
@@ -87,7 +87,7 @@ Basic cryptographic utilities including SHA-256 hashing.
 
 - `sha256`
 
-#### [JWT](./sentrie/jwt)
+#### [JWT](/reference/typescript_modules/sentrie/jwt)
 
 JSON Web Token decoding and verification utilities. **Note:** This module only decodes and verifies tokens; it does NOT create/generate tokens.
 
@@ -99,7 +99,7 @@ JSON Web Token decoding and verification utilities. **Note:** This module only d
 
 ### Encoding & Decoding
 
-#### [Encoding](./sentrie/encoding)
+#### [Encoding](/reference/typescript_modules/sentrie/encoding)
 
 Various encoding and decoding utilities. Supports Base64, Hex, and URL encoding/decoding operations.
 
@@ -111,7 +111,7 @@ Various encoding and decoding utilities. Supports Base64, Hex, and URL encoding/
 
 ### Network & Internet
 
-#### [Net](./sentrie/net)
+#### [Net](/reference/typescript_modules/sentrie/net)
 
 Network and IP address utilities for network-based policies. Supports both IPv4 and IPv6 addresses and CIDR notation.
 
@@ -120,7 +120,7 @@ Network and IP address utilities for network-based policies. Supports both IPv4 
 - `cidrContains`, `cidrIntersects`, `cidrIsValid`, `cidrExpand`, `cidrMerge`
 - `parseIP`, `isIPv4`, `isIPv6`, `isPrivate`, `isPublic`, `isLoopback`
 
-#### [URL](./sentrie/url)
+#### [URL](/reference/typescript_modules/sentrie/url)
 
 URL parsing and manipulation utilities. **Note:** URL encoding/decoding is provided by the encoding module.
 
@@ -130,7 +130,7 @@ URL parsing and manipulation utilities. **Note:** URL encoding/decoding is provi
 
 ### Date & Time
 
-#### [Time](./sentrie/time)
+#### [Time](/reference/typescript_modules/sentrie/time)
 
 Date and time manipulation utilities. All timestamps are Unix timestamps (seconds since epoch).
 
@@ -145,7 +145,7 @@ Date and time manipulation utilities. All timestamps are Unix timestamps (second
 
 ### JavaScript Globals
 
-#### [JavaScript Globals](./sentrie/js)
+#### [JavaScript Globals](/reference/typescript_modules/sentrie/js)
 
 Access to JavaScript globals (Math, String, Number, Date, JSON, Array) as individual functions. This module provides direct access to standard JavaScript functions.
 
@@ -164,7 +164,7 @@ Access to JavaScript globals (Math, String, Number, Date, JSON, Array) as indivi
 
 ### Pattern Matching
 
-#### [Regex](./sentrie/regex)
+#### [Regex](/reference/typescript_modules/sentrie/regex)
 
 Regular expression pattern matching and manipulation utilities. All patterns are compiled and cached for performance.
 
@@ -174,7 +174,7 @@ Regular expression pattern matching and manipulation utilities. All patterns are
 
 ### Version Management
 
-#### [Semver](./sentrie/semver)
+#### [Semver](/reference/typescript_modules/sentrie/semver)
 
 Semantic version comparison and validation utilities. Supports the "v" prefix (e.g., `"v1.2.3"` is equivalent to `"1.2.3"`).
 
@@ -185,7 +185,7 @@ Semantic version comparison and validation utilities. Supports the "v" prefix (e
 
 ### Identifiers
 
-#### [UUID](./sentrie/uuid)
+#### [UUID](/reference/typescript_modules/sentrie/uuid)
 
 Functions for generating UUIDs (Universally Unique Identifiers).
 
@@ -199,19 +199,19 @@ Functions for generating UUIDs (Universally Unique Identifiers).
 
 | Module                                      | Description                                                  | Category           |
 | ------------------------------------------- | ------------------------------------------------------------ | ------------------ |
-| [@sentrie/collection](./sentrie/collection) | List and dict manipulation utilities                          | Data Manipulation  |
-| [@sentrie/crypto](./sentrie/crypto)         | Cryptographic functions (SHA-256)                            | Cryptography       |
-| [@sentrie/encoding](./sentrie/encoding)     | Base64, Hex, and URL encoding/decoding                       | Encoding           |
-| [@sentrie/hash](./sentrie/hash)             | Hash functions (MD5, SHA-1, SHA-256, SHA-512, HMAC)          | Cryptography       |
-| [@sentrie/js](./sentrie/js)                 | JavaScript globals (Math, String, Number, Date, JSON, Array) | JavaScript Globals |
-| [@sentrie/json](./sentrie/json)             | JSON validation utility                                      | Data Manipulation  |
-| [@sentrie/jwt](./sentrie/jwt)               | JSON Web Token decoding and verification                     | Security           |
-| [@sentrie/net](./sentrie/net)               | Network and IP address utilities                             | Network            |
-| [@sentrie/regex](./sentrie/regex)           | Regular expression pattern matching                          | Pattern Matching   |
-| [@sentrie/semver](./sentrie/semver)         | Semantic version comparison and validation                   | Version Management |
-| [@sentrie/time](./sentrie/time)             | Date and time manipulation                                   | Date & Time        |
-| [@sentrie/url](./sentrie/url)               | URL parsing and manipulation                                 | Network            |
-| [@sentrie/uuid](./sentrie/uuid)             | UUID generation (v4, v6, v7)                                 | Identifiers        |
+| [@sentrie/collection](/reference/typescript_modules/sentrie/collection) | List and dict manipulation utilities                          | Data Manipulation  |
+| [@sentrie/crypto](/reference/typescript_modules/sentrie/crypto)         | Cryptographic functions (SHA-256)                            | Cryptography       |
+| [@sentrie/encoding](/reference/typescript_modules/sentrie/encoding)     | Base64, Hex, and URL encoding/decoding                       | Encoding           |
+| [@sentrie/hash](/reference/typescript_modules/sentrie/hash)             | Hash functions (MD5, SHA-1, SHA-256, SHA-512, HMAC)          | Cryptography       |
+| [@sentrie/js](/reference/typescript_modules/sentrie/js)                 | JavaScript globals (Math, String, Number, Date, JSON, Array) | JavaScript Globals |
+| [@sentrie/json](/reference/typescript_modules/sentrie/json)             | JSON validation utility                                      | Data Manipulation  |
+| [@sentrie/jwt](/reference/typescript_modules/sentrie/jwt)               | JSON Web Token decoding and verification                     | Security           |
+| [@sentrie/net](/reference/typescript_modules/sentrie/net)               | Network and IP address utilities                             | Network            |
+| [@sentrie/regex](/reference/typescript_modules/sentrie/regex)           | Regular expression pattern matching                          | Pattern Matching   |
+| [@sentrie/semver](/reference/typescript_modules/sentrie/semver)         | Semantic version comparison and validation                   | Version Management |
+| [@sentrie/time](/reference/typescript_modules/sentrie/time)             | Date and time manipulation                                   | Date & Time        |
+| [@sentrie/url](/reference/typescript_modules/sentrie/url)               | URL parsing and manipulation                                 | Network            |
+| [@sentrie/uuid](/reference/typescript_modules/sentrie/uuid)             | UUID generation (v4, v6, v7)                                 | Identifiers        |
 
 ## Common Use Cases
 
