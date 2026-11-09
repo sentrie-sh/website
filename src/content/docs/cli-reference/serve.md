@@ -1,23 +1,21 @@
 ---
-title: "serve Command"
-description: "Start the Sentrie HTTP server to evaluate policies."
+title: "sentrie serve"
+description: "Start the HTTP server for policy evaluation; load pack from a directory."
 ---
 
-# serve Command
+When you need to evaluate policies over HTTP (e.g. from a backend or API gateway), you run `sentrie serve`. It loads a policy pack from a directory and exposes a REST API so callers can POST facts and get decisions. Use it for local development or as the process behind a reverse proxy in production.
 
-The `serve` command starts the Sentrie HTTP server to evaluate policies.
-
-## Syntax
+Here is the basic syntax:
 
 ```bash
-sentrie serve [OPTIONS]
+sentrie serve [--pack-location <PATH>] [--http-port <INT>] [--http-listen <ADDR> ...]
 ```
 
-## Description
+All options are optional: pack directory defaults to the current directory, port to `7529`, and listen address to localhost (`--http-listen local`).
 
-The `serve` command starts an HTTP server that provides a REST API for evaluating Sentrie policies. The server loads policy files from a specified directory, creates an index of available policies and rules, and starts listening for HTTP requests.
+## Configuration & Arguments
 
-## Options
+You can customize where the pack is loaded from and how the server listens using the following options:
 
 | Option            | Type     | Default     | Description                       |
 | ----------------- | -------- | ----------- | --------------------------------- |
@@ -25,12 +23,20 @@ The `serve` command starts an HTTP server that provides a REST API for evaluatin
 | `--pack-location` | string   | `./`        | Directory containing policy files |
 | `--http-listen`   | []string | `["local"]` | Address(es) to listen on          |
 
+**Returns:** Process runs until SIGINT/SIGTERM (graceful shutdown). Exit non-zero on startup failure (e.g. port in use, pack load or parse error). HTTP API base: `http://<listen>:<port>`; see [Running as a Service](/deployment-operations/running-as-service) for request/response format.
+
 ### --http-port
 
-Specifies the port number for the HTTP server to listen on.
+---
+
+## Examples in Action
+
+### Starting the server with defaults
+
+You want to run the server on localhost with the current directory as the pack and default port.
 
 ```bash
-sentrie serve --http-port 8080
+sentrie serve
 ```
 
 **Default**: `7529` (PLCY on a phone keypad)
@@ -105,39 +111,41 @@ sentrie serve --http-port 8080
 sentrie serve --pack-location ./my-policies
 ```
 
-### Production Configuration
+### Using a custom port and pack path
+
+You are developing with policies in a separate folder and want the server on a different port.
 
 ```bash
+sentrie serve --http-port 8080 --pack-location ./my-policies
+
 # Production setup with environment variables
 export SENTRIE_LOG_LEVEL=WARN
 export SENTRIE_PORT=8080
 sentrie serve --pack-location /etc/sentrie/policies --http-listen 0.0.0.0
 ```
 
-### Development Setup
+### Binding to all interfaces for production-style access
+
+You are running behind a reverse proxy or need the server reachable from other machines; you point it at a fixed pack path and listen on all interfaces.
 
 ```bash
-# Development setup with debug logging
-sentrie serve --debug --log-level DEBUG --pack-location ./policies
+sentrie serve --pack-location /etc/sentrie/policies --http-listen 0.0.0.0 --http-port 8080
 ```
 
-### Multiple Listen Addresses
+### Listening on multiple addresses with debug logging
+
+You want the server on specific IPs and more verbose logs for troubleshooting.
 
 ```bash
-# Listen on multiple addresses
-sentrie serve --http-listen 127.0.0.1 --http-listen 192.168.1.100 --http-port 8080
+# Listen on multiple addresses with debug logging
+sentrie serve --http-listen 127.0.0.1 --http-listen 192.168.1.100 --http-port 8080 --debug --log-level DEBUG
 ```
 
-## Server Behavior
+---
 
-### Startup Process
+## Good to Know
 
-1. **Load Pack**: Load policy pack from specified directory
-2. **Parse Policies**: Parse all `.sentrie` files
-3. **Validate Policies**: Check syntax and semantics
-4. **Create Index**: Build index of policies and rules
-5. **Start Server**: Begin listening for HTTP requests
-6. **Log Status**: Log startup information and any errors
+Before you run this in production, keep a few boundaries in mind:
 
 ### Pack Loading
 
@@ -412,3 +420,8 @@ sentrie serve \
   --pack-location ./policies \
   --http-port 3000
 ```
+
+### Runtime behavior
+
+- **Constraint:** Startup loads the pack from `--pack-location`, parses `*.sentrie`, validates, builds the index, then listens. Policy or pack errors prevent startup. SIGINT (Ctrl+C) and SIGTERM trigger graceful shutdown; SIGKILL does not. Environment variables `SENTRIE_DEBUG`, `SENTRIE_LOG_LEVEL`, `SENTRIE_PORT` can override when not set via flags. All output goes to stdout/stderr; no file logging by default.
+- **Edge case:** Port already in use → startup fails; use another `--http-port`. Invalid or missing pack directory or pack load/parse failure → startup fails. Listening on `0.0.0.0` exposes the server on all interfaces; secure with firewall, reverse proxy, and/or auth. HTTPS and auth are not provided by `serve`; use a reverse proxy. Full HTTP API schema and deployment details: [Running as a Service](/deployment-operations/running-as-service).

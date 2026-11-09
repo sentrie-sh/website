@@ -12,4 +12,4 @@ When **writing or generating** Cursor plan markdown (for example under `.cursor/
 - For **markdown links** to files, use repo-root-relative targets, for example `[page.tsx](src/app/page.tsx)`.
 - When the plan spans multiple repositories in a multi-root workspace, make it explicit which repo each path is relative to (e.g. a short label or section per repo) and still avoid absolute paths.
 
-This applies to plan bodies, todos, and any embedded file lists—not only when editing an existing plan file.
+This applies to plan bodies, todos, and any embedded file lists, not only when editing an existing plan file.
