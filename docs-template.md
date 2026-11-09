@@ -1,6 +1,6 @@
 # [Feature Name]
 
-[A short, conversational paragraph explaining what this is and the exact problem it solves. Write as if you are explaining it to a colleague. Focus on the "why"—e.g., "When you need to guarantee the exact structure of an incoming payload before evaluating it, use Shapes."]
+[A short, conversational paragraph explaining what this is and the exact problem it solves. Write as if you are explaining it to a colleague. Focus on the "why", e.g., "When you need to guarantee the exact structure of an incoming payload before evaluating it, use Shapes."]
 
 Here is the basic syntax:
 
@@ -16,7 +16,7 @@ Here is the basic syntax:
 | :---------- | :----- | :------- | :-------------------------------------------- |
 | `paramName` | `Type` | Yes/No   | A plain-English explanation of this argument. |
 
-**Returns:** `ReturnType` — [Explain what the developer gets back in plain English, e.g., "A validated object, or it aborts the evaluation if constraints fail."]
+**Returns:** `ReturnType`: [Explain what the developer gets back in plain English, e.g., "A validated object, or it aborts the evaluation if constraints fail."]
 
 ---
 

@@ -3,7 +3,7 @@ title: "sentrie validate"
 description: "Validate pack structure, syntax, and types without executing policies."
 ---
 
-When you want to catch policy and pack errors before running or deploying (e.g. in CI or before a release), you use `sentrie validate`. It loads the pack and checks structure, syntax, types, and references without executing any rules—so you get fast feedback and no side effects.
+When you want to catch policy and pack errors before running or deploying (e.g. in CI or before a release), you use `sentrie validate`. It loads the pack and checks structure, syntax, types, and references without executing any rules, so you get fast feedback and no side effects.
 
 Here is the basic syntax:
 

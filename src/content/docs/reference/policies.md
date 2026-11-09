@@ -17,7 +17,7 @@ A policy is a named block inside a [namespace](/reference/namespaces) that group
 
 Statements inside a policy follow a **fixed grouped order** (comments may appear anywhere): optional **metadata** → optional **facts** → optional **uses** → **body** (`let`, `rule`, `export`, policy-local `shape`, …). See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`.
 
-- **Metadata** (optional): `title`, `description`, `version`, `tag` — static strings for docs and tooling
+- **Metadata** (optional): `title`, `description`, `version`, `tag`: static strings for docs and tooling
 - **Facts**: Input data with `fact` statements (**all facts before any `use`**)
 - **Use**: External TypeScript functions via `use` statements (after facts, if any)
 - **Variables**: Intermediate calculations using `let` statements
@@ -29,7 +29,7 @@ Statements inside a policy follow a **fixed grouped order** (comments may appear
 Ignoring comments, statements inside a policy must follow this **grouped** order:
 
 1. **Metadata block** (optional): any of `title`, `description`, `version`, `tag*`, grouped together at the top.
-2. **Facts block** (optional): `fact*` — all facts before any `use`.
+2. **Facts block** (optional): `fact*`: all facts before any `use`.
 3. **Uses block** (optional): `use*`.
 4. **Body**: `rule`, `export` (rule export), `let`, `shape`, etc.
 

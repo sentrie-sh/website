@@ -20,8 +20,8 @@ All commands support these options:
 
 | Option | Description | Default |
 | :--- | :--- | :--- |
-| `--help`, `-h` | Show help for the command. | — |
-| `--version`, `-v` | Show Sentrie version. | — |
+| `--help`, `-h` | Show help for the command. | None |
+| `--version`, `-v` | Show Sentrie version. | None |
 | `--debug` | Enable debug logging. | `false` |
 | `--log-level` | Log level: DEBUG, INFO, WARN, ERROR. | `INFO` |
 

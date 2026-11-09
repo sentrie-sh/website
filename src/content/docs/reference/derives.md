@@ -18,7 +18,7 @@ derive NAME = LAMBDA
 export derive NAME
 ```
 
-Inside a policy body (after metadata, `fact`, and `use`—the same phase as `let`, `rule`, and `shape`):
+Inside a policy body (after metadata, `fact`, and `use`, in the same phase as `let`, `rule`, and `shape`):
 
 ```text
 derive NAME = LAMBDA
@@ -45,7 +45,7 @@ Typed parameters, optional parameters (`?`), and return types use the same lambd
 
 Inside a **rule** or other non-derive expression, an unqualified derive name is invoked with `(...)`.
 
-Inside another **derive** body, a visible derive must also be invoked as `otherDerive(...)` — not referenced as a bare identifier — except when passed as a callback to certain higher-order builtins (see [Callbacks](#callbacks-for-higher-order-builtins) below).
+Inside another **derive** body, a visible derive must also be invoked as `otherDerive(...)`, not referenced as a bare identifier, except when passed as a callback to certain higher-order builtins (see [Callbacks](#callbacks-for-higher-order-builtins) below).
 
 ### Qualified slash callee
 
@@ -63,7 +63,7 @@ Cross-namespace access by slash FQN requires `export derive NAME` at namespace s
 
 ### Policy-scoped derives
 
-Declared inside a policy body. Visible only within **that policy** — not to other policies in the same namespace, and not to namespace-scoped derives.
+Declared inside a policy body. Visible only within **that policy**, not to other policies in the same namespace, and not to namespace-scoped derives.
 
 A rule in `com/ex/polB` cannot call `com/ex/polA/secret()` even when both policies share the namespace. Index validation and runtime both enforce this boundary.
 
@@ -82,11 +82,11 @@ Derive bodies are validated statically and enforced at runtime. A derive must be
 
 ### Not allowed
 
-- **TypeScript module calls** (`alias.fn(...)`) — including modules imported with `use`
-- **Facts** — fact identifiers are not available inside a derive
-- **Rules** — rules cannot be referenced or dispatched from inside a derive
-- **Callable return values** — a derive cannot `yield` a lambda or other callable value
-- **Non-whitelisted builtins** — builtins outside the pure set cannot be used from a derive
+- **TypeScript module calls** (`alias.fn(...)`), including modules imported with `use`
+- **Facts**: fact identifiers are not available inside a derive
+- **Rules**: rules cannot be referenced or dispatched from inside a derive
+- **Callable return values**: a derive cannot `yield` a lambda or other callable value
+- **Non-whitelisted builtins**: builtins outside the pure set cannot be used from a derive
 
 The `now()` builtin is explicitly allowed: it returns the policy execution start time (`createdAt`), not wall-clock time per call, so it stays deterministic for the run.
 
@@ -162,6 +162,6 @@ policy cart {
 
 ## See also
 
-- [Lambdas](/reference#lambdas) — parameter lists, optional parameters, return types, and arity for builtins
-- [Built-in functions](/reference/built-in-functions) — collection helpers that accept lambdas or derive callbacks
-- [Using TypeScript](/reference/using-typescript) — TypeScript modules in **rules** and `let` expressions (not inside derive bodies)
+- [Lambdas](/reference#lambdas): parameter lists, optional parameters, return types, and arity for builtins
+- [Built-in functions](/reference/built-in-functions): collection helpers that accept lambdas or derive callbacks
+- [Using TypeScript](/reference/using-typescript): TypeScript modules in **rules** and `let` expressions (not inside derive bodies)

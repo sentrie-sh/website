@@ -8,7 +8,7 @@ Good tests make it safe to evolve policies. Sentrie’s CLI is designed to be sc
 ## When to use which command
 
 - **`sentrie exec`**: Execute rules and see decisions. Use for local development, debugging, and “golden” tests that assert specific outputs.
-- **`sentrie validate`**: Load the pack and type-check policies (and optional facts) without executing rules. Use to catch syntax, type, and pack errors early—especially in CI.
+- **`sentrie validate`**: Load the pack and type-check policies (and optional facts) without executing rules. Use to catch syntax, type, and pack errors early, especially in CI.
 
 See:
 

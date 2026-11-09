@@ -15,7 +15,7 @@ At a high level:
 
 ## Where to find full details
 
-This page is a conceptual overview. For the complete HTTP API reference—including flags, endpoints, request/response schema, and error formats—see:
+This page is a conceptual overview. For the complete HTTP API reference, including flags, endpoints, request/response schema, and error formats, see:
 
 - [CLI Reference: `sentrie serve`](/cli-reference/serve)
 - [Deployment & Operations: Running as a Service](/deployment-operations/running-as-service)

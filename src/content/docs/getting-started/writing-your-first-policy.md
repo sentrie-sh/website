@@ -22,7 +22,7 @@ policy IDENT {
 
 A policy consists of (in this order; see [Policy metadata](/reference/policy-metadata/) and [Policies](/reference/policies/)):
 
-- **Metadata** (optional): `title`, `description`, `version`, and one or more `tag` string literals for humans and tooling—they do not affect evaluation.
+- **Metadata** (optional): `title`, `description`, `version`, and one or more `tag` string literals for humans and tooling; they do not affect evaluation.
 - **Facts**: Input data for the policy (before any `use` if you import modules).
 - **Rules**: Individual decision logic.
 - **Exports**: Rules that are exported to make them available for external evaluation.

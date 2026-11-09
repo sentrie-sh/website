@@ -3,7 +3,7 @@ title: "sentrie exec"
 description: "Execute a policy or rule with facts; output decisions to stdout."
 ---
 
-When you want to run a policy from the command line—to test a rule, debug a decision, or script a one-off check—you use `sentrie exec`. It loads a policy pack, runs the rule(s) you specify with the facts you supply, and prints the decision output. Perfect for local development and CI.
+When you want to run a policy from the command line (to test a rule, debug a decision, or script a one-off check), you use `sentrie exec`. It loads a policy pack, runs the rule(s) you specify with the facts you supply, and prints the decision output. Perfect for local development and CI.
 
 Here is the basic syntax:
 

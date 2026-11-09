@@ -36,12 +36,12 @@ haystack contains needle
 - **Haystack:** list. **Needle:** any value.
 - **Result:** true if any element of the list is equal to needle (by `==`). Element-wise equality; no deep structural comparison beyond the language’s equality. Empty list → false.
 
-### Map — key presence
+### Map: key presence
 
 - **Haystack:** map. **Needle:** string.
 - **Result:** true if the map has a key equal to needle; false otherwise. Only key presence is checked; the value is irrelevant.
 
-### Map — subset
+### Map: subset
 
 - **Haystack:** map. **Needle:** map.
 - **Result:** true if every key in needle exists in haystack and the corresponding values are equal (by `==`). Extra keys in haystack are allowed. If any key in needle is missing from haystack or any value differs, result is false. The value comparison is **recursive**: when values are themselves maps or lists, they are compared recursively (nested maps must match key-for-key; nested lists element-for-element).

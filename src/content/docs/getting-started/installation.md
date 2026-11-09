@@ -3,7 +3,7 @@ title: Installation
 description: Learn how to install Sentrie
 ---
 
-When you need to run Sentrie locally or on a server, you install a single binary. There are no external dependencies—just the executable. Convenience scripts are provided for macOS, Linux, and Windows so you can install or pin a version with one command.
+When you need to run Sentrie locally or on a server, you install a single binary. There are no external dependencies, just the executable. Convenience scripts are provided for macOS, Linux, and Windows so you can install or pin a version with one command.
 
 Here is the basic syntax:
 

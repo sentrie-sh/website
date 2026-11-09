@@ -15,13 +15,13 @@ Arithmetic operators operate on `number` (float64). All numeric operands are tre
 
 | Operator | Description | Operands | Result | Edge case |
 | :------- | :---------- | :------- | :----- | :-------- |
-| `+` | Addition | number, number | number | — |
-| `-` | Subtraction | number, number | number | — |
-| `*` | Multiplication | number, number | number | — |
+| `+` | Addition | number, number | number | None |
+| `-` | Subtraction | number, number | number | None |
+| `*` | Multiplication | number, number | number | None |
 | `/` | Division | number, number | number | Divisor zero → error; evaluation aborts. |
 | `%` | Modulo (remainder) | number, number | number | Divisor zero → error; evaluation aborts. |
-| unary `+` | Unary plus | number | number | — |
-| unary `-` | Unary minus (negation) | number | number | — |
+| unary `+` | Unary plus | number | number | None |
+| unary `-` | Unary minus (negation) | number | number | None |
 
 **Returns:** `number`. Division or modulo by zero aborts evaluation.
 
