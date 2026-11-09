@@ -152,6 +152,17 @@ let normalized = normalise_list(mixed_input)  -- Returns [1, 2, 3, 4, 5]
 
 **Note:** If the input contains `undefined` values, the function returns `undefined`.
 
+## `now() => number` and `now_ms() => number`
+
+Return the policy execution start time as an exact integer: `now()` in Unix seconds and `now_ms()` in Unix milliseconds. Both take no arguments, and both return the same value every time they are called within one execution.
+
+```sentrie
+let started: number = now()        -- For example 1793498744
+let started_ms: number = now_ms()  -- For example 1793498744111
+```
+
+Because the results are integers, arithmetic and comparison on them is exact, and they print without a fractional part or exponent.
+
 ## List builtins
 
 Builtins `any`, `all`, `filter`, `first`, `collect`, `reduce`, and `distinct` work on **lists**. They take a list as the first argument (except `reduce`, which also takes an initial accumulator, and `distinct`, which can take an optional second argument that is a callable).

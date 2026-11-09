@@ -230,6 +230,8 @@ The `{target...}` parameter is the full path after `/decision/`:
 }
 ```
 
+Integers in `facts` that fit in 64 bits are read exactly, so an ID such as `9007199254740993` is evaluated, compared and returned with every digit. A number outside the float range, such as `1e400`, is rejected with a `400` problem response ("Invalid JSON"). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).
+
 **Query Parameters:**
 
 - Query parameters are parsed and passed as run configuration (currently parsed but not used in execution)
