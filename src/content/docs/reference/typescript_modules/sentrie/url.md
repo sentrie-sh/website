@@ -186,7 +186,7 @@ policy mypolicy {
 
 ## See Also
 
-- [@sentrie/encoding](./encoding) - For URL encoding/decoding operations
+- [@sentrie/encoding](/reference/typescript_modules/sentrie/encoding) - For URL encoding/decoding operations
 
 ## Notes
 

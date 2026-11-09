@@ -506,4 +506,4 @@ rule transformData = default false {
 - [Policies](/reference/policies) - Learn about policies and their structure
 - [Rules](/reference/rules) - Learn about rules and how they work
 - [Facts](/reference/facts) - Learn about facts and input data declarations
-- [Expressions](/reference/index#expressions) - Learn about expressions and operators
+- [Expressions](/reference#expressions) - Learn about expressions and operators
