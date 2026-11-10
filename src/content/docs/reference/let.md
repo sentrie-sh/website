@@ -3,7 +3,7 @@ title: Intermediate Values (let)
 description: "let declaration syntax, scoping, immutability, and type validation."
 ---
 
-`let` binds a name to an expression inside a block. It is used for intermediate values in a [policy](/reference/policies) or inside a [rule](/reference/rules) body. The binding is scoped to the block, is immutable (no reassignment), and cannot be exported. Only [rules](/reference/rules) can be exported. If a type annotation is present, the value is validated at runtime (including [constraints](/reference/constraints)); validation failure aborts evaluation.
+`let` binds a name to an expression inside a block. It is used for intermediate values in a [policy](/reference/policies) or inside a [rule](/reference/rules) body. The binding is scoped to the block, is immutable (no reassignment), and cannot be exported. Only [rules](/reference/rules) can be exported. If a type annotation is present, the value is validated at runtime (including [constraints](/reference/constraints)); validation failure aborts evaluation. An undefined value is not validated; see [Typed let and undefined](#typed-let-and-undefined).
 
 ## Syntax
 
@@ -48,6 +48,29 @@ let count: number = 10
 ```
 
 Without a type, the value is not validated against a type. With a type, the value must conform (and satisfy constraints if any).
+
+### Typed let and undefined
+
+Reading data that is not there, such as a field the fact does not carry, gives an undefined value. A typed `let` passes it through, as an untyped one does: the type and its constraints are not checked, and the binding is undefined.
+
+```sentrie
+namespace docs/typed
+
+policy P {
+  fact user: document
+
+  rule typedLet = {
+    let n: number = user.missing
+    yield n
+  }
+
+  export decision of typedLet
+}
+```
+
+With `{"user": {}}` the rule is `unknown`, the same as with `let n = user.missing`. A value that is present is still validated, so `let n: number = user.name` fails when `user.name` is a string. Because constraints are not checked on an undefined value, a constraint is also not evaluated there.
+
+Before this change a typed `let` failed with `value undefined is not a number` where the untyped form gave `unknown`. To require a value, test it with `is defined` or `is number`, which reject undefined, or use a cast such as `user.age as number`.
 
 ### Typed let with constraints
 
