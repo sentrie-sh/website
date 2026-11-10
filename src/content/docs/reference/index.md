@@ -194,7 +194,7 @@ rule deny: list[string] = []
 contribute deny when user.disabled { yield "user disabled" }
 ```
 
-`contribute` is a reserved keyword, so it cannot be used as an identifier or a namespace segment. It can still be a field name, as in `user.contribute`.
+`contribute` is a reserved keyword, so it cannot be used as a rule, fact, policy, shape or let name, or as the first segment of a namespace. It can still be a field name, as in `user.contribute`.
 
 ## Expressions
 
