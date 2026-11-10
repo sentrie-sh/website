@@ -25,7 +25,7 @@ You can customize the run using the following options:
 | `--fact-file` | path | No | Path to JSON file; top-level object gives facts. Loaded first; `--facts` overrides. |
 | `--output` | enum | No | `table` or `json`. Default: `table`. |
 
-**Returns:** Exit 0 on success; non-zero on error. Output goes to stdout: table (human-readable) or JSON array of decision objects (namespace, policyName, ruleName, decision.state, decision.value, attachments).
+**Returns:** Exit 0 on success; non-zero on error. Output goes to stdout: table (human-readable) or JSON array of decision objects (namespace, policyName, ruleName, decision.state, decision.value, attachments). The `Error:` line goes to stderr. When a rule of a policy fails, `exec` still prints every rule (a failed rule has an `error` object in JSON and a line under `Errors:` in the table) and then exits 1 with `Error: <n> of <m> rules failed`.
 
 ---
 
@@ -78,5 +78,5 @@ sentrie exec docs/ids/accounts/echo \
 Before you rely on this in scripts or CI, keep a few boundaries in mind:
 
 - **Constraint:** Required facts must be present (in `--facts` and/or `--fact-file`). Optional facts may be omitted if they have defaults. Keys must match fact names or aliases; types must satisfy declared shapes. Facts from `--fact-file` are loaded first; `--facts` overrides conflicting keys. Table output lists namespace, policy, rules, values, attachments; JSON is an array of decision objects. Decision states are `TRUE`, `FALSE`, or `UNKNOWN`.
-- **Edge case:** Invalid or missing TARGET (unknown namespace/policy/rule) → error; rule must be exported. Missing required fact → evaluation error. Invalid JSON in `--facts` or `--fact-file` → error. `--fact-file` path must exist and be readable. Pack directory must contain loadable `*.sentrie`. For the full HTTP API, see [Running as a Service](/deployment-operations/running-as-service).
+- **Edge case:** Invalid or missing TARGET (unknown namespace/policy/rule) → error; rule must be exported. Missing required fact → evaluation error. A rule that fails while the policy runs does not stop the others: all rules are printed, then the command exits 1 with `<n> of <m> rules failed` (see [Executing Policies](/running-sentrie/executing-policies#when-a-rule-fails)). The order of the rules in the output is not guaranteed. Invalid JSON in `--facts` or `--fact-file` → error. `--fact-file` path must exist and be readable. Pack directory must contain loadable `*.sentrie`. For the full HTTP API, see [Running as a Service](/deployment-operations/running-as-service).
 - **Large integers:** Integers that fit in 64 bits are read exactly, so a large ID keeps every digit. A number outside the float range, such as `1e400`, fails with `facts: number 1e400 is out of range` (`fact file: ...` for `--fact-file`). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).

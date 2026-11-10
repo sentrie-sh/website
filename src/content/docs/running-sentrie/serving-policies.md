@@ -258,7 +258,7 @@ Integers in `facts` that fit in 64 bits are read exactly, so an ID such as `9007
 }
 ```
 
-A successful evaluation is HTTP **200** with a `decisions` array and **no** `error` field. Failures do not return 200 with an error string - they use [Problem Details](#error-responses) below.
+A policy request in which every rule evaluated is HTTP **200** with a `decisions` array. If any rule failed, the response is **207 Multi-Status** instead; see [When a Rule Fails](#when-a-rule-fails) below. Request errors do not return 200 with an error string - they use [Problem Details](#error-responses) below.
 
 **Response Fields:**
 
@@ -271,6 +271,7 @@ A successful evaluation is HTTP **200** with a `decisions` array and **no** `err
     - `value`: The actual value of the decision (any JSON-serializable type)
   - `attachments`: Any attachments exported by the rule (dict of string to any)
   - `trace`: Execution trace information (object, optional)
+  - `error`: Present only when this rule failed; see [When a Rule Fails](#when-a-rule-fails)
 
 **Decision States:**
 
@@ -308,6 +309,54 @@ curl -X POST http://localhost:7529/decision/com/example/auth/user \
   }'
 ```
 
+### When a Rule Fails
+
+A rule can fail while it is evaluated (a division by zero, a value of the wrong type, an exceeded deadline). On a request for a whole policy, the failure is reported for that rule only and the other rules are still evaluated:
+
+- The response is **207 Multi-Status** when any rule failed, including when every rule failed, and **200 OK** otherwise.
+- The body is the same `{"decisions": [...]}`, with one entry per exported rule. A failed rule has an `unknown` decision and an `error` object; a rule that succeeded has no `error` field.
+- `error.status` is the HTTP status that failure would have had on its own: `400` for an invalid invocation, `503` for a deadline, `500` otherwise.
+
+```json
+{
+  "decisions": [
+    {
+      "policy": "access",
+      "namespace": "docs/checks",
+      "rule": "ratio",
+      "decision": { "state": "unknown", "value": null },
+      "attachments": null,
+      "trace": { ... },
+      "error": {
+        "title": "Evaluation Failed",
+        "status": 500,
+        "detail": "divide by zero"
+      }
+    },
+    {
+      "policy": "access",
+      "namespace": "docs/checks",
+      "rule": "is_admin",
+      "decision": { "state": "true", "value": true },
+      "attachments": {},
+      "trace": { ... }
+    }
+  ]
+}
+```
+
+Treat `207` as a success of the request that contains failures: read each decision, and check its `error` before you trust its `decision`.
+
+Three things are not per-rule errors and answer with a [Problem Details](#error-responses) document:
+
+- A fact error: a required fact is missing, or a fact is invalid. This is a problem with the request, so it is a `400`.
+- A request for a single rule (`/decision/{namespace}/{policy}/{rule}`) whose rule fails. The status follows the failure (`400`, `503` or `500`).
+- A policy that cannot be resolved (`404`).
+
+:::note
+The order of the entries in `decisions` is not guaranteed and can differ between requests. Match results by `namespace`, `policy` and `rule`, not by position.
+:::
+
 ## Error Responses
 
 The API uses RFC 9457 Problem Details format for error responses.
@@ -332,11 +381,12 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 
 **Common HTTP Status Codes:**
 
-- `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` only.
-- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact (`InvalidInvocation`)
+- `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` and no rule has an `error`.
+- `207 Multi-Status`: A policy request in which at least one rule failed. Body is `{"decisions": [...]}`; see [When a Rule Fails](#when-a-rule-fails). This is not a Problem Details response.
+- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required or invalid fact (`InvalidInvocation`)
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
-- `500 Internal Server Error`: Evaluation failed for an internal reason
+- `500 Internal Server Error`: Evaluation failed for an internal reason (on a single-rule request)
 
 A failed single-rule evaluation does not include a `null` entry in `decisions`; the handler returns Problem Details instead.
 
@@ -367,6 +417,6 @@ Please refer to the latest codebase for the most current implementation details.
 
 1. **Use Specific Rules**: When possible, evaluate specific rules rather than entire policies for better performance and clearer results
 2. **Validate Facts**: Ensure facts match the expected types and shapes defined in your policies
-3. **Handle Errors**: Treat non-200 responses as failures and parse the Problem Details body. A 200 response has no `error` field.
+3. **Handle Errors**: Parse the Problem Details body of a 4xx or 5xx response. Accept both 200 and 207 for a policy request, and check each decision's `error` field on a 207.
 4. **Use Health Checks**: Monitor `/health` to ensure the server is running, and `/health/deep` to ensure it is ready to evaluate policies
 5. **Secure Connections**: In production, use HTTPS and implement proper authentication/authorization
