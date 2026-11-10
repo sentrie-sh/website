@@ -11,7 +11,7 @@ Some builtins take extra arguments that are **callables**: values you write inli
 
 Returns the number of elements in a collection or the length of a string.
 
-The `count` function accepts a list, dict, set or string and returns the number of elements or characters. Anything else is an error: `count(5)` and `count(true)` are rejected by `sentrie validate` when the argument's kind is known statically, and stop evaluation at runtime when it is only known then. `count(null)` is an error. `count(undefined)` (for example a missing optional fact) is undefined.
+The `count` function accepts a list, dict, set or string and returns the number of elements or characters. Anything else is an error: `count(5)` and `count(true)` are rejected by `sentrie validate` when the argument's kind is known statically, and stop evaluation at runtime when it is only known then. `count(null)` is an error. `count(undefined)` (for example a missing optional list fact) is undefined.
 
 **Breaking change (v0.0.5):** `count` of a number, bool or other non-collection used to return undefined. It is now an error, so a pack that counted such a value fails to validate or evaluate.
 
