@@ -20,7 +20,7 @@ shape Name {
 }
 ```
 
-A field name can be any identifier or any keyword, so `version: string` and `default?: number` are valid. Fields are separated by newlines, not commas. See [Keywords as field names](/reference/identifiers#keywords-as-field-names).
+A field name can be any identifier or any keyword, so `version: string` and `default?: number` are valid. Fields are separated by whitespace or newlines, not commas. See [Keywords as field names](/reference/identifiers#keywords-as-field-names).
 
 Each field has a name, an optional `?` suffix on the name, a colon, and a type (any [type or shape](/reference/types-and-values)). A `?` on the name makes the field optional; a `?` after the type makes its value nullable.
 
