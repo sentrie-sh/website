@@ -8,7 +8,7 @@ The type system defines values (primitives, collections, documents) and structur
 
 ## Syntax
 
-**Primitives:** `number` | `string` | `trinary` | `bool` | `document`
+**Primitives:** `number` | `string` | `trinary` | `boolean` | `document`
 
 **Collections:** `list[T]` | `dict[T]` | `record[T1, T2, ...]`
 
@@ -68,7 +68,7 @@ let e: Extended = { id: "1", role: "admin" }
 
 Before you implement this, keep a few boundaries in mind:
 
-- **Primitives:** `number` (exact 64-bit integer or float), `string`, `trinary` (`true`/`false`/`unknown`), `bool` (subset of trinary), `document` (JSON-like).
+- **Primitives:** `number` (exact 64-bit integer or float), `string`, `trinary` (`true`/`false`/`unknown`), `boolean` (strictly `true` or `false`; rejects `unknown`), `document` (JSON-like).
 - **Collections:** `list[T]` index by number; `dict[T]` keys are strings (dot or `["key"]` access); `record[T1,T2,...]` fixed-length tuple.
 - **Shapes:** Define contracts for facts and `let` bindings. Optional fields may be omitted; use `is defined` to check.
 - **Constraints:** Validate at runtime. Failing constraint validation aborts evaluation immediately.

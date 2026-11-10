@@ -64,7 +64,7 @@ Language keywords are reserved and cannot be used as identifiers. Using them as 
 | :------ | :---- |
 | `string` | String type. |
 | `number` | Numeric type. |
-| `bool` | Boolean type. |
+| `boolean` | Boolean type: strictly `true` or `false`. |
 | `trinary` | Three-valued logic type. |
 | `document` | Unstructured JSON-like value. |
 | `list` | List collection type. |

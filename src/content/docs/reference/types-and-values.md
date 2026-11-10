@@ -3,11 +3,11 @@ title: Types and Values
 description: "Built-in primitive and collection types, unions, the any type, type declarations, indexing, cast, and validation."
 ---
 
-Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `document`) and collection types (`list[T]`, `dict[T]`, `set[T]`, `record[T1,T2,...]`), [union types](#union-types) and the [`any` type](#the-any-type). User-defined [shapes](/reference/shapes) extend these. Types can be used in [let](/reference/let), [facts](/reference/facts), and shape fields. Types may carry [constraints](/reference/constraints) for runtime validation.
+Sentrie provides primitive types (`number`, `string`, `trinary`, `boolean`, `document`) and collection types (`list[T]`, `dict[T]`, `set[T]`, `record[T1,T2,...]`), [union types](#union-types) and the [`any` type](#the-any-type). User-defined [shapes](/reference/shapes) extend these. Types can be used in [let](/reference/let), [facts](/reference/facts), and shape fields. Types may carry [constraints](/reference/constraints) for runtime validation.
 
 ## Syntax
 
-**Primitives:** `number` | `string` | `trinary` | `bool` | `document`
+**Primitives:** `number` | `string` | `trinary` | `boolean` | `document`
 
 **Collections:** `list[T]` | `dict[T]` | `set[T]` | `record[T1, T2, ...]`
 
@@ -25,12 +25,20 @@ Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `docume
 
 ### Primitive types
 
+:::caution[Breaking change: `bool`, `int` and `float` are not types]
+The only type names for numbers and truth values are `number`, `boolean` and `trinary`. `bool`, `int` and `float` are not aliases: using any of them where a type is expected is a parse error with a hint, for example `unknown type "bool": did you mean "boolean"?` (`number` for `int` and `float`). Replace `let ok: bool = ...` with `boolean`, and `int` or `float` with `number`.
+
+The three words are still ordinary identifiers, so `let int = 5` or a field named `bool` keeps working. A shape cannot be named `bool`, `int` or `float` (parse error), because it could never be referenced as a type.
+
+A `number` already holds either an exact integer or a float (see [Integers and floats](#integers-and-floats)), so there is nothing to choose between.
+:::
+
 | Type | Description | Notes |
 | :--- | :---------- | :---- |
 | `number` | Numeric values: exact 64-bit integers and 64-bit floats. | Whole numbers that fit in a signed 64-bit integer stay exact; see [Integers and floats](#integers-and-floats). |
 | `string` | UTF-8 string. | Literals: double-quoted or backtick. |
-| `trinary` | Three-valued logic: `true`, `false`, `unknown`. | Used for conditions and [boolean operations](/reference/boolean-operations). See [Trinary](/reference/trinary). |
-| `bool` | Two-valued: `true`, `false`. | Subset of trinary; no `unknown` literal for bool, but expressions can produce trinary. |
+| `trinary` | Three-valued logic: `true`, `false`, `unknown`. Accepts all three. | Used for conditions and [boolean operations](/reference/boolean-operations). See [Trinary](/reference/trinary). |
+| `boolean` | Strictly `true` or `false`. | Behaves like a `trinary` that rejects `unknown`: a value that is `unknown` fails the check with `value 'unknown' is not a boolean ... use trinary to allow unknown`. Use `trinary` when `unknown` is a valid answer. |
 | `document` | JSON-like object (string keys, arbitrary values). | Used for untyped or semi-structured data. |
 
 ### Number literals
@@ -237,7 +245,7 @@ Use it for data whose structure you do not want to validate, such as a fact that
 
 ### Cast
 
-The postfix cast `expr as type` converts the value of `expr` to the given type. The result is validated against the type and any [constraints](/reference/constraints) on that type. If conversion or validation fails, evaluation errors; it never yields an unchecked value. `as` binds to the expression on its left, so write `(a + b) as number` to cast a sum. Supported conversions include string↔number, number↔string, bool↔string, and literal document to `document`.
+The postfix cast `expr as type` converts the value of `expr` to the given type. The result is validated against the type and any [constraints](/reference/constraints) on that type. If conversion or validation fails, evaluation errors; it never yields an unchecked value. `as` binds to the expression on its left, so write `(a + b) as number` to cast a sum. Casting `unknown` to `boolean` is an error. Supported conversions include string↔number, number↔string, boolean↔string, and literal document to `document`.
 
 **Returns:** N/A for type declarations. For a cast: the value after conversion and validation; failure is an evaluation error.
 
@@ -261,10 +269,10 @@ The postfix cast `expr as type` converts the value of `expr` to the given type. 
 ```text
 let u: number = 50
 let s: string = "hello"
-let b: bool = true
+let b: boolean = true
 let arr: list[number] = [1, 2, 3]
 let m: dict[number] = { "one": 1, "two": 2 }
-let r: record[string, number, bool] = ["one", 1, true]
+let r: record[string, number, boolean] = ["one", 1, true]
 ```
 
 ### Indexing
@@ -280,7 +288,7 @@ let oneAlt: number = m.one
 ```text
 let x: number = "50" as number
 let y: string = 50 as string
-let z: bool = "true" as bool
+let z: boolean = "true" as boolean
 let doc: document = { "name": "John", "age": 30 } as document
 ```
 
@@ -441,7 +449,7 @@ let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 Every element of a collection is checked against its element type. A value typed `dict[number]` rejects `{"a": 1, "b": "two"}` with an error naming the key, `value for key "b" is not valid`. When several values fail, the first failing key in sorted order is reported. In an `is` check the mismatch gives `false`: `{"b": "two"} is dict[number]` is `false`.
 
 ```text
-let u: record[string, number, bool] = ["one", 1, true]
+let u: record[string, number, boolean] = ["one", 1, true]
 ```
 
 ```text
@@ -519,7 +527,7 @@ let u: string = 50 as string
 ```
 
 ```text
-let u: bool = "true" as bool
+let u: boolean = "true" as boolean
 ```
 
 ```text
