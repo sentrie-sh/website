@@ -440,6 +440,10 @@ let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 
 Every element of a collection is checked against its element type. A value typed `dict[number]` rejects `{"a": 1, "b": "two"}` with an error naming the key, `value for key "b" is not valid`. When several values fail, the first failing key in sorted order is reported. In an `is` check the mismatch gives `false`: `{"b": "two"} is dict[number]` is `false`.
 
+The check includes the constraints on `T`: with `dict[number @min(0) @max(100)]`, `{"a": 50, "b": 150}` fails with `value for key "b" is not valid`, followed by the failed constraint. When `T` is a [shape](/reference/shapes#closed-and-open-shapes), each value is checked against it, so a value with a field the shape does not declare is rejected too, with the key named.
+
+A dict literal with a repeated key is not an error: the last value wins and nothing is reported (`{ "k": 1, "k": 2 }` has `k` equal to `2`).
+
 ```text
 let u: record[string, number, bool] = ["one", 1, true]
 ```
