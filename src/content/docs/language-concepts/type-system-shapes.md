@@ -37,7 +37,7 @@ shape Name {
 | `field?: T`   | No       | Optional; the field may be omitted, and if present is not null.  |
 | `field: T?`   | No       | Required but nullable; the field must be present and may be null. |
 | `field?: T?`  | No       | Optional and nullable.                                           |
-| `with Base`   | No       | Shape inherits all fields of Base plus its own.                  |
+| `with Base`   | No       | Inherits Base's fields. Cross-namespace bases must be qualified and exported.|
 
 **Returns:** N/A (type system). Constraint validation fails at runtime if a value does not meet the type or constraints; evaluation aborts.
 
@@ -78,4 +78,5 @@ Before you implement this, keep a few boundaries in mind:
 - Map keys must be strings.
 - Type annotation on `let` is optional; if omitted, values are not validated against types.
 - Circular shape composition is not allowed.
+- A `with` base is looked up in the enclosing policy, then the shape's namespace. A base in another namespace must be written qualified (`with com/base/Base`) and exported there with `export shape Base`; an unqualified or unexported cross-namespace base fails validation. See [Composition](/reference/shapes#composition-extending-a-base-shape).
 - Exported shapes are visible across namespaces; unexported shapes are namespace-local.
