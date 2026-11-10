@@ -505,7 +505,22 @@ policy output {
 
 `nested` has the decision value `{"f":{"kind":"callable"},"n":1}`. The trace of `positive` shows the lambda passed to `filter` as `"result": {"kind":"callable"}`, while its decision value is the filtered list. Table output prints a nested lambda as `<callable>`.
 
-A rule whose **whole value** is a lambda (`rule fn = { yield (x) => { yield x } }`) has no useful value to report, so it is that rule's error: `rule com/example/lambdas/output/fn: a rule's value cannot be a callable`. `sentrie exec` prints the error and exits 1, also when you run the whole policy. `sentrie serve` answers `500` with an `application/problem+json` document titled `Evaluation Failed`. A rule that reaches such a rule with `import decision` fails with the same error.
+A **reported** rule whose **whole value** is a lambda (`rule fn = { yield (x) => { yield x } }`) has no useful value to report, so it is that rule's error: `rule com/example/lambdas/output/fn: a rule's value cannot be a callable`. A rule is reported when it is exported and you run it with `sentrie exec` or `sentrie serve`, or when another rule imports it with `import decision`. `sentrie exec` prints the error and exits 1, also when you run the whole policy. `sentrie serve` answers `500` with an `application/problem+json` document titled `Evaluation Failed`. A rule that reaches such a rule with `import decision` fails with the same error.
+
+An unexported helper rule whose value is a lambda is not reported, so it works as a callback:
+
+```sentrie
+namespace com/example/lambdas
+
+policy helpers {
+  rule helper = (x) => { yield x > 1 }
+  rule picked = { yield filter([1, 2, 3], helper) }
+
+  export decision of picked
+}
+```
+
+`picked` has the decision value `[2, 3]`. Exporting `helper` would turn it into a reported rule and make it fail with the error above.
 
 ### Lexical environment
 
