@@ -593,14 +593,27 @@ The composed shape includes all fields from the base shape plus any additional f
 
 Constraints can be applied to primitives, collections, and shape fields:
 
-```text
+```sentrie
+namespace docs/reference
+
 shape User {
-  name: string @length(1, 100)
+  name: string @minlength(1) @maxlength(100)
   age: number @min(0) @max(150)
-  email: string @email
-  tags: list[string] @maxlength(10)
+  email: string @email()
+  tags: list[string] @not_empty()
 }
 
+policy users {
+  fact user: User
+
+  rule valid = true
+  export decision of valid
+}
+```
+
+Collection types take constraints on their elements:
+
+```text
 let numbers: list[number] = [1, 2, 3]
 let scores: dict[number @min(0) @max(100)] = {"alice": 95, "bob": 87}
 ```
