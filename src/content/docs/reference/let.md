@@ -263,20 +263,27 @@ Type annotations can be used with `let` declarations to help with type safety an
 ### Without Type Annotation
 
 ```sentrie
--- Type is inferred from the expression
-let count = 10        -- inferred as number
-let name = "John Doe" -- inferred as string
-let isActive = true   -- inferred as bool
-let items = [1, 2, 3] -- inferred as list[number]
+namespace example/lets
+
+policy inferred {
+  -- Type is inferred from the expression
+  let count = 10        -- inferred as number
+  let name = "John Doe" -- inferred as string
+  let isActive = true   -- inferred as boolean
+  let items = [1, 2, 3] -- inferred as list[number]
+
+  rule ok: boolean = isActive
+  export decision of ok
+}
 ```
 
 ### With Type Annotation
 
-```sentrie
+```text
 -- Explicit type annotations
 let count: number = 10
 let name: string = "example"
-let isActive: bool = true
+let isActive: boolean = true
 let items: list[number] = [1, 2, 3]
 let scores: dict[number] = {"alice": 95, "bob": 87}
 
