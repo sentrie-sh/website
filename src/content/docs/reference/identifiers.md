@@ -104,13 +104,13 @@ policy p {
 }
 ```
 
-With `d` = `{"title": "T", "version": "1.2", "in": true}` and `input` = `{"version": "9"}`, the rule `reads` yields `"T/9"` and the decision carries `"attachments": {"version": "1.2", "default": 5}`.
+With `d` = `{"title": "T", "version": "1.2", "in": true}`, `input` = `{"version": "9"}` and `obj` = `{"true": {"null": 1}}`, the rule `reads` yields `"T/9"` and the decision carries `"attachments": {"version": "1.2", "default": 5}`.
 
 Things to know:
 
 - The word after a `.` is always a field name, so `x.in`, `x.not`, `x.is` and `x.true.null` are field accesses. An operator keeps its meaning when it comes after the access: `x.is is defined` reads the field `is` and then tests it, `2 in [x.in]` is a membership test and `x.contains contains 7` is the `contains` operator applied to the field `contains`.
 - A key that is not an identifier, such as `a-b`, still needs brackets: `d["a-b"]`.
-- Shape fields are separated by newlines, not commas.
+- Shape fields are separated by whitespace or newlines, not commas.
 - A bare dict literal key must still be quoted: `{title: 1}` is a parse error, `{"title": 1}` works.
 - Rule, fact, policy, shape and let names still cannot be keywords. `rule let = ...` is a parse error.
 - `sentrie fmt` keeps keyword field names as written.
