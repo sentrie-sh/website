@@ -72,7 +72,7 @@ Every field in a shape body has two independent properties: whether the field is
 - **Nullable:** If the field is present and its value is `null`, validation fails unless the type is nullable (`T?`).
 - **Legacy `!`:** The `!` field modifier has been removed. Write `field!: T` as `field: T`, and `field!?: T` or `field?!: T` as `field?: T`. If an old bare `field: T` relied on being nullable, write `field: T?`.
 
-Field type can be any type reference: primitives (`number`, `string`, `trinary`, `bool`, `document`), collections (`list[T]`, `dict[T]`, `record[...]`), or another shape. Constraints on the type are validated when the value is assigned or when the value is supplied as a fact.
+Field type can be any type reference: primitives (`number`, `string`, `trinary`, `boolean`, `document`), collections (`list[T]`, `dict[T]`, `record[...]`), or another shape. Constraints on the type are validated when the value is assigned or when the value is supplied as a fact.
 
 ### Composition rules
 
@@ -223,7 +223,7 @@ let bad2: Person = {
 :::note[Checking Optional Fields]
 You can check if optional fields are defined using the `is defined` operator:
 
-```sentrie
+```text
 let user: User = {
   name: "Alice",
   age: 25,
@@ -231,7 +231,7 @@ let user: User = {
 }
 
 -- You can also use this in boolean expressions
-let has_phone: bool = user.phone is defined
+let has_phone: boolean = user.phone is defined
 let contact_info: string = user.phone is defined ? user.phone : "No phone available"
 let display_gender: string = user.gender ?: "unknown"
 

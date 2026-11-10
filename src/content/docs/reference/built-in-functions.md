@@ -187,14 +187,14 @@ any(list, (element) => { yield expression })
 any(list, (element, index) => { yield expression })
 ```
 
-```sentrie
+```text
 let numbers: list[number] = [1, 2, 3, 4, 5]
-let has_even: bool = any(numbers, (num, idx) => {
+let has_even: boolean = any(numbers, (num, idx) => {
   yield num % 2 == 0
 })
 
 let scores: list[number] = [85, 92, 78, 96, 85]
-let has_perfect_score: bool = any(scores, (score) => {
+let has_perfect_score: boolean = any(scores, (score) => {
   yield score == 100
 })
 
@@ -209,7 +209,7 @@ let users: list[User] = [
   { name: "Bob", age: 30, role: "user" }
 ]
 
-let has_admin: bool = any(users, (user) => {
+let has_admin: boolean = any(users, (user) => {
   yield user.role == "admin"
 })
 ```
@@ -223,14 +223,14 @@ all(list, (element) => { yield expression })
 all(list, (element, index) => { yield expression })
 ```
 
-```sentrie
+```text
 let numbers: list[number] = [2, 4, 6, 8, 10]
-let all_even: bool = all(numbers, (num) => {
+let all_even: boolean = all(numbers, (num) => {
   yield num % 2 == 0
 })
 
 let scores: list[number] = [85, 92, 78, 96, 85]
-let all_passing: bool = all(scores, (score) => {
+let all_passing: boolean = all(scores, (score) => {
   yield score >= 80
 })
 ```

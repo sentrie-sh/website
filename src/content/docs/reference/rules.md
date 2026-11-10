@@ -24,7 +24,7 @@ contribute IDENT [ when expr ] { stmt* yield expr }
 | Part | Type | Required | Description |
 | :--- | :--- | :------- | :---------- |
 | `: type` | type | No | Declared result type, checked against the body and the `default`. See [Declaring a rule's type](#declaring-a-rules-type). |
-| `default expr` | expression | No | Fallback outcome when `when` is not truthy. Type can be any value (e.g. bool, number, string). If omitted, non-truthy `when` yields `unknown`. |
+| `default expr` | expression | No | Fallback outcome when `when` is not truthy. Type can be any value (e.g. boolean, number, string). If omitted, non-truthy `when` yields `unknown`. |
 | `when expr` | expression (trinary/truthy) | No | Guard. Evaluated first. Only if [truthy](/reference/trinary) (i.e. `true` in trinary semantics) is the body evaluated. Default when omitted: treated as true. |
 | body | block | Yes | Statements (e.g. `let`) followed by exactly one `yield expr`. Only the chosen branch (body or default) is evaluated; the other is not. |
 
@@ -57,7 +57,7 @@ rule isAdmin = default false when user.role is defined {
 
 If `user.role` is not defined (or expression is false/unknown), outcome is `false`. Otherwise outcome is the result of `user.role == "admin"`.
 
-### Rule yielding a value (not just bool)
+### Rule yielding a value (not just boolean)
 
 ```sentrie
 rule getPrice = default 0 when product.price is defined {
