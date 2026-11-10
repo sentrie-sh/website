@@ -31,7 +31,7 @@ rule localName = import decision of ruleName
 | `ruleName` | identifier | Yes | Rule being exported or imported; must be exported in the target policy. |
 | `namespace/policy` | path | Yes | Fully qualified namespace and policy (e.g. `com/example/auth/userAccess`). Same-namespace: policy name only. |
 | `with fact as expr` | clause | Yes for each required fact | Maps current policy expression to target policy fact name (alias). |
-| `attach name as expr` | clause | No | Evaluated when rule is executed; attached to decision for importers. |
+| `attach name as expr` | clause | No | `name` may be any identifier or keyword (`attach version as ...`). Evaluated when rule is executed; attached to decision for importers. |
 
 **Returns:** Exported rule’s decision (trinary or value). If attachments exist, import returns an object with the decision and attachment fields (e.g. `authResult.role`).
 

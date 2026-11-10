@@ -90,7 +90,7 @@ An integer beyond `Number.MAX_SAFE_INTEGER` (2^53-1) cannot be passed to a [Type
 | Type | Description | Index type | Notes |
 | :--- | :---------- | :--------- | :---- |
 | `list[T]` | Ordered sequence of values of type `T`. | `number` (zero-based). | Index out of range is an error or undefined behavior per implementation. |
-| `dict[T]` | Key-value map; keys are strings, values are type `T`. | `string` or `.key` (identifier). | Keys must be strings. Dot access: `map.key` when key is a [valid identifier](/reference/identifiers). |
+| `dict[T]` | Key-value map; keys are strings, values are type `T`. | `string` or `.key` (identifier). | Keys must be strings. Dot access: `map.key` when key is a [valid identifier or a keyword](/reference/identifiers#keywords-as-field-names). |
 | `set[T]` | Distinct values of type `T`, always written out in sorted order. | Not indexable. | No literal syntax; see [Sets](#sets). Works with `in`, `contains` and `count`. |
 | `record[T1,T2,...]` | Fixed-length tuple with typed positions. | `number` (zero-based position). | Length and types are fixed at type declaration. |
 
@@ -289,7 +289,7 @@ let doc: document = { "name": "John", "age": 30 } as document
 Before you implement this, keep a few boundaries in mind:
 
 - **Type annotation on let:** Optional. When omitted, the value is not validated against a type. When present, the value is validated (and constraints apply); failure aborts evaluation.
-- **Map keys:** Must be strings. Access with `[index]`: numeric index for list/record, string key for map. Dot access for maps only when the key is a [valid identifier](/reference/identifiers).
+- **Map keys:** Must be strings. Access with `[index]`: numeric index for list/record, string key for map. Dot access for maps only when the key is a [valid identifier or a keyword](/reference/identifiers#keywords-as-field-names).
 - **Division by zero:** Aborts evaluation. [Constraint](/reference/constraints) failure also aborts evaluation.
 - **Cast:** Validates against the target type and any constraints; failure aborts evaluation. Not all type combinations may be supported; see implementation for allowed conversions.
 
