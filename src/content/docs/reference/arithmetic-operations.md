@@ -46,7 +46,7 @@ The rules are:
 
 `+` is also the string-joining operator. When either operand is a `string`, the other operand is turned into text and the two are joined, in either order. The rules follow JavaScript for scalars:
 
-```sentrie
+```text
 "a" + 1          -- "a1"
 1 + "a"          -- "1a"
 "a" + 1.0        -- "a1"      (a whole float prints without a fractional part)
@@ -57,7 +57,7 @@ The rules are:
 
 Numbers print the way JavaScript's `Number.prototype.toString` prints them, so large and small floats switch to an exponent only at the same points JavaScript does:
 
-```sentrie
+```text
 "a" + 1e20       -- "a100000000000000000000"
 "a" + 1e21       -- "a1e+21"
 "a" + 0.000001   -- "a0.000001"
