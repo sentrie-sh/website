@@ -507,6 +507,31 @@ You can annotate lambda parameters and the return value:
 
 Optional parameters use `?` after the name (for example `b?`). A required parameter cannot follow an optional one; that ordering is rejected at parse time.
 
+A return value is checked against the declared return type, except that an undefined value passes through unchecked, as it does for an untyped lambda. A required parameter still rejects an undefined argument.
+
+```sentrie
+namespace docs/lambda
+
+policy P {
+  fact order: document
+
+  rule fromLambda = {
+    let f = (d: document): number => { yield d.amount }
+    yield f(order)
+  }
+
+  rule strict = {
+    let f = (x: number): number => { yield x }
+    yield f(order.amount)
+  }
+
+  export decision of fromLambda
+  export decision of strict
+}
+```
+
+With `{"order": {}}`, `fromLambda` is `unknown` and `strict` fails because the argument `x` is undefined, not a number.
+
 ## Derives
 
 **Derives** are named pure functions at namespace or policy scope. They reuse lambda syntax and are documented in the dedicated [Derives](/reference/derives) page (calling rules, FQN slash callees, builtin whitelist, and exports).
