@@ -8,7 +8,7 @@ Good tests make it safe to evolve policies. Sentrie’s CLI is designed to be sc
 ## When to use which command
 
 - **`sentrie exec`**: Execute rules and see decisions. Use for local development, debugging, and “golden” tests that assert specific outputs.
-- **`sentrie validate`**: Load the pack and type-check policies (and optional facts) without executing rules. Use to catch syntax, type, and pack errors early, especially in CI.
+- **`sentrie validate`**: Load the pack and run its static checks without executing rules: syntax, undefined identifiers, self-referencing rules, cycles, shape and constraint errors. Use to catch these early, especially in CI.
 
 See:
 
@@ -67,19 +67,15 @@ Add a validation step to your CI pipeline to catch errors before deploy:
 
 ```bash
 # Validate the whole pack from the repo root
-sentrie validate com/example/auth/access --pack-location ./policy-pack
+sentrie validate --pack-location ./policy-pack
 ```
 
-You can optionally pass representative facts to catch shape and constraint issues:
+`validate` always checks the whole pack and takes no target and no facts. Earlier releases accepted a `namespace/policy` target and a `--facts` flag and ignored both; they are now errors, so remove them from existing CI jobs.
 
-```bash
-sentrie validate com/example/auth/access \
-  --pack-location ./policy-pack \
-  --facts '{"user":{"role":"admin","status":"active"}}'
-```
+Among other things it fails the build on a rule that refers to itself (`rule r = r`) and on an identifier that names nothing in scope, such as a typo in a fact name. It does not check facts. To exercise a policy against representative facts, run `sentrie exec` with `--fact-file`, as above.
 
 Recommended pattern:
 
-1. Run `sentrie validate` on the main policies you care about.
+1. Run `sentrie validate` on the pack.
 2. Run a small set of `sentrie exec ... --output json` commands and assert on the JSON in your CI language of choice.
 

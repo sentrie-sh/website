@@ -22,7 +22,7 @@ All CLI commands follow a simple convention:
 Common cases:
 
 - `sentrie exec`: non-zero on pack load failure, invalid target, missing required facts, or evaluation error.
-- `sentrie validate`: non-zero on pack load failure, parse or type error, or invalid facts passed for validation.
+- `sentrie validate`: non-zero on pack load failure, parse error, a failed static check (such as a self-referencing rule or an undefined identifier), or a stray argument. It takes no facts.
 - `sentrie serve`: non-zero on startup if the pack cannot be loaded or the port/listen configuration is invalid.
 
 See:
