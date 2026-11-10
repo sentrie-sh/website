@@ -1,6 +1,6 @@
 ---
 title: Arithmetic Operations
-description: "Arithmetic operators (+, -, *, /, %), unary +/-, operand types, and edge cases including division by zero."
+description: "Arithmetic operators (+, -, *, /, %), unary +/-, operand types, string concatenation with +, and edge cases including division by zero."
 ---
 
 Arithmetic operators operate on `number`. A `number` holds either an **exact integer** (a whole number that fits in a signed 64-bit integer, from `-9223372036854775808` to `9223372036854775807`) or a **float** (a 64-bit floating-point number). You never declare which one you want: whole numbers you write, or receive in facts, stay exact integers, and anything with a fractional part or an exponent is a float. The result of every arithmetic operation is `number`. Division by zero and modulo by zero abort evaluation with an error.
@@ -15,7 +15,7 @@ Arithmetic operators operate on `number`. A `number` holds either an **exact int
 
 | Operator | Description | Operands | Result | Edge case |
 | :------- | :---------- | :------- | :----- | :-------- |
-| `+` | Addition | number, number | number | Integer overflow → error. |
+| `+` | Addition, or string concatenation | number, number (or a string with a scalar) | number (or string) | Integer overflow → error. See [String concatenation](#string-concatenation). |
 | `-` | Subtraction | number, number | number | Integer overflow → error. |
 | `*` | Multiplication | number, number | number | Integer overflow → error. |
 | `/` | Division | number, number | number | Divisor zero → error; evaluation aborts. Integer with integer is an integer only when exact, otherwise a float. |
@@ -41,6 +41,35 @@ The rules are:
 - **Equality and ordering are exact** across both forms. [Comparing numbers](#comparing-numbers) covers the details.
 - An integer literal too large for 64 bits, such as `18446744073709551616`, is read as a float.
 - A JSON fact written as `5.0` or `1e3` is a float, even though its value is whole.
+
+### String concatenation
+
+`+` is also the string-joining operator. When either operand is a `string`, the other operand is turned into text and the two are joined, in either order. The rules follow JavaScript for scalars:
+
+```sentrie
+"a" + 1          -- "a1"
+1 + "a"          -- "1a"
+"a" + 1.0        -- "a1"      (a whole float prints without a fractional part)
+"a" + 1.5        -- "a1.5"
+"a" + true       -- "atrue"
+"a" + null       -- "anull"
+```
+
+Numbers print the way JavaScript's `Number.prototype.toString` prints them, so large and small floats switch to an exponent only at the same points JavaScript does:
+
+```sentrie
+"a" + 1e20       -- "a100000000000000000000"
+"a" + 1e21       -- "a1e+21"
+"a" + 0.000001   -- "a0.000001"
+"a" + 1e-7       -- "a1e-7"
+```
+
+Two cases behave differently:
+
+- **A list or dict beside a string is an error.** `"a" + [1, 2]` stops evaluation with `+ cannot join a string with a list` (and `... with a dict` for a dict). Join the elements yourself instead of relying on `+`.
+- **Undefined or unknown beside a string gives unknown**, in either order. `"a" + x` is `unknown` when `x` is undefined (for example a missing optional fact or a missing dict key) or `unknown`. Without a string in the expression, undefined still propagates as undefined: `1 + x` is undefined.
+
+**Breaking change (v0.0.5):** a list or dict joined to a string used to produce text; it is now an error. Packs that relied on that must convert the value first.
 
 ### Division
 
@@ -144,7 +173,7 @@ let area: number = rect.width * rect.height
 
 Before you implement this, keep a few boundaries in mind:
 
-- **Operands:** All operands are `number`, which is an exact 64-bit integer or a float. An operation on an integer and a float is a float operation.
+- **Operands:** Apart from [string concatenation](#string-concatenation), all operands are `number`, which is an exact 64-bit integer or a float. An operation on an integer and a float is a float operation.
 - **Division:** Two integers divide to an integer only when exact (`10 / 2` is `5`); otherwise the result is a float (`7 / 2` is `3.5`). Division by zero aborts evaluation. Use a guard (e.g. ternary or `when`) to avoid dividing by zero.
 - **Modulo:** Truncated remainder, taking the sign of the left operand (`-7 % 3` is `-1`). Divisor zero aborts evaluation.
 - **Overflow:** An integer result outside the signed 64-bit range is an error, never a wrap-around.
