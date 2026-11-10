@@ -11,7 +11,7 @@ Constraints validate values at runtime using the `@` syntax on types. They apply
 type @constraint1(args) @constraint2
 ```
 
-Examples: `number @min(0) @max(100)`, `string @email`, `list[string @one_of("a","b")]`. Multiple constraints can be chained; all must pass. Constraint arguments are literals: numbers, strings and trinary values. A number argument can be negative (see [Negative arguments](#negative-arguments)).
+Examples: `number @min(0) @max(100)`, `string @email()`, `list[string @one_of("a","b")]`. Multiple constraints can be chained; all must pass. Constraint arguments are literals: numbers, strings and trinary values. A number argument can be negative (see [Negative arguments](#negative-arguments)).
 
 A number argument to a constraint can use [exponent notation](/reference/types-and-values/#number-literals):
 
@@ -167,6 +167,7 @@ With facts `{"homepage": "http://localhost:8080/status", "mirror": "ssh://10.0.0
 
 - With no arguments (`@url()`), only `http` and `https` pass.
 - Scheme arguments **replace** that default set. `@url("ftp")` accepts only `ftp`, not `http`; to accept the web schemes as well, list them: `@url("http", "https", "ftp")`. Schemes compare case-insensitively.
+- Schemes without a host, such as `mailto:` and `urn:`, never pass `@url`, even when listed as arguments (`@url("mailto")` still rejects `mailto:a@b.c`), because a host is required.
 - `localhost:8080` (it parses as scheme `localhost`), `/path` and `http://` fail because there is no scheme or no host. A scheme argument that is not valid scheme syntax, such as `@url("ftp://")`, is an invalid argument and is reported when the pack is validated.
 
 ### String length
