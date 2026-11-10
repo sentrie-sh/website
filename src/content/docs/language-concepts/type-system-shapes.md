@@ -58,10 +58,19 @@ let u: User = { name: "Alice", age: 28 }
 ### Going further
 
 ```sentrie
+namespace com/example/users
+
 shape Base { id: string }
 shape Extended with Base { role: string }
 
-let e: Extended = { id: "1", role: "admin" }
+policy example {
+  fact v: document
+
+  let e: Extended = { "id": "1", "role": "admin" }
+
+  rule ok = { yield v is Extended }
+  export decision of ok
+}
 ```
 
 ## Good to Know

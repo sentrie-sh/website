@@ -52,6 +52,17 @@ The child shape’s effective fields are the union of the base’s fields and th
 - **Unqualified base that only another namespace exports**: this is an error, not a lookup. Validation fails with `shape 'A' ... is exported by another namespace and must be qualified: use com/base/A`. Write the qualified name.
 - **A name found nowhere**: `shape 'A' not found`.
 
+A namespace that exports the base:
+
+```sentrie
+namespace com/base
+
+shape A { id: string }
+export shape A
+```
+
+And a namespace that uses it in each of the three ways:
+
 ```sentrie
 namespace com/app
 
@@ -177,6 +188,8 @@ let p: Percent = 50
 ### Composition
 
 ```sentrie
+namespace com/example/users
+
 shape Base { id: string }
 shape Extended with Base { role: string }
 ```
@@ -633,7 +646,10 @@ shape Base { id: string }
 export shape Base
 
 policy P {
-  -- ...
+  fact v: document
+
+  rule ok = { yield v is Base }
+  export decision of ok
 }
 ```
 
