@@ -86,7 +86,7 @@ A request for a policy answers `207 Multi-Status` when any rule failed (also whe
 | Health | GET | `/health` | none |
 | Decision | POST | `/decision/{namespace}/{policy}[/{rule}]` | `{ "facts": { ... } }` |
 
-**Returns:** See schemas above. 200 for success; 207 when a rule of a policy request failed; 400 for invalid JSON or path, or a missing or invalid fact; 404 for unknown policy/rule; 405 for wrong method; 500 for an evaluation error on a single-rule request.
+**Returns:** See schemas above. 200 for success; 207 when a rule of a policy request failed; 400 for invalid JSON or path, or a missing required fact; 404 for unknown policy/rule; 405 for wrong method; 500 for an evaluation error on a single-rule request or, for now, a fact with the wrong type (400 after sentrie-sh/sentrie#147).
 
 ## Examples in Action
 
@@ -134,4 +134,4 @@ Before you implement this, keep a few boundaries in mind:
 - Base URL: default `http://localhost:7529`. `--listen all` binds 0.0.0.0. Only POST is allowed for `/decision/{target...}`. Query parameters are parsed but not used for execution semantics.
 
 
-- Facts must match policy declarations (required facts present; types/shapes valid). Missing or invalid facts return 400. CORS headers are sent (`Access-Control-Allow-Origin: *` etc.). No built-in auth or rate limiting.
+- Facts must match policy declarations (required facts present; types/shapes valid). A missing fact returns 400; a fact with the wrong type returns 500 for now (400 after sentrie-sh/sentrie#147). CORS headers are sent (`Access-Control-Allow-Origin: *` etc.). No built-in auth or rate limiting.

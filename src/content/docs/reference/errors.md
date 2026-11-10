@@ -51,10 +51,10 @@ Typical status codes:
 | Status | Meaning |
 | :----- | :------ |
 | `207` | Multi-Status. Not a problem document: a policy request in which at least one rule failed. The body is the normal `decisions` array and each failed rule has an `error` object. |
-| `400` | Bad request (invalid JSON, missing or malformed path, bad `facts` shape, missing or invalid fact). |
+| `400` | Bad request (invalid JSON, missing or malformed path, bad `facts` shape, missing required fact). |
 | `404` | Policy, namespace, or rule not found. |
 | `405` | Method not allowed (e.g. non-POST on `/decision`). |
-| `500` | Internal error during evaluation of a single-rule request. |
+| `500` | Internal error during evaluation of a single-rule request. For now also a fact with the wrong type (`400` after sentrie-sh/sentrie#147). |
 
 ## Per-rule errors
 
