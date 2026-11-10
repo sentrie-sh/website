@@ -485,6 +485,28 @@ Two limits apply to every execution:
 
 A recursion with a base case that stays within these limits, such as `factorial` above, is not affected.
 
+### Lambdas in decision output
+
+A lambda cannot be written out as JSON, so Sentrie stands in for it. A lambda nested anywhere in a rule's value, in an attachment, or in the trace is encoded as `{"kind":"callable"}`:
+
+```sentrie
+namespace com/example/lambdas
+
+policy output {
+  fact items: list[number]
+
+  rule nested = { "f": (x) => { yield x }, "n": 1 }
+  rule positive = { yield filter(items, (x) => { yield x > 0 }) }
+
+  export decision of nested
+  export decision of positive
+}
+```
+
+`nested` has the decision value `{"f":{"kind":"callable"},"n":1}`. The trace of `positive` shows the lambda passed to `filter` as `"result": {"kind":"callable"}`, while its decision value is the filtered list. Table output prints a nested lambda as `<callable>`.
+
+A rule whose **whole value** is a lambda (`rule fn = { yield (x) => { yield x } }`) has no useful value to report, so it is that rule's error: `rule com/example/lambdas/output/fn: a rule's value cannot be a callable`. `sentrie exec` prints the error and exits 1, also when you run the whole policy. `sentrie serve` answers `500` with an `application/problem+json` document titled `Evaluation Failed`. A rule that reaches such a rule with `import decision` fails with the same error.
+
 ### Lexical environment
 
 Lambdas **capture** the surrounding execution context: names visible where the lambda is written remain visible when the callable runs (for example `user`, `let` bindings in the same block, and facts). In the current language version, that capture uses the **parent execution context by reference**, so later changes to captured bindings can affect a lambda that runs afterward.
