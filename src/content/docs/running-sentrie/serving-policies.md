@@ -29,10 +29,10 @@ The following sections summarize default flags and typical API usage.
   - `local4` - Listen on the IPv4 loopback address (127.0.0.1)
   - `local6` - Listen on the IPv6 loopback address (`::1`)
   - `network` - Listen on all network interfaces, IPv4 and IPv6
-  - `network4` - Listen on all IPv4 interfaces (0.0.0.0)
-  - `network6` - Listen on all IPv6 interfaces (`::`)
+  - `network4` - Listen on `0.0.0.0`
+  - `network6` - Listen on `::`
 
-  A predefined value must be the only `--http-listen` value. `local6` binds `[::1]:<port>` and `network6` binds `[::]:<port>`. If an address cannot be bound, or the list has no addresses, `serve` exits with `invalid or unusable --http-listen: <cause>`.
+  A predefined value must be the only `--http-listen` value. `local6` binds `[::1]:<port>` and `network6` binds `[::]:<port>`. On dual-stack hosts either wildcard also accepts the other address family, same as `network`. If an address cannot be bound, the port is invalid, or an address is empty (`--http-listen=`), `serve` exits with `invalid or unusable --http-listen/--http-port: <cause>`.
 
 ### Examples
 
