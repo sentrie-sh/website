@@ -32,7 +32,7 @@ The following sections summarize default flags and typical API usage.
   - `network4` - Listen on all IPv4 interfaces (0.0.0.0)
   - `network6` - Listen on all IPv6 interfaces (`::`)
 
-  A predefined value must be the only `--http-listen` value.
+  A predefined value must be the only `--http-listen` value. `local6` binds `[::1]:<port>` and `network6` binds `[::]:<port>`. If an address cannot be bound, or the list has no addresses, `serve` exits with `invalid or unusable --http-listen: <cause>`.
 
 ### Examples
 
@@ -51,6 +51,9 @@ sentrie serve --http-listen local --http-port 8080 .
 
 # Listen on multiple interfaces
 sentrie serve --http-listen 192.168.1.100,192.168.100.101 --http-port 8080 .
+
+# Listen on the IPv6 loopback address only
+sentrie serve --http-listen local6 --http-port 8080 .
 ```
 
 ## API Endpoints

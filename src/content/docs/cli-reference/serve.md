@@ -84,6 +84,28 @@ sentrie serve --http-listen 0.0.0.0 --http-listen 127.0.0.1
 - `--http-listen 127.0.0.1` - Listen on localhost
 - `--http-listen 192.168.1.100` - Listen on specific IP
 
+**Predefined values**: `local`, `local4`, `local6`, `network`, `network4` and `network6` are shorthands for common addresses. A predefined value must be the only `--http-listen` value.
+
+| Value      | Binds                                    |
+| ---------- | ---------------------------------------- |
+| `local`    | `localhost:<port>`                       |
+| `local4`   | `127.0.0.1:<port>`                       |
+| `local6`   | `[::1]:<port>` (IPv6 loopback)           |
+| `network`  | all interfaces, IPv4 and IPv6            |
+| `network4` | `0.0.0.0:<port>` (all IPv4 interfaces)   |
+| `network6` | `[::]:<port>` (all IPv6 interfaces)      |
+
+```bash
+# IPv6 loopback only; reachable at http://[::1]:8080
+sentrie serve --http-listen local6 --http-port 8080 .
+```
+
+To listen on a literal IPv6 address, pass it without brackets (for example `--http-listen ::1`); Sentrie adds the brackets when it joins the address and port.
+
+**Errors**: If a listen address cannot be bound (for example the port is already in use), `serve` exits non-zero with `invalid or unusable --http-listen: <cause>`. A listen list with no addresses is rejected the same way, with `invalid or unusable --http-listen: at least one listen address is required`; it never panics.
+
+> `local6` and `network6` previously produced a malformed `[[::1]]` and `[[::]]` address and failed to bind. They now work as documented. This is a bug fix, not a behaviour change for working setups.
+
 **Security Note**: Listening on `0.0.0.0` makes the server accessible from any network interface. Use with caution in production environments.
 
 ## Environment Variables
