@@ -150,7 +150,7 @@ How the rule's own value and its contributions are combined depends on the decla
 | Declared type | Result |
 |---------------|--------|
 | `list[T]` | The rule's own list, followed by the value of each contribution that applies, in declaration order. |
-| `boolean` or `trinary` | The rule's own value combined with each contribution that applies using [`or`](/reference/trinary), following three-valued logic. |
+| `boolean` or `trinary` | The rule's own value combined with each contribution that applies using [`or`](/reference/trinary), following three-valued logic. For a `boolean` rule, a contribution that yields `unknown` is an error; a rule whose own `when` fails, which has no `default`, and which gets no `true` contribution reports `unknown`. |
 
 Each contribution yields a single element for a `list[T]` rule, not a list. The element is checked against `T`.
 

@@ -5,7 +5,7 @@ description: "Three-valued logic (true, false, unknown), truthiness, Kleene AND/
 
 Sentrie uses three values for logic and conditions: `true`, `false`, and `unknown`. `unknown` represents an indeterminate result (e.g. an optional field that is not present, or a comparison involving `unknown`). [Rule](/reference/rules) `when` guards, the [ternary](/reference/boolean-operations) operator (`? :`), and the Elvis operator (`?:`) use **truthiness**: only `true` is truthy; `false` and `unknown` are non-truthy. Logical operators (`and`, `or`, `xor`, `not`/`!`) follow **Kleene** three-valued logic so `unknown` propagates in defined ways.
 
-`unknown` is only valid in a `trinary`. A value declared `boolean` is strictly `true` or `false`: it behaves like a `trinary` that rejects `unknown`, and an `unknown` reaching a `boolean` fact, `let`, rule result or cast is an error. Declare the value `trinary` when `unknown` is a legitimate outcome. The names `bool`, `int` and `float` are not types; see [Types and Values](/reference/types-and-values#primitive-types).
+`unknown` is only valid in a `trinary`. A value declared `boolean` is strictly `true` or `false`: it behaves like a `trinary` that rejects `unknown`, and an `unknown` value yielded by a `boolean` rule, `let`, fact or cast is an error. A `boolean` rule that produces no value at all still reports `unknown`: this happens when its `when` fails, it has no `default`, and no contribution yields `true`. Declare the value `trinary` when `unknown` is a legitimate outcome. The names `bool`, `int` and `float` are not types; see [Types and Values](/reference/types-and-values#primitive-types).
 
 ## Syntax
 
