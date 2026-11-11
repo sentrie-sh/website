@@ -26,7 +26,7 @@ See:
 
 ## Pack permissions (`fs_read`, `net`, `env`)
 
-Policy packs declare what they are allowed to reach at runtime in `sentrie.pack.toml`:
+Policy packs declare permissions in `sentrie.pack.toml`:
 
 ```toml
 [permissions]
@@ -35,9 +35,15 @@ net     = ["https://api.example.com"]
 env     = ["APP_ENV", "API_KEY"]
 ```
 
+:::caution
+Only `env` is enforced in this release. `fs_read` and `net` are validated and then ignored: they do not stop a pack from reading files or reaching the network, and Sentrie prints a warning to stderr when either is non-empty. Do not treat them as a sandbox.
+:::
+
 Recommendations:
 
-- **Principle of least privilege**: Only grant the filesystem paths, hosts, and environment variables a pack truly needs.
+- **Confine the process at the OS level**: Because `fs_read` and `net` gate nothing, restrict file and network access with a container, a read-only filesystem and egress rules.
+- **Only run packs you trust**: Review a pack and its TypeScript modules before deploying it.
+- **Principle of least privilege for `env`**: Only list the environment variables a pack truly needs.
 - **Review permissions for each release**: Treat permission changes like code changes and review them in PRs.
 - **Keep secrets in env, not facts**: Let Sentrie read secrets from permitted environment variables instead of embedding them in facts.
 
