@@ -8,7 +8,7 @@ When you want to run a policy from the command line (to test a rule, debug a dec
 Here is the basic syntax:
 
 ```bash
-sentrie exec <TARGET> [ --pack-location <PATH> ] [ --facts <JSON> ] [ --fact-file <PATH> ] [ --output (table|json) ]
+sentrie exec <TARGET> [ --pack-location <PATH> ] [ --facts <JSON> ] [ --fact-file <PATH> ] [ --output (table|json) ] [ --skip-engine-check ]
 ```
 
 **TARGET** is required: `namespace/policy` or `namespace/policy/rule`. The rest are optional: pack directory, inline facts, fact file, and output format.
@@ -24,6 +24,7 @@ You can customize the run using the following options:
 | `--facts` | JSON string | No | Inline facts. Keys match policy fact names or aliases. Overrides same keys from `--fact-file`. |
 | `--fact-file` | path | No | Path to JSON file; top-level object gives facts. Loaded first; `--facts` overrides. |
 | `--output` | enum | No | `table` or `json`. Default: `table`. |
+| `--skip-engine-check` | bool | No | Do not check the pack's `[engine]` version constraint against this binary. Default: `false`. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional). |
 
 **Returns:** Exit 0 on success; non-zero on error. Output goes to stdout: table (human-readable) or JSON array of decision objects (namespace, policyName, ruleName, decision.state, decision.value, attachments).
 
@@ -78,5 +79,6 @@ sentrie exec docs/ids/accounts/echo \
 Before you rely on this in scripts or CI, keep a few boundaries in mind:
 
 - **Constraint:** Required facts must be present (in `--facts` and/or `--fact-file`). Optional facts may be omitted if they have defaults. Keys must match fact names or aliases; types must satisfy declared shapes. Facts from `--fact-file` are loaded first; `--facts` overrides conflicting keys. Table output lists namespace, policy, rules, values, attachments; JSON is an array of decision objects. Decision states are `TRUE`, `FALSE`, or `UNKNOWN`.
+- **Constraint:** The pack's `[engine]` version constraint is checked against the running binary before anything runs. A mismatch is an error ending `(use --skip-engine-check to load it anyway)`; a dev or unversioned build passes with a warning. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional).
 - **Edge case:** Invalid or missing TARGET (unknown namespace/policy/rule) → error; rule must be exported. Missing required fact → evaluation error. Invalid JSON in `--facts` or `--fact-file` → error. `--fact-file` path must exist and be readable. Pack directory must contain loadable `*.sentrie`. For the full HTTP API, see [Running as a Service](/deployment-operations/running-as-service).
 - **Large integers:** Integers that fit in 64 bits are read exactly, so a large ID keeps every digit. A number outside the float range, such as `1e400`, fails with `facts: number 1e400 is out of range` (`fact file: ...` for `--fact-file`). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).

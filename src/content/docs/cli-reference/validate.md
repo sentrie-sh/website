@@ -8,7 +8,7 @@ When you want to catch policy and pack errors before running or deploying (e.g. 
 Here is the basic syntax:
 
 ```bash
-sentrie validate <TARGET> [ --pack-location <PATH> ] [ --facts <JSON> ]
+sentrie validate <TARGET> [ --pack-location <PATH> ] [ --facts <JSON> ] [ --skip-engine-check ]
 ```
 
 **TARGET** is required (`namespace/policy` or `namespace/policy/rule`). **--pack-location** and **--facts** are optional; facts are used for type-checking when provided.
@@ -22,6 +22,7 @@ You can point validation at a specific policy and pack using the following optio
 | TARGET | string | Yes | `namespace/policy` or `namespace/policy/rule`. Namespace and policy must exist; rule is optional (used for context). |
 | `--pack-location` | path | No | Directory containing the policy pack. Default: `./`. |
 | `--facts` | JSON string | No | Facts for type checking. Validates that fact types and required/optional match declarations. Default: `{}`. |
+| `--skip-engine-check` | bool | No | Do not check the pack's `[engine]` version constraint against this binary. Default: `false`. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional). |
 
 **Returns:** Exit 0 if validation succeeds; non-zero with error messages if pack loading, parsing, type checking, or executor creation fails. No decision output; validation only.
 
@@ -62,6 +63,7 @@ Before you rely on this in CI, keep a few boundaries in mind:
 
 - **Constraint:** Validation checks pack file structure, policy parsing and syntax, namespace/policy/rule references, type annotations and shape constraints, and executor creation (including TypeScript module loading). It does not execute rules. When `--facts` is provided, it validates that fact types and required/optional match declarations and that values satisfy shapes. Errors are printed to stderr; no table or JSON decision output.
 - **Edge case:** Invalid or missing TARGET (unknown namespace/policy) → error. Pack load failure, parse error, type error, or reference error → non-zero exit. `--facts` must be valid JSON; invalid JSON → error. Unlike `exec`, validate does not run policies or produce decision output; use [sentrie exec](/cli-reference/exec) for execution.
+- **Constraint:** Validation checks the pack's `[engine]` version constraint against the running binary, and a mismatch is an error. Pass `--skip-engine-check` to skip it. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional).
 - **Constraint:** Validation checks every constraint's arguments: their number, their kinds, and arguments that can never work, such as a pattern that does not compile or `@multiple_of(0)`. See [Constraint Arguments](/reference/constraints#constraint-arguments).
 - **Constraint:** Validation detects reference cycles between the rules and lets of a policy, whatever expression the reference sits in: operators, calls, index access, casts, transforms, list and map literals (keys as well as values), lambda bodies and import `with` values. A cycle fails with `infinite recursion: a -> b -> a`, the error `exec` would otherwise hit on the first evaluation. A rule that refers directly to itself (`rule r = { yield r }`) is not caught yet ([sentrie#155](https://github.com/sentrie-sh/sentrie/issues/155)).
 - **Constraint:** Validation checks that every shape a type names exists and is visible from where it is written: in facts, `let`s, casts (`as`), `is` checks, shape fields and aliases, derive and lambda parameter and return types, and element types inside `list`, `dict` and `record`. A missing shape, or one another namespace does not export, is reported at its position, even in a `let` no rule uses. Shapes named inside a derive resolve in the derive's scope, and a shape's fields resolve where the shape is declared.

@@ -102,6 +102,7 @@ sentrie serve [OPTIONS]
 | `--http-port`     | int      | `7529`      | Port to listen on                 |
 | `--pack-location` | string   | `./`        | Directory containing policy files |
 | `--http-listen`   | []string | `["local"]` | Address(es) to listen on          |
+| `--skip-engine-check` | bool | `false` | Do not check the pack's `[engine]` version constraint against this binary |
 
 #### Examples
 
@@ -183,6 +184,7 @@ sentrie validate <FQN> [OPTIONS]
 | ----------------- | ------ | ------- | --------------------------------- |
 | `--pack-location` | string | `./`    | Directory containing policy files |
 | `--facts`         | string | `{}`    | Facts for type checking           |
+| `--skip-engine-check` | bool | `false` | Do not check the pack's `[engine]` version constraint against this binary |
 
 #### Examples
 
