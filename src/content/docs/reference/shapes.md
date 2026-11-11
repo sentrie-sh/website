@@ -68,9 +68,37 @@ Every field in a shape body has two independent properties: whether the field is
 | `field: T?`  | Yes       | Yes       | Field must be present; value may be `null`. |
 | `field?: T?` | No        | Yes       | Field may be omitted; if present, value may be `null`. |
 
-- **Required:** If the field is missing from the value at runtime, validation fails.
+- **Required:** If the field is missing from the value at runtime, validation fails. A field that holds an undefined value counts as missing, because undefined is not a value: `x is S` is `false` and a typed check against `S` fails with `field <name> is required`, exactly as for an absent field. An optional field holding undefined is fine and is treated as omitted.
 - **Nullable:** If the field is present and its value is `null`, validation fails unless the type is nullable (`T?`).
 - **Legacy `!`:** The `!` field modifier has been removed. Write `field!: T` as `field: T`, and `field!?: T` or `field?!: T` as `field?: T`. If an old bare `field: T` relied on being nullable, write `field: T?`.
+
+```sentrie
+namespace docs/undef
+
+shape Item {
+  id: string
+  note?: string
+}
+
+policy P {
+  fact payload: document
+
+  rule requiredIsUndefined = {
+    let item = { "id": payload.missing, "note": "n" }
+    yield item is Item
+  }
+
+  rule optionalIsUndefined = {
+    let item: Item = { "id": "a", "note": payload.missing }
+    yield item.id
+  }
+
+  export decision of requiredIsUndefined
+  export decision of optionalIsUndefined
+}
+```
+
+With `{"payload": {}}`, `requiredIsUndefined` is `false` because `id` reads an undefined value, and `optionalIsUndefined` is `"a"`. Writing `let item: Item = { "id": payload.missing }` instead fails with `field id is required`. Only a whole value that is undefined passes through a typed `let`, a derive return or a lambda return unchecked (see [Typed let and undefined](/reference/let#typed-let-and-undefined)).
 
 Field type can be any type reference: primitives (`number`, `string`, `trinary`, `bool`, `document`), collections (`list[T]`, `dict[T]`, `record[...]`), or another shape. Constraints on the type are validated when the value is assigned or when the value is supplied as a fact.
 

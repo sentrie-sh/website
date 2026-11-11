@@ -70,6 +70,8 @@ policy P {
 
 With `{"user": {}}` the rule is `unknown`, the same as with `let n = user.missing`. A value that is present is still validated, so `let n: number = user.name` fails when `user.name` is a string. Because constraints are not checked on an undefined value, a constraint is also not evaluated there.
 
+This applies to a whole value that is undefined. A shape value whose required field holds undefined is not undefined itself: the field counts as missing and the check fails with `field <name> is required` (see [Field modifiers](/reference/shapes#field-modifiers-complex-shapes)).
+
 Before this change a typed `let` failed with `value undefined is not a number` where the untyped form gave `unknown`. To require a value, test it with `is defined` or `is number`, which reject undefined, or use a cast such as `user.age as number`.
 
 ### Typed let with constraints
