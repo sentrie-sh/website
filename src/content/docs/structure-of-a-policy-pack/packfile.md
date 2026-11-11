@@ -92,7 +92,7 @@ If the `[engine]` table is present, the `sentrie` field is required.
 
 `sentrie exec`, `sentrie serve` and `sentrie validate` check the constraint against the version of the running binary as soon as the pack is loaded. `sentrie bench` does not check it.
 
-- **Strict semantic versioning.** A prerelease does not satisfy a constraint that names a release, so `0.0.5-rc1` does not satisfy `>=0.0.5`.
+- **Strict semantic versioning.** A prerelease sorts before its release, so `0.0.5-rc1` does not satisfy `>=0.0.5` but does satisfy `>=0.0.4`.
 - **A mismatch is an error**, including under `validate`:
 
   ```text
@@ -100,7 +100,7 @@ If the `[engine]` table is present, the `sentrie` field is required.
   ```
 
 - **Skipping the check.** Pass `--skip-engine-check` to `exec`, `serve` or `validate` to load the pack anyway.
-- **Dev builds.** A binary with no version, or one built from a source checkout (its version is a Go pseudo-version), passes with a warning and the constraint is not checked. A binary whose version is not valid semver also warns and passes.
+- **Dev builds.** A binary with no version, or one built from a source checkout (its version is a Go pseudo-version, whether or not the checkout has a tag), passes with a warning and the constraint is not checked. A binary whose version is not valid semver also warns and passes.
 
 ```text
 warning: pack requires sentrie >=0.0.5; this is a dev or unversioned build, so the engine version is not checked
