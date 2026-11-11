@@ -46,7 +46,36 @@ fact name? : type [ as alias ] [ default expr ]  -- optional
 
 When another policy imports a decision from this policy (e.g. `import decision of RuleName from "ns" with ...`), the `with` clause binds values to the **target policy’s facts**. The key in `with` must be the **declared name** of the fact, not its `as` alias. The value must match the fact’s type and constraints.
 
-An imported policy's wrongly typed `with` value is not a request error, because the binding belongs to the importing policy rather than to the caller. It fails the importing rule, which reports a per-rule `500` (see [Serving Policies](/running-sentrie/serving-policies#when-a-rule-fails)).
+A wrongly typed `with` value, a `null` for a fact that does not accept `null`, or a required fact with no `with` clause fails the **whole request** with a `400` problem document and no decisions, exactly like a wrongly typed or missing fact sent by the caller. This holds for a whole-policy request, for a request naming one rule, for `sentrie exec`, and for imports that reach the target through another import. The message names the imported policy, because the caller did not supply that fact:
+
+```text
+imported policy com/example/imp/target: fact 'n': value x is not a number: invalid invocation
+imported policy com/example/imp/target: required fact not found: n
+```
+
+If two importing rules hit different `with` fact errors, the error reported is the one of the rule declared first in the policy, so the same request always gets the same message.
+
+Any other failure inside the imported rule (an evaluation error, or the imported policy's own default failing its type) stays the importing rule's error: in a whole-policy request it appears as that rule's entry in the `207` response (see [Serving Policies](/running-sentrie/serving-policies#when-a-rule-fails)), while a request naming that one rule gets a problem document with the rule's status.
+
+```sentrie
+namespace com/example/imp
+
+policy target {
+  fact n?: number
+  rule double = { yield n * 2 }
+  export decision of double
+}
+
+policy caller {
+  fact raw: string
+  rule fine = { yield true }
+  rule viaImport = import decision double from com/example/imp/target with n as raw
+  export decision of fine
+  export decision of viaImport
+}
+```
+
+With `{"raw": "x"}`, a request for `caller` (or for `caller/viaImport`) returns `400`, even though `fine` would succeed on its own.
 
 ## Examples in Action
 

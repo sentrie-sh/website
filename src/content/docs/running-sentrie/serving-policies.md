@@ -335,7 +335,7 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 **Common HTTP Status Codes:**
 
 - `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` only.
-- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact or a supplied fact of the wrong type (`InvalidInvocation`)
+- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact or a supplied fact of the wrong type (`InvalidInvocation`). This includes a wrongly typed or missing `with` fact that an imported policy receives from the importing policy: the whole request fails with one `400` and no decisions, and the message names the imported policy
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
 - `500 Internal Server Error`: Evaluation failed for an internal reason

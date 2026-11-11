@@ -30,7 +30,7 @@ rule localName = import decision of ruleName
 | :--- | :--- | :--- | :--- |
 | `ruleName` | identifier | Yes | Rule being exported or imported; must be exported in the target policy. |
 | `namespace/policy` | path | Yes | Fully qualified namespace and policy (e.g. `com/example/auth/userAccess`). Same-namespace: policy name only. |
-| `with fact as expr` | clause | Yes for each required fact | Maps current policy expression to target policy fact name (the declared name, not the `as` alias). |
+| `with fact as expr` | clause | Yes for each required fact | Maps current policy expression to target policy fact name (the declared name, not the `as` alias). A wrongly typed value, or a required fact left out, fails the whole request with a `400`, like a caller's fact error; see [Facts](/reference/facts#import-binding-policy-composition). |
 | `attach name as expr` | clause | No | Evaluated when rule is executed; attached to decision for importers. |
 
 **Returns:** Exported rule’s decision (trinary or value). If attachments exist, import returns an object with the decision and attachment fields (e.g. `authResult.role`).
