@@ -35,7 +35,7 @@ Functions are a fundamental part of Sentrie that allow you to perform operations
 ## Resolution of source
 
 - **Built-in:** `@sentrie/name` refers to a built-in module (e.g. `@sentrie/hash`, `@sentrie/time`). The runtime resolves these to the provided implementations.
-- **Relative:** A string path (e.g. `"./utils.ts"`) is resolved relative to the policy file or the pack root, per tooling. Only paths that the [permissions](/reference/security-and-permissions) allow can be loaded.
+- **Relative:** A string path (e.g. `"./utils.ts"`) is resolved relative to the policy file or the pack root, per tooling. Local modules must stay inside the pack root (see [security and permissions](/reference/security-and-permissions)).
 
 ### Example
 
@@ -250,4 +250,4 @@ Before you implement this, keep a few boundaries in mind:
 - **Memoization:** Functions may be memoized per (function, arguments) when applicable; repeated calls with the same arguments may return a cached result. This is implementation-defined.
 - **Scope:** `use` is per policy. The alias (or default) is used only in that policy. Other policies must declare their own `use` to call the same or other modules.
 - **Errors:** Missing or wrong-type arguments, or runtime errors inside the function, can cause evaluation to abort. See [Built-in TypeScript modules](/reference/typescript_modules/) and [Writing custom TypeScript modules](/extensibility/writing-custom-typescript-modules) for function contracts and types.
-- **Permissions:** Custom modules (e.g. `"./file.ts"`) are subject to [security and permissions](/reference/security-and-permissions) (e.g. filesystem read). Built-in modules run with the same permissions as the pack.
+- **Permissions:** Custom modules (e.g. `"./file.ts"`) are confined to the pack root, and see only the environment variables listed in `env` (see [security and permissions](/reference/security-and-permissions)). Built-in modules run with the same permissions as the pack.

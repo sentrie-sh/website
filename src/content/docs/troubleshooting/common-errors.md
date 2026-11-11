@@ -34,11 +34,9 @@ This page lists common errors you may encounter when authoring or running Sentri
 
 If your pack uses TypeScript modules that read files, call the network, or access environment variables, you may see permission-related failures:
 
-- Files or directories not readable when using local I/O helpers.
-- Network calls failing despite valid URLs.
 - Environment variables always appearing unset.
 
-These are usually caused by restrictive pack permissions.
+This is usually caused by `env` in the pack permissions not listing the variable name. `fs_read` and `net` are not enforced yet, so they do not cause file or network failures; Sentrie warns on stderr if they are declared.
 
-See **[Security and Permissions](/reference/security-and-permissions)** for how to configure `fs_read`, `net`, and `env` in `sentrie.pack.toml` and apply the principle of least privilege.
+See **[Security and Permissions](/reference/security-and-permissions)** for how to configure `env` in `sentrie.pack.toml` and what is enforced.
 
