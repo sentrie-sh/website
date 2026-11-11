@@ -111,7 +111,7 @@ rule score: number = default 0 when user.active {
 }
 ```
 
-A declared type is checked against the rule's body and its `default`. With `user.score` set to `7` the rule above yields `7`; with `"high"` the evaluation fails with `value high is not a number`; and when `user.active` is false it falls back to the `default`, `0`. A value that is undefined, or a `when` that does not hold with no `default`, is not checked. Typed `let` declarations, derive and lambda return types and shape fields treat undefined the same way; see [Intermediate Values](/reference/let#typed-let-and-undefined).
+A declared type is checked against the rule's body and its `default`. With `user.score` set to `7` the rule above yields `7`; with `"high"` the evaluation fails with `value high is not a number`; and when `user.active` is false it falls back to the `default`, `0`. A value that is undefined, or a `when` that does not hold with no `default`, is not checked. Typed `let` declarations and derive and lambda return types treat undefined the same way; see [Intermediate Values](/reference/let#typed-let-and-undefined). Shape fields differ: an optional field holding undefined is treated as omitted, and a required one counts as missing; see [Shapes](/reference/shapes#field-modifiers-complex-shapes).
 
 A declared type is optional for most rules, but a rule must declare one before other statements can [contribute](#contributing-to-a-rule) to it.
 
