@@ -89,7 +89,7 @@ Field type can be any type reference: primitives (`number`, `string`, `trinary`,
 Shapes are closed by default. Before, a value could carry fields its shape did not declare and they passed through unchecked. A pack that relied on this, for example by passing a whole upstream JSON object to a shape that names only some of its fields, now fails the shape check. In a typed `let`, a derive argument or a fact it is an evaluation error; for a fact served by `sentrie serve` it is a request error. Declare the extra fields, or end the shape body with `...` to keep the old behaviour for that shape.
 :::
 
-A value checked against a closed shape must not carry a field the shape does not declare. The fields a shape takes in through `with` count as declared.
+A value checked against a closed shape must not carry a field the shape does not declare. The fields a shape takes in through `with` count as declared. A key holding `undefined` counts as absent, so it is not an undeclared field: with a `payload` fact that has no `role`, `{ "name": "Alice", "age": 28, "role": payload.role } is User` is `true`.
 
 ```sentrie
 namespace com/example/users
