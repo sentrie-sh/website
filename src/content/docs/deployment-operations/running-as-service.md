@@ -80,7 +80,7 @@ Evaluates a policy or rule. `{target...}` = path segments: `namespace/policy` or
 | Health | GET | `/health` | none |
 | Decision | POST | `/decision/{namespace}/{policy}[/{rule}]` | `{ "facts": { ... } }` |
 
-**Returns:** See schemas above. 400 for invalid JSON or path; 404 for unknown policy/rule; 405 for wrong method; 500 for evaluation error.
+**Returns:** See schemas above. 400 for invalid JSON or path; 404 for unknown policy/rule; 405 for wrong method; 413 when the body is larger than `--http-max-body-bytes` (1 MiB by default); 500 for evaluation error.
 
 ## Examples in Action
 
