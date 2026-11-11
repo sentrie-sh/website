@@ -338,9 +338,9 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 
 - `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` only.
 - `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact (`InvalidInvocation`)
-- `413 Request Entity Too Large`: The request body is larger than the server's `--http-max-body-bytes` limit (1 MiB by default). The problem document has the title `Request Body Too Large` and its `detail` names the limit in bytes
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
+- `413 Request Entity Too Large`: The request body is larger than the server's `--http-max-body-bytes` limit (1 MiB by default). The problem document has the title `Request Body Too Large` and its `detail` names the limit in bytes
 - `500 Internal Server Error`: Evaluation failed for an internal reason
 
 A failed single-rule evaluation does not include a `null` entry in `decisions`; the handler returns Problem Details instead.
