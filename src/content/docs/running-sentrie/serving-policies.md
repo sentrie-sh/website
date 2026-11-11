@@ -34,6 +34,8 @@ The following sections summarize default flags and typical API usage.
 
   A predefined value must be the only `--http-listen` value.
 
+- `--http-max-body-bytes` (default: `1048576`): Largest request body to accept, in bytes. A plain integer; `0` removes the limit and a negative value is rejected at startup. A request over the limit is answered with `413`.
+
 ### Examples
 
 ```bash
@@ -232,6 +234,8 @@ The `{target...}` parameter is the full path after `/decision/`:
 
 Integers in `facts` that fit in 64 bits are read exactly, so an ID such as `9007199254740993` is evaluated, compared and returned with every digit. A number outside the float range, such as `1e400`, is rejected with a `400` problem response ("Invalid JSON"). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).
 
+A request body may be at most 1 MiB unless the server was started with a different `--http-max-body-bytes`. A larger body is answered with `413` and a [problem response](#error-responses) titled "Request Body Too Large" without evaluating anything.
+
 **Query Parameters:**
 
 - Query parameters are parsed and passed as run configuration (currently parsed but not used in execution)
@@ -334,6 +338,7 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 
 - `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` only.
 - `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact (`InvalidInvocation`)
+- `413 Request Entity Too Large`: The request body is larger than the server's `--http-max-body-bytes` limit (1 MiB by default). The problem document has the title `Request Body Too Large` and its `detail` names the limit in bytes
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
 - `500 Internal Server Error`: Evaluation failed for an internal reason
