@@ -42,7 +42,7 @@ Evaluates a policy or rule. `{target...}` = path segments: `namespace/policy` or
 
 | Field | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
-| `facts` | object | Yes | Map of fact name (or alias) to JSON value. Must satisfy policy fact types. |
+| `facts` | object | Yes | Map of declared fact name to JSON value (the name after `fact`, never the `as` alias). Must satisfy policy fact types. |
 
 **Response:** `200` with body:
 
@@ -128,4 +128,4 @@ Before you implement this, keep a few boundaries in mind:
 - Base URL: default `http://localhost:7529`. `--listen all` binds 0.0.0.0. Only POST is allowed for `/decision/{target...}`. Query parameters are parsed but not used for execution semantics.
 
 
-- Facts must match policy declarations (required facts present; types/shapes valid). Missing or invalid facts can return 400 or 500. CORS headers are sent (`Access-Control-Allow-Origin: *` etc.). No built-in auth or rate limiting.
+- Facts must match policy declarations (required facts present; types/shapes valid). A missing required fact, or a supplied fact of the wrong type, returns 400. CORS headers are sent (`Access-Control-Allow-Origin: *` etc.). No built-in auth or rate limiting.

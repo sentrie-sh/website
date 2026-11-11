@@ -230,6 +230,8 @@ The `{target...}` parameter is the full path after `/decision/`:
 }
 ```
 
+Each key in `facts` is a fact's **declared name**, the name written after `fact`, not its `as` alias. For `fact user: User as u`, send `user`; `u` is only the local name inside the policy. This is a breaking change from earlier versions, which keyed facts by alias, and there is no fallback: a request that sends `u` gets a `400` with `required fact not found: user`. A fact of the wrong type, such as a string for a `number`, also gets a `400` (`fact 'level': value x is not a number: invalid invocation`); it is the caller's mistake, so it is not reported per rule. See [Facts](/reference/facts).
+
 Integers in `facts` that fit in 64 bits are read exactly, so an ID such as `9007199254740993` is evaluated, compared and returned with every digit. A number outside the float range, such as `1e400`, is rejected with a `400` problem response ("Invalid JSON"). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).
 
 **Query Parameters:**
@@ -333,7 +335,7 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 **Common HTTP Status Codes:**
 
 - `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` only.
-- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact (`InvalidInvocation`)
+- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact or a supplied fact of the wrong type (`InvalidInvocation`)
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
 - `500 Internal Server Error`: Evaluation failed for an internal reason
