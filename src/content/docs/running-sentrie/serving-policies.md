@@ -246,7 +246,7 @@ Integers in `facts` that fit in 64 bits are read exactly, so an ID such as `9007
       "namespace": "com/example/auth",
       "rule": "isAdmin",
       "decision": {
-        "state": "TRUE",
+        "state": "true",
         "value": true
       },
       "attachments": {
@@ -267,9 +267,9 @@ A policy request in which every rule evaluated is HTTP **200** with a `decisions
   - `namespace`: The namespace (string)
   - `rule`: The rule name (string)
   - `decision`: The decision result object containing:
-    - `state`: The decision state as a string: `"TRUE"`, `"FALSE"`, or `"UNKNOWN"`
+    - `state`: The decision state as a string: `"true"`, `"false"`, or `"unknown"`
     - `value`: The actual value of the decision (any JSON-serializable type)
-  - `attachments`: Any attachments exported by the rule (dict of string to any)
+  - `attachments`: Any attachments exported by the rule (dict of string to any); `null` when the rule failed
   - `trace`: Execution trace information (object, optional)
   - `error`: Present only when this rule failed; see [When a Rule Fails](#when-a-rule-fails)
 
@@ -277,9 +277,9 @@ A policy request in which every rule evaluated is HTTP **200** with a `decisions
 
 The `state` field in the decision object can be one of:
 
-- `"TRUE"`: The rule evaluated to true
-- `"FALSE"`: The rule evaluated to false
-- `"UNKNOWN"`: The rule evaluated to unknown (e.g., when `when` condition is false and no default is provided)
+- `"true"`: The rule evaluated to true
+- `"false"`: The rule evaluated to false
+- `"unknown"`: The rule evaluated to unknown (e.g., when `when` condition is false and no default is provided)
 
 **Example Requests:**
 
@@ -314,7 +314,8 @@ curl -X POST http://localhost:7529/decision/com/example/auth/user \
 A rule can fail while it is evaluated (a division by zero, a value of the wrong type, an exceeded deadline). On a request for a whole policy, the failure is reported for that rule only and the other rules are still evaluated:
 
 - The response is **207 Multi-Status** when any rule failed, including when every rule failed, and **200 OK** otherwise.
-- The body is the same `{"decisions": [...]}`, with one entry per exported rule. A failed rule has an `unknown` decision and an `error` object; a rule that succeeded has no `error` field.
+- The body is the same `{"decisions": [...]}`, with one entry per exported rule. A failed rule has an `unknown` decision, `null` attachments (even when only an attachment failed) and an `error` object; a rule that succeeded has no `error` field.
+- A failed rule's `trace` shows where it failed in its `err` fields, but it can keep values computed before the failure. Read `decision` and `error`, not the trace.
 - `error.status` is the HTTP status that failure would have had on its own: `400` for an invalid invocation, `503` for a deadline, `500` otherwise.
 
 ```json
@@ -324,7 +325,7 @@ A rule can fail while it is evaluated (a division by zero, a value of the wrong 
       "policy": "access",
       "namespace": "docs/checks",
       "rule": "ratio",
-      "decision": { "state": "unknown", "value": null },
+      "decision": { "state": "unknown", "value": "unknown" },
       "attachments": null,
       "trace": { ... },
       "error": {

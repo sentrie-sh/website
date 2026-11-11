@@ -54,7 +54,7 @@ Evaluates a policy or rule. `{target...}` = path segments: `namespace/policy` or
       "namespace": "string",
       "rule": "string",
       "decision": {
-        "state": "TRUE" | "FALSE" | "UNKNOWN",
+        "state": "true" | "false" | "unknown",
         "value": <any>
       },
       "attachments": { "<name>": <value>, ... },

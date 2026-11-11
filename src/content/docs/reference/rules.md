@@ -252,7 +252,7 @@ Values that are not literals are checked when the rule is evaluated. If a contri
 
 ## When a Rule Fails
 
-A rule can fail while it is evaluated, for example on a division by zero or a value that does not match a declared type. The failure belongs to that rule alone: its decision is `unknown`, it carries an `error` object next to its output, and every other rule of the policy is still evaluated and reported.
+A rule can fail while it is evaluated, for example on a division by zero or a value that does not match a declared type. The failure belongs to that rule alone: its decision is `unknown`, its attachments are `null` (also when only an attachment failed), it carries an `error` object next to its output, and every other rule of the policy is still evaluated and reported.
 
 Take this policy. `ratio` fails when `limit` is `0`, and `is_admin` does not depend on it:
 
@@ -288,7 +288,7 @@ With the facts `{"user":{"role":"admin","limit":0}}`, the output for `ratio` is 
   "policy": "access",
   "namespace": "docs/checks",
   "rule": "ratio",
-  "decision": { "state": "unknown", "value": null },
+  "decision": { "state": "unknown", "value": "unknown" },
   "attachments": null,
   "error": {
     "title": "Evaluation Failed",
