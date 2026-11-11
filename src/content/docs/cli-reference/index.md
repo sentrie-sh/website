@@ -62,6 +62,7 @@ sentrie bench <FQN> [OPTIONS]
 | `--count`         | int    | `1`     | Repeat the measurement this many times, one line per run        |
 | `--eval-timeout`  | string | `10s`   | Deadline for evaluating one decision; `0` disables it           |
 | `--capabilities`  | string | -       | Capabilities file limiting builtins and modules                 |
+| `--skip-engine-check` | bool | `false` | Do not check the pack's `[engine]` version constraint against this binary |
 
 #### Examples
 

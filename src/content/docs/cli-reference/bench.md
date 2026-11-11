@@ -27,6 +27,7 @@ sentrie bench <FQN> [OPTIONS]
 | `--count` | int | No | Repeat the measurement this many times. Default: `1`. |
 | `--eval-timeout` | duration | No | Deadline for one decision; `0` disables it. Default: `10s`. |
 | `--capabilities` | path | No | Capabilities file limiting builtins and modules. Default: allow everything. |
+| `--skip-engine-check` | bool | No | Do not check the pack's `[engine]` version constraint against this binary. Default: `false`. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional). |
 
 **Returns:** Results in Go benchmark format on stdout (see [Output](#output)); exit 0 on success, 1 on error.
 
@@ -121,6 +122,16 @@ sentrie bench user_management/user_access --capabilities ./capabilities.json
 ```
 
 **Default:** (empty - allow everything)
+
+### `--skip-engine-check`
+
+Loads the pack even when its `[engine]` version constraint is not satisfied by this binary. Without the flag, a mismatch is an error and nothing is measured:
+
+```text
+Error: pack requires sentrie >=0.0.5, running 0.0.4 (use --skip-engine-check to load it anyway)
+```
+
+**Default:** `false`. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional).
 
 ---
 
@@ -225,7 +236,7 @@ These cases exit non-zero:
 - **Missing or invalid FQN**: no argument, or a namespace, policy or rule that does not exist or is not exported
 - **Failing evaluation**: the target cannot be evaluated with the facts given, for example because a required fact is missing or does not match its shape. The target is evaluated once before timing starts, so this is reported before any result line is printed.
 - **Invalid flags**: an unparseable `--benchtime`, a `--count` below `1`, an invalid `--eval-timeout`, or invalid JSON in `--facts`
-- **File errors**: `--fact-file` or `--capabilities` cannot be read or parsed, or the pack cannot be loaded
+- **File errors**: `--fact-file` or `--capabilities` cannot be read or parsed, or the pack cannot be loaded, including a pack whose `[engine]` constraint this binary does not satisfy (pass `--skip-engine-check` to load it anyway)
 
 For example, a rule that needs a fact you did not provide:
 
