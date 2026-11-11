@@ -90,6 +90,22 @@ sentrie = ">=0.1.0 <2.0.0"
 If the `[engine]` table is present, the `sentrie` field is required.
 :::
 
+`sentrie exec`, `sentrie serve` and `sentrie validate` check the constraint against the version of the running binary as soon as the pack is loaded. `sentrie bench` does not check it.
+
+- **Strict semantic versioning.** A prerelease does not satisfy a constraint that names a release, so `0.0.5-rc1` does not satisfy `>=0.0.5`.
+- **A mismatch is an error**, including under `validate`:
+
+  ```text
+  Error: pack requires sentrie >=0.0.5, running 0.0.4 (use --skip-engine-check to load it anyway)
+  ```
+
+- **Skipping the check.** Pass `--skip-engine-check` to `exec`, `serve` or `validate` to load the pack anyway.
+- **Dev builds.** A binary with no version, or one built from a source checkout (its version is a Go pseudo-version), passes with a warning and the constraint is not checked. A binary whose version is not valid semver also warns and passes.
+
+```text
+warning: pack requires sentrie >=0.0.5; this is a dev or unversioned build, so the engine version is not checked
+```
+
 ### `[permissions]` (optional)
 
 The permissions section declares security permissions and capabilities required by the pack. Refer to [Security and Permissions](/reference/security-and-permissions/) for detailed information.
@@ -225,7 +241,7 @@ The pack file is validated against the following rules:
 2. **Schema version**: Must be `1` (integer)
 3. **Pack name**: Must be a valid identifier (starts with letter, contains only letters, numbers, underscores, hyphens, and dots)
 4. **Pack version**: Must be a valid semantic version string
-5. **Engine table**: If present, must contain `sentrie` field
+5. **Engine table**: If present, must contain `sentrie` field; the constraint is checked against the running binary by `exec`, `serve` and `validate`
 6. **Data table**: If present, each key must be an identifier and each value a non-empty path string
 7. **Top-level tables**: Only `schema`, `pack`, `engine`, `permissions`, `data`, and `metadata` are allowed
 
