@@ -30,7 +30,7 @@ rule localName = import decision of ruleName
 | :--- | :--- | :--- | :--- |
 | `ruleName` | identifier | Yes | Rule being exported or imported; must be exported in the target policy. |
 | `namespace/policy` | path | Yes | Fully qualified namespace and policy (e.g. `com/example/auth/userAccess`). Same-namespace: policy name only. |
-| `with fact as expr` | clause | Yes for each required fact | Maps current policy expression to target policy fact name (alias). |
+| `with fact as expr` | clause | Yes for each required fact | Maps current policy expression to target policy fact name (the declared name, not the `as` alias). |
 | `attach name as expr` | clause | No | Evaluated when rule is executed; attached to decision for importers. |
 
 **Returns:** Exported rule’s decision (trinary or value). If attachments exist, import returns an object with the decision and attachment fields (e.g. `authResult.role`).
@@ -114,10 +114,10 @@ Before you implement this, keep a few boundaries in mind:
 - **Import:** The imported rule runs in a sandbox: it sees only the facts provided by `with` clauses. It cannot access the calling policy’s other facts or context. Facts are type-checked against the target policy.
 - **Attachments:** Evaluated at rule execution; any expression allowed. Import side accesses via dot notation on the imported rule’s result.
 - **Recursion:** Circular imports (A imports B, B imports A) are prevented and will fail.
-- **Namespace:** Use full `namespace/policy` or, in the same namespace, policy name only. Fact names in `with` must match the target policy’s fact alias.
+- **Namespace:** Use full `namespace/policy` or, in the same namespace, policy name only. Fact names in `with` must match the target policy’s declared fact name, not its `as` alias.
 
 
 - Rule not found: ensure the rule is exported and the namespace/policy path and rule name are correct (case-sensitive).
-- Fact not found: use the target policy’s fact alias in `with`, not the original name.
+- Fact not found: use the target policy’s declared fact name in `with`, not its `as` alias.
 - Type mismatch: the expression in `with` must evaluate to the type expected by the target policy’s fact.
 - Missing attachments: check with `is defined` if an attachment may be absent before accessing it.
