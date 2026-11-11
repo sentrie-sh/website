@@ -186,7 +186,7 @@ readinessProbe:
     port: 7529
 ```
 
-Start the server with `--http-listen network` (or `network4` for IPv4 only) so the probes can reach it from outside the container.
+Start the server with `--http-listen network` (or `network4`) so the probes can reach it from outside the container.
 
 :::caution
 The API has no authentication (see [sentrie-sh/sentrie#115](https://github.com/sentrie-sh/sentrie/issues/115)). Keep it behind a cluster-internal Service or a NetworkPolicy, and never expose it publicly.
