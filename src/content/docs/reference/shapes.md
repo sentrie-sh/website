@@ -98,7 +98,7 @@ policy P {
 }
 ```
 
-With `{"payload": {}}`, `requiredIsUndefined` is `false` because `id` reads an undefined value, and `optionalIsUndefined` is `"a"`. Writing `let item: Item = { "id": payload.missing }` instead fails with `field id is required`. Only a whole value that is undefined passes through a typed `let`, a derive return or a lambda return unchecked (see [Typed let and undefined](/reference/let#typed-let-and-undefined)).
+With `{"payload": {}}`, `requiredIsUndefined` is `false` because `id` reads an undefined value, and `optionalIsUndefined` is `"a"`. Writing `let item: Item = { "id": payload.missing }` instead fails with `field id is required`. A `dict[T]` entry is treated like an optional field: an entry holding undefined counts as absent and passes the check (see [Collection types](/reference/types-and-values#declaring-a-collection-type)), so a shape field of type `dict[number]` accepts it. Only a whole value that is undefined passes through a typed `let`, a derive return or a lambda return unchecked (see [Typed let and undefined](/reference/let#typed-let-and-undefined)).
 
 Field type can be any type reference: primitives (`number`, `string`, `trinary`, `bool`, `document`), collections (`list[T]`, `dict[T]`, `record[...]`), or another shape. Constraints on the type are validated when the value is assigned or when the value is supplied as a fact.
 
