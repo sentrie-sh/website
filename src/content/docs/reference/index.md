@@ -589,6 +589,8 @@ shape AdminUser with BaseUser {
 
 The composed shape includes all fields from the base shape plus any additional fields defined in the composed shape.
 
+An unqualified base is looked up in the enclosing policy, then in the shape's namespace. A base from another namespace must be qualified (`with com/base/BaseUser`) and exported there with `export shape BaseUser`; an unqualified or unexported cross-namespace base fails validation. See [Composition](/reference/shapes#composition-extending-a-base-shape).
+
 ### Constraints
 
 Constraints can be applied to primitives, collections, and shape fields:

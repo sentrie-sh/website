@@ -89,7 +89,7 @@ An integer beyond `Number.MAX_SAFE_INTEGER` (2^53-1) cannot be passed to a [Type
 
 | Type | Description | Index type | Notes |
 | :--- | :---------- | :--------- | :---- |
-| `list[T]` | Ordered sequence of values of type `T`. | `number` (zero-based). | Index out of range is an error or undefined behavior per implementation. |
+| `list[T]` | Ordered sequence of values of type `T`. | `number` (zero-based). | Index out of range is undefined. A non-integer index is an error; see [Indexing and access](#indexing-and-access). |
 | `dict[T]` | Key-value map; keys are strings, values are type `T`. | `string` or `.key` (identifier). | Keys must be strings. Dot access: `map.key` when key is a [valid identifier or a keyword](/reference/identifiers#keywords-as-field-names). |
 | `set[T]` | Distinct values of type `T`, always written out in sorted order. | Not indexable. | No literal syntax; see [Sets](#sets). Works with `in`, `contains` and `count`. |
 | `record[T1,T2,...]` | Fixed-length tuple with typed positions. | `number` (zero-based position). | Length and types are fixed at type declaration. |
@@ -243,7 +243,10 @@ The postfix cast `expr as type` converts the value of `expr` to the given type. 
 
 ## Indexing and access
 
-- **List:** `listExpr[indexExpr]`. `indexExpr` must be a number (or evaluate to a number). Zero-based. Bounds behavior is implementation-defined (error or undefined).
+- **List:** `listExpr[indexExpr]`. Zero-based. The index must be an integer, or a float with a whole value such as `2.0`.
+  - An index past either end of the list (including a negative one) is **undefined**, not an error.
+  - An undefined index (for example `xs[x.missing]`) gives undefined.
+  - Any other index is an **error**: `list index must be an integer, got <kind or value>`. That covers a string, bool, null, list or dict, and a fractional number such as `1.7` or `NaN`. `[10, 20, 30]["foo"]` and `[10, 20, 30][1.7]` stop evaluation; they no longer return `10` and `20`.
 - **Record:** `recordExpr[indexExpr]`. Same as list; index is the position (0, 1, 2, …).
 - **Map:** `mapExpr[keyExpr]` or `mapExpr.key`. Key must be a string. Dot form is equivalent to bracket form when the key is a [valid identifier](/reference/identifiers) (e.g. `m.one` ≈ `m["one"]`).
 
@@ -275,6 +278,18 @@ let one: number = m["one"]
 let oneAlt: number = m.one
 ```
 
+### Index errors
+
+```text
+let xs: list[number] = [10, 20, 30]
+let ok: number = xs[2.0]        -- 30
+let none: number = xs[5]        -- undefined (out of range)
+let bad = xs["foo"]             -- Error: list index must be an integer, got string
+let frac = xs[1.7]              -- Error: list index must be an integer, got 1.7
+```
+
+**Breaking change (v0.0.5):** packs that indexed a list with a string, a bool, null or a fractional number now fail at evaluation. An undefined index used to read element zero and now gives undefined. Fix the index (cast with `as number` and round it yourself if it is fractional) before upgrading.
+
 ### Cast
 
 ```text
@@ -289,7 +304,7 @@ let doc: document = { "name": "John", "age": 30 } as document
 Before you implement this, keep a few boundaries in mind:
 
 - **Type annotation on let:** Optional. When omitted, the value is not validated against a type. When present, the value is validated (and constraints apply); failure aborts evaluation.
-- **Map keys:** Must be strings. Access with `[index]`: numeric index for list/record, string key for map. Dot access for maps only when the key is a [valid identifier or a keyword](/reference/identifiers#keywords-as-field-names).
+- **Map keys:** Must be strings. Access with `[index]`: integer index for list/record, string key for map. A missing map key is undefined, as before; a string or fractional list index is an error. Dot access for maps only when the key is a [valid identifier or a keyword](/reference/identifiers#keywords-as-field-names).
 - **Division by zero:** Aborts evaluation. [Constraint](/reference/constraints) failure also aborts evaluation.
 - **Cast:** Validates against the target type and any constraints; failure aborts evaluation. Not all type combinations may be supported; see implementation for allowed conversions.
 

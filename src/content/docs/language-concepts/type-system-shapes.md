@@ -37,7 +37,7 @@ shape Name {
 | `field?: T`   | No       | Optional; the field may be omitted, and if present is not null.  |
 | `field: T?`   | No       | Required but nullable; the field must be present and may be null. |
 | `field?: T?`  | No       | Optional and nullable.                                           |
-| `with Base`   | No       | Shape inherits all fields of Base plus its own.                  |
+| `with Base`   | No       | Inherits Base's fields. Cross-namespace bases must be qualified and exported.|
 
 **Returns:** N/A (type system). Constraint validation fails at runtime if a value does not meet the type or constraints; evaluation aborts.
 
@@ -58,10 +58,19 @@ let u: User = { name: "Alice", age: 28 }
 ### Going further
 
 ```sentrie
+namespace com/example/users
+
 shape Base { id: string }
 shape Extended with Base { role: string }
 
-let e: Extended = { id: "1", role: "admin" }
+policy example {
+  fact v: document
+
+  let e: Extended = { "id": "1", "role": "admin" }
+
+  rule ok = { yield v is Extended }
+  export decision of ok
+}
 ```
 
 ## Good to Know
@@ -69,7 +78,7 @@ let e: Extended = { id: "1", role: "admin" }
 Before you implement this, keep a few boundaries in mind:
 
 - **Primitives:** `number` (exact 64-bit integer or float), `string`, `trinary` (`true`/`false`/`unknown`), `bool` (subset of trinary), `document` (JSON-like).
-- **Collections:** `list[T]` index by number; `dict[T]` keys are strings (dot or `["key"]` access); `record[T1,T2,...]` fixed-length tuple.
+- **Collections:** `list[T]` index by integer (a string or fractional index is an error, an out-of-range index is undefined); `dict[T]` keys are strings (dot or `["key"]` access); `record[T1,T2,...]` fixed-length tuple.
 - **Shapes:** Define contracts for facts and `let` bindings. Optional fields may be omitted; use `is defined` to check.
 - **Constraints:** Validate at runtime. Failing constraint validation aborts evaluation immediately.
 - **Cast:** postfix `expr as Type` converts and validates against the target type (and its constraints). A failed conversion is an evaluation error.
@@ -78,4 +87,5 @@ Before you implement this, keep a few boundaries in mind:
 - Map keys must be strings.
 - Type annotation on `let` is optional; if omitted, values are not validated against types.
 - Circular shape composition is not allowed.
+- A `with` base is looked up in the enclosing policy, then the shape's namespace. A base in another namespace must be written qualified (`with com/base/Base`) and exported there with `export shape Base`; an unqualified or unexported cross-namespace base fails validation. See [Composition](/reference/shapes#composition-extending-a-base-shape).
 - Exported shapes are visible across namespaces; unexported shapes are namespace-local.
