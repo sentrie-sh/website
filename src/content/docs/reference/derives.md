@@ -144,6 +144,26 @@ Derive bodies may call only these builtins (plus other visible derives):
 
 Argument and return types are checked at invoke time; type mismatches include the **parameter name** in the error.
 
+An undefined value passes through a declared return type unchecked, as it does through an untyped derive. A derive declared `: number` whose body yields a missing field gives an undefined result, and the calling rule is `unknown`, rather than an error. A required parameter still rejects an undefined argument, and `x is number` and `x as number` still reject undefined.
+
+```sentrie
+namespace docs/derived
+
+derive total = (d: document): number => {
+  yield d.amount
+}
+
+policy P {
+  fact order: document
+
+  rule fromDerive = { yield total(order) }
+
+  export decision of fromDerive
+}
+```
+
+With `{"order": {}}` the rule is `unknown`; with `{"order": {"amount": "x"}}` the return check fails because `x` is not a number.
+
 ## Callbacks for higher-order builtins
 
 Single-parameter derives may be passed **by identifier** as the callable argument to these pure builtins:

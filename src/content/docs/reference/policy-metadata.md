@@ -23,7 +23,7 @@ tag "key" = "value"
 - **`version`**: one string. **SemVer validation** runs on the literal after **trimming leading and trailing whitespace** (so `"  v1.2.3  "` is accepted as `1.2.3`). **`VersionLiteral` / stored display text** keeps the **exact source string** from the policy, including any surrounding spaces inside the quotes.
 - **`tag`**: `tag "key" = "value"`; repeatable. The **key** must be non-empty after trim. The **value** may be empty or whitespace-only; duplicate keys are allowed (tags are multi-valued, order preserved).
 
-`title`, `description`, `version`, and `tag` are **reserved keywords** in the lexer everywhere in a program, not only inside policies.
+`title`, `description`, `version`, and `tag` are **reserved keywords** in the lexer everywhere in a program, not only inside policies. They can still be used as field names, so `doc.title` and a shape field `version: string` are fine; see [Keywords as field names](/reference/identifiers#keywords-as-field-names).
 
 ## Uniqueness
 

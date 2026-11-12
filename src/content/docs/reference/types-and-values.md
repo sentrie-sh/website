@@ -3,11 +3,11 @@ title: Types and Values
 description: "Built-in primitive and collection types, unions, the any type, type declarations, indexing, cast, and validation."
 ---
 
-Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `document`) and collection types (`list[T]`, `dict[T]`, `set[T]`, `record[T1,T2,...]`), [union types](#union-types) and the [`any` type](#the-any-type). User-defined [shapes](/reference/shapes) extend these. Types can be used in [let](/reference/let), [facts](/reference/facts), and shape fields. Types may carry [constraints](/reference/constraints) for runtime validation.
+Sentrie provides primitive types (`number`, `string`, `trinary`, `boolean`, `document`) and collection types (`list[T]`, `dict[T]`, `set[T]`, `record[T1,T2,...]`), [union types](#union-types) and the [`any` type](#the-any-type). User-defined [shapes](/reference/shapes) extend these. Types can be used in [let](/reference/let), [facts](/reference/facts), and shape fields. Types may carry [constraints](/reference/constraints) for runtime validation.
 
 ## Syntax
 
-**Primitives:** `number` | `string` | `trinary` | `bool` | `document`
+**Primitives:** `number` | `string` | `trinary` | `boolean` | `document`
 
 **Collections:** `list[T]` | `dict[T]` | `set[T]` | `record[T1, T2, ...]`
 
@@ -25,12 +25,20 @@ Sentrie provides primitive types (`number`, `string`, `trinary`, `bool`, `docume
 
 ### Primitive types
 
+:::caution[Breaking change: `bool`, `int` and `float` are not types]
+The only type names for numbers and truth values are `number`, `boolean` and `trinary`. `bool`, `int` and `float` are not aliases: using any of them where a type is expected is a parse error with a hint, for example `unknown type "bool": did you mean "boolean"?` (`number` for `int` and `float`). Replace `let ok: bool = ...` with `boolean`, and `int` or `float` with `number`.
+
+The three words are still ordinary identifiers, so `let int = 5` or a field named `bool` keeps working. A shape cannot be named `bool`, `int` or `float` (parse error), because it could never be referenced as a type.
+
+A `number` already holds either an exact integer or a float (see [Integers and floats](#integers-and-floats)), so there is nothing to choose between.
+:::
+
 | Type | Description | Notes |
 | :--- | :---------- | :---- |
 | `number` | Numeric values: exact 64-bit integers and 64-bit floats. | Whole numbers that fit in a signed 64-bit integer stay exact; see [Integers and floats](#integers-and-floats). |
 | `string` | UTF-8 string. | Literals: double-quoted or backtick. |
-| `trinary` | Three-valued logic: `true`, `false`, `unknown`. | Used for conditions and [boolean operations](/reference/boolean-operations). See [Trinary](/reference/trinary). |
-| `bool` | Two-valued: `true`, `false`. | Subset of trinary; no `unknown` literal for bool, but expressions can produce trinary. |
+| `trinary` | Three-valued logic: `true`, `false`, `unknown`. Accepts all three. | Used for conditions and [boolean operations](/reference/boolean-operations). See [Trinary](/reference/trinary). |
+| `boolean` | Strictly `true` or `false`. | Behaves like a `trinary` that rejects `unknown`: a value that is `unknown` fails the check with `value 'unknown' is not a boolean ... use trinary to allow unknown`. Use `trinary` when `unknown` is a valid answer. |
 | `document` | JSON-like object (string keys, arbitrary values). | Used for untyped or semi-structured data. |
 
 ### Number literals
@@ -89,8 +97,8 @@ An integer beyond `Number.MAX_SAFE_INTEGER` (2^53-1) cannot be passed to a [Type
 
 | Type | Description | Index type | Notes |
 | :--- | :---------- | :--------- | :---- |
-| `list[T]` | Ordered sequence of values of type `T`. | `number` (zero-based). | Index out of range is an error or undefined behavior per implementation. |
-| `dict[T]` | Key-value map; keys are strings, values are type `T`. | `string` or `.key` (identifier). | Keys must be strings. Dot access: `map.key` when key is a [valid identifier](/reference/identifiers). |
+| `list[T]` | Ordered sequence of values of type `T`. | `number` (zero-based). | Index out of range is undefined. A non-integer index is an error; see [Indexing and access](#indexing-and-access). |
+| `dict[T]` | Key-value map; keys are strings, values are type `T`. | `string` or `.key` (identifier). | Keys must be strings. Dot access: `map.key` when key is a [valid identifier or a keyword](/reference/identifiers#keywords-as-field-names). |
 | `set[T]` | Distinct values of type `T`, always written out in sorted order. | Not indexable. | No literal syntax; see [Sets](#sets). Works with `in`, `contains` and `count`. |
 | `record[T1,T2,...]` | Fixed-length tuple with typed positions. | `number` (zero-based position). | Length and types are fixed at type declaration. |
 
@@ -237,13 +245,16 @@ Use it for data whose structure you do not want to validate, such as a fact that
 
 ### Cast
 
-The postfix cast `expr as type` converts the value of `expr` to the given type. The result is validated against the type and any [constraints](/reference/constraints) on that type. If conversion or validation fails, evaluation errors; it never yields an unchecked value. `as` binds to the expression on its left, so write `(a + b) as number` to cast a sum. Supported conversions include string↔number, number↔string, bool↔string, and literal document to `document`.
+The postfix cast `expr as type` converts the value of `expr` to the given type. The result is validated against the type and any [constraints](/reference/constraints) on that type. If conversion or validation fails, evaluation errors; it never yields an unchecked value. `as` binds to the expression on its left, so write `(a + b) as number` to cast a sum. Casting `unknown` to `boolean` is an error. Supported conversions include string↔number, number↔string, boolean↔string, and literal document to `document`.
 
 **Returns:** N/A for type declarations. For a cast: the value after conversion and validation; failure is an evaluation error.
 
 ## Indexing and access
 
-- **List:** `listExpr[indexExpr]`. `indexExpr` must be a number (or evaluate to a number). Zero-based. Bounds behavior is implementation-defined (error or undefined).
+- **List:** `listExpr[indexExpr]`. Zero-based. The index must be an integer, or a float with a whole value such as `2.0`.
+  - An index past either end of the list (including a negative one) is **undefined**, not an error.
+  - An undefined index (for example `xs[x.missing]`) gives undefined.
+  - Any other index is an **error**: `list index must be an integer, got <kind or value>`. That covers a string, bool, null, list or dict, and a fractional number such as `1.7` or `NaN`. `[10, 20, 30]["foo"]` and `[10, 20, 30][1.7]` stop evaluation; they no longer return `10` and `20`.
 - **Record:** `recordExpr[indexExpr]`. Same as list; index is the position (0, 1, 2, …).
 - **Map:** `mapExpr[keyExpr]` or `mapExpr.key`. Key must be a string. Dot form is equivalent to bracket form when the key is a [valid identifier](/reference/identifiers) (e.g. `m.one` ≈ `m["one"]`).
 
@@ -261,10 +272,10 @@ The postfix cast `expr as type` converts the value of `expr` to the given type. 
 ```text
 let u: number = 50
 let s: string = "hello"
-let b: bool = true
+let b: boolean = true
 let arr: list[number] = [1, 2, 3]
 let m: dict[number] = { "one": 1, "two": 2 }
-let r: record[string, number, bool] = ["one", 1, true]
+let r: record[string, number, boolean] = ["one", 1, true]
 ```
 
 ### Indexing
@@ -275,12 +286,24 @@ let one: number = m["one"]
 let oneAlt: number = m.one
 ```
 
+### Index errors
+
+```text
+let xs: list[number] = [10, 20, 30]
+let ok: number = xs[2.0]        -- 30
+let none: number = xs[5]        -- undefined (out of range)
+let bad = xs["foo"]             -- Error: list index must be an integer, got string
+let frac = xs[1.7]              -- Error: list index must be an integer, got 1.7
+```
+
+**Breaking change (v0.0.5):** packs that indexed a list with a string, a bool, null or a fractional number now fail at evaluation. An undefined index used to read element zero and now gives undefined. Fix the index (cast with `as number` and round it yourself if it is fractional) before upgrading.
+
 ### Cast
 
 ```text
 let x: number = "50" as number
 let y: string = 50 as string
-let z: bool = "true" as bool
+let z: boolean = "true" as boolean
 let doc: document = { "name": "John", "age": 30 } as document
 ```
 
@@ -289,7 +312,7 @@ let doc: document = { "name": "John", "age": 30 } as document
 Before you implement this, keep a few boundaries in mind:
 
 - **Type annotation on let:** Optional. When omitted, the value is not validated against a type. When present, the value is validated (and constraints apply); failure aborts evaluation.
-- **Map keys:** Must be strings. Access with `[index]`: numeric index for list/record, string key for map. Dot access for maps only when the key is a [valid identifier](/reference/identifiers).
+- **Map keys:** Must be strings. Access with `[index]`: integer index for list/record, string key for map. A missing map key is undefined, as before; a string or fractional list index is an error. Dot access for maps only when the key is a [valid identifier or a keyword](/reference/identifiers#keywords-as-field-names).
 - **Division by zero:** Aborts evaluation. [Constraint](/reference/constraints) failure also aborts evaluation.
 - **Cast:** Validates against the target type and any constraints; failure aborts evaluation. Not all type combinations may be supported; see implementation for allowed conversions.
 
@@ -440,12 +463,43 @@ let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 
 Every element of a collection is checked against its element type. A value typed `dict[number]` rejects `{"a": 1, "b": "two"}` with an error naming the key, `value for key "b" is not valid`. When several values fail, the first failing key in sorted order is reported. In an `is` check the mismatch gives `false`: `{"b": "two"} is dict[number]` is `false`.
 
+A `dict[T]` entry that holds an undefined value counts as absent, because undefined is not a value. `{ "a": payload.missing, "b": 2 } is dict[number]` is `true`, and a typed `let`, a lambda parameter or return, or a shape field of type `dict[number]` accepts such a dict. An entry with a real value of the wrong type still fails, so `{ "a": payload.missing, "b": "two" } is dict[number]` is `false`. The entry is not removed from the value: the dict keeps the key, and JSON output writes it as `null`, for example `{"a":null,"b":2}`. A `list[T]` element holding undefined still fails the check.
+
+```sentrie
+namespace docs/dictundef
+
+policy P {
+  fact payload: document
+
+  rule entryIsAbsent = {
+    let scores = { "a": payload.missing, "b": 2 }
+    yield scores is dict[number]
+  }
+
+  rule wrongValue = {
+    let scores = { "a": payload.missing, "b": "two" }
+    yield scores is dict[number]
+  }
+
+  rule typedLet = {
+    let scores: dict[number] = { "a": payload.missing, "b": 2 }
+    yield scores
+  }
+
+  export decision of entryIsAbsent
+  export decision of wrongValue
+  export decision of typedLet
+}
+```
+
+With `{"payload": {}}`, `entryIsAbsent` is `true`, `wrongValue` is `false`, and `typedLet` is `{"a": null, "b": 2}`.
+
 The check includes the constraints on `T`: with `dict[number @min(0) @max(100)]`, `{"a": 50, "b": 150}` fails with `value for key "b" is not valid`, followed by the failed constraint. When `T` is a [shape](/reference/shapes#closed-and-open-shapes), each value is checked against it, so a value with a field the shape does not declare is rejected too, with the key named.
 
 A dict literal with a repeated key is not an error: the last value wins and nothing is reported (`{ "k": 1, "k": 2 }` has `k` equal to `2`).
 
 ```text
-let u: record[string, number, bool] = ["one", 1, true]
+let u: record[string, number, boolean] = ["one", 1, true]
 ```
 
 ```text
@@ -523,7 +577,7 @@ let u: string = 50 as string
 ```
 
 ```text
-let u: bool = "true" as bool
+let u: boolean = "true" as boolean
 ```
 
 ```text

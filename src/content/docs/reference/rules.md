@@ -24,7 +24,7 @@ contribute IDENT [ when expr ] { stmt* yield expr }
 | Part | Type | Required | Description |
 | :--- | :--- | :------- | :---------- |
 | `: type` | type | No | Declared result type, checked against the body and the `default`. See [Declaring a rule's type](#declaring-a-rules-type). |
-| `default expr` | expression | No | Fallback outcome when `when` is not truthy. Type can be any value (e.g. bool, number, string). If omitted, non-truthy `when` yields `unknown`. |
+| `default expr` | expression | No | Fallback outcome when `when` is not truthy. Type can be any value (e.g. boolean, number, string). If omitted, non-truthy `when` yields `unknown`. |
 | `when expr` | expression (trinary/truthy) | No | Guard. Evaluated first. Only if [truthy](/reference/trinary) (i.e. `true` in trinary semantics) is the body evaluated. Default when omitted: treated as true. |
 | body | block | Yes | Statements (e.g. `let`) followed by exactly one `yield expr`. Only the chosen branch (body or default) is evaluated; the other is not. |
 
@@ -57,7 +57,7 @@ rule isAdmin = default false when user.role is defined {
 
 If `user.role` is not defined (or expression is false/unknown), outcome is `false`. Otherwise outcome is the result of `user.role == "admin"`.
 
-### Rule yielding a value (not just bool)
+### Rule yielding a value (not just boolean)
 
 ```sentrie
 rule getPrice = default 0 when product.price is defined {
@@ -79,6 +79,28 @@ export decision of canEdit
 
 `canEdit`’s body evaluates `isAdmin`, which runs with the same facts. So the outcome of `canEdit` is the outcome of `isAdmin` in this example.
 
+### What `default` covers
+
+`default` replaces the outcome only when the `when` guard is not truthy. It does not replace a body that runs and yields an undefined value: the rule stays `unknown`, so a `default` never hides a problem in the body.
+
+```sentrie
+namespace docs/typed
+
+policy P {
+  fact user: document
+
+  rule guarded = default false when user.active {
+    yield user.missing
+  }
+
+  export decision of guarded
+}
+```
+
+With `{"user": {"active": false}}` the guard is not truthy and the outcome is the `default`, `false`. With `{"user": {"active": true}}` the body runs, `user.missing` is undefined, and the outcome is `unknown`.
+
+The `default` expression is evaluated only when it is used, and an error raised in it is the rule's error, like an error in the body. `default 1 / 0 when user.active` fails with `divide by zero` when `user.active` is not true. The error is reported as that rule's error; before, an error in a `default` expression was dropped and the rule reported `unknown`.
+
 ## Declaring a Rule's Type
 
 A rule can declare the type of its result, written the same way as the type on a `let`:
@@ -89,7 +111,7 @@ rule score: number = default 0 when user.active {
 }
 ```
 
-A declared type is checked against the rule's body and its `default`. With `user.score` set to `7` the rule above yields `7`; with `"high"` the evaluation fails with `value high is not a number`; and when `user.active` is false it falls back to the `default`, `0`. A value that is undefined, or a `when` that does not hold with no `default`, is not checked.
+A declared type is checked against the rule's body and its `default`. With `user.score` set to `7` the rule above yields `7`; with `"high"` the evaluation fails with `value high is not a number`; and when `user.active` is false it falls back to the `default`, `0`. A value that is undefined, or a `when` that does not hold with no `default`, is not checked. Typed `let` declarations and derive and lambda return types treat undefined the same way; see [Intermediate Values](/reference/let#typed-let-and-undefined). Shape fields differ: an optional field holding undefined is treated as omitted, and a required one counts as missing; see [Shapes](/reference/shapes#field-modifiers-complex-shapes).
 
 A declared type is optional for most rules, but a rule must declare one before other statements can [contribute](#contributing-to-a-rule) to it.
 
@@ -150,7 +172,7 @@ How the rule's own value and its contributions are combined depends on the decla
 | Declared type | Result |
 |---------------|--------|
 | `list[T]` | The rule's own list, followed by the value of each contribution that applies, in declaration order. |
-| `boolean` or `trinary` | The rule's own value combined with each contribution that applies using [`or`](/reference/trinary), following three-valued logic. |
+| `boolean` or `trinary` | The rule's own value combined with each contribution that applies using [`or`](/reference/trinary), following three-valued logic. For a `boolean` rule, a contribution that yields `unknown` is an error; a rule whose own `when` fails, which has no `default`, and which gets no `true` contribution reports `unknown`. |
 
 Each contribution yields a single element for a `list[T]` rule, not a list. The element is checked against `T`.
 
@@ -244,10 +266,72 @@ A contribution is checked when the pack is validated. These are reported as inde
 
 A contribution that reads its own rule is rejected because the rule's value depends on the contribution. Use a separate rule if you need to inspect the combined result, as `allow` does with `count(deny)` above.
 
-Values that are not literals are checked when the rule is evaluated. If a contribution's value does not match the element type, for example `value 5 is not a string`, or if a contribution or the declared type of the rule produces any other error, the evaluation fails with that error (`sentrie exec` exits non-zero and the HTTP API returns 500) and no decision is returned. It never reports the rule's own value or a partly combined list.
+Values that are not literals are checked when the rule is evaluated. If a contribution's value does not match the element type, for example `value 5 is not a string`, or if a contribution or the declared type of the rule produces any other error, the rule fails with that error and no decision is returned for it: the rule reports an [error](#when-a-rule-fails) and an unknown decision. It never reports the rule's own value or a partly combined list.
 
 :::note
-`contribute` is a reserved keyword. It cannot be used as an identifier, a namespace segment, or a field name after a `.`, so `user.contribute` is a parse error (`expected Ident, got contribute`). To read a document field called `contribute`, use index access: `user["contribute"]`.
+`contribute` is a reserved keyword. It cannot be used as a rule, fact, policy, shape or let name, or as the first segment of a namespace, but it can be a field name, so `user.contribute` reads the document field called `contribute`.
+:::
+
+## When a Rule Fails
+
+A rule can fail while it is evaluated, for example on a division by zero or a value that does not match a declared type. The failure belongs to that rule alone: its decision is `unknown`, its attachments are `null` (also when only an attachment failed), it carries an `error` object next to its output, and every other rule of the policy is still evaluated and reported.
+
+Take this policy. `ratio` fails when `limit` is `0`, and `is_admin` does not depend on it:
+
+```sentrie
+namespace docs/checks
+
+shape User {
+  role: string
+  limit: number
+}
+
+policy access {
+  fact user: User
+
+  rule is_admin = default false {
+    yield user.role == "admin"
+  }
+
+  rule ratio = {
+    let limit = user.limit
+    yield 100 / limit
+  }
+
+  export decision of is_admin
+  export decision of ratio
+}
+```
+
+With the facts `{"user":{"role":"admin","limit":0}}`, the output for `ratio` is (the `trace` is left out):
+
+```json
+{
+  "policy": "access",
+  "namespace": "docs/checks",
+  "rule": "ratio",
+  "decision": { "state": "unknown", "value": "unknown" },
+  "attachments": null,
+  "error": {
+    "title": "Evaluation Failed",
+    "status": 500,
+    "detail": "divide by zero"
+  }
+}
+```
+
+The output for `is_admin` is unchanged and has no `error` field.
+
+| Field | Meaning |
+| :---- | :------ |
+| `title` | Always `Evaluation Failed`. |
+| `status` | The HTTP status the failure maps to: `400` for an invalid invocation, `503` when the evaluation deadline passed, `500` otherwise. |
+| `detail` | The error message. |
+
+A rule whose whole value is a lambda is one kind of per-rule error. How the error is reported depends on how you run the policy: `sentrie exec` prints every rule and then exits `1` (see [Executing Policies](/running-sentrie/executing-policies#when-a-rule-fails)), and `sentrie serve` answers `207 Multi-Status` (see [Serving Policies](/running-sentrie/serving-policies#when-a-rule-fails)).
+
+:::note
+The order of the rules in the output, and of the errors in an error message that lists several, is not guaranteed and can differ between runs. Match results by their `rule` field, not by position.
 :::
 
 ## Good to Know
