@@ -160,4 +160,4 @@ Before you implement this, keep a few boundaries in mind:
 - **Policy name:** The policy name is an identifier. The same namespace may contain multiple policies. Each has its own facts, let, use, and rules.
 - **Export target:** Exported rule names are the targets for the CLI/API and for `import decision of` from other policies. When importing, the binding (e.g. `with` clause) uses the rule name as defined in the target policy (and the declared fact names of that policy, not their aliases).
 - **Evaluation:** When a decision is requested, the runtime evaluates the chosen rule (with facts bound). Only that rule’s body or default is run; other rules are not evaluated unless the chosen rule references them.
-- **Contributions:** `contribute` is a reserved keyword, so it cannot be used as an identifier, a namespace segment or a field name after a `.`.
+- **Contributions:** `contribute` is a reserved keyword, so it cannot be used as a rule, fact, policy, shape or let name, or as the first segment of a namespace. It can still be a field name, as in `user.contribute`.
