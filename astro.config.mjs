@@ -27,8 +27,28 @@ export default defineConfig({
           label: "Getting Started",
           items: [
             {
+              label: "Overview",
+              slug: "getting-started",
+            },
+            {
+              label: "Quick Glance",
+              slug: "quick-glance",
+            },
+            {
               label: "Introduction & Core Philosophy",
               slug: "getting-started/introduction",
+            },
+            {
+              label: "What is Sentrie?",
+              slug: "getting-started/what-is-sentrie",
+            },
+            {
+              label: "What is Policy as Code?",
+              slug: "getting-started/what-is-policy-as-code",
+            },
+            {
+              label: "Why Sentrie?",
+              slug: "getting-started/why-sentrie",
             },
             { label: "Quick Start", slug: "getting-started/quick-start" },
             { label: "Installation", slug: "getting-started/installation" },
@@ -71,6 +91,31 @@ export default defineConfig({
             {
               label: "Pattern Matching & Conditionals",
               slug: "language-concepts/pattern-matching-conditionals",
+            },
+          ],
+        },
+        {
+          label: "Structure of a Policy Pack",
+          items: [
+            {
+              label: "Overview",
+              slug: "structure-of-a-policy-pack/overview",
+            },
+            {
+              label: "Pack File",
+              slug: "structure-of-a-policy-pack/packfile",
+            },
+            {
+              label: "Program File",
+              slug: "structure-of-a-policy-pack/program-file",
+            },
+            {
+              label: "TypeScript File",
+              slug: "structure-of-a-policy-pack/typescript-file",
+            },
+            {
+              label: "Example Pack",
+              slug: "structure-of-a-policy-pack/example-pack",
             },
           ],
         },
