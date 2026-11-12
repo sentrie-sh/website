@@ -75,6 +75,31 @@ export default defineConfig({
           ],
         },
         {
+          label: "Structure of a Policy Pack",
+          items: [
+            {
+              label: "Overview",
+              slug: "structure-of-a-policy-pack/overview",
+            },
+            {
+              label: "Pack File",
+              slug: "structure-of-a-policy-pack/packfile",
+            },
+            {
+              label: "Program File",
+              slug: "structure-of-a-policy-pack/program-file",
+            },
+            {
+              label: "TypeScript File",
+              slug: "structure-of-a-policy-pack/typescript-file",
+            },
+            {
+              label: "Example Pack",
+              slug: "structure-of-a-policy-pack/example-pack",
+            },
+          ],
+        },
+        {
           label: "Running Sentrie",
           items: [
             {
