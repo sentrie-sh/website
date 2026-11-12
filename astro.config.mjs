@@ -289,10 +289,6 @@ export default defineConfig({
               label: "Writing Custom TypeScript Modules",
               slug: "extensibility/writing-custom-typescript-modules",
             },
-            {
-              label: "JavaScript Modules",
-              slug: "typescript-modules",
-            },
           ],
         },
         {
