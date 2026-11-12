@@ -79,6 +79,28 @@ export decision of canEdit
 
 `canEdit`’s body evaluates `isAdmin`, which runs with the same facts. So the outcome of `canEdit` is the outcome of `isAdmin` in this example.
 
+### What `default` covers
+
+`default` replaces the outcome only when the `when` guard is not truthy. It does not replace a body that runs and yields an undefined value: the rule stays `unknown`, so a `default` never hides a problem in the body.
+
+```sentrie
+namespace docs/typed
+
+policy P {
+  fact user: document
+
+  rule guarded = default false when user.active {
+    yield user.missing
+  }
+
+  export decision of guarded
+}
+```
+
+With `{"user": {"active": false}}` the guard is not truthy and the outcome is the `default`, `false`. With `{"user": {"active": true}}` the body runs, `user.missing` is undefined, and the outcome is `unknown`.
+
+The `default` expression is evaluated only when it is used, and an error raised in it is the rule's error, like an error in the body. `default 1 / 0 when user.active` fails with `divide by zero` when `user.active` is not true. The error is reported as that rule's error; before, an error in a `default` expression was dropped and the rule reported `unknown`.
+
 ## Declaring a Rule's Type
 
 A rule can declare the type of its result, written the same way as the type on a `let`:
@@ -89,7 +111,7 @@ rule score: number = default 0 when user.active {
 }
 ```
 
-A declared type is checked against the rule's body and its `default`. With `user.score` set to `7` the rule above yields `7`; with `"high"` the evaluation fails with `value high is not a number`; and when `user.active` is false it falls back to the `default`, `0`. A value that is undefined, or a `when` that does not hold with no `default`, is not checked.
+A declared type is checked against the rule's body and its `default`. With `user.score` set to `7` the rule above yields `7`; with `"high"` the evaluation fails with `value high is not a number`; and when `user.active` is false it falls back to the `default`, `0`. A value that is undefined, or a `when` that does not hold with no `default`, is not checked. Typed `let` declarations and derive and lambda return types treat undefined the same way; see [Intermediate Values](/reference/let#typed-let-and-undefined). Shape fields differ: an optional field holding undefined is treated as omitted, and a required one counts as missing; see [Shapes](/reference/shapes#field-modifiers-complex-shapes).
 
 A declared type is optional for most rules, but a rule must declare one before other statements can [contribute](#contributing-to-a-rule) to it.
 
