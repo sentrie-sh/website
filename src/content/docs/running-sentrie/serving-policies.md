@@ -29,10 +29,10 @@ The following sections summarize default flags and typical API usage.
   - `local4` - Listen on the IPv4 loopback address (127.0.0.1)
   - `local6` - Listen on the IPv6 loopback address (`::1`)
   - `network` - Listen on all network interfaces, IPv4 and IPv6
-  - `network4` - Listen on all IPv4 interfaces (0.0.0.0)
-  - `network6` - Listen on all IPv6 interfaces (`::`)
+  - `network4` - Listen on `0.0.0.0`
+  - `network6` - Listen on `::`
 
-  A predefined value must be the only `--http-listen` value.
+  A predefined value must be the only `--http-listen` value. `local6` binds `[::1]:<port>` and `network6` binds `[::]:<port>`. On dual-stack hosts either wildcard also accepts the other address family, same as `network`. If an address cannot be bound, the port is invalid, or an address is empty (`--http-listen=`), `serve` exits with `invalid or unusable --http-listen/--http-port: <cause>`.
 
 - `--http-max-body-bytes` (default: `1048576`): Largest request body to accept, in bytes. A plain integer; `0` removes the limit and a negative value is rejected at startup. A request over the limit is answered with `413`.
 
@@ -53,6 +53,9 @@ sentrie serve --http-listen local --http-port 8080 .
 
 # Listen on multiple interfaces
 sentrie serve --http-listen 192.168.1.100,192.168.100.101 --http-port 8080 .
+
+# Listen on the IPv6 loopback address only
+sentrie serve --http-listen local6 --http-port 8080 .
 ```
 
 ## API Endpoints
@@ -185,7 +188,7 @@ readinessProbe:
     port: 7529
 ```
 
-Start the server with `--http-listen network` (or `network4` for IPv4 only) so the probes can reach it from outside the container.
+Start the server with `--http-listen network` (or `network4`) so the probes can reach it from outside the container.
 
 :::caution
 The API has no authentication (see [sentrie-sh/sentrie#115](https://github.com/sentrie-sh/sentrie/issues/115)). Keep it behind a cluster-internal Service or a NetworkPolicy, and never expose it publicly.
