@@ -131,6 +131,10 @@ export default defineConfig({
               slug: "reference/facts",
             },
             {
+              label: "Pack data",
+              slug: "reference/pack-data",
+            },
+            {
               label: "Rules",
               slug: "reference/rules",
             },
