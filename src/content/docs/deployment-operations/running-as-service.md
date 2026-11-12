@@ -44,7 +44,7 @@ Evaluates a policy or rule. `{target...}` = path segments: `namespace/policy` or
 | :--- | :--- | :--- | :--- |
 | `facts` | object | Yes | Map of declared fact name to JSON value (the name after `fact`, never the `as` alias). Must satisfy policy fact types. |
 
-**Response:** `200` with body:
+**Response:** `200` with body (or `207` when a rule failed, see below):
 
 ```json
 {
@@ -54,14 +54,18 @@ Evaluates a policy or rule. `{target...}` = path segments: `namespace/policy` or
       "namespace": "string",
       "rule": "string",
       "decision": {
-        "state": "TRUE" | "FALSE" | "UNKNOWN",
+        "state": "true" | "false" | "unknown",
         "value": <any>
       },
       "attachments": { "<name>": <value>, ... },
-      "trace": { ... }
+      "trace": { ... },
+      "error": {
+        "title": "Evaluation Failed",
+        "status": 500,
+        "detail": "string"
+      }
     }
-  ],
-  "error": "string"
+  ]
 }
 ```
 
@@ -71,7 +75,9 @@ Evaluates a policy or rule. `{target...}` = path segments: `namespace/policy` or
 | `decision.state` | string | Trinary outcome. |
 | `decision.value` | any | Rule yield value. |
 | `attachments` | object | Exported attachments for that rule. |
-| `error` | string | Non-empty if execution failed. |
+| `error` | object | Present only on a rule that failed: `title`, `status` (`400`, `503` or `500`) and `detail`. Its `decision` is `unknown`. |
+
+A request for a policy answers `207 Multi-Status` when any rule failed (also when all failed) and `200` otherwise. The other rules are still evaluated and reported. The order of `decisions` is not guaranteed. A missing or invalid fact, and a failing single-rule request, answer with a problem document instead. See [Serving Policies](/running-sentrie/serving-policies#when-a-rule-fails).
 
 ## Endpoints
 
@@ -80,7 +86,7 @@ Evaluates a policy or rule. `{target...}` = path segments: `namespace/policy` or
 | Health | GET | `/health` | none |
 | Decision | POST | `/decision/{namespace}/{policy}[/{rule}]` | `{ "facts": { ... } }` |
 
-**Returns:** See schemas above. 400 for invalid JSON or path; 404 for unknown policy/rule; 405 for wrong method; 500 for evaluation error.
+**Returns:** See schemas above. 200 for success; 207 when a rule of a policy request failed; 400 for invalid JSON or path, or a missing required fact; 404 for unknown policy/rule; 405 for wrong method; 500 for an evaluation error on a single-rule request or, for now, a fact with the wrong type (400 after sentrie-sh/sentrie#147).
 
 ## Examples in Action
 
@@ -119,7 +125,7 @@ curl -X POST "http://localhost:7529/decision/com/example/auth/user" \
 | 400 | Bad request (invalid JSON, missing path). |
 | 404 | Policy or rule not found. |
 | 405 | Method not allowed (e.g. GET on /decision). |
-| 500 | Internal error during evaluation. |
+| 500 | Internal error during evaluation of a single rule. |
 
 ## Good to Know
 

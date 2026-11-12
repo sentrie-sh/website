@@ -244,10 +244,72 @@ A contribution is checked when the pack is validated. These are reported as inde
 
 A contribution that reads its own rule is rejected because the rule's value depends on the contribution. Use a separate rule if you need to inspect the combined result, as `allow` does with `count(deny)` above.
 
-Values that are not literals are checked when the rule is evaluated. If a contribution's value does not match the element type, for example `value 5 is not a string`, or if a contribution or the declared type of the rule produces any other error, the evaluation fails with that error (`sentrie exec` exits non-zero and the HTTP API returns 500) and no decision is returned. It never reports the rule's own value or a partly combined list.
+Values that are not literals are checked when the rule is evaluated. If a contribution's value does not match the element type, for example `value 5 is not a string`, or if a contribution or the declared type of the rule produces any other error, the rule fails with that error and no decision is returned for it: the rule reports an [error](#when-a-rule-fails) and an unknown decision. It never reports the rule's own value or a partly combined list.
 
 :::note
 `contribute` is a reserved keyword. It cannot be used as an identifier, a namespace segment, or a field name after a `.`, so `user.contribute` is a parse error (`expected Ident, got contribute`). To read a document field called `contribute`, use index access: `user["contribute"]`.
+:::
+
+## When a Rule Fails
+
+A rule can fail while it is evaluated, for example on a division by zero or a value that does not match a declared type. The failure belongs to that rule alone: its decision is `unknown`, its attachments are `null` (also when only an attachment failed), it carries an `error` object next to its output, and every other rule of the policy is still evaluated and reported.
+
+Take this policy. `ratio` fails when `limit` is `0`, and `is_admin` does not depend on it:
+
+```sentrie
+namespace docs/checks
+
+shape User {
+  role: string
+  limit: number
+}
+
+policy access {
+  fact user: User
+
+  rule is_admin = default false {
+    yield user.role == "admin"
+  }
+
+  rule ratio = {
+    let limit = user.limit
+    yield 100 / limit
+  }
+
+  export decision of is_admin
+  export decision of ratio
+}
+```
+
+With the facts `{"user":{"role":"admin","limit":0}}`, the output for `ratio` is (the `trace` is left out):
+
+```json
+{
+  "policy": "access",
+  "namespace": "docs/checks",
+  "rule": "ratio",
+  "decision": { "state": "unknown", "value": "unknown" },
+  "attachments": null,
+  "error": {
+    "title": "Evaluation Failed",
+    "status": 500,
+    "detail": "divide by zero"
+  }
+}
+```
+
+The output for `is_admin` is unchanged and has no `error` field.
+
+| Field | Meaning |
+| :---- | :------ |
+| `title` | Always `Evaluation Failed`. |
+| `status` | The HTTP status the failure maps to: `400` for an invalid invocation, `503` when the evaluation deadline passed, `500` otherwise. |
+| `detail` | The error message. |
+
+A rule whose whole value is a lambda is one kind of per-rule error. How the error is reported depends on how you run the policy: `sentrie exec` prints every rule and then exits `1` (see [Executing Policies](/running-sentrie/executing-policies#when-a-rule-fails)), and `sentrie serve` answers `207 Multi-Status` (see [Serving Policies](/running-sentrie/serving-policies#when-a-rule-fails)).
+
+:::note
+The order of the rules in the output, and of the errors in an error message that lists several, is not guaranteed and can differ between runs. Match results by their `rule` field, not by position.
 :::
 
 ## Good to Know
