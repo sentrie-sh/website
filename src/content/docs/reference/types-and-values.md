@@ -455,6 +455,37 @@ let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 
 Every element of a collection is checked against its element type. A value typed `dict[number]` rejects `{"a": 1, "b": "two"}` with an error naming the key, `value for key "b" is not valid`. When several values fail, the first failing key in sorted order is reported. In an `is` check the mismatch gives `false`: `{"b": "two"} is dict[number]` is `false`.
 
+A `dict[T]` entry that holds an undefined value counts as absent, because undefined is not a value. `{ "a": payload.missing, "b": 2 } is dict[number]` is `true`, and a typed `let`, a lambda parameter or return, or a shape field of type `dict[number]` accepts such a dict. An entry with a real value of the wrong type still fails, so `{ "a": payload.missing, "b": "two" } is dict[number]` is `false`. The entry is not removed from the value: the dict keeps the key, and JSON output writes it as `null`, for example `{"a":null,"b":2}`. A `list[T]` element holding undefined still fails the check.
+
+```sentrie
+namespace docs/dictundef
+
+policy P {
+  fact payload: document
+
+  rule entryIsAbsent = {
+    let scores = { "a": payload.missing, "b": 2 }
+    yield scores is dict[number]
+  }
+
+  rule wrongValue = {
+    let scores = { "a": payload.missing, "b": "two" }
+    yield scores is dict[number]
+  }
+
+  rule typedLet = {
+    let scores: dict[number] = { "a": payload.missing, "b": 2 }
+    yield scores
+  }
+
+  export decision of entryIsAbsent
+  export decision of wrongValue
+  export decision of typedLet
+}
+```
+
+With `{"payload": {}}`, `entryIsAbsent` is `true`, `wrongValue` is `false`, and `typedLet` is `{"a": null, "b": 2}`.
+
 ```text
 let u: record[string, number, bool] = ["one", 1, true]
 ```
