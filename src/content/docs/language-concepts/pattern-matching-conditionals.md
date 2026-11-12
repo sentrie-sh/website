@@ -56,7 +56,7 @@ Before you implement this, keep a few boundaries in mind:
 
 - **Ternary:** Condition is evaluated first; only the chosen branch is evaluated. Nested ternaries are allowed; precedence is right-associative.
 - **Elvis:** Shorthand for “use this value or default.” Only `null` and undefined select the default. Any other left side, including `false`, `0`, `""` and `unknown`, is returned as it is.
-- **matches:** Right-hand side is a string regex. Patterns are compiled and cached. Match is against the whole string unless the pattern allows partial match.
+- **matches:** Right-hand side is a string regex. Patterns are compiled and cached. A pattern matches anywhere in the string (a substring match), so `"not-admin-suffix" matches "admin"` is true. Anchor the pattern for a whole-string check: `value matches "^admin$"`.
 - **is defined:** Use for optional shape fields or values that may be undefined. Accessing undefined without checking can propagate unknown.
 - **is empty:** Applies to strings, lists, and maps. Non-empty means at least one character or element.
 
