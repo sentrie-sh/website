@@ -352,7 +352,7 @@ Treat `207` as a success of the request that contains failures: read each decisi
 
 Three things are not per-rule errors and answer with a [Problem Details](#error-responses) document:
 
-- A fact error: a required fact is missing (`400`), or a fact has the wrong type (`500` for now, `400` once [sentrie-sh/sentrie#147](https://github.com/sentrie-sh/sentrie/issues/147) lands).
+- A fact error: a required fact is missing, a supplied fact has the wrong type, or an imported policy gets a wrongly typed or missing `with` fact (`400`).
 - A request for a single rule (`/decision/{namespace}/{policy}/{rule}`) whose rule fails. The status follows the failure (`400`, `503` or `500`).
 - A policy that cannot be resolved (`404`).
 
@@ -389,7 +389,7 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 - `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact or a supplied fact of the wrong type (`InvalidInvocation`). This includes a wrongly typed or missing `with` fact that an imported policy receives from the importing policy: the whole request fails with one `400` and no decisions, and the message names the imported policy
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
-- `500 Internal Server Error`: Evaluation failed for an internal reason (on a single-rule request), or a fact has the wrong type (for now)
+- `500 Internal Server Error`: Evaluation failed for an internal reason (on a single-rule request)
 
 A failed single-rule evaluation does not include a `null` entry in `decisions`; the handler returns Problem Details instead.
 

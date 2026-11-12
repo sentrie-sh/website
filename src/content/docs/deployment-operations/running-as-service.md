@@ -86,7 +86,7 @@ A request for a policy answers `207 Multi-Status` when any rule failed (also whe
 | Health | GET | `/health` | none |
 | Decision | POST | `/decision/{namespace}/{policy}[/{rule}]` | `{ "facts": { ... } }` |
 
-**Returns:** See schemas above. 200 for success; 207 when a rule of a policy request failed; 400 for invalid JSON or path, or a missing required fact; 404 for unknown policy/rule; 405 for wrong method; 500 for an evaluation error on a single-rule request or, for now, a fact with the wrong type (400 after sentrie-sh/sentrie#147).
+**Returns:** See schemas above. 200 for success; 207 when a rule of a policy request failed; 400 for invalid JSON or path, a missing required fact, a supplied fact of the wrong type, or a wrongly typed or missing `with` fact of an imported policy; 404 for unknown policy/rule; 405 for wrong method; 500 for an evaluation error on a single-rule request.
 
 ## Examples in Action
 

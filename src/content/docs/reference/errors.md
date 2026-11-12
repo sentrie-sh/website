@@ -54,7 +54,7 @@ Typical status codes:
 | `400` | Bad request (invalid JSON, missing or malformed path, bad `facts` shape, missing required fact, a supplied fact of the wrong type, or a wrongly typed or missing `with` fact of an imported policy). |
 | `404` | Policy, namespace, or rule not found. |
 | `405` | Method not allowed (e.g. non-POST on `/decision`). |
-| `500` | Internal error during evaluation of a single-rule request. For now also a fact with the wrong type (`400` after sentrie-sh/sentrie#147). |
+| `500` | Internal error during evaluation of a single-rule request. |
 
 ## Per-rule errors
 
