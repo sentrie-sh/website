@@ -27,8 +27,28 @@ export default defineConfig({
           label: "Getting Started",
           items: [
             {
+              label: "Overview",
+              slug: "getting-started",
+            },
+            {
+              label: "Quick Glance",
+              slug: "quick-glance",
+            },
+            {
               label: "Introduction & Core Philosophy",
               slug: "getting-started/introduction",
+            },
+            {
+              label: "What is Sentrie?",
+              slug: "getting-started/what-is-sentrie",
+            },
+            {
+              label: "What is Policy as Code?",
+              slug: "getting-started/what-is-policy-as-code",
+            },
+            {
+              label: "Why Sentrie?",
+              slug: "getting-started/why-sentrie",
             },
             { label: "Quick Start", slug: "getting-started/quick-start" },
             { label: "Installation", slug: "getting-started/installation" },
@@ -268,6 +288,10 @@ export default defineConfig({
             {
               label: "Writing Custom TypeScript Modules",
               slug: "extensibility/writing-custom-typescript-modules",
+            },
+            {
+              label: "JavaScript Modules",
+              slug: "typescript-modules",
             },
           ],
         },
