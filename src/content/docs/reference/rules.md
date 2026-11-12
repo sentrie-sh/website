@@ -247,7 +247,7 @@ A contribution that reads its own rule is rejected because the rule's value depe
 Values that are not literals are checked when the rule is evaluated. If a contribution's value does not match the element type, for example `value 5 is not a string`, or if a contribution or the declared type of the rule produces any other error, the rule fails with that error and no decision is returned for it: the rule reports an [error](#when-a-rule-fails) and an unknown decision. It never reports the rule's own value or a partly combined list.
 
 :::note
-`contribute` is a reserved keyword. It cannot be used as an identifier, a namespace segment, or a field name after a `.`, so `user.contribute` is a parse error (`expected Ident, got contribute`). To read a document field called `contribute`, use index access: `user["contribute"]`.
+`contribute` is a reserved keyword. It cannot be used as a rule, fact, policy, shape or let name, or as the first segment of a namespace, but it can be a field name, so `user.contribute` reads the document field called `contribute`.
 :::
 
 ## When a Rule Fails

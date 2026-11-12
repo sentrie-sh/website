@@ -194,7 +194,7 @@ rule deny: list[string] = []
 contribute deny when user.disabled { yield "user disabled" }
 ```
 
-`contribute` is a reserved keyword, so it cannot be used as an identifier, a namespace segment or a field name after a `.`.
+`contribute` is a reserved keyword, so it cannot be used as a rule, fact, policy, shape or let name, or as the first segment of a namespace. It can still be a field name, as in `user.contribute`.
 
 ## Expressions
 
@@ -485,6 +485,43 @@ Two limits apply to every execution:
 
 A recursion with a base case that stays within these limits, such as `factorial` above, is not affected.
 
+### Lambdas in decision output
+
+A lambda cannot be written out as JSON, so Sentrie stands in for it. A lambda nested anywhere in a rule's value, in an attachment, or in the trace is encoded as `{"kind":"callable"}`:
+
+```sentrie
+namespace com/example/lambdas
+
+policy output {
+  fact items: list[number]
+
+  rule nested = { "f": (x) => { yield x }, "n": 1 }
+  rule positive = { yield filter(items, (x) => { yield x > 0 }) }
+
+  export decision of nested
+  export decision of positive
+}
+```
+
+`nested` has the decision value `{"f":{"kind":"callable"},"n":1}`. The trace of `positive` shows the lambda passed to `filter` as `"result": {"kind":"callable"}`, while its decision value is the filtered list. Table output prints a nested lambda as `<callable>`.
+
+A **reported** rule whose **whole value** is a lambda (`rule fn = { yield (x) => { yield x } }`) has no useful value to report, so it is that rule's error: `rule com/example/lambdas/output/fn: a rule's value cannot be a callable`. A rule is reported when it is exported and you run it with `sentrie exec` or `sentrie serve`, or when another rule imports it with `import decision`. `sentrie exec` prints the error and exits 1, also when you run the whole policy. `sentrie serve` answers `500` with an `application/problem+json` document titled `Evaluation Failed`. A rule that reaches such a rule with `import decision` fails with the same error.
+
+An unexported helper rule whose value is a lambda is not reported, so it works as a callback:
+
+```sentrie
+namespace com/example/lambdas
+
+policy helpers {
+  rule helper = (x) => { yield x > 1 }
+  rule picked = { yield filter([1, 2, 3], helper) }
+
+  export decision of picked
+}
+```
+
+`picked` has the decision value `[2, 3]`. Exporting `helper` would turn it into a reported rule and make it fail with the error above.
+
 ### Lexical environment
 
 Lambdas **capture** the surrounding execution context: names visible where the lambda is written remain visible when the callable runs (for example `user`, `let` bindings in the same block, and facts). In the current language version, that capture uses the **parent execution context by reference**, so later changes to captured bindings can affect a lambda that runs afterward.
@@ -589,18 +626,33 @@ shape AdminUser with BaseUser {
 
 The composed shape includes all fields from the base shape plus any additional fields defined in the composed shape.
 
+An unqualified base is looked up in the enclosing policy, then in the shape's namespace. A base from another namespace must be qualified (`with com/base/BaseUser`) and exported there with `export shape BaseUser`; an unqualified or unexported cross-namespace base fails validation. See [Composition](/reference/shapes#composition-extending-a-base-shape).
+
 ### Constraints
 
 Constraints can be applied to primitives, collections, and shape fields:
 
-```text
+```sentrie
+namespace docs/reference
+
 shape User {
-  name: string @length(1, 100)
+  name: string @minlength(1) @maxlength(100)
   age: number @min(0) @max(150)
-  email: string @email
-  tags: list[string] @maxlength(10)
+  email: string @email()
+  tags: list[string] @not_empty()
 }
 
+policy users {
+  fact user: User
+
+  rule valid = true
+  export decision of valid
+}
+```
+
+Collection types take constraints on their elements:
+
+```text
 let numbers: list[number] = [1, 2, 3]
 let scores: dict[number @min(0) @max(100)] = {"alice": 95, "bob": 87}
 ```

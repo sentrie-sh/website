@@ -9,7 +9,7 @@ This page summarizes how Sentrie reports errors across the CLI, pack loading, ev
 
 - **Parse and pack errors**: Syntax issues in `*.sentrie` files or invalid `sentrie.pack.toml`.
 - **Type and constraint errors**: Type mismatches, missing required facts, and constraint violations.
-- **Evaluation errors**: Failures while evaluating a rule (often surfaced as type or constraint errors at a specific expression). Each failing rule reports its own [`error` object](/reference/rules#when-a-rule-fails); the other rules of the policy are still evaluated.
+- **Evaluation errors**: Failures while evaluating a rule (often surfaced as type or constraint errors at a specific expression). Each failing rule reports its own [`error` object](/reference/rules#when-a-rule-fails); the other rules of the policy are still evaluated. Invalid operands are in this group: a string or fractional list index (`list index must be an integer, got ...`), `count` of something that is not a list, dict, set or string, and `+` joining a string with a list or dict (`+ cannot join a string with a list`).
 - **Service/API errors**: HTTP 4xx/5xx responses when using `sentrie serve`.
 
 ## CLI exit codes
