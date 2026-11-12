@@ -24,6 +24,15 @@ A field name can be any identifier or any keyword, so `version: string` and `def
 
 Each field has a name, an optional `?` suffix on the name, a colon, and a type (any [type or shape](/reference/types-and-values)). A `?` on the name makes the field optional; a `?` after the type makes its value nullable.
 
+A shape is **closed** by default: a value that carries a field the body does not declare is rejected. To accept undeclared fields, end the body with the open-shape marker `...` (see [Closed and Open Shapes](#closed-and-open-shapes)):
+
+```text
+shape Name {
+  fieldName: type
+  ...
+}
+```
+
 ### Type alias (simple shape)
 
 A shape that is an alias for a single type, optionally with constraints:
@@ -144,6 +153,145 @@ With `{"payload": {}}`, `requiredIsUndefined` is `false` because `id` reads an u
 
 Field type can be any type reference: primitives (`number`, `string`, `trinary`, `boolean`, `document`), collections (`list[T]`, `dict[T]`, `record[...]`), or another shape. Constraints on the type are validated when the value is assigned or when the value is supplied as a fact.
 
+### Closed and open shapes
+
+:::caution[Breaking change]
+Shapes are closed by default. Before, a value could carry fields its shape did not declare and they passed through unchecked. A pack that relied on this, for example by passing a whole upstream JSON object to a shape that names only some of its fields, now fails the shape check. In a typed `let`, a derive argument or a fact it is an evaluation error; for a fact served by `sentrie serve` it is a request error. Declare the extra fields, or end the shape body with `...` to keep the old behaviour for that shape.
+:::
+
+A value checked against a closed shape must not carry a field the shape does not declare. The fields a shape takes in through `with` count as declared. A key holding `undefined` counts as absent, so it is not an undeclared field: with a `payload` fact that has no `role`, `{ "name": "Alice", "age": 28, "role": payload.role } is User` is `true`.
+
+```sentrie
+namespace com/example/users
+
+shape User {
+  name: string
+  age: number
+}
+
+policy access {
+  rule r = {
+    let u: User = { "name": "Alice", "age": 28, "role": "admin" }
+    yield u.name
+  }
+
+  export decision of r
+}
+```
+
+`sentrie validate` accepts this pack and running `r` fails:
+
+```text
+invalid value for let declaration u: field role is not declared in shape com/example/users/User at <file>:10:19-66 - the shape is closed; end its body with '...' to allow undeclared fields
+```
+
+The same holds at every depth. A shape reached through a field, a `list[...]`, a `dict[...]` or a `record[...]` is closed on its own, and the error says which field it came from. With a `User` that has an optional `address?: Address` field, a fact `{"name": "A", "age": 28, "address": {"city": "x", "zip": "1"}}` fails with:
+
+```text
+field 'address' is not valid: field zip is not declared in shape com/example/users/Address at <file>:15:3-18 - the shape is closed; end its body with '...' to allow undeclared fields
+```
+
+Declared fields are checked first, so a missing or wrongly typed field is reported before an undeclared one. When several fields are undeclared, the first in sorted order is reported, so the message is the same on every run.
+
+#### Opting out with `...`
+
+End the shape body with `...` to accept fields the shape does not declare. The declared fields are still checked as usual; only the undeclared ones are let through.
+
+```sentrie
+namespace com/example/users
+
+shape User {
+  name: string
+  age: number
+  email?: string
+  ... -- keep any other keys the upstream sends
+}
+
+policy access {
+  fact user: User
+
+  rule adult = default false {
+    yield user.age >= 18
+  }
+
+  export decision of adult
+}
+```
+
+With `{"user": {"name": "A", "age": 28, "role": "admin"}}` as the facts, `adult` is `true`. Without the `...` line the same input fails with `field role is not declared in shape com/example/users/User ...`.
+
+Rules for the marker:
+
+- `...` must be the last entry in the body. A field after it is a parse error: `the open-shape marker '...' at <span> must be the last entry in the shape body`.
+- A comment may follow it, as above.
+- It applies to the shape that writes it, not to the shapes nested inside. Making `Envelope` open does not open the `Address` that one of its fields names; that shape is closed unless it has its own `...`.
+
+#### Openness and `with`
+
+Openness is not inherited through `with`. A child is closed unless its own body ends with `...`, whether or not its base is open:
+
+```sentrie
+namespace com/example/users
+
+shape Base {
+  id: string
+  ...
+}
+
+shape Child with Base {
+  role: string
+}
+
+shape OpenChild with Base {
+  role: string
+  ...
+}
+```
+
+With `{"id": "1", "role": "a", "x": 1}`, a `Child` fails with `field x is not declared in shape com/example/users/Child ...` while an `OpenChild` is accepted. The reverse also holds: an open child of a closed base is open.
+
+#### Duplicate fields
+
+Declaring the same field twice in one shape body is a parse error that names both declarations, so `sentrie validate` rejects the pack:
+
+```sentrie
+namespace com/example/users
+
+shape User {
+  name: string
+  name: number
+}
+```
+
+```text
+parsing error at <file>:5:3-15: duplicate shape field 'name': first declared at <file>:4:3-15
+```
+
+Earlier, the second declaration silently replaced the first.
+
+#### Duplicate keys in a dict literal
+
+A dict literal is not a shape, and a repeated key in one is not an error. The last value wins and nothing is reported:
+
+```sentrie
+namespace com/example/users
+
+policy keys {
+  rule r = {
+    let m = { "k": 1, "k": 2 }
+    yield m.k
+  }
+
+  export decision of r
+}
+```
+
+`r` yields `2`.
+
+#### Values of a `dict[T]`
+
+Every value of a `dict[T]` is checked against `T`, including its constraints, and the error names the key. With `fact scores: dict[number @min(0) @max(100)]`, `{"a": 50, "b": 150}` fails with `value for key "b" is not valid ... constraint failed: 'max'`, and `{"a": 50, "b": "x"}` fails with `value for key "b" is not valid ... value x is not a number`. When `T` is a shape, each value is checked against the closed shape like any other.
+
 ### Composition rules
 
 | Aspect | Rule |
@@ -151,6 +299,7 @@ Field type can be any type reference: primitives (`number`, `string`, `trinary`,
 | Base shape | Exactly one `with BaseName`. The base must be a complex shape (or a type-alias shape that the implementation treats as a structural base where applicable). |
 | Visibility | An unqualified base is found in the enclosing policy, then the child's namespace. A base in another namespace must be written qualified (`with com/base/BaseName`) and declared with `export shape BaseName` there; an unexported or unqualified cross-namespace base is a validation error. A qualified base naming the child's own namespace needs no export. |
 | Duplicate fields | A child cannot declare a field with the same name as a field in the base. |
+| Openness | Not inherited. Each shape is closed unless its own body ends with `...`; see [Closed and Open Shapes](#closed-and-open-shapes). |
 | Circular composition | Not allowed (e.g. A with B, B with A). |
 
 ### Type alias (simple shape) rules
@@ -321,14 +470,7 @@ let phone_message: string = user.phone is defined ? "Phone: " + user.phone : "No
 - **Type Safety**: Values must match the exact shape they're assigned to
 - **Data Model Requirement**: Shapes cannot be composed with alias shapes
 
-```sentrie
--- This will cause a validation error
-let user: User = {
-  name: "John",
-  age: 30,
-  permissions: ["read", "write"]  -- User doesn't have permissions field
-}
-```
+A value with a field the shape does not declare is rejected; see [Closed and Open Shapes](#closed-and-open-shapes).
 
 ## Applying Constraints
 
@@ -728,7 +870,7 @@ The same holds for:
 
 ### Shape literals and field order
 
-When constructing a value (e.g. in a let or as input), field order in the literal does not affect type checking. All required fields must be present and all constraints must hold.
+When constructing a value (e.g. in a let or as input), field order in the literal does not affect type checking. All required fields must be present, all constraints must hold, and, unless the shape ends with `...`, no field the shape does not declare may appear.
 
 ## Good to Know
 
@@ -736,7 +878,8 @@ Before you implement this, keep a few boundaries in mind:
 
 - **Validation timing:** Shape (and constraint) validation runs when a value is assigned to a variable or field of that shape, or when facts are bound. Failure aborts evaluation.
 - **Optional fields:** Use `is defined` (and null checks if the field is nullable) before using an optional or nullable field in expressions. Accessing a missing optional field yields `unknown` in expressions; the shape validator only checks that required fields are present and non-nullable fields are non-null when present.
-- **Composition:** The composed shape effectively has all base fields plus its own. Circular composition (A with B, B with A, or longer cycles) is not allowed. Duplicate field names between base and child are not allowed.
+- **Closed by default:** A value with a field the shape does not declare fails the shape check; end the shape body with `...` to allow it. Openness is not inherited through `with`. See [Closed and Open Shapes](#closed-and-open-shapes).
+- **Composition:** The composed shape effectively has all base fields plus its own. Circular composition (A with B, B with A, or longer cycles) is not allowed. Duplicate field names between base and child, or within one shape body, are not allowed.
 - **Export:** Only shapes declared in the same file can be exported with `export shape Name`. Exported shapes are visible to other namespaces for use as types or, by qualified name, as base shapes in composition. Unexported shapes are namespace-local.
 - **Field order:** The order of fields in a shape literal does not affect type checking; only presence and types (and constraints) matter.
 - **Naming:** Shape names are [identifiers](/reference/identifiers); field names are identifiers or keywords. The same namespace can contain multiple shapes; policies in that namespace can reference any shape in the same namespace or any exported shape from another namespace (per import/resolution rules).

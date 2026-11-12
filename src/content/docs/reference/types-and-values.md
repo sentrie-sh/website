@@ -494,6 +494,10 @@ policy P {
 
 With `{"payload": {}}`, `entryIsAbsent` is `true`, `wrongValue` is `false`, and `typedLet` is `{"a": null, "b": 2}`.
 
+The check includes the constraints on `T`: with `dict[number @min(0) @max(100)]`, `{"a": 50, "b": 150}` fails with `value for key "b" is not valid`, followed by the failed constraint. When `T` is a [shape](/reference/shapes#closed-and-open-shapes), each value is checked against it, so a value with a field the shape does not declare is rejected too, with the key named.
+
+A dict literal with a repeated key is not an error: the last value wins and nothing is reported (`{ "k": 1, "k": 2 }` has `k` equal to `2`).
+
 ```text
 let u: record[string, number, boolean] = ["one", 1, true]
 ```

@@ -20,8 +20,11 @@ shape Name {
   field?: type
   field: type?
   field?: type?
+  ...
 }
 ```
+
+The `...` marker is optional and must be the last entry in the body.
 
 **Shape (alias):** `shape Name baseType @constraint1 @constraint2`
 
@@ -38,6 +41,7 @@ shape Name {
 | `field: T?`   | No       | Required but nullable; the field must be present and may be null. |
 | `field?: T?`  | No       | Optional and nullable.                                           |
 | `with Base`   | No       | Inherits Base's fields. Cross-namespace bases must be qualified and exported.|
+| `...`         | No       | Open-shape marker, last in the body; the shape accepts fields it does not declare. Without it the shape is closed. |
 
 **Returns:** N/A (type system). Constraint validation fails at runtime if a value does not meet the type or constraints; evaluation aborts.
 
@@ -75,11 +79,16 @@ policy example {
 
 ## Good to Know
 
+:::caution[Breaking change]
+Shapes are closed by default. A pack that passed values with extra fields into a narrower shape now fails the shape check. Declare the fields or end the shape body with `...`.
+:::
+
 Before you implement this, keep a few boundaries in mind:
 
 - **Primitives:** `number` (exact 64-bit integer or float), `string`, `trinary` (`true`/`false`/`unknown`), `boolean` (strictly `true` or `false`; rejects `unknown`), `document` (JSON-like).
 - **Collections:** `list[T]` index by integer (a string or fractional index is an error, an out-of-range index is undefined); `dict[T]` keys are strings (dot or `["key"]` access); `record[T1,T2,...]` fixed-length tuple.
 - **Shapes:** Define contracts for facts and `let` bindings. Optional fields may be omitted; use `is defined` to check.
+- **Closed by default:** A value with a field the shape does not declare is rejected, at every depth. End the shape body with `...` to allow undeclared fields. Openness is not inherited through `with`. A shape that declares the same field twice does not parse. See [Closed and Open Shapes](/reference/shapes#closed-and-open-shapes).
 - **Constraints:** Validate at runtime. Failing constraint validation aborts evaluation immediately.
 - **Cast:** postfix `expr as Type` converts and validates against the target type (and its constraints). A failed conversion is an evaluation error.
 
