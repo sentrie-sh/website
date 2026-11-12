@@ -18,6 +18,7 @@ Key points:
 - Sentrie serves plain HTTP; terminate TLS in a reverse proxy (e.g. nginx, Envoy) or API gateway.
 - Add authentication and authorization at the proxy/gateway layer before requests reach Sentrie.
 - Restrict which networks can reach the Sentrie service (firewalls, security groups, service mesh).
+- Request bodies are limited to 1 MiB by default and a larger one gets `413`. Raise or lower the limit with `--http-max-body-bytes <bytes>`; `0` removes it, which you should only do behind a proxy that enforces its own limit.
 
 See:
 
@@ -49,6 +50,7 @@ Combine Sentrie with your existing platform primitives:
 
 - **TLS and mTLS**: Terminate HTTPS at a reverse proxy; optionally enforce mTLS between callers and the proxy.
 - **AuthN/AuthZ for callers**: Require auth tokens for access to the Sentrie endpoint and restrict which services can call which decisions.
+- **Request size**: Sentrie caps request bodies itself (`--http-max-body-bytes`, 1 MiB by default). Set a matching or smaller limit at the proxy so oversized requests are rejected before they reach Sentrie.
 - **Rate limiting and quotas**: Apply rate limits and timeouts at the proxy; treat Sentrie like any other critical backend.
 - **Observability**: Export logs and metrics (through your wrapper or sidecar) so you can monitor error rates and latency.
 

@@ -34,6 +34,8 @@ The following sections summarize default flags and typical API usage.
 
   A predefined value must be the only `--http-listen` value.
 
+- `--http-max-body-bytes` (default: `1048576`): Largest request body to accept, in bytes. A plain integer; `0` removes the limit and a negative value is rejected at startup. A request over the limit is answered with `413`.
+
 ### Examples
 
 ```bash
@@ -234,6 +236,8 @@ Each key in `facts` is a fact's **declared name**, the name written after `fact`
 
 Integers in `facts` that fit in 64 bits are read exactly, so an ID such as `9007199254740993` is evaluated, compared and returned with every digit. A number outside the float range, such as `1e400`, is rejected with a `400` problem response ("Invalid JSON"). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).
 
+A request body may be at most 1 MiB unless the server was started with a different `--http-max-body-bytes`. A larger body is answered with `413` and a [problem response](#error-responses) titled "Request Body Too Large" without evaluating anything.
+
 **Query Parameters:**
 
 - Query parameters are parsed and passed as run configuration (currently parsed but not used in execution)
@@ -389,6 +393,7 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 - `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact or a supplied fact of the wrong type (`InvalidInvocation`). This includes a wrongly typed or missing `with` fact that an imported policy receives from the importing policy: the whole request fails with one `400` and no decisions, and the message names the imported policy
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
+- `413 Request Entity Too Large`: The request body is larger than the server's `--http-max-body-bytes` limit (1 MiB by default). The problem document has the title `Request Body Too Large` and its `detail` names the limit in bytes
 - `500 Internal Server Error`: Evaluation failed for an internal reason (on a single-rule request)
 
 A `500` also covers two output problems. A rule whose whole value is a lambda fails with `Evaluation Failed` and the detail `rule <namespace>/<policy>/<rule>: a rule's value cannot be a callable`. Any other failure to encode the response body as JSON returns a `500` problem document too; the server never sends a half-written `200`. A lambda nested inside a value, an attachment or the trace is not an error: it is encoded as `{"kind":"callable"}`. See [Lambdas in decision output](/reference#lambdas-in-decision-output).
