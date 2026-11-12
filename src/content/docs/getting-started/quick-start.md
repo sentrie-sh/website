@@ -88,7 +88,7 @@ You want to see the outcome of all exported rules in one policy (e.g. for debugg
 sentrie exec com/example/app/access --facts '{"user": {"role": "admin", "status": "active"}}'
 ```
 
-Facts JSON keys must match the fact names (or aliases) declared in the policy. Required facts must be present.
+Facts JSON keys must match the fact names declared in the policy. Required facts must be present.
 
 ---
 

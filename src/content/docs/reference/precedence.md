@@ -52,15 +52,15 @@ Parentheses override precedence. Any subexpression can be wrapped in `( ... )` t
 
 ### Precedence in arithmetic
 
-```sentrie
+```text
 let result: number = 2 + 3 * 4         -- 14 (multiplication before addition)
-let valid: bool = 5 + 3 > 7            -- true (arithmetic before comparison)
+let valid: boolean = 5 + 3 > 7            -- true (arithmetic before comparison)
 ```
 
 ### Logical precedence
 
-```sentrie
-let complex: bool = true and false or true   -- true (and before or; (true and false) or true)
+```text
+let complex: boolean = true and false or true   -- true (and before or; (true and false) or true)
 ```
 
 ### Ternary right-associativity
@@ -74,8 +74,8 @@ Without parentheses, `a ? b : c ? d : e` is parsed as `a ? b : (c ? d : e)`.
 
 ### Using parentheses to clarify
 
-```sentrie
-let safe: bool = (user.role == "admin") and (age >= 18)
+```text
+let safe: boolean = (user.role == "admin") and (age >= 18)
 let sum: number = (a + b) * (c + d)
 ```
 

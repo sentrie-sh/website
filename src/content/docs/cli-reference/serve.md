@@ -218,6 +218,8 @@ curl -X POST "http://localhost:7529/decision/com/example/auth/user/allow" \
   -d '{"user": {"role": "admin"}}'
 ```
 
+A request for a whole policy (`/decision/{namespace}/{policy}`) answers `200` when every rule evaluated and `207 Multi-Status` when any rule failed; each failed rule carries an `error` object and the others are still returned, in no guaranteed order. See [Serving Policies](/running-sentrie/serving-policies#when-a-rule-fails).
+
 ### Health Endpoints
 
 **GET** `/health` is a liveness probe and always returns `200 OK`:

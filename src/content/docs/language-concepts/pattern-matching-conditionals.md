@@ -33,11 +33,11 @@ Sentrie uses trinary logic (`true`, `false`, `unknown`) and provides the ternary
 
 ### Typical use
 
-```sentrie
+```text
 let status: string = age >= 18 ? "adult" : "minor"
 let displayName: string = user.name ?: "Anonymous"
-let valid: bool = email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-let hasPhone: bool = user.phone is defined
+let valid: boolean = email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+let hasPhone: boolean = user.phone is defined
 ```
 
 ### Going further
