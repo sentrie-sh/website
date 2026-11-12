@@ -11,7 +11,9 @@ Some builtins take extra arguments that are **callables**: values you write inli
 
 Returns the number of elements in a collection or the length of a string.
 
-The `count` function accepts a list, dict, or string and returns the number of elements or characters.
+The `count` function accepts a list, dict, set or string and returns the number of elements or characters. Anything else is an error: `count(5)` and `count(true)` are rejected by `sentrie validate` when the argument's kind is known statically, and stop evaluation at runtime when it is only known then. `count(null)` is an error. `count(undefined)` (for example a missing optional list fact) is undefined.
+
+**Breaking change (v0.0.5):** `count` of a number, bool or other non-collection used to return undefined. It is now an error, so a pack that counted such a value fails to validate or evaluate.
 
 **Examples:**
 
@@ -188,30 +190,34 @@ any(list, (element, index) => { yield expression })
 ```
 
 ```sentrie
-let numbers: list[number] = [1, 2, 3, 4, 5]
-let has_even: bool = any(numbers, (num, idx) => {
-  yield num % 2 == 0
-})
+namespace docs/builtins
 
-let scores: list[number] = [85, 92, 78, 96, 85]
-let has_perfect_score: bool = any(scores, (score) => {
-  yield score == 100
-})
+policy any_example {
+  fact users: list[User]
 
-shape User {
-  name: string
-  age: number
-  role: string
+  shape User {
+    name: string
+    age: number
+    role: string
+  }
+
+  let numbers: list[number] = [1, 2, 3, 4, 5]
+
+  rule has_even: boolean = {
+    yield any(numbers, (num, idx) => {
+      yield num % 2 == 0
+    })
+  }
+
+  rule has_admin: boolean = {
+    yield any(users, (user) => {
+      yield user.role == "admin"
+    })
+  }
+
+  export decision of has_even
+  export decision of has_admin
 }
-
-let users: list[User] = [
-  { name: "Alice", age: 25, role: "admin" },
-  { name: "Bob", age: 30, role: "user" }
-]
-
-let has_admin: bool = any(users, (user) => {
-  yield user.role == "admin"
-})
 ```
 
 ### `all(list, predicate)`
@@ -224,15 +230,27 @@ all(list, (element, index) => { yield expression })
 ```
 
 ```sentrie
-let numbers: list[number] = [2, 4, 6, 8, 10]
-let all_even: bool = all(numbers, (num) => {
-  yield num % 2 == 0
-})
+namespace docs/builtins
 
-let scores: list[number] = [85, 92, 78, 96, 85]
-let all_passing: bool = all(scores, (score) => {
-  yield score >= 80
-})
+policy all_example {
+  let numbers: list[number] = [2, 4, 6, 8, 10]
+  let scores: list[number] = [85, 92, 78, 96, 85]
+
+  rule all_even: boolean = {
+    yield all(numbers, (num) => {
+      yield num % 2 == 0
+    })
+  }
+
+  rule all_passing: boolean = {
+    yield all(scores, (score) => {
+      yield score >= 80
+    })
+  }
+
+  export decision of all_even
+  export decision of all_passing
+}
 ```
 
 ### `filter(list, predicate)`

@@ -8,10 +8,10 @@ When you need to evaluate policies over HTTP (e.g. from a backend or API gateway
 Here is the basic syntax:
 
 ```bash
-sentrie serve [--pack-location <PATH>] [--http-port <INT>] [--http-listen <ADDR> ...]
+sentrie serve [--pack-location <PATH>] [--http-port <INT>] [--http-listen <ADDR> ...] [--http-max-body-bytes <INT>]
 ```
 
-All options are optional: pack directory defaults to the current directory, port to `7529`, and listen address to localhost (`--http-listen local`).
+All options are optional: pack directory defaults to the current directory, port to `7529`, listen address to localhost (`--http-listen local`), and the request body limit to 1 MiB.
 
 ## Configuration & Arguments
 
@@ -22,6 +22,7 @@ You can customize where the pack is loaded from and how the server listens using
 | `--http-port`     | int      | `7529`      | Port to listen on                 |
 | `--pack-location` | string   | `./`        | Directory containing policy files |
 | `--http-listen`   | []string | `["local"]` | Address(es) to listen on          |
+| `--http-max-body-bytes` | int | `1048576` | Largest request body to accept, in bytes; `0` means no limit |
 | `--skip-engine-check` | bool | `false`  | Do not check the pack's `[engine]` version constraint against this binary |
 
 **Returns:** Process runs until SIGINT/SIGTERM (graceful shutdown). Exit non-zero on startup failure (e.g. port in use, pack load or parse error). HTTP API base: `http://<listen>:<port>`; see [Running as a Service](/deployment-operations/running-as-service) for request/response format.
@@ -86,6 +87,28 @@ sentrie serve --http-listen 0.0.0.0 --http-listen 127.0.0.1
 - `--http-listen 192.168.1.100` - Listen on specific IP
 
 **Security Note**: Listening on `0.0.0.0` makes the server accessible from any network interface. Use with caution in production environments.
+
+### --http-max-body-bytes
+
+Sets the largest request body, in bytes, that the server accepts. A request with a larger body is answered with `413 Request Entity Too Large` and a [problem document](#request-body-too-large) before any facts are evaluated.
+
+```bash
+sentrie serve --http-max-body-bytes 4194304
+```
+
+**Default**: `1048576` (1 MiB)
+
+**Examples**:
+
+- `--http-max-body-bytes 65536` - Accept bodies up to 64 KiB
+- `--http-max-body-bytes 4194304` - Accept bodies up to 4 MiB
+- `--http-max-body-bytes 0` - Remove the limit
+
+**Requirements**:
+
+- The value is a plain integer number of bytes; suffixes such as `MiB` are not accepted.
+- `0` disables the limit. Use it only behind a proxy that enforces its own limit, because an unlimited body lets any caller make the server read as much as it is sent.
+- A negative value is rejected at startup: `invalid --http-max-body-bytes -1: must not be negative; use 0 for no limit`.
 
 ## Environment Variables
 
@@ -196,6 +219,24 @@ curl -X POST "http://localhost:7529/decision/com/example/auth/user/allow" \
   -H "Content-Type: application/json" \
   -d '{"user": {"role": "admin"}}'
 ```
+
+A request for a whole policy (`/decision/{namespace}/{policy}`) answers `200` when every rule evaluated and `207 Multi-Status` when any rule failed; each failed rule carries an `error` object and the others are still returned, in no guaranteed order. See [Serving Policies](/running-sentrie/serving-policies#when-a-rule-fails).
+
+#### Request Body Too Large
+
+The body of a decision request may not exceed `--http-max-body-bytes` (1 MiB by default). A larger body gets `413` with `Content-Type: application/problem+json`, whether its size is declared in `Content-Length` or only discovered while reading (chunked requests):
+
+```json
+{
+  "type": "https://sentrie.sh/problems/413",
+  "title": "Request Body Too Large",
+  "status": 413,
+  "detail": "The request body is larger than this server's limit of 100 bytes",
+  "instance": "8faf997e-e224-46ce-9f97-006beec24ac9"
+}
+```
+
+The `detail` names the limit in effect and `instance` is the request ID. A caller should treat a `413` as permanent for that payload and send fewer facts, or ask the operator to raise the limit. Data after the first JSON value is still ignored, as before, provided the whole body is within the limit.
 
 ### Health Endpoints
 
@@ -312,6 +353,7 @@ The server includes several caching mechanisms:
 - **Read-Only**: Policy files should be read-only
 - **Permissions**: Restrict access to policy directories
 - **Validation**: Validate all input data
+- **Request size**: Request bodies are capped at 1 MiB by default (`--http-max-body-bytes`), so a caller cannot make the server buffer an arbitrarily large body
 
 ## Best Practices
 
