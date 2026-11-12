@@ -3,7 +3,7 @@ title: Boolean Operations
 description: "Logical (and, or, xor, not), comparison (==, !=, <, <=, >, >=), pattern (matches), and conditional (ternary, Elvis) operators."
 ---
 
-Boolean operations combine conditions, compare values, and branch on truthiness. Logical and comparison operators use [trinary](/reference/trinary) semantics (true, false, unknown). The pattern operator `matches` works on strings and returns a boolean. The ternary (`? :`) and Elvis (`?:`) operators choose a value based on whether a condition is truthy; only `true` is truthy.
+Boolean operations combine conditions, compare values, and branch on truthiness. Logical and comparison operators use [trinary](/reference/trinary) semantics (true, false, unknown). The pattern operator `matches` works on strings and returns a boolean. The ternary (`? :`) operator chooses a value based on whether a condition is truthy; only `true` is truthy. The Elvis (`?:`) operator is different: it falls back to its default only when the left side is undefined or `null`.
 
 ## Syntax
 
@@ -38,13 +38,15 @@ Boolean operations combine conditions, compare values, and branch on truthiness.
 | `<`, `<=`, `>`, `>=` | expr, expr                       | Ordering. Both sides must be comparable (e.g. number, string).                                                                 | trinary                 |
 | `matches`            | string, string                   | Left: value; right: regex pattern (Go [regexp](https://pkg.go.dev/regexp)). Invalid pattern → error.                           | boolean                 |
 | `? :`                | condition, trueValue, falseValue | Ternary: if condition is truthy, result is trueValue; else falseValue. Only the chosen branch is evaluated. Right-associative. | type of chosen branch   |
-| `?:`                 | expr, default                    | Elvis: if expr is truthy, result is expr; else result is default. Non-truthy: false, unknown, null, 0, "", empty collection.   | type of expr or default |
+| `?:`                 | expr, default                    | Elvis: if expr is undefined or `null`, result is default; otherwise result is expr, whatever its value (`false`, `0`, `""`, `unknown` and empty collections are kept). | type of expr or default |
 
 **Returns:** Trinary for logical and comparison; boolean for `matches`; type of the chosen value for ternary and Elvis.
 
-## Truthiness (for ternary and Elvis)
+## Truthiness (for ternary)
 
-Only `true` is truthy. The following are treated as non-truthy: `false`, `unknown`, `null`, `0`, `""`, and empty collections. So `expr ?: default` yields `default` when `expr` is any of these.
+Only `true` is truthy. The following are treated as non-truthy: `false`, `unknown`, `null`, `0`, `""`, and empty collections. So `cond ? a : b` yields `b` when `cond` is any of these.
+
+Elvis does not use truthiness. `expr ?: default` yields `default` only when `expr` is undefined or `null`, so `false ?: true` is `false`, `0 ?: 9` is `0`, `"" ?: "x"` is `""` and `unknown ?: true` is `unknown`. To fall back on other values, test them explicitly, for example with a ternary.
 
 ## Short-circuit and evaluation order
 
@@ -91,18 +93,18 @@ Before you wire these into policies, keep a few boundaries in mind:
 #### Examples
 
 ```sentrie
--- If product.price is not truthy (null/undefined → unknown, 0, etc.), use 100 as the default
+-- If product.price is undefined or null, use 100 as the default (a price of 0 is kept)
 let price: number = product.price ?: 100
 
--- If user.name is empty or undefined (→ unknown), use "Anonymous" as the default
+-- If user.name is undefined or null, use "Anonymous" as the default (an empty string is kept)
 let displayName: string = user.name ?: "Anonymous"
 
--- If items list is empty or undefined (→ unknown), use an empty list as the default
+-- If items is undefined or null, use an empty list as the default (an empty list is kept)
 let safeItems: list[string] = items ?: []
 ```
 
 :::note[Note]
-When `null` or `undefined` values are used with the Elvis operator, they are converted to `unknown` in trinary logic. Since `unknown` is not truthy, the default value is used.
+The Elvis operator checks definedness, not truthiness. Only an undefined or `null` left side selects the default; `false`, `0`, `""` and `unknown` are returned as they are.
 :::
 
 ## Logical Operations

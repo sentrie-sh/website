@@ -9,7 +9,7 @@ Sentrie uses trinary logic (`true`, `false`, `unknown`) and provides the ternary
 
 **Ternary:** `condition ? trueValue : falseValue`
 
-**Elvis:** `expression ?: defaultValue` (equivalent to `expression ? expression : defaultValue`)
+**Elvis:** `expression ?: defaultValue` (the default is used only when `expression` is undefined or `null`; it is not the same as `expression ? expression : defaultValue`)
 
 **Pattern match:** `string matches pattern`
 
@@ -22,12 +22,12 @@ Sentrie uses trinary logic (`true`, `false`, `unknown`) and provides the ternary
 | Construct          | Left                | Right                 | Description                                                       |
 | :----------------- | :------------------ | :-------------------- | :---------------------------------------------------------------- |
 | `? :`              | condition (trinary) | trueValue, falseValue | If condition is truthy, result is trueValue; else falseValue.     |
-| `?:`               | expression          | defaultValue          | If expression is truthy, result is expression; else defaultValue. |
+| `?:`               | expression          | defaultValue          | If expression is undefined or `null`, result is defaultValue; else expression. |
 | `matches`          | string              | string (regex)        | True if string matches the regex pattern.                         |
 | `is [not] defined` | any                 | -                     | True if value is [not] undefined.                                 |
 | `is [not] empty`   | string/list/map     | -                     | True if [not] empty (e.g. `""`, `[]`, `{}`).                      |
 
-**Returns:** For ternary/Elvis: the selected value (any type). For `matches`, `is defined`, `is empty`: boolean (or trinary where applicable). Non-truthy for Elvis includes `false`, `null`, `undefined` (treated as unknown), `0`, `""`, empty collections.
+**Returns:** For ternary/Elvis: the selected value (any type). For `matches`, `is defined`, `is empty`: boolean (or trinary where applicable). Elvis falls back only for `null` and undefined; `false`, `0`, `""`, `unknown` and empty collections are returned unchanged (`false ?: true` is `false`, `0 ?: 9` is `0`, `unknown ?: true` is `unknown`).
 
 ## Examples in Action
 
@@ -55,11 +55,11 @@ let safeItems: list[string] = items ?: []
 Before you implement this, keep a few boundaries in mind:
 
 - **Ternary:** Condition is evaluated first; only the chosen branch is evaluated. Nested ternaries are allowed; precedence is right-associative.
-- **Elvis:** Shorthand for “use this value or default.” `null`/`undefined` are non-truthy (unknown in trinary), so the default is used.
+- **Elvis:** Shorthand for “use this value or default.” Only `null` and undefined select the default. Any other left side, including `false`, `0`, `""` and `unknown`, is returned as it is.
 - **matches:** Right-hand side is a string regex. Patterns are compiled and cached. Match is against the whole string unless the pattern allows partial match.
 - **is defined:** Use for optional shape fields or values that may be undefined. Accessing undefined without checking can propagate unknown.
 - **is empty:** Applies to strings, lists, and maps. Non-empty means at least one character or element.
 
-- Unknown (trinary) in a condition is not truthy; the false branch of ternary is used, and Elvis returns the default.
+- Unknown (trinary) in a ternary condition is not truthy, so the false branch is used. Elvis does not look at truthiness: `unknown ?: x` is `unknown`.
 - Regex syntax is that of the engine (e.g. escaping in strings). Invalid regex causes error.
 - `in` / `contains` for collections are documented in the reference; use with conditionals as needed.
