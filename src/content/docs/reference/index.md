@@ -582,7 +582,7 @@ Sentrie provides primitives, collections, shapes, and aliases for defining data 
 - `number` - Numeric values: exact 64-bit integers and floats (see [Arithmetic Operations](/reference/arithmetic-operations))
 - `string` - Text strings
 - `trinary` - Trinary values (true/false/unknown)
-  - `bool` - Boolean values (true/false) - a special case of `trinary`
+- `boolean` - Strictly `true` or `false`; rejects `unknown`
 - `document` - JSON-like objects
 - `any` - every defined value, `null` included (see [Types and Values](/reference/types-and-values#the-any-type))
 

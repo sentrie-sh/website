@@ -138,7 +138,7 @@ For now, the basic configuration is enough. We'll add the policy files in the ne
 Create `shapes.sentrie` to define the data structures we'll work with:
 
 ```sentrie
-// shapes.sentrie
+-- shapes.sentrie
 namespace com/example/auth
 
 -- This shape represents an incoming HTTP request
@@ -159,8 +159,8 @@ shape User {
 
 -- This shape represents JWT token claims
 shape Claims {
-  issued_at: int        -- When the token was issued (Unix timestamp)
-  expires_at: int       -- When the token expires (Unix timestamp)
+  issued_at: number     -- When the token was issued (Unix timestamp)
+  expires_at: number    -- When the token expires (Unix timestamp)
   token_id: string      -- Unique token identifier
 }
 ```

@@ -193,7 +193,7 @@ policy names {
 | :------------- | :-------- | :---------------------- |
 | `@not_empty()` | 0         | List must not be empty. |
 
-### Trinary constraints (`trinary` / `bool`)
+### Trinary constraints (`trinary` / `boolean`)
 
 | Constraint       | Arguments   | Description                                                             |
 | :--------------- | :---------- | :---------------------------------------------------------------------- |

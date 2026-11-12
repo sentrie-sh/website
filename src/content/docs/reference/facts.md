@@ -21,7 +21,7 @@ fact name? : type [ as alias ] [ default expr ]  -- optional
 ```
 
 - **name / name?:** Identifier. Trailing `?` makes the fact optional; otherwise it is required.
-- **type:** Any type: primitive (`number`, `string`, `trinary`, `bool`, `document`), collection (`list[T]`, `dict[T]`, `record[...]`), a [union](/reference/types-and-values#union-types) (`string | number`), [`any`](/reference/types-and-values#the-any-type), or a [shape](/reference/shapes). The supplied value is validated against this type (and any constraints) at evaluation.
+- **type:** Any type: primitive (`number`, `string`, `trinary`, `boolean`, `document`), collection (`list[T]`, `dict[T]`, `record[...]`), a [union](/reference/types-and-values#union-types) (`string | number`), [`any`](/reference/types-and-values#the-any-type), or a [shape](/reference/shapes). The supplied value is validated against this type (and any constraints) at evaluation.
 - **as alias:** Optional. Identifier used in the policy body to refer to this fact. If omitted, the body uses `name`. The alias is local to the policy: callers never use it.
 - **default expr:** Optional. Allowed only for **optional** facts (`name?`). Used when the fact is omitted from the input. The expression is evaluated in the policy context (e.g. can reference other facts or policy-level let if order allows). A literal default of the wrong type is rejected when the pack is validated (see [Defaults are type-checked](#defaults-are-type-checked)).
 
@@ -103,14 +103,21 @@ fact context?: Context as context default { "key": "value" }
 ### Primitive Types
 
 ```sentrie
--- Required facts (must be provided)
-fact userId: string as id
-fact isActive: bool as active
+namespace example/facts
 
--- Optional facts with defaults
-fact score?: number as points default 0
-fact price?: number as cost default 0.0
-fact name?: string as userName default "anonymous"
+policy primitives {
+  -- Required facts (must be provided)
+  fact userId: string as id
+  fact isActive: boolean as active
+
+  -- Optional facts with defaults
+  fact score?: number as points default 0
+  fact price?: number as cost default 0.0
+  fact name?: string as userName default "anonymous"
+
+  rule ok: boolean = active
+  export decision of ok
+}
 ```
 
 ### Collection Types
@@ -237,7 +244,7 @@ fact config?: document as settings default { "env": "production" }
 
 ### Multiple facts, mix of required and optional
 
-```sentrie
+```text
 fact user: User as currentUser
 fact request: Request as req
 fact options?: Options as opts default {}
@@ -250,7 +257,7 @@ fact count?: number as itemCount default 0
 fact rate?: number as interestRate default 0.05
 
 -- Boolean defaults (optional facts)
-fact enabled?: bool as isEnabled default true
+fact enabled?: boolean as isEnabled default true
 
 -- Collection defaults (optional facts)
 fact tags?: list[string] as itemTags default []
