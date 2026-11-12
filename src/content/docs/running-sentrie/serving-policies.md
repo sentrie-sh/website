@@ -230,6 +230,8 @@ The `{target...}` parameter is the full path after `/decision/`:
 }
 ```
 
+Each key in `facts` is a fact's **declared name**, the name written after `fact`, not its `as` alias. For `fact user: User as u`, send `user`; `u` is only the local name inside the policy. This is a breaking change from earlier versions, which keyed facts by alias, and there is no fallback: a request that sends `u` gets a `400` with `required fact not found: user`. A fact of the wrong type, such as a string for a `number`, also gets a `400` (`fact 'level': value x is not a number: invalid invocation`); it is the caller's mistake, so it is not reported per rule. See [Facts](/reference/facts).
+
 Integers in `facts` that fit in 64 bits are read exactly, so an ID such as `9007199254740993` is evaluated, compared and returned with every digit. A number outside the float range, such as `1e400`, is rejected with a `400` problem response ("Invalid JSON"). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).
 
 **Query Parameters:**
@@ -350,7 +352,7 @@ Treat `207` as a success of the request that contains failures: read each decisi
 
 Three things are not per-rule errors and answer with a [Problem Details](#error-responses) document:
 
-- A fact error: a required fact is missing (`400`), or a fact has the wrong type (`500` for now, `400` once [sentrie-sh/sentrie#147](https://github.com/sentrie-sh/sentrie/issues/147) lands).
+- A fact error: a required fact is missing, a supplied fact has the wrong type, or an imported policy gets a wrongly typed or missing `with` fact (`400`).
 - A request for a single rule (`/decision/{namespace}/{policy}/{rule}`) whose rule fails. The status follows the failure (`400`, `503` or `500`).
 - A policy that cannot be resolved (`404`).
 
@@ -384,10 +386,10 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 
 - `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` and no rule has an `error`.
 - `207 Multi-Status`: A policy request in which at least one rule failed. Body is `{"decisions": [...]}`; see [When a Rule Fails](#when-a-rule-fails). This is not a Problem Details response.
-- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact (`InvalidInvocation`)
+- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact or a supplied fact of the wrong type (`InvalidInvocation`). This includes a wrongly typed or missing `with` fact that an imported policy receives from the importing policy: the whole request fails with one `400` and no decisions, and the message names the imported policy
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
-- `500 Internal Server Error`: Evaluation failed for an internal reason (on a single-rule request), or a fact has the wrong type (for now)
+- `500 Internal Server Error`: Evaluation failed for an internal reason (on a single-rule request)
 
 A `500` also covers two output problems. A rule whose whole value is a lambda fails with `Evaluation Failed` and the detail `rule <namespace>/<policy>/<rule>: a rule's value cannot be a callable`. Any other failure to encode the response body as JSON returns a `500` problem document too; the server never sends a half-written `200`. A lambda nested inside a value, an attachment or the trace is not an error: it is encoded as `{"kind":"callable"}`. See [Lambdas in decision output](/reference#lambdas-in-decision-output).
 
