@@ -74,6 +74,7 @@ export derive IDENT
 - **[Policies](/reference/policies):** Policy block, statement order (facts, let, use, rules, export), evaluation.
 - **[Rules](/reference/rules):** Rule syntax, when/default/body, outcome type, truthiness, cross-references.
 - **[Facts](/reference/facts):** Required/optional facts, type, alias, default, binding at evaluation, import binding.
+- **[Pack data](/reference/pack-data):** Static reference data from the pack's `[data]` table, `data` declarations, typing and errors.
 - **[Intermediate values (let)](/reference/let):** let syntax, scoping, immutability, type validation.
 - **[Derives](/reference/derives):** Named pure functions (`derive`), calling rules, and export.
 - **[Identifiers](/reference/identifiers):** What counts as a valid identifier (characters, reserved keywords).

@@ -19,7 +19,7 @@ Statements inside a policy follow a **fixed grouped order** (comments may appear
 
 - **Metadata** (optional): `title`, `description`, `version`, `tag`: static strings for docs and tooling
 - **Facts**: Input data with `fact` statements (**all facts before any `use`**)
-- **Pack data**: Static reference data from the pack's `[data]` table with `data` statements (same block as facts; see [Pack data](/reference/facts/#pack-data))
+- **Pack data**: Static reference data from the pack's `[data]` table with `data` statements (same block as facts; see [Pack data](/reference/pack-data/))
 - **Use**: External TypeScript functions via `use` statements (after facts, if any)
 - **Variables**: Intermediate calculations using `let` statements
 - **Rules**: Decision logic with conditions and outcomes with `rule` statements
@@ -59,7 +59,7 @@ policy policyName {
 | Statement | Required | Order | Description |
 | :-------- | :------- | :---- | :---------- |
 | `fact` | No | First | Declare input facts. All fact declarations must appear before any `let`, `use`, or `rule`. Only facts (and comments) may precede facts. |
-| `data` | No | With facts | Read static reference data from the pack's `[data]` table. Sits in the same block as facts, and may also appear among the `use` statements, but before the body. See [Pack data](/reference/facts/#pack-data). |
+| `data` | No | With facts | Read static reference data from the pack's `[data]` table. Sits in the same block as facts, and may also appear among the `use` statements, but before the body. See [Pack data](/reference/pack-data/). |
 | `let` | No | After facts | Intermediate values. Scoped to the policy block; visible to all rules in the policy. |
 | `use` | No | After let | Import TypeScript modules (e.g. `use { sha256 } from @sentrie/hash`). See [Functions](/reference/functions). |
 | `rule` | Yes (≥1) | After use | Decision logic. At least one rule must be declared. |

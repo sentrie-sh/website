@@ -129,7 +129,7 @@ Permissions are not enforced yet for `fs_read` and `net`. When either is non-emp
 
 ### `[data]` (optional)
 
-The data section maps names to JSON files that ship with the pack. Each file is read and decoded once, when the pack is loaded, and policies read the value through a `data` declaration. Refer to [Pack data](/reference/facts/#pack-data) for the policy side.
+The data section maps names to JSON files that ship with the pack. Each file is read and decoded once, when the pack is loaded, and policies read the value through a `data` declaration. Refer to [Pack data](/reference/pack-data/) for the policy side.
 
 ```toml
 [data]
@@ -253,5 +253,5 @@ The pack file is validated against the following rules:
 
 - [Overview](/structure-of-a-policy-pack/overview/) - Learn about policy pack structure
 - [Security and Permissions](/reference/security-and-permissions/) - Detailed information about permissions
-- [Facts: Pack data](/reference/facts/#pack-data) - Read the files in `[data]` from a policy
+- [Pack Data](/reference/pack-data/) - Read the files in `[data]` from a policy
 - [CLI Reference: init](/cli-reference/init) - Learn how to initialize a new pack
