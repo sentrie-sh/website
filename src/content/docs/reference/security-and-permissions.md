@@ -1,73 +1,77 @@
 ---
 title: Security and Permissions
-description: "Policy pack permissions (filesystem read, network, environment variables); configuration and defaults."
+description: "Policy pack permissions (filesystem read, network, environment variables); what is enforced today and what is only declared."
 ---
 
-Permissions define what a policy pack can access at runtime: which filesystem paths can be read, which network hosts can be contacted, and which environment variable names are exposed to the pack. They are configured in the pack configuration file (e.g. `sentrie.pack.toml`) under a `[permissions]` section. Default behavior is restrictive: typically only the pack root is readable; no network access; no environment variables. Explicit entries grant access only to the listed paths, hosts, and variable names.
+Pack permissions are configured in the pack configuration file (`sentrie.pack.toml`) under a `[permissions]` section. Of the three permission keys, only `env` is enforced in this release. `fs_read` and `net` are parsed and validated, but nothing consults them: declaring them does not restrict what a pack or its TypeScript modules can read or reach.
+
+:::caution
+`fs_read` and `net` are not enforced yet. Do not rely on them as a sandbox. When a pack declares a non-empty `fs_read` or `net`, Sentrie prints a warning to stderr (see [Warnings](#warnings)) and carries on.
+:::
 
 ## Syntax
 
-In the pack configuration file (e.g. `sentrie.pack.toml`):
+In the pack configuration file (`sentrie.pack.toml`):
 
-```text
+```toml
 [permissions]
-fs_read = ["path1", "path2", ...]
-net     = ["host1", "host2", ...]
-env     = ["VAR1", "VAR2", ...]
+fs_read = ["path1", "path2"]
+net     = ["https://host1.example.com", "https://host2.example.com"]
+env     = ["VAR1", "VAR2"]
 ```
 
-- **fs_read:** List of paths (or path prefixes) that the pack is allowed to read. Paths can be absolute or relative to the pack root, per tooling.
-- **net:** List of hosts (or patterns) allowed for outbound network access. Format is tooling-dependent (e.g. hostname, host:port, or pattern).
-- **env:** List of environment variable names that are exposed to the pack. Only these names are visible; other environment variables are not.
+- **fs_read:** List of strings. Declared and validated, not enforced yet. It does not limit which files the pack can read.
+- **net:** List of URIs (for example `https://api.example.com`). A value that is not a URI is rejected when the pack is loaded. Declared and validated, not enforced yet. It does not limit which hosts the pack can contact.
+- **env:** List of environment variable names that are exposed to the pack. Only these names are visible through the `env` object in TypeScript modules; other environment variables are not. This is enforced.
 
 ## Configuration & Arguments
 
-| Key | Type | Required | Description |
-| :--- | :--- | :------- | :---------- |
-| `fs_read` | list of strings | No | Paths (or prefixes) the pack can read. Default: typically pack root only (e.g. `["."]` or the pack directory). Paths outside this set cause a runtime error if access is attempted. |
-| `net` | list of strings | No | Hosts (or patterns) allowed for network access. Default: none. Attempts to contact hosts not in the list (or not matching a pattern) fail at runtime. |
-| `env` | list of strings | No | Environment variable names exposed to the pack. Default: none. Only these names are visible; other env vars are hidden. |
+| Key | Type | Required | Enforced | Description |
+| :--- | :--- | :------- | :------- | :---------- |
+| `fs_read` | list of strings | No | No | Declared filesystem paths. Parsed and validated only; nothing restricts file access. |
+| `net` | list of URIs | No | No | Declared network endpoints. Each entry must be a URI. Parsed and validated only; nothing restricts network access. |
+| `env` | list of strings | No | Yes | Environment variable names exposed to the pack. Default: none. Only these names are visible; other env vars are hidden. |
 
-**Returns:** N/A (configuration). Violations (e.g. reading a file outside `fs_read`, contacting a host not in `net`, or reading an env var not in `env`) cause runtime failure or denial.
+## Warnings
+
+When a pack declares a non-empty `fs_read` or `net` list, `sentrie validate`, `sentrie exec`, `sentrie serve` and `sentrie bench` print one line per list to stderr after loading the pack:
+
+```text
+warning: pack permission "fs_read" is declared but not enforced yet; it gates nothing in this release
+warning: pack permission "net" is declared but not enforced yet; it gates nothing in this release
+```
+
+The warning never changes the exit status: the command still succeeds. Packs with no `[permissions]` section, empty lists, or only `env` print nothing.
 
 ## Default behavior
 
-- **Filesystem:** If `fs_read` is omitted or empty, the default is typically the pack root only. The pack can read files under that root (e.g. `.sentrie` files, local TypeScript modules). Reading outside the allowed set fails. Pack-supplied TypeScript cannot read outside the pack root: `use` / `require` of `@local/…` (and relative paths normalized to `@local`) reject `..` escapes and symlinks that leave the pack.
-- **Network:** If `net` is omitted or empty, no network access is granted. TypeScript modules or built-ins that perform network I/O will fail unless the required host is listed.
-- **Environment:** If `env` is omitted or empty, no environment variables are exposed. The pack cannot read `process.env` (or equivalent) except for the names explicitly listed.
+- **Environment:** If `env` is omitted or empty, no environment variables are exposed. TypeScript modules can see only the names listed in `env`.
+- **Filesystem:** Not enforced through `fs_read`. Pack-supplied TypeScript cannot read outside the pack root, but that confinement does not come from `fs_read`: `use` / `require` of `@local/...` (and relative paths normalized to `@local`) reject `..` escapes and symlinks that leave the pack.
+- **Network:** Not enforced through `net`. Declaring or omitting `net` does not change what a module can reach.
 
 ## Examples in Action
-
-### Minimal (pack root only)
-
-```toml
-[permissions]
-fs_read = ["."]
-```
-
-### Explicit paths and network
-
-```toml
-[permissions]
-fs_read = [".", "/etc/app/config"]
-net     = ["api.example.com", "cdn.example.com"]
-```
 
 ### Exposing environment variables
 
 ```toml
 [permissions]
-fs_read = ["."]
-env     = ["ORG_DSN", "REDIS_PASSWORD", "API_KEY"]
+env = ["ORG_DSN", "REDIS_PASSWORD", "API_KEY"]
 ```
 
 Only these variable names are visible to the pack; others are not exposed.
 
+### Declared but not enforced
+
+```toml
+[permissions]
+fs_read = ["."]
+net     = ["https://api.example.com", "https://cdn.example.com"]
+```
+
+This pack loads and runs, and each command prints the two warnings above. The lists document intent for a future release; they restrict nothing today.
+
 ## Good to Know
 
-Before you implement this, keep a few boundaries in mind:
-
-- **Default:** Filesystem access is typically limited to the policy pack root; no network; no environment variables. Explicit entries grant access only to the listed paths, hosts, and variable names.
 - **Scope:** Permissions apply to the entire pack. All policies and TypeScript modules in the pack run with the same permissions. There is no per-policy or per-module permission granularity in this model.
-- **Validation:** Invalid or unsupported paths/hosts/names may be rejected at load time or at first use. Restrict permissions to the minimum required for the pack to function.
-- **Security:** Do not grant broader filesystem, network, or env access than necessary. Use explicit allowlists rather than wildcards unless the tooling documents safe patterns.
+- **Validation:** The pack schema rejects malformed permissions when the pack is loaded, for example a `net` entry that is not a URI.
+- **Not a sandbox:** Until `fs_read` and `net` are enforced, treat packs as trusted code. Review third-party packs and their TypeScript modules before running them, and use OS-level controls (container, filesystem and network policy) to confine the process.

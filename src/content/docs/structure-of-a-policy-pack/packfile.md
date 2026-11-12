@@ -108,7 +108,7 @@ warning: pack requires sentrie >=0.0.5; this is a dev or unversioned build, so t
 
 ### `[permissions]` (optional)
 
-The permissions section declares security permissions and capabilities required by the pack. Refer to [Security and Permissions](/reference/security-and-permissions/) for detailed information.
+The permissions section declares the access a pack expects. Only `env` is enforced in this release; `fs_read` and `net` are validated but gate nothing. Refer to [Security and Permissions](/reference/security-and-permissions/) for detailed information.
 
 ```toml
 [permissions]
@@ -119,9 +119,13 @@ env = ["AWS_REGION", "AWS_PROFILE"]
 
 **Available permission types:**
 
-- `fs_read` - Array of file system paths that can be read (supports glob patterns)
-- `net` - Array of network URLs that can be accessed
-- `env` - Array of environment variable names that can be accessed (must match pattern `^[A-Z_][A-Z0-9_]*$`)
+- `fs_read` - Array of file system paths the pack declares it reads. Not enforced yet: it does not restrict file access.
+- `net` - Array of URIs the pack declares it contacts. Each entry must be a URI. Not enforced yet: it does not restrict network access.
+- `env` - Array of environment variable names that can be accessed (must match pattern `^[A-Z_][A-Z0-9_]*$`). Enforced.
+
+:::caution
+Permissions are not enforced yet for `fs_read` and `net`. When either is non-empty, `validate`, `exec`, `serve` and `bench` print `warning: pack permission "fs_read" is declared but not enforced yet; it gates nothing in this release` (or the same for `"net"`) to stderr and still succeed. See [Security and Permissions](/reference/security-and-permissions/#warnings).
+:::
 
 ### `[data]` (optional)
 
