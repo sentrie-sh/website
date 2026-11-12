@@ -11,7 +11,7 @@ Here is the basic syntax:
 sentrie exec TARGET [ --facts JSON ] [ --pack-location PATH ]
 ```
 
-**TARGET** is `namespace/policy` (all exported rules) or `namespace/policy/rule` (single rule). Run from the pack directory or pass `--pack-location`. **Facts** are a JSON object whose keys match fact names (or aliases); required facts must be present.
+**TARGET** is `namespace/policy` (all exported rules) or `namespace/policy/rule` (single rule). Run from the pack directory or pass `--pack-location`. **Facts** are a JSON object whose keys are the declared fact names (not `as` aliases); required facts must be present.
 
 ## Configuration & Arguments
 
@@ -20,7 +20,7 @@ You can control what gets run and where the pack lives using these options:
 | Argument | Required | What it does |
 | :------- | :------- | :----------- |
 | Target | Yes | `namespace/policy` or `namespace/policy/rule`. Slashes match namespace and policy/rule identifiers. |
-| Facts | Depends | JSON object. Required if the policy declares required facts. Keys match fact names (or aliases). |
+| Facts | Depends | JSON object. Required if the policy declares required facts. Keys are declared fact names, not `as` aliases. |
 | Pack path | No | Default: current directory. Use `--pack-location PATH` to point at a different pack root. |
 
 **Returns:** Exit code 0 on success; non-zero on evaluation or CLI error. Rule names and decision values are printed to stdout (namespace, policy, rules, values, optional attachments).
@@ -87,5 +87,5 @@ sentrie exec com/example/user_management/user_access --pack-location /path/to/my
 
 Before you rely on this in scripts or CI, keep a few boundaries in mind:
 
-- **Constraint:** Target must be `namespace/policy` or `namespace/policy/rule`; namespace and policy/rule must exist and the rule must be exported. Facts JSON keys must match fact names (or aliases); types must satisfy the declared shapes. If `--pack-location` is omitted, the current directory is the pack root (must contain `*.sentrie` and optionally `sentrie.pack.toml`).
+- **Constraint:** Target must be `namespace/policy` or `namespace/policy/rule`; namespace and policy/rule must exist and the rule must be exported. Facts JSON keys must be declared fact names (not `as` aliases); types must satisfy the declared shapes. If `--pack-location` is omitted, the current directory is the pack root (must contain `*.sentrie` and optionally `sentrie.pack.toml`).
 - **Edge case:** Missing required fact → evaluation error; optional fact may be omitted if it has a default. Invalid or malformed JSON in `--facts` → CLI error. Invalid target (unknown namespace, policy, or rule) → error. At least one rule must be exported from the policy to be executable via `sentrie exec`.

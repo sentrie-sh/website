@@ -22,7 +22,7 @@ haystack contains needle
 | `in` | needle | haystack | true if haystack contains needle; otherwise false. |
 | `contains` | haystack | needle | Same as above; argument order reversed. |
 
-**Returns:** bool. Not trinary. Type mismatch or unsupported combination yields false (or key-mismatch for map-subset case).
+**Returns:** boolean. Not trinary. Type mismatch or unsupported combination yields false (or key-mismatch for map-subset case).
 
 ## Semantics by type
 
@@ -50,17 +50,17 @@ haystack contains needle
 
 ### Substring and list membership
 
-```sentrie
-let in_str: bool = "foo" in "xfoobar"
-let has_role: bool = "admin" in user.roles
-let has_guest: bool = roles contains "guest"
+```text
+let in_str: boolean = "foo" in "xfoobar"
+let has_role: boolean = "admin" in user.roles
+let has_guest: boolean = roles contains "guest"
 ```
 
 ### Map key presence and subset
 
-```sentrie
-let key_exists: bool = "plan" in subscription
-let subset: bool = {"a": 1, "b": 2} contains subscription
+```text
+let key_exists: boolean = "plan" in subscription
+let subset: boolean = {"a": 1, "b": 2} contains subscription
 ```
 
 ## Good to Know
