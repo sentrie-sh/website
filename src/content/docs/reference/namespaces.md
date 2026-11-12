@@ -30,7 +30,7 @@ The name is a **fully qualified name (FQN)**: one or more [identifiers](/referen
 ## Visibility and cross-namespace reference
 
 - **Policies and shapes** declared in a file belong to that file’s namespace. They are visible by simple name within the same namespace (same file or other files in the same pack that share the same namespace, if the tooling supports multiple files per namespace).
-- **Exported shapes:** A shape can be exported with `export shape Name`. Exported shapes are visible to other namespaces for use as types (e.g. fact types, [composition](/reference/shapes) base). See [Policy composition](/language-concepts/policy-composition) and [Shapes](/reference/shapes) for how other namespaces refer to them.
+- **Exported shapes:** A shape can be exported with `export shape Name`. Exported shapes are visible to other namespaces for use as types (e.g. fact types, or as a [composition](/reference/shapes#composition-extending-a-base-shape) base written with its qualified name, such as `shape B with com/base/A`; an unqualified `with A` never finds another namespace's export). See [Policy composition](/language-concepts/policy-composition) and [Shapes](/reference/shapes) for how other namespaces refer to them.
 - **Exported rules:** Rules are exported via `export decision of RuleName` inside a policy. Other namespaces can import and call those decisions; the namespace and policy identify the source.
 
 ## Keyword segments

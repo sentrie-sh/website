@@ -8,7 +8,7 @@ The type system defines values (primitives, collections, documents) and structur
 
 ## Syntax
 
-**Primitives:** `number` | `string` | `trinary` | `bool` | `document`
+**Primitives:** `number` | `string` | `trinary` | `boolean` | `document`
 
 **Collections:** `list[T]` | `dict[T]` | `record[T1, T2, ...]`
 
@@ -20,8 +20,11 @@ shape Name {
   field?: type
   field: type?
   field?: type?
+  ...
 }
 ```
+
+The `...` marker is optional and must be the last entry in the body.
 
 **Shape (alias):** `shape Name baseType @constraint1 @constraint2`
 
@@ -37,7 +40,8 @@ shape Name {
 | `field?: T`   | No       | Optional; the field may be omitted, and if present is not null.  |
 | `field: T?`   | No       | Required but nullable; the field must be present and may be null. |
 | `field?: T?`  | No       | Optional and nullable.                                           |
-| `with Base`   | No       | Shape inherits all fields of Base plus its own.                  |
+| `with Base`   | No       | Inherits Base's fields. Cross-namespace bases must be qualified and exported.|
+| `...`         | No       | Open-shape marker, last in the body; the shape accepts fields it does not declare. Without it the shape is closed. |
 
 **Returns:** N/A (type system). Constraint validation fails at runtime if a value does not meet the type or constraints; evaluation aborts.
 
@@ -58,19 +62,33 @@ let u: User = { name: "Alice", age: 28 }
 ### Going further
 
 ```sentrie
+namespace com/example/users
+
 shape Base { id: string }
 shape Extended with Base { role: string }
 
-let e: Extended = { id: "1", role: "admin" }
+policy example {
+  fact v: document
+
+  let e: Extended = { "id": "1", "role": "admin" }
+
+  rule ok = { yield v is Extended }
+  export decision of ok
+}
 ```
 
 ## Good to Know
 
+:::caution[Breaking change]
+Shapes are closed by default. A pack that passed values with extra fields into a narrower shape now fails the shape check. Declare the fields or end the shape body with `...`.
+:::
+
 Before you implement this, keep a few boundaries in mind:
 
-- **Primitives:** `number` (exact 64-bit integer or float), `string`, `trinary` (`true`/`false`/`unknown`), `bool` (subset of trinary), `document` (JSON-like).
-- **Collections:** `list[T]` index by number; `dict[T]` keys are strings (dot or `["key"]` access); `record[T1,T2,...]` fixed-length tuple.
+- **Primitives:** `number` (exact 64-bit integer or float), `string`, `trinary` (`true`/`false`/`unknown`), `boolean` (strictly `true` or `false`; rejects `unknown`), `document` (JSON-like).
+- **Collections:** `list[T]` index by integer (a string or fractional index is an error, an out-of-range index is undefined); `dict[T]` keys are strings (dot or `["key"]` access); `record[T1,T2,...]` fixed-length tuple.
 - **Shapes:** Define contracts for facts and `let` bindings. Optional fields may be omitted; use `is defined` to check.
+- **Closed by default:** A value with a field the shape does not declare is rejected, at every depth. End the shape body with `...` to allow undeclared fields. Openness is not inherited through `with`. A shape that declares the same field twice does not parse. See [Closed and Open Shapes](/reference/shapes#closed-and-open-shapes).
 - **Constraints:** Validate at runtime. Failing constraint validation aborts evaluation immediately.
 - **Cast:** postfix `expr as Type` converts and validates against the target type (and its constraints). A failed conversion is an evaluation error.
 
@@ -78,4 +96,5 @@ Before you implement this, keep a few boundaries in mind:
 - Map keys must be strings.
 - Type annotation on `let` is optional; if omitted, values are not validated against types.
 - Circular shape composition is not allowed.
+- A `with` base is looked up in the enclosing policy, then the shape's namespace. A base in another namespace must be written qualified (`with com/base/Base`) and exported there with `export shape Base`; an unqualified or unexported cross-namespace base fails validation. See [Composition](/reference/shapes#composition-extending-a-base-shape).
 - Exported shapes are visible across namespaces; unexported shapes are namespace-local.
