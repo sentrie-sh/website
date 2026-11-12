@@ -78,7 +78,7 @@ policy example {
 Before you implement this, keep a few boundaries in mind:
 
 - **Primitives:** `number` (exact 64-bit integer or float), `string`, `trinary` (`true`/`false`/`unknown`), `bool` (subset of trinary), `document` (JSON-like).
-- **Collections:** `list[T]` index by number; `dict[T]` keys are strings (dot or `["key"]` access); `record[T1,T2,...]` fixed-length tuple.
+- **Collections:** `list[T]` index by integer (a string or fractional index is an error, an out-of-range index is undefined); `dict[T]` keys are strings (dot or `["key"]` access); `record[T1,T2,...]` fixed-length tuple.
 - **Shapes:** Define contracts for facts and `let` bindings. Optional fields may be omitted; use `is defined` to check.
 - **Constraints:** Validate at runtime. Failing constraint validation aborts evaluation immediately.
 - **Cast:** postfix `expr as Type` converts and validates against the target type (and its constraints). A failed conversion is an evaluation error.
