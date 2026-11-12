@@ -1,9 +1,9 @@
 ---
 title: Trinary Values
-description: "Three-valued logic (true, false, unknown), truthiness, Kleene AND/OR/NOT tables, and use in when, ternary, and Elvis."
+description: "Three-valued logic (true, false, unknown), truthiness, Kleene AND/OR/NOT tables, and use in when and ternary."
 ---
 
-Sentrie uses three values for logic and conditions: `true`, `false`, and `unknown`. `unknown` represents an indeterminate result (e.g. an optional field that is not present, or a comparison involving `unknown`). [Rule](/reference/rules) `when` guards, the [ternary](/reference/boolean-operations) operator (`? :`), and the Elvis operator (`?:`) use **truthiness**: only `true` is truthy; `false` and `unknown` are non-truthy. Logical operators (`and`, `or`, `xor`, `not`/`!`) follow **Kleene** three-valued logic so `unknown` propagates in defined ways.
+Sentrie uses three values for logic and conditions: `true`, `false`, and `unknown`. `unknown` represents an indeterminate result (e.g. an optional field that is not present, or a comparison involving `unknown`). [Rule](/reference/rules) `when` guards and the [ternary](/reference/boolean-operations) operator (`? :`) use **truthiness**: only `true` is truthy; `false` and `unknown` are non-truthy. The Elvis operator (`?:`) does not: it falls back only when its left side is undefined or `null`. Logical operators (`and`, `or`, `xor`, `not`/`!`) follow **Kleene** three-valued logic so `unknown` propagates in defined ways.
 
 `unknown` is only valid in a `trinary`. A value declared `boolean` is strictly `true` or `false`: it behaves like a `trinary` that rejects `unknown`, and an `unknown` value yielded by a `boolean` rule, `let`, fact or cast is an error. A `boolean` rule that produces no value at all still reports `unknown`: this happens when its `when` fails, it has no `default`, and no contribution yields `true`. Declare the value `trinary` when `unknown` is a legitimate outcome. The names `bool`, `int` and `float` are not types; see [Types and Values](/reference/types-and-values#primitive-types).
 
@@ -19,7 +19,7 @@ Sentrie uses three values for logic and conditions: `true`, `false`, and `unknow
 
 ### Truthiness
 
-Used by `when`, ternary (`? :`), and Elvis (`?:`):
+Used by `when` and ternary (`? :`) (not by Elvis, which only checks for undefined or `null`):
 
 | Value     | Truthy? |
 | :-------- | :------ |
@@ -97,6 +97,6 @@ For runtime validation of trinary values (e.g. require `true` or forbid `unknown
 
 Before you implement this, keep a few boundaries in mind:
 
-- **Constraint:** Undefined or missing field access can yield `unknown`. Operations on `unknown` propagate according to the Kleene tables. Rule `when` and ternary/Elvis use truthiness: only `true` is truthy.
+- **Constraint:** Undefined or missing field access can yield `unknown`. Operations on `unknown` propagate according to the Kleene tables. Rule `when` and ternary use truthiness: only `true` is truthy. Elvis (`?:`) returns `unknown` as it is and falls back only for undefined or `null`.
 - **Edge case:** If a `when` evaluates to `unknown`, the rule uses its default or returns `unknown`. `not unknown` is `unknown`, so it is still non-truthy.
 - **Trinary constraints:** See [Constraints](/reference/constraints) for `@not_unknown()`, `@eq`, `@neq`, `@is_true()`, `@is_false()` on `trinary` and `boolean` types.

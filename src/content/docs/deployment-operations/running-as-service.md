@@ -9,7 +9,7 @@ Start the server with `sentrie serve`. The API exposes health and decision evalu
 ## Syntax
 
 ```bash
-sentrie serve [ --port 7529 ] [ --pack-location ./ ] [ --listen local | all | IP... ]
+sentrie serve [ --http-port 7529 ] [ --pack-location ./ ] [ --http-listen local | local4 | local6 | network | network4 | network6 | IP... ]
 ```
 
 ## Endpoints
@@ -131,7 +131,7 @@ curl -X POST "http://localhost:7529/decision/com/example/auth/user" \
 
 Before you implement this, keep a few boundaries in mind:
 
-- Base URL: default `http://localhost:7529`. `--listen all` binds 0.0.0.0. Only POST is allowed for `/decision/{target...}`. Query parameters are parsed but not used for execution semantics.
+- Base URL: default `http://localhost:7529`. `--http-listen network` binds every interface; see [`serve`](/cli-reference/serve) for the other values. Only POST is allowed for `/decision/{target...}`. Query parameters are parsed but not used for execution semantics.
 
 
 - Facts must match policy declarations (required facts present; types/shapes valid). A missing required fact, or a supplied fact of the wrong type, returns 400. CORS headers are sent (`Access-Control-Allow-Origin: *` etc.). No built-in auth or rate limiting.

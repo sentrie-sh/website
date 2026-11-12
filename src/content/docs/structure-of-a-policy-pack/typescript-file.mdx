@@ -81,7 +81,7 @@ namespace com/example/auth
 policy userAccess {
   fact user: User
 
-  use { calculateAge } from "@local/utils/helpers" as helpers
+  use { calculateAge } from @local/utils/helpers as helpers
 
   rule checkAccess = {
     yield helpers.calculateAge(user.birthDate) >= 18

@@ -10,17 +10,17 @@ You can add TypeScript files to your policy pack and import them in policies wit
 
 ```text
 use { fn1, fn2 } from "./path/to/file.ts" [ as alias ]
-use { fn1 } from "@local/path/to/module" [ as alias ]
+use { fn1 } from @local/path/to/module [ as alias ]
 ```
 
-Built-in: `use { fn1 } from @sentrie/module` (no quotes). Local: quoted path or `@local/...`; resolved relative to current file or pack root.
+Built-in: `use { fn1 } from @sentrie/module` (no quotes). Local: a quoted relative file path (`"./file.ts"`), or an unquoted `@local/...` module path resolved from the pack root. Do not quote an `@` path: `"@local/..."` is rejected because a quoted path is read as a file name.
 
 ## Configuration & Arguments
 
 | Element | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
 | `fn1`, `fn2` | identifiers | Yes | Exported function (or type) names from the module. |
-| `"./file.ts"` or `@local/...` | path | Yes | Relative to `.sentrie` file or pack root. |
+| `"./file.ts"` or `@local/...` | path | Yes | A quoted path is relative to the `.sentrie` file; an unquoted `@local/...` path starts at the pack root. |
 | `as alias` | identifier | No | Default alias: last segment of path (e.g. `utils` for `./utils.ts`). |
 
 **Returns:** N/A (import). Call as `alias.fn1(args)` in the policy.
