@@ -126,6 +126,40 @@ sentrie exec user_management/user_access --output json
 
 The JSON format is useful for programmatic consumption or integration with other tools.
 
+## When a Rule Fails
+
+When you execute a whole policy and a rule fails, `exec` still evaluates the other rules. It prints every rule, the failed ones included, and then exits with status `1` and the message `Error: <n> of <m> rules failed`.
+
+With the `access` policy from [When a Rule Fails](/reference/rules#when-a-rule-fails) and a `limit` of `0`:
+
+```bash
+sentrie exec docs/checks/access --facts '{"user":{"role":"admin","limit":0}}'
+```
+
+```
+Namespace: docs/checks
+Policy:    access
+
+Rules:     
+  ✓ ratio: • Unknown
+  ✓ is_admin: ✓ True
+
+Values:    
+  ✓ is_admin: true
+  ✓ ratio: undefined
+
+Errors:    
+  ! ratio: divide by zero
+
+Error: 1 of 2 rules failed
+```
+
+- **Table output** adds an `Errors:` section with one line per failed rule. The failed rule shows an unknown decision.
+- **JSON output** gives each failed rule an `error` object (`title`, `status`, `detail`) next to its `decision`, which is `unknown`. Rules that succeeded have no `error` field.
+- The `Error:` line is written to **stderr**, so the JSON on stdout stays parseable when you pipe it. Check the exit status before you trust the decisions.
+- The order of the rules, and of the errors, is not guaranteed and can differ between runs. Match results by rule name.
+- A single rule target (`namespace/policy/rule`) that fails prints only the error, with no output, and exits `1`.
+
 ## Specifying the Policy Pack
 
 By default, `sentrie exec` looks for a policy pack in the current directory (`.`). You can specify a different location using the `--pack-location` flag:
@@ -158,7 +192,7 @@ The policy will use its default fact values for execution.
 
 ## Output Destination
 
-All output is written to **stdout**, making it easy to pipe results to other commands or redirect to files:
+Results are written to **stdout**, and the `Error:` line of a failed command is written to **stderr**, making it easy to pipe results to other commands or redirect to files:
 
 ```bash
 # Save output to a file

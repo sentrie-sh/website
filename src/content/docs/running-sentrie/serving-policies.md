@@ -246,7 +246,7 @@ Integers in `facts` that fit in 64 bits are read exactly, so an ID such as `9007
       "namespace": "com/example/auth",
       "rule": "isAdmin",
       "decision": {
-        "state": "TRUE",
+        "state": "true",
         "value": true
       },
       "attachments": {
@@ -258,7 +258,7 @@ Integers in `facts` that fit in 64 bits are read exactly, so an ID such as `9007
 }
 ```
 
-A successful evaluation is HTTP **200** with a `decisions` array and **no** `error` field. Failures do not return 200 with an error string - they use [Problem Details](#error-responses) below.
+A policy request in which every rule evaluated is HTTP **200** with a `decisions` array. If any rule failed, the response is **207 Multi-Status** instead; see [When a Rule Fails](#when-a-rule-fails) below. Request errors do not return 200 with an error string - they use [Problem Details](#error-responses) below.
 
 **Response Fields:**
 
@@ -267,18 +267,19 @@ A successful evaluation is HTTP **200** with a `decisions` array and **no** `err
   - `namespace`: The namespace (string)
   - `rule`: The rule name (string)
   - `decision`: The decision result object containing:
-    - `state`: The decision state as a string: `"TRUE"`, `"FALSE"`, or `"UNKNOWN"`
+    - `state`: The decision state as a string: `"true"`, `"false"`, or `"unknown"`
     - `value`: The actual value of the decision (any JSON-serializable type)
-  - `attachments`: Any attachments exported by the rule (dict of string to any)
+  - `attachments`: Any attachments exported by the rule (dict of string to any); `null` when the rule failed
   - `trace`: Execution trace information (object, optional)
+  - `error`: Present only when this rule failed; see [When a Rule Fails](#when-a-rule-fails)
 
 **Decision States:**
 
 The `state` field in the decision object can be one of:
 
-- `"TRUE"`: The rule evaluated to true
-- `"FALSE"`: The rule evaluated to false
-- `"UNKNOWN"`: The rule evaluated to unknown (e.g., when `when` condition is false and no default is provided)
+- `"true"`: The rule evaluated to true
+- `"false"`: The rule evaluated to false
+- `"unknown"`: The rule evaluated to unknown (e.g., when `when` condition is false and no default is provided)
 
 **Example Requests:**
 
@@ -308,6 +309,55 @@ curl -X POST http://localhost:7529/decision/com/example/auth/user \
   }'
 ```
 
+### When a Rule Fails
+
+A rule can fail while it is evaluated (a division by zero, a value of the wrong type, an exceeded deadline). On a request for a whole policy, the failure is reported for that rule only and the other rules are still evaluated:
+
+- The response is **207 Multi-Status** when any rule failed, including when every rule failed, and **200 OK** otherwise.
+- The body is the same `{"decisions": [...]}`, with one entry per exported rule. A failed rule has an `unknown` decision, `null` attachments (even when only an attachment failed) and an `error` object; a rule that succeeded has no `error` field.
+- A failed rule's `trace` shows where it failed in its `err` fields, but it can keep values computed before the failure. Read `decision` and `error`, not the trace.
+- `error.status` is the HTTP status that failure would have had on its own: `400` for an invalid invocation, `503` for a deadline, `500` otherwise.
+
+```json
+{
+  "decisions": [
+    {
+      "policy": "access",
+      "namespace": "docs/checks",
+      "rule": "ratio",
+      "decision": { "state": "unknown", "value": "unknown" },
+      "attachments": null,
+      "trace": { ... },
+      "error": {
+        "title": "Evaluation Failed",
+        "status": 500,
+        "detail": "divide by zero"
+      }
+    },
+    {
+      "policy": "access",
+      "namespace": "docs/checks",
+      "rule": "is_admin",
+      "decision": { "state": "true", "value": true },
+      "attachments": {},
+      "trace": { ... }
+    }
+  ]
+}
+```
+
+Treat `207` as a success of the request that contains failures: read each decision, and check its `error` before you trust its `decision`.
+
+Three things are not per-rule errors and answer with a [Problem Details](#error-responses) document:
+
+- A fact error: a required fact is missing (`400`), or a fact has the wrong type (`500` for now, `400` once [sentrie-sh/sentrie#147](https://github.com/sentrie-sh/sentrie/issues/147) lands).
+- A request for a single rule (`/decision/{namespace}/{policy}/{rule}`) whose rule fails. The status follows the failure (`400`, `503` or `500`).
+- A policy that cannot be resolved (`404`).
+
+:::note
+The order of the entries in `decisions` is not guaranteed and can differ between requests. Match results by `namespace`, `policy` and `rule`, not by position.
+:::
+
 ## Error Responses
 
 The API uses RFC 9457 Problem Details format for error responses.
@@ -332,11 +382,12 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 
 **Common HTTP Status Codes:**
 
-- `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` only.
+- `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` and no rule has an `error`.
+- `207 Multi-Status`: A policy request in which at least one rule failed. Body is `{"decisions": [...]}`; see [When a Rule Fails](#when-a-rule-fails). This is not a Problem Details response.
 - `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact (`InvalidInvocation`)
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
-- `500 Internal Server Error`: Evaluation failed for an internal reason
+- `500 Internal Server Error`: Evaluation failed for an internal reason (on a single-rule request), or a fact has the wrong type (for now)
 
 A `500` also covers two output problems. A rule whose whole value is a lambda fails with `Evaluation Failed` and the detail `rule <namespace>/<policy>/<rule>: a rule's value cannot be a callable`. Any other failure to encode the response body as JSON returns a `500` problem document too; the server never sends a half-written `200`. A lambda nested inside a value, an attachment or the trace is not an error: it is encoded as `{"kind":"callable"}`. See [Lambdas in decision output](/reference#lambdas-in-decision-output).
 
@@ -369,6 +420,6 @@ Please refer to the latest codebase for the most current implementation details.
 
 1. **Use Specific Rules**: When possible, evaluate specific rules rather than entire policies for better performance and clearer results
 2. **Validate Facts**: Ensure facts match the expected types and shapes defined in your policies
-3. **Handle Errors**: Treat non-200 responses as failures and parse the Problem Details body. A 200 response has no `error` field.
+3. **Handle Errors**: Parse the Problem Details body of a 4xx or 5xx response. Accept both 200 and 207 for a policy request, and check each decision's `error` field on a 207.
 4. **Use Health Checks**: Monitor `/health` to ensure the server is running, and `/health/deep` to ensure it is ready to evaluate policies
 5. **Secure Connections**: In production, use HTTPS and implement proper authentication/authorization

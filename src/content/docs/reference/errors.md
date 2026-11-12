@@ -9,7 +9,7 @@ This page summarizes how Sentrie reports errors across the CLI, pack loading, ev
 
 - **Parse and pack errors**: Syntax issues in `*.sentrie` files or invalid `sentrie.pack.toml`.
 - **Type and constraint errors**: Type mismatches, missing required facts, and constraint violations.
-- **Evaluation errors**: Failures while evaluating a rule (often surfaced as type or constraint errors at a specific expression). Invalid operands are in this group: a string or fractional list index (`list index must be an integer, got ...`), `count` of something that is not a list, dict, set or string, and `+` joining a string with a list or dict (`+ cannot join a string with a list`).
+- **Evaluation errors**: Failures while evaluating a rule (often surfaced as type or constraint errors at a specific expression). Each failing rule reports its own [`error` object](/reference/rules#when-a-rule-fails); the other rules of the policy are still evaluated. Invalid operands are in this group: a string or fractional list index (`list index must be an integer, got ...`), `count` of something that is not a list, dict, set or string, and `+` joining a string with a list or dict (`+ cannot join a string with a list`).
 - **Service/API errors**: HTTP 4xx/5xx responses when using `sentrie serve`.
 
 ## CLI exit codes
@@ -21,7 +21,7 @@ All CLI commands follow a simple convention:
 
 Common cases:
 
-- `sentrie exec`: non-zero on pack load failure, invalid target, missing required facts, or evaluation error.
+- `sentrie exec`: non-zero on pack load failure, invalid target, missing required facts, or evaluation error. When a rule of a policy fails, every rule is still printed and the command exits `1` with `<n> of <m> rules failed`. The `Error:` line is written to stderr.
 - `sentrie validate`: non-zero on pack load failure, parse or type error, or invalid facts passed for validation.
 - `sentrie serve`: non-zero on startup if the pack cannot be loaded or the port/listen configuration is invalid.
 
@@ -50,10 +50,21 @@ Typical status codes:
 
 | Status | Meaning |
 | :----- | :------ |
-| `400` | Bad request (invalid JSON, missing or malformed path, bad `facts` shape). |
+| `207` | Multi-Status. Not a problem document: a policy request in which at least one rule failed. The body is the normal `decisions` array and each failed rule has an `error` object. |
+| `400` | Bad request (invalid JSON, missing or malformed path, bad `facts` shape, missing required fact). |
 | `404` | Policy, namespace, or rule not found. |
 | `405` | Method not allowed (e.g. non-POST on `/decision`). |
-| `500` | Internal error during evaluation. |
+| `500` | Internal error during evaluation of a single-rule request. For now also a fact with the wrong type (`400` after sentrie-sh/sentrie#147). |
+
+## Per-rule errors
+
+When a rule fails, it carries an `error` object next to its output, with the same fields as a problem document:
+
+```json
+"error": { "title": "Evaluation Failed", "status": 500, "detail": "divide by zero" }
+```
+
+`status` is `400` for an invalid invocation, `503` for an exceeded deadline and `500` otherwise. The rule's decision is `unknown`. See [When a Rule Fails](/reference/rules#when-a-rule-fails).
 
 See: [Running as a Service](/deployment-operations/running-as-service)
 
