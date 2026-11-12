@@ -338,6 +338,8 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
 - `500 Internal Server Error`: Evaluation failed for an internal reason
 
+A `500` also covers two output problems. A rule whose whole value is a lambda fails with `Evaluation Failed` and the detail `rule <namespace>/<policy>/<rule>: a rule's value cannot be a callable`. Any other failure to encode the response body as JSON returns a `500` problem document too; the server never sends a half-written `200`. A lambda nested inside a value, an attachment or the trace is not an error: it is encoded as `{"kind":"callable"}`. See [Lambdas in decision output](/reference#lambdas-in-decision-output).
+
 A failed single-rule evaluation does not include a `null` entry in `decisions`; the handler returns Problem Details instead.
 
 ## CORS Support
