@@ -36,11 +36,11 @@ Boolean operations combine conditions, compare values, and branch on truthiness.
 | `==`, `is`           | expr, expr                       | Equality. Both sides must be comparable.                                                                                       | trinary                 |
 | `!=`, `is not`       | expr, expr                       | Inequality.                                                                                                                    | trinary                 |
 | `<`, `<=`, `>`, `>=` | expr, expr                       | Ordering. Both sides must be comparable (e.g. number, string).                                                                 | trinary                 |
-| `matches`            | string, string                   | Left: value; right: regex pattern (Go [regexp](https://pkg.go.dev/regexp)). Invalid pattern → error.                           | bool                    |
+| `matches`            | string, string                   | Left: value; right: regex pattern (Go [regexp](https://pkg.go.dev/regexp)). Invalid pattern → error.                           | boolean                 |
 | `? :`                | condition, trueValue, falseValue | Ternary: if condition is truthy, result is trueValue; else falseValue. Only the chosen branch is evaluated. Right-associative. | type of chosen branch   |
 | `?:`                 | expr, default                    | Elvis: if expr is truthy, result is expr; else result is default. Non-truthy: false, unknown, null, 0, "", empty collection.   | type of expr or default |
 
-**Returns:** Trinary for logical and comparison; bool for `matches`; type of the chosen value for ternary and Elvis.
+**Returns:** Trinary for logical and comparison; boolean for `matches`; type of the chosen value for ternary and Elvis.
 
 ## Truthiness (for ternary and Elvis)
 
@@ -56,10 +56,10 @@ Only `true` is truthy. The following are treated as non-truthy: `false`, `unknow
 
 ### Logical and comparison
 
-```sentrie
-let a: bool = true and false
-let b: bool = age >= 18
-let c: bool = not (user.role in allowed_roles)
+```text
+let a: boolean = true and false
+let b: boolean = age >= 18
+let c: boolean = not (user.role in allowed_roles)
 ```
 
 ### Ternary and Elvis
@@ -71,17 +71,17 @@ let e: string = user.name ?: "Anonymous"
 
 ### Pattern matching (regex)
 
-```sentrie
-let g: bool = email matches `^[a-z]+@[a-z]+\\.com$`
+```text
+let g: boolean = email matches `^[a-z]+@[a-z]+\\.com$`
 ```
 
 Left and right must be strings. The right is interpreted as a Go regexp. Invalid pattern causes an evaluation error.
 
 ### Combining conditions
 
-```sentrie
-let f: bool = user.role == "admin" or (user.role == "user" and user.status == "active")
-let h: bool = not (role in ["guest"]) and status == "active"
+```text
+let f: boolean = user.role == "admin" or (user.role == "user" and user.status == "active")
+let h: boolean = not (role in ["guest"]) and status == "active"
 ```
 
 ## Good to Know
@@ -126,13 +126,13 @@ value1 is value2
 
 #### Basic Examples
 
-```sentrie
+```text
 let age: number = 25
-let is_adult: bool = age == 18
+let is_adult: boolean = age == 18
 -- Result: false
 
 let name: string = "Alice"
-let is_alice: bool = name is "Alice"
+let is_alice: boolean = name is "Alice"
 -- Result: true
 
 let score1: number = 85.5
@@ -156,9 +156,9 @@ value1 is not value2
 
 #### Examples
 
-```sentrie
+```text
 let age: number = 25
-let is_minor: bool = age != 18
+let is_minor: boolean = age != 18
 -- Result: true
 
 let status: string = "active"
@@ -182,17 +182,17 @@ value1 > value2
 
 #### Examples
 
-```sentrie
+```text
 let age: number = 25
-let is_adult: bool = age > 17
+let is_adult: boolean = age > 17
 -- Result: true
 
 let score: number = 85.5
-let is_passing: bool = score > 80.0
+let is_passing: boolean = score > 80.0
 -- Result: true
 
 let price: number = 99.99
-let is_expensive: bool = price > 50.0
+let is_expensive: boolean = price > 50.0
 -- Result: true
 ```
 
@@ -208,17 +208,17 @@ value1 >= value2
 
 #### Examples
 
-```sentrie
+```text
 let age: number = 18
-let can_vote: bool = age >= 18
+let can_vote: boolean = age >= 18
 -- Result: true
 
 let score: number = 80.0
-let is_passing: bool = score >= 80.0
+let is_passing: boolean = score >= 80.0
 -- Result: true
 
 let temperature: number = 32.0
-let is_freezing: bool = temperature >= 32.0
+let is_freezing: boolean = temperature >= 32.0
 -- Result: true
 ```
 
@@ -234,17 +234,17 @@ value1 < value2
 
 #### Examples
 
-```sentrie
+```text
 let age: number = 16
-let is_minor: bool = age < 18
+let is_minor: boolean = age < 18
 -- Result: true
 
 let score: number = 75.0
-let is_failing: bool = score < 80.0
+let is_failing: boolean = score < 80.0
 -- Result: true
 
 let price: number = 25.0
-let is_cheap: bool = price < 50.0
+let is_cheap: boolean = price < 50.0
 -- Result: true
 ```
 
@@ -260,17 +260,17 @@ value1 <= value2
 
 #### Examples
 
-```sentrie
+```text
 let age: number = 18
-let is_minor: bool = age <= 17
+let is_minor: boolean = age <= 17
 -- Result: false
 
 let score: number = 80.0
-let is_passing: bool = score <= 100.0
+let is_passing: boolean = score <= 100.0
 -- Result: true
 
 let quantity: number = 10
-let is_limited: bool = quantity <= 10
+let is_limited: boolean = quantity <= 10
 -- Result: true
 ```
 
@@ -280,17 +280,17 @@ The ordering operators `<`, `<=`, `>`, and `>=` also work on two strings. String
 
 #### Examples
 
-```sentrie
-let upper_first: bool = "Z" < "a"
+```text
+let upper_first: boolean = "Z" < "a"
 -- Result: true (uppercase letters sort before lowercase)
 
-let by_prefix: bool = "app" < "apple"
+let by_prefix: boolean = "app" < "apple"
 -- Result: true (a shorter string sorts before a longer one it prefixes)
 
-let digits: bool = "10" < "9"
+let digits: boolean = "10" < "9"
 -- Result: true (strings are not compared as numbers)
 
-let same: bool = "a" <= "a"
+let same: boolean = "a" <= "a"
 -- Result: true
 ```
 
@@ -330,17 +330,17 @@ string matches pattern
 
 #### Examples
 
-```sentrie
+```text
 let email: string = "user@example.com"
-let is_valid_email: bool = email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+let is_valid_email: boolean = email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
 -- Result: true
 
 let phone: string = "+1234567890"
-let is_valid_phone: bool = phone matches "^\\+?[1-9]\\d{1,14}$"
+let is_valid_phone: boolean = phone matches "^\\+?[1-9]\\d{1,14}$"
 -- Result: true
 
 let username: string = "alice123"
-let is_valid_username: bool = username matches "^[a-zA-Z0-9_]{3,20}$"
+let is_valid_username: boolean = username matches "^[a-zA-Z0-9_]{3,20}$"
 -- Result: true
 ```
 
@@ -366,17 +366,17 @@ collection contains value
 
 #### Examples
 
-```sentrie
+```text
 let numbers: list[number] = [1, 2, 3, 4, 5]
-let has_three: bool = 3 in numbers
+let has_three: boolean = 3 in numbers
 -- Result: true
 
 let colors: list[string] = ["red", "blue", "green"]
-let has_red: bool = "red" in colors
+let has_red: boolean = "red" in colors
 -- Result: true
 
 let permissions: list[string] = ["read", "write", "delete"]
-let can_read: bool = "read" in permissions
+let can_read: boolean = "read" in permissions
 -- Result: true
 ```
 
@@ -384,7 +384,7 @@ let can_read: bool = "read" in permissions
 
 For dicts, if the `needle` is a string, it will be used as the key to check if the key exists in the `haystack`. If the `needle` is another dict, then it will be used to check if the `needle` dict is a subset of the `haystack` dict.
 
-```sentrie
+```text
 let user_permissions: dict[string] = {
   "read": true,
   "write": false,
@@ -393,7 +393,7 @@ let user_permissions: dict[string] = {
 }
 
 -- Check if the "read" permission is set
-let has_read: bool = "read" in user_permissions and user_permissions["read"] == true
+let has_read: boolean = "read" in user_permissions and user_permissions["read"] == true
 -- Result: true
 
 ```
@@ -425,27 +425,27 @@ value is not empty
 
 #### Basic Examples
 
-```sentrie
+```text
 let empty_string: string = ""
-let is_empty: bool = empty_string is empty
+let is_empty: boolean = empty_string is empty
 -- Result: true
 
 let non_empty_string: string = "hello"
-let is_not_empty: bool = non_empty_string is not empty
+let is_not_empty: boolean = non_empty_string is not empty
 -- Result: true
 
 let empty_list: list[number] = []
-let list_is_empty: bool = empty_list is empty
+let list_is_empty: boolean = empty_list is empty
 -- Result: true
 
 let non_empty_list: list[number] = [1, 2, 3]
-let list_is_not_empty: bool = non_empty_list is not empty
+let list_is_not_empty: boolean = non_empty_list is not empty
 -- Result: true
 ```
 
 #### Working with Shapes
 
-```sentrie
+```text
 shape User {
   name: string
   email?: string
@@ -458,11 +458,11 @@ let user: User = {
 }
 
 -- Check if email is not empty
-let has_email: bool = user.email is defined and user.email is not empty
+let has_email: boolean = user.email is defined and user.email is not empty
 -- Result: true
 
 -- Check if phone is empty
-let phone_empty: bool = user.phone is defined ? user.phone is empty : true
+let phone_empty: boolean = user.phone is defined ? user.phone is empty : true
 -- Result: true
 ```
 
@@ -479,7 +479,7 @@ value is not defined
 
 #### Basic Examples
 
-```sentrie
+```text
 shape User {
   name: string
   email?: string
@@ -492,11 +492,11 @@ let user: User = {
 }
 
 -- Check if email is defined
-let email_defined: bool = user.email is defined
+let email_defined: boolean = user.email is defined
 -- Result: true
 
 -- Check if phone is not defined
-let phone_not_defined: bool = user.phone is not defined
+let phone_not_defined: boolean = user.phone is not defined
 -- Result: true
 
 -- Safe access pattern
@@ -506,7 +506,7 @@ let display_email: string = user.email is defined ? user.email : "No email provi
 
 #### Complex Definedness Logic
 
-```sentrie
+```text
 shape Order {
   id: string
   customer_name: string
@@ -522,11 +522,11 @@ let order: Order = {
 }
 
 -- Check if customer has contact information
-let has_contact: bool = order.customer_email is defined or order.customer_phone is defined
+let has_contact: boolean = order.customer_email is defined or order.customer_phone is defined
 -- Result: true
 
 -- Check if order is complete
-let is_complete: bool = order.customer_name is not empty and
+let is_complete: boolean = order.customer_name is not empty and
                        order.shipping_address is defined
 -- Result: false
 
@@ -543,14 +543,14 @@ let contact_method: string = order.customer_email is defined ?
 
 ### Access Control System
 
-```sentrie
+```text
 shape User {
   id: string
   username: string
   role: string
   age: number
   email?: string
-  active: bool
+  active: boolean
   permissions: list[string]
 }
 
@@ -581,7 +581,7 @@ let resource: Resource = {
 }
 
 -- Complex access control logic
-let can_access: bool = user.active and
+let can_access: boolean = user.active and
                       user.age >= resource.min_age and
                       (user.role == resource.required_role or
                        user.role == "superuser") and
@@ -593,7 +593,7 @@ let can_access: bool = user.active and
 
 ### Data Validation System
 
-```sentrie
+```text
 use {length} from @sentrie/js as str
 
 shape RegistrationData {
@@ -601,7 +601,7 @@ shape RegistrationData {
   email?: string
   password: string
   age: number
-  terms_accepted: bool
+  terms_accepted: boolean
 }
 
 let registration: RegistrationData = {
@@ -613,7 +613,7 @@ let registration: RegistrationData = {
 }
 
 -- Comprehensive validation
-let is_valid_registration: bool =
+let is_valid_registration: boolean =
   registration.username is not empty and
   str.length(registration.username) >= 3 and
   str.length(registration.username) <= 20 and
@@ -636,30 +636,30 @@ let is_valid_registration: bool =
 
 ### Use Clear Variable Names
 
-```sentrie
+```text
 -- Good
-let is_valid_user: bool = user.age >= 18 and user.email is defined
+let is_valid_user: boolean = user.age >= 18 and user.email is defined
 
 -- Avoid
-let flag: bool = user.age >= 18 and user.email is defined
+let flag: boolean = user.age >= 18 and user.email is defined
 ```
 
 ### Combine Operations Readably
 
-```sentrie
+```text
 -- Good: Clear grouping with parentheses
-let can_access: bool = (user.active and user.verified) or
+let can_access: boolean = (user.active and user.verified) or
                        (user.role == "admin" and user.age >= 18)
 
 -- Avoid: Ambiguous precedence
-let can_access: bool = user.active and user.verified or user.role == "admin" and user.age >= 18
+let can_access: boolean = user.active and user.verified or user.role == "admin" and user.age >= 18
 ```
 
 ### Handle Edge Cases
 
-```sentrie
+```text
 -- Check for empty values before operations
-let is_valid: bool = user.name is not empty and
+let is_valid: boolean = user.name is not empty and
                     str.length(user.name) >= 2 and
                     user.email is defined and
                     user.email is not empty
@@ -667,15 +667,15 @@ let is_valid: bool = user.name is not empty and
 
 ### Use Appropriate Operators
 
-```sentrie
+```text
 -- Use 'is' for readability with null checks
-let has_email: bool = user.email is defined
+let has_email: boolean = user.email is defined
 
 -- Use '==' for value comparisons
-let is_admin: bool = user.role == "admin"
+let is_admin: boolean = user.role == "admin"
 
 -- Use 'in' for collection membership
-let can_read: bool = "read" in user.permissions
+let can_read: boolean = "read" in user.permissions
 ```
 
 ### Boundary conditions
