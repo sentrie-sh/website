@@ -8,7 +8,7 @@ When you want to catch policy and pack errors before running or deploying (e.g. 
 Here is the basic syntax:
 
 ```bash
-sentrie validate [ --pack-location <PATH> ] [ --capabilities <FILE> ]
+sentrie validate [ --pack-location <PATH> ] [ --capabilities <FILE> ] [ --skip-engine-check ]
 ```
 
 `validate` checks the whole pack. It takes no target and no facts.
@@ -25,6 +25,7 @@ You can point validation at a specific pack using the following options:
 | :------- | :--- | :------- | :----------- |
 | `--pack-location` | path | No | Directory containing the policy pack. Default: `./`. |
 | `--capabilities` | path | No | Capabilities file limiting the builtins and modules the pack may use. Default: allow everything. |
+| `--skip-engine-check` | bool | No | Do not check the pack's `[engine]` version constraint against this binary. Default: `false`. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional). |
 
 **Returns:** Exit 0 if validation succeeds; non-zero with an error message on stderr if pack loading, parsing, or any static check fails. No decision output; validation only.
 
@@ -104,6 +105,7 @@ Before you rely on this in CI, keep a few boundaries in mind:
 - **Constraint:** Validation checks pack file structure, policy parsing and syntax, namespace/policy/rule references, type annotations and shape constraints, and executor creation (including TypeScript module loading). It does not execute rules and does not take facts. Errors are printed to stderr; no table or JSON decision output.
 - **Edge case:** Only words that start with two dashes are flags. `sentrie validate -x` fails with `validate: unknown flag "-x": flags take two dashes, as in --pack-location`.
 - **Edge case:** An unreadable pack, a parse error, or a failed static check gives a non-zero exit, and validation stops at the first failing check. A stray positional argument, such as a leftover `namespace/policy` target, is an error rather than being ignored. Unlike `exec`, validate does not run policies or produce decision output; use [sentrie exec](/cli-reference/exec) for execution.
+- **Constraint:** Validation checks the pack's `[engine]` version constraint against the running binary, and a mismatch is an error. Pass `--skip-engine-check` to skip it. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional).
 - **Constraint:** Validation checks every constraint's arguments: their number, their kinds, and arguments that can never work, such as a pattern that does not compile or `@multiple_of(0)`. See [Constraint Arguments](/reference/constraints#constraint-arguments).
 - **Constraint:** Validation detects reference cycles between the rules and lets of a policy, whatever expression the reference sits in: operators, calls, index access, casts, transforms, list and map literals (keys as well as values), lambda bodies and import `with` values. A cycle fails with `infinite recursion: a -> b -> a`, the error `exec` would otherwise hit on the first evaluation. A rule or `let` that refers directly to itself (`rule r = r`) fails the same way, including when the reference sits in a block, a `when` condition or a `default` value. An attach expression that reads the rule it is attached to (`export decision of r attach note as r`) is reported too, because `exec` fails on it the same way; attaching another rule is fine. A reference to the rule's own name inside a lambda body is not reported.
 - **Constraint:** Validation checks that every shape a type names exists and is visible from where it is written: in facts, `let`s, casts (`as`), `is` checks, shape fields and aliases, derive and lambda parameter and return types, and element types inside `list`, `dict` and `record`. A missing shape, or one another namespace does not export, is reported at its position, even in a `let` no rule uses. Shapes named inside a derive resolve in the derive's scope, and a shape's fields resolve where the shape is declared.

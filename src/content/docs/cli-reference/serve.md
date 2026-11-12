@@ -23,6 +23,7 @@ You can customize where the pack is loaded from and how the server listens using
 | `--pack-location` | string   | `./`        | Directory containing policy files |
 | `--http-listen`   | []string | `["local"]` | Address(es) to listen on          |
 | `--http-max-body-bytes` | int | `1048576` | Largest request body to accept, in bytes; `0` means no limit |
+| `--skip-engine-check` | bool | `false`  | Do not check the pack's `[engine]` version constraint against this binary |
 
 **Returns:** Process runs until SIGINT/SIGTERM (graceful shutdown). Exit non-zero on startup failure (e.g. port in use, pack load or parse error). HTTP API base: `http://<listen>:<port>`; see [Running as a Service](/deployment-operations/running-as-service) for request/response format.
 
@@ -195,6 +196,8 @@ sentrie serve --http-listen 127.0.0.1 --http-listen 192.168.1.100 --http-port 80
 Before you run this in production, keep a few boundaries in mind:
 
 ### Pack Loading
+
+The pack's `[engine]` version constraint is checked against the running binary at startup; a mismatch stops the server with an error. Pass `--skip-engine-check` to start anyway. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional).
 
 The server looks for the following files in the pack directory:
 
