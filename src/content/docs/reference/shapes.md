@@ -20,6 +20,8 @@ shape Name {
 }
 ```
 
+A field name can be any identifier or any keyword, so `version: string` and `default?: number` are valid. Fields are separated by whitespace or newlines, not commas. See [Keywords as field names](/reference/identifiers#keywords-as-field-names).
+
 Each field has a name, an optional `?` suffix on the name, a colon, and a type (any [type or shape](/reference/types-and-values)). A `?` on the name makes the field optional; a `?` after the type makes its value nullable.
 
 ### Type alias (simple shape)
@@ -35,7 +37,7 @@ Examples: `shape ID string @uuid()`, `shape Score number @min(0) @max(100)`.
 
 ### Composition (extending a base shape)
 
-A complex shape can extend exactly one other shape with `with BaseName` before the opening `{`. The base shape must be in scope (same namespace or [exported](/reference/namespaces) from another namespace).
+A complex shape can extend exactly one other shape with `with BaseName` before the opening `{`. The base is written either unqualified (`with Base`) or qualified with a namespace (`with com/base/Base`); see [How a base is resolved](#how-a-base-is-resolved).
 
 ```text
 shape Child with Base {
@@ -43,7 +45,47 @@ shape Child with Base {
 }
 ```
 
-The child shape’s effective fields are the union of the base’s fields and the child’s own fields. Duplicate field names between base and child are not allowed.
+The child shape’s effective fields are the union of the base’s fields and the child’s own fields. Duplicate field names between base and child are not allowed. Shapes declared inside a [policy](/reference/policies) can use `with` too, with the same rules.
+
+#### How a base is resolved
+
+- **Qualified base** (`with com/base/A`): looked up only in the namespace it names, and that namespace must declare `export shape A`. Otherwise validation fails with `shape 'com/base/A' not exported`. A qualified base that names the shape's own namespace needs no export.
+- **Unqualified base** (`with A`): looked up first among the enclosing policy's shapes (when the child is declared in a policy), then among the shapes of the child's own namespace. The first match wins, so a policy shape shadows a namespace shape of the same name.
+- **Unqualified base that only another namespace exports**: this is an error, not a lookup. Validation fails with `shape 'A' ... is exported by another namespace and must be qualified: use com/base/A`. Write the qualified name.
+- **A name found nowhere**: `shape 'A' not found`.
+
+A namespace that exports the base:
+
+```sentrie
+namespace com/base
+
+shape A { id: string }
+export shape A
+```
+
+And a namespace that uses it in each of the three ways:
+
+```sentrie
+namespace com/app
+
+shape Item { sku: string }
+
+policy p {
+  fact v: document
+
+  shape Extra { n: number }
+  shape ItemPlus with Item { qty: number }           -- namespace shape
+  shape Both with Extra { m: number }                -- sibling policy shape
+  shape FromBase with com/base/A { role: string }    -- qualified, needs `export shape A` in com/base
+
+  rule ok = { yield v is FromBase }
+  export decision of ok
+}
+```
+
+:::caution[Breaking change for some packs]
+Earlier versions let an unqualified `with A` match a shape that another namespace exported, and let a qualified `with com/base/A` succeed even when `A` was not exported there (and could resolve to a local `A` instead). Both now fail validation. Qualify cross-namespace bases (`with com/base/A`) and add `export shape A` in the namespace that declares the base.
+:::
 
 ### Exporting a shape
 
@@ -68,9 +110,37 @@ Every field in a shape body has two independent properties: whether the field is
 | `field: T?`  | Yes       | Yes       | Field must be present; value may be `null`. |
 | `field?: T?` | No        | Yes       | Field may be omitted; if present, value may be `null`. |
 
-- **Required:** If the field is missing from the value at runtime, validation fails.
+- **Required:** If the field is missing from the value at runtime, validation fails. A field that holds an undefined value counts as missing, because undefined is not a value: `x is S` is `false` and a typed check against `S` fails with `field <name> is required`, exactly as for an absent field. An optional field holding undefined is fine and is treated as omitted.
 - **Nullable:** If the field is present and its value is `null`, validation fails unless the type is nullable (`T?`).
 - **Legacy `!`:** The `!` field modifier has been removed. Write `field!: T` as `field: T`, and `field!?: T` or `field?!: T` as `field?: T`. If an old bare `field: T` relied on being nullable, write `field: T?`.
+
+```sentrie
+namespace docs/undef
+
+shape Item {
+  id: string
+  note?: string
+}
+
+policy P {
+  fact payload: document
+
+  rule requiredIsUndefined = {
+    let item = { "id": payload.missing, "note": "n" }
+    yield item is Item
+  }
+
+  rule optionalIsUndefined = {
+    let item: Item = { "id": "a", "note": payload.missing }
+    yield item.id
+  }
+
+  export decision of requiredIsUndefined
+  export decision of optionalIsUndefined
+}
+```
+
+With `{"payload": {}}`, `requiredIsUndefined` is `false` because `id` reads an undefined value, and `optionalIsUndefined` is `"a"`. Writing `let item: Item = { "id": payload.missing }` instead fails with `field id is required`. A `dict[T]` entry is treated like an optional field: an entry holding undefined counts as absent and passes the check (see [Collection types](/reference/types-and-values#declaring-a-collection-type)), so a shape field of type `dict[number]` accepts it. Only a whole value that is undefined passes through a typed `let`, a derive return or a lambda return unchecked (see [Typed let and undefined](/reference/let#typed-let-and-undefined)).
 
 Field type can be any type reference: primitives (`number`, `string`, `trinary`, `boolean`, `document`), collections (`list[T]`, `dict[T]`, `record[...]`), or another shape. Constraints on the type are validated when the value is assigned or when the value is supplied as a fact.
 
@@ -79,7 +149,7 @@ Field type can be any type reference: primitives (`number`, `string`, `trinary`,
 | Aspect | Rule |
 | :----- | :--- |
 | Base shape | Exactly one `with BaseName`. The base must be a complex shape (or a type-alias shape that the implementation treats as a structural base where applicable). |
-| Visibility | Base must be in the same namespace or exported from another namespace. Cross-namespace base requires the base shape to be declared with `export shape BaseName` in its file. |
+| Visibility | An unqualified base is found in the enclosing policy, then the child's namespace. A base in another namespace must be written qualified (`with com/base/BaseName`) and declared with `export shape BaseName` there; an unexported or unqualified cross-namespace base is a validation error. A qualified base naming the child's own namespace needs no export. |
 | Duplicate fields | A child cannot declare a field with the same name as a field in the base. |
 | Circular composition | Not allowed (e.g. A with B, B with A). |
 
@@ -148,6 +218,8 @@ let p: Percent = 50
 ### Composition
 
 ```sentrie
+namespace com/example/users
+
 shape Base { id: string }
 shape Extended with Base { role: string }
 ```
@@ -156,7 +228,7 @@ A value of type `Extended` must have both `id` and `role`, and both must be non-
 
 ### Composition with exported base (cross-namespace)
 
-Exported shapes from another file can be used as composition bases. See [Exporting Shapes](#exporting-shapes) and [Policy composition](/language-concepts/policy-composition).
+Exported shapes from another namespace can be used as composition bases, written with the qualified name (`shape Child with com/base/A { ... }`). See [Exporting Shapes](#exporting-shapes) and [Policy composition](/language-concepts/policy-composition).
 
 #### Field Optionality and Nullability
 
@@ -604,11 +676,14 @@ shape Base { id: string }
 export shape Base
 
 policy P {
-  -- ...
+  fact v: document
+
+  rule ok = { yield v is Base }
+  export decision of ok
 }
 ```
 
-In another file in a different namespace, a shape can extend `Base` by referencing the exported name (see [Policy composition](/language-concepts/policy-composition) and namespace resolution). The base shape must be exported for cross-namespace composition.
+In another namespace, a shape extends `Base` by its qualified name, `shape Child with com/example/auth/Base { ... }` (see [How a base is resolved](#how-a-base-is-resolved)). The base shape must be exported for cross-namespace composition, and an unqualified `with Base` does not find it.
 
 ### Where a Shape's Fields Resolve
 
@@ -662,6 +737,6 @@ Before you implement this, keep a few boundaries in mind:
 - **Validation timing:** Shape (and constraint) validation runs when a value is assigned to a variable or field of that shape, or when facts are bound. Failure aborts evaluation.
 - **Optional fields:** Use `is defined` (and null checks if the field is nullable) before using an optional or nullable field in expressions. Accessing a missing optional field yields `unknown` in expressions; the shape validator only checks that required fields are present and non-nullable fields are non-null when present.
 - **Composition:** The composed shape effectively has all base fields plus its own. Circular composition (A with B, B with A, or longer cycles) is not allowed. Duplicate field names between base and child are not allowed.
-- **Export:** Only shapes declared in the same file can be exported with `export shape Name`. Exported shapes are visible to other namespaces for use as types or as base shapes in composition. Unexported shapes are namespace-local.
+- **Export:** Only shapes declared in the same file can be exported with `export shape Name`. Exported shapes are visible to other namespaces for use as types or, by qualified name, as base shapes in composition. Unexported shapes are namespace-local.
 - **Field order:** The order of fields in a shape literal does not affect type checking; only presence and types (and constraints) matter.
-- **Naming:** Shape names and field names are [identifiers](/reference/identifiers). The same namespace can contain multiple shapes; policies in that namespace can reference any shape in the same namespace or any exported shape from another namespace (per import/resolution rules).
+- **Naming:** Shape names are [identifiers](/reference/identifiers); field names are identifiers or keywords. The same namespace can contain multiple shapes; policies in that namespace can reference any shape in the same namespace or any exported shape from another namespace (per import/resolution rules).
