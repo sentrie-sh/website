@@ -20,6 +20,8 @@ shape Name {
 }
 ```
 
+A field name can be any identifier or any keyword, so `version: string` and `default?: number` are valid. Fields are separated by whitespace or newlines, not commas. See [Keywords as field names](/reference/identifiers#keywords-as-field-names).
+
 Each field has a name, an optional `?` suffix on the name, a colon, and a type (any [type or shape](/reference/types-and-values)). A `?` on the name makes the field optional; a `?` after the type makes its value nullable.
 
 ### Type alias (simple shape)
@@ -709,4 +711,4 @@ Before you implement this, keep a few boundaries in mind:
 - **Composition:** The composed shape effectively has all base fields plus its own. Circular composition (A with B, B with A, or longer cycles) is not allowed. Duplicate field names between base and child are not allowed.
 - **Export:** Only shapes declared in the same file can be exported with `export shape Name`. Exported shapes are visible to other namespaces for use as types or, by qualified name, as base shapes in composition. Unexported shapes are namespace-local.
 - **Field order:** The order of fields in a shape literal does not affect type checking; only presence and types (and constraints) matter.
-- **Naming:** Shape names and field names are [identifiers](/reference/identifiers). The same namespace can contain multiple shapes; policies in that namespace can reference any shape in the same namespace or any exported shape from another namespace (per import/resolution rules).
+- **Naming:** Shape names are [identifiers](/reference/identifiers); field names are identifiers or keywords. The same namespace can contain multiple shapes; policies in that namespace can reference any shape in the same namespace or any exported shape from another namespace (per import/resolution rules).
