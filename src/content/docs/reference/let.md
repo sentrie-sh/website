@@ -37,7 +37,7 @@ let totalPrice = item.price * quantity
 -- With type annotations
 let count: number = 10
 let name: string = "example"
-let isActive: bool = true
+let isActive: boolean = true
 
 -- With type annotations and constraints
 let count: number @min(0) @max(100) = 50
@@ -310,6 +310,31 @@ let anything: any = { "k": true }
 ```
 
 See [Types and Values](/reference/types-and-values#union-types) for how unions are checked.
+
+### Typed let and undefined
+
+Reading data that is not there, such as a field the fact does not carry, gives an undefined value. A typed `let` passes it through, as an untyped one does: the type and its constraints are not checked, and the binding is undefined.
+
+```sentrie
+namespace docs/typed
+
+policy P {
+  fact user: document
+
+  rule typedLet = {
+    let n: number = user.missing
+    yield n
+  }
+
+  export decision of typedLet
+}
+```
+
+With `{"user": {}}` the rule is `unknown`, the same as with `let n = user.missing`. A value that is present is still validated, so `let n: number = user.name` fails when `user.name` is a string. Because constraints are not checked on an undefined value, a constraint is also not evaluated there.
+
+This applies to a whole value that is undefined. A shape value whose required field holds undefined is not undefined itself: the field counts as missing and the check fails with `field <name> is required` (see [Field modifiers](/reference/shapes#field-optionality-and-nullability)).
+
+Before this change a typed `let` failed with `value undefined is not a number` where the untyped form gave `unknown`. To require a value, test it with `is defined` or `is number`, which reject undefined, or use a cast such as `user.age as number`.
 
 ### Type Annotations with Constraints
 
