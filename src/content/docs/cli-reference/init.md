@@ -1,62 +1,105 @@
 ---
-title: "sentrie init"
-description: "Create a new policy pack with sentrie.pack.toml in the current or given directory."
+title: "init"
+description: "Initialize a new policy pack."
 ---
 
-When you are starting a new policy pack and want a valid `sentrie.pack.toml` without editing one by hand, you use `sentrie init`. It creates the pack file with the name you give and the right schema so the rest of the tooling can load the pack.
+The `init` command initializes a new policy pack in the provided directory with the provided name. It creates a `sentrie.pack.toml` file with the correct structure and validates the pack name.
 
-Here is the basic syntax:
-
-```bash
-sentrie init <NAME> [ --directory <PATH> ]
-```
-
-**NAME** is required (e.g. `my-policy-pack`, `com.example.pack`). **--directory** is optional; the directory must be empty. Default is the current directory.
-
-## Configuration & Arguments
-
-You can customize where the pack is created using the following options:
-
-| Argument | Type | Required | What it does |
-| :------- | :--- | :------- | :----------- |
-| NAME | string | Yes | Pack name. Must start with a letter; letters, numbers, underscores, hyphens, dots allowed; each segment after a dot must start with a letter. Invalid: leading digit, leading hyphen, double dot. |
-| `--directory` | path | No | Directory for the pack. Must be empty. Default: `./`. |
-
-**Returns:** Exit 0 on success. Creates `sentrie.pack.toml` with `[schema] version = 1`, `[pack] name = "<NAME>"`, `version = "0.0.1"`. No other files are created.
-
----
-
-## Examples in Action
-
-### Creating a pack in the current directory
-
-You are in an empty folder and want to turn it into a pack with a given name.
+## Syntax
 
 ```bash
-sentrie init my-policy-pack
+sentrie init {NAME} [OPTIONS]
 ```
 
-### Creating a pack in a new directory
+## Arguments
 
-You want the pack to live in a new subdirectory (e.g. to keep policies separate from app code).
+### `NAME` (required)
+
+The name of the policy pack. The name must be a valid identifier:
+
+- Must start with a letter (a-z, A-Z)
+- Can contain letters, numbers, underscores (`_`), hyphens (`-`), and dots (`.`)
+- Dots can be used for hierarchical names (e.g., `com.example.pack`)
+- Each segment after a dot must also start with a letter
+
+**Valid examples:**
+
+- `my-policy-pack`
+- `my_policy_pack`
+- `myPolicyPack`
+- `com.example.pack`
+- `org.mycompany.policies`
+
+**Invalid examples:**
+
+- `123pack` (starts with a number)
+- `-mypack` (starts with a hyphen)
+- `my..pack` (double dot)
+- `my.123pack` (segment after dot starts with a number)
+
+## Options
+
+### `--directory`
+
+Specifies the directory to initialize the policy pack in.
 
 ```bash
 sentrie init my-policy-pack --directory ./my-policy-pack
 ```
 
-### Using a hierarchical pack name
+:::warning[Important]
+The directory **MUST be empty**. If the directory contains any files, the command will fail with an error.
+:::
 
-You are naming the pack with a dotted identifier (e.g. for org or product).
+**Default**: `./` (current directory)
+
+## What Gets Created
+
+The command creates a `sentrie.pack.toml` file with the following structure:
+
+```toml
+[schema]
+version = 1
+
+[pack]
+name = "my-policy-pack"
+version = "0.0.1"
+```
+
+The pack file is validated against the Sentrie pack schema to ensure it's correctly formatted.
+
+## Examples
+
+Create a policy pack in the current directory:
+
+```bash
+sentrie init my-policy-pack
+```
+
+Create a policy pack in a new directory:
+
+```bash
+sentrie init my-policy-pack --directory ./my-policy-pack
+```
+
+Create a policy pack with a hierarchical name:
 
 ```bash
 sentrie init com.example.iam --directory ./iam-pack
 ```
 
----
+## Error Messages
 
-## Good to Know
+If the pack name is invalid, you'll see an error:
 
-Before you run this, keep a few boundaries in mind:
+```bash
+$ sentrie init 123pack
+Error: name needs to be a valid identity. It must start with a letter and can only contain letters, numbers, underscores and `dot`.
+```
 
-- **Constraint:** The directory must exist and be empty. If it contains any files, the command fails. Only `sentrie.pack.toml` is written; structure matches the Sentrie pack schema. Pack name is validated; invalid name produces an error and no file is written.
-- **Edge case:** Invalid name (e.g. `123pack`, `-mypack`, `my..pack`, `my.123pack`) → error; no pack file created. Non-empty directory → error (e.g. "directory is not empty - please choose a different directory"). `--directory` must point to an existing directory; `init` does not create the directory.
+If the directory is not empty:
+
+```bash
+$ sentrie init my-pack
+Error: directory is not empty - please choose a different directory
+```

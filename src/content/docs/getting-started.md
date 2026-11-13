@@ -3,6 +3,8 @@ title: "Getting Started"
 description: "Learn the basics of Sentrie and write your first policy."
 ---
 
+# Getting Started
+
 Welcome to Sentrie! This guide will help you get up and running with Sentrie quickly.
 
 ## What is Sentrie?
@@ -216,12 +218,9 @@ This is equivalent to nested calls such as `str.toLower(str.trim(input))`. See [
 
 ## Troubleshooting
 
-For a catalog of common problems and fixes, see:
+### Common Issues
 
-- [Troubleshooting Overview](/troubleshooting)
-- [Common Errors](/troubleshooting/common-errors)
-
-You can also:
+**Policy not found**: Make sure your namespace and policy names match exactly in the URL path.
 
 **Invalid JSON**: Ensure your request body is valid JSON and matches the expected structure.
 

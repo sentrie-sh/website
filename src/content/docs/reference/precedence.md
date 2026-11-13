@@ -1,11 +1,11 @@
 ---
 title: Precedence
-description: "Operator precedence (highest to lowest), associativity, and use of parentheses."
+description: Operator precedence determines the order of operations in expressions.
 ---
 
-Operators are evaluated in order of precedence: higher precedence binds first. When two operators have the same precedence, they are usually evaluated left-to-right; the ternary operator `? :` is right-associative. Parentheses `( ... )` override precedence and explicitly group subexpressions.
+Operator precedence defines which operations are performed first when multiple operators appear in an expression. Higher precedence operations are evaluated before lower precedence ones.
 
-## Syntax
+## Precedence Table (highest to lowest)
 
 | Precedence | Operators                                         | Description                                                  |
 | ---------- | ------------------------------------------------- | ------------------------------------------------------------ |
@@ -21,62 +21,34 @@ Operators are evaluated in order of precedence: higher precedence binds first. W
 | 10         | `? :`                                             | Ternary conditional                                          |
 | 11         | `|>`                                              | Pipeline operator (lowest precedence)                        |
 
-## Configuration & Arguments (precedence table)
+## Examples
 
-| Level | Precedence | Operators | Description |
-| :---- | :--------- | :-------- | :---------- |
-| 1 | Highest | `( )`, `[ ]`, `.` | Primary: function call `f(...)`, indexing `e[i]`, member access `e.f`. Literals and identifiers are atoms. |
-| 2 | | `not`, `!`, unary `+`, unary `-` | Unary: logical not, unary plus/minus. |
-| 3 | | `*`, `/`, `%` | Multiplicative. |
-| 4 | | `+`, `-` | Additive (binary). |
-| 5 | | `<`, `<=`, `>`, `>=`, `in`, `matches`, `contains` | Comparison and containment. |
-| 6 | | `==`, `!=`, `is`, `is not` | Equality. |
-| 7 | | `and` | Logical AND. |
-| 8 | | `xor` | Logical XOR. |
-| 9 | | `or` | Logical OR. |
-| 10 | | `? :` | Ternary conditional. **Right-associative.** |
-| 11 | Lowest | `|>` | Pipeline: left operand is piped into the next call. **Left-associative.** |
-
-**Returns:** N/A (ordering rule). The result type is the type of the top-level expression after all operators are applied.
-
-## Associativity
-
-- **Left-to-right:** Same-precedence operators (e.g. `+` and `-`, `*` and `/`, `and`, `or`, `xor`) group from the left unless overridden by parentheses. Example: `a - b - c` is `(a - b) - c`.
-- **Right-associative:** The ternary `? :` groups from the right. Example: `a ? b : c ? d : e` is `a ? b : (c ? d : e)`.
-
-## Parentheses
-
-Parentheses override precedence. Any subexpression can be wrapped in `( ... )` to force that subexpression to be evaluated first. Use parentheses when the intended grouping is not obvious.
-
-## Examples in Action
-
-### Precedence in arithmetic
-
-```text
-let result: number = 2 + 3 * 4         -- 14 (multiplication before addition)
-let valid: boolean = 5 + 3 > 7            -- true (arithmetic before comparison)
-```
-
-### Logical precedence
-
-```text
-let complex: boolean = true and false or true   -- true (and before or; (true and false) or true)
-```
-
-### Ternary right-associativity
+### Arithmetic Precedence
 
 ```sentrie
-let value: number = 5 > 3 ? 10 : 20                    -- 10
-let nested: string = true ? (false ? "A" : "B") : "C" -- "B"
+let result: number = 2 + 3 * 4         -- Result: 14 (not 20)
+let calculation: number = 10 / 2 + 3 -- Result: 8.0 (not 1.25)
 ```
 
-Without parentheses, `a ? b : c ? d : e` is parsed as `a ? b : (c ? d : e)`.
+### Comparison vs Arithmetic
 
-### Using parentheses to clarify
+```sentrie
+let is_valid: bool = 5 + 3 > 7     -- Result: true
+let check: bool = 10 * 2 == 20     -- Result: true
+```
 
-```text
-let safe: boolean = (user.role == "admin") and (age >= 18)
-let sum: number = (a + b) * (c + d)
+### Logical Precedence
+
+```sentrie
+let complex: bool = true and false or true  -- Result: true
+let mixed: bool = 5 > 3 and 2 < 4           -- Result: true
+```
+
+### Ternary Precedence
+
+```sentrie
+let value: number = 5 > 3 ? 10 : 20                       -- Result: 10
+let nested: string = true ? (false ? "A" : "B") : "C"  -- Result: "B"
 ```
 
 ### Pipeline Precedence and Associativity
@@ -96,10 +68,63 @@ let c = cond ? x : y |> len
 
 For pipeline syntax, valid targets, and memoization, see [Function chaining](/reference/function-chaining).
 
-## Good to Know
+## Using Parentheses
 
-Before you implement this, keep a few boundaries in mind:
+### Override Precedence
 
-- **Parentheses:** Override precedence and associativity. Use them when in doubt to make intent explicit.
-- **Same level:** Left to right except for ternary (`? :`), which is right-associative.
-- **Primary:** Function calls, indexing, and dot access have the highest precedence so that `a.f()`, `a[i]`, and `a.b` are grouped as expected.
+```sentrie
+-- Without parentheses (follows precedence)
+let result1: number = 2 + 3 * 4        -- Result: 14
+
+-- With parentheses (override precedence)
+let result2: number = (2 + 3) * 4      -- Result: 20
+```
+
+### Complex Expressions
+
+```sentrie
+-- Clear grouping for readability
+let access: bool = (user.age >= 18 and user.verified) or
+                  (user.role == "admin" and user.active)
+
+-- Mixed operations
+let calculation: number = (10 + 5) * (3 - 1) / 2  -- Result: 15.0
+
+-- Same precedence is evaluated from left to right
+let calculation: number = (10 + 5) * (5 - 2) / 2  -- Result: 22.5 (15 * 3 / 2)
+
+```
+
+## Best Practices
+
+### Use Parentheses for Clarity
+
+```sentrie
+-- Good: Clear intent
+let result: bool = (a and b) or (c and d)
+
+-- Avoid: Relying on precedence knowledge
+let result: bool = a and b or c and d
+```
+
+### Group Related Operations
+
+```sentrie
+-- Good: Logical grouping
+let price: number = (base_price + tax) * discount_rate
+
+-- Good: Comparison grouping
+let valid: bool = (age >= 18) and (income > 50000)
+```
+
+### Break Complex Expressions
+
+```sentrie
+-- Good: Step-by-step calculation
+let temp1: number = base_price + tax
+let temp2: number = temp1 * discount_rate
+let final_price: number = temp2 - shipping
+
+-- Avoid: One complex expression
+let final_price: number = (base_price + tax) * discount_rate - shipping
+```

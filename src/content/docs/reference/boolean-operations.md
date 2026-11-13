@@ -1,15 +1,13 @@
 ---
 title: Boolean Operations
-description: "Logical (and, or, xor, not), comparison (==, !=, <, <=, >, >=), pattern (matches), and conditional (ternary, Elvis) operators."
+description: Boolean operations provide powerful ways to evaluate conditions, compare values, and make decisions in Sentrie.
 ---
 
-Boolean operations combine conditions, compare values, and branch on truthiness. Logical and comparison operators use [trinary](/reference/trinary) semantics (true, false, unknown). The pattern operator `matches` works on strings and returns a boolean. The ternary (`? :`) operator chooses a value based on whether a condition is truthy; only `true` is truthy. The Elvis (`?:`) operator is different: it falls back to its default only when the left side is undefined or `null`.
+Sentrie provides a comprehensive set of boolean operations that allow you to evaluate conditions, compare values, and make logical decisions in your policies. These operations are essential for creating conditional logic and data validation.
 
-## Syntax
+## Overview
 
-**Logical (binary):** `and` | `or` | `xor`
-
-**Negation (unary):** `not expr` | `! expr`
+Boolean operations in Sentrie include:
 
 - **Trinary Logic**: Three-valued logic with `true`, `false`, and `unknown`
 - **Conditional Operators**: Ternary (`? :`) and Elvis (`?:`) operators for conditional value selection
@@ -19,76 +17,78 @@ Boolean operations combine conditions, compare values, and branch on truthiness.
 - **Collection builtins and membership**: List quantifiers (`any`, `all`), plus `in` and `contains`
 - **State Checking**: Checking emptiness and definedness
 
-**Comparison:** `==` | `!=` | `is` | `is not` | `<` | `<=` | `>` | `>=`
+## Conditional Operators
 
-**Pattern:** `stringExpr matches patternExpr` (both operands strings; right is a regex pattern)
+Sentrie provides two operators for conditional value selection: the ternary operator and the Elvis operator. The Elvis operator is a shorthand for a common pattern using the ternary operator.
 
-**Conditional:** `condition ? trueValue : falseValue` | `expr ?: default`
+### Ternary Operator (`? :`)
 
-## Configuration & Arguments
+The ternary operator allows you to conditionally select between two values based on a boolean condition.
 
-| Operator             | Operands                         | What it does                                                                                                                   | Returns                 |
-| :------------------- | :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
-| `and`                | expr, expr                       | Logical AND (Kleene). Short-circuits: if left is false, right is not evaluated.                                                | trinary                 |
-| `or`                 | expr, expr                       | Logical OR (Kleene). Short-circuits: if left is true, right is not evaluated.                                                  | trinary                 |
-| `xor`                | expr, expr                       | Logical XOR. True when exactly one operand is truthy.                                                                          | trinary                 |
-| `not`, `!`           | expr                             | Logical NOT (unary). One operand; converted to trinary then negated (true↔false; unknown→unknown).                             | trinary                 |
-| `==`, `is`           | expr, expr                       | Equality. Both sides must be comparable.                                                                                       | trinary                 |
-| `!=`, `is not`       | expr, expr                       | Inequality.                                                                                                                    | trinary                 |
-| `<`, `<=`, `>`, `>=` | expr, expr                       | Ordering. Both sides must be comparable (e.g. number, string).                                                                 | trinary                 |
-| `matches`            | string, string                   | Left: value; right: regex pattern ([RE2 syntax](https://github.com/google/re2/wiki/Syntax)). Invalid pattern → error.                           | boolean                 |
-| `? :`                | condition, trueValue, falseValue | Ternary: if condition is truthy, result is trueValue; else falseValue. Only the chosen branch is evaluated. Right-associative. | type of chosen branch   |
-| `?:`                 | expr, default                    | Elvis: if expr is undefined or `null`, result is default; otherwise result is expr, whatever its value (`false`, `0`, `""`, `unknown` and empty collections are kept). | type of expr or default |
-
-**Returns:** Trinary for logical and comparison; boolean for `matches`; type of the chosen value for ternary and Elvis.
-
-## Truthiness (for ternary)
-
-Only `true` is truthy. The following are treated as non-truthy: `false`, `unknown`, `null`, `0`, `""`, and empty collections. So `cond ? a : b` yields `b` when `cond` is any of these.
-
-Elvis does not use truthiness. `expr ?: default` yields `default` only when `expr` is undefined or `null`, so `false ?: true` is `false`, `0 ?: 9` is `0`, `"" ?: "x"` is `""` and `unknown ?: true` is `unknown`. To fall back on other values, test them explicitly, for example with a ternary.
-
-## Short-circuit and evaluation order
-
-- **and:** Left-to-right. If the left operand is false, the right is not evaluated.
-- **or:** Left-to-right. If the left operand is true, the right is not evaluated.
-- **? ::** Only the branch selected by the condition is evaluated. The condition is always evaluated first.
-
-## Examples in Action
-
-### Logical and comparison
-
-```text
-let a: boolean = true and false
-let b: boolean = age >= 18
-let c: boolean = not (user.role in allowed_roles)
-```
-
-### Ternary and Elvis
+#### Syntax
 
 ```sentrie
-let d: string = age >= 18 ? "adult" : "minor"
-let e: string = user.name ?: "Anonymous"
+condition ? trueValue : falseValue
 ```
 
-### Pattern matching (regex)
+#### Examples
 
-```text
-let g: boolean = email matches `^[a-z]+@[a-z]+\\.com$`
+```sentrie
+let age: number = 25
+let status: string = age >= 18 ? "adult" : "minor"
+-- Result: "adult"
+
+let score: number = 85
+let grade: string = score >= 90 ? "A" : score >= 80 ? "B" : score >= 70 ? "C" : "F"
+-- Result: "B"
+
+let user_role: string = "admin"
+let can_access: bool = user_role == "admin" ? true : false
+-- Result: true
 ```
 
-Left and right must be strings. The right is a regular expression in [RE2 syntax](https://github.com/google/re2/wiki/Syntax). Invalid pattern causes an evaluation error.
+#### Complex Ternary Logic
 
-### Combining conditions
+```sentrie
+shape Product {
+  name: string
+  price: number
+  category: string
+  in_stock: bool
+}
 
-```text
-let f: boolean = user.role == "admin" or (user.role == "user" and user.status == "active")
-let h: boolean = not (role in ["guest"]) and status == "active"
+fact product: Product
+
+-- Complex pricing logic
+let final_price: number = product.in_stock ?
+  (product.category == "Electronics" ? product.price * 0.9 : product.price) :
+  0.0
+-- Result: 899.991 (10% discount for electronics)
+
+-- Status message
+let status_message: string = product.in_stock ?
+  "Available for $" + product.price.toString() :
+  "Out of stock"
+-- Result: "Available for $999.99"
 ```
 
-## Good to Know
+### Elvis Operator (`?:`)
 
-Before you wire these into policies, keep a few boundaries in mind:
+The Elvis operator (`?:`) provides a shorthand way to provide a default value when the left-hand expression is not truthy. It is equivalent to using the ternary operator with the same expression on both sides of the `?`.
+
+When the left-hand expression evaluates to a non-truthy value (including `false`, `null`, `undefined` → `unknown`, `0`, `""`, or empty collections), the default value is used.
+
+#### Syntax
+
+```sentrie
+expression ?: defaultValue
+```
+
+This is equivalent to:
+
+```sentrie
+expression ? expression : defaultValue
+```
 
 #### Examples
 
@@ -109,7 +109,7 @@ The Elvis operator checks definedness, not truthiness. Only an undefined or `nul
 
 ## Logical Operations
 
-For details on trinary logic, see the [Kleene's three-valued logic](/reference/trinary#configuration--arguments) section.
+For details on trinary logic, see the [Kleene's three-valued logic](/reference/trinary#kleene-truth-tables) section.
 
 ## Comparison Operations
 
@@ -679,10 +679,3 @@ let is_admin: boolean = user.role == "admin"
 -- Use 'in' for collection membership
 let can_read: boolean = "read" in user.permissions
 ```
-
-### Boundary conditions
-
-- **not / !:** Unary prefix; one operand. Converted to trinary then negated. `not unknown` yields `unknown`. You can write `not expr` or `! expr` (no space required after `!`).
-- **Short-circuit:** `and` and `or` evaluate left-to-right; the right side may be skipped. The ternary evaluates only the chosen branch.
-- **Comparison:** Both sides must be comparable; result is trinary. Equality with `unknown` yields `unknown`.
-- **matches:** Left and right must be strings. Right is a regular expression in [RE2 syntax](https://github.com/google/re2/wiki/Syntax). Invalid pattern causes an evaluation error. For membership in collections or substring checks, use [in](/reference/membership-operations) or [contains](/reference/membership-operations).
