@@ -235,6 +235,10 @@ export default defineConfig({
               label: "Security and Permissions",
               slug: "reference/security-and-permissions",
             },
+            {
+              label: "Capabilities",
+              slug: "reference/capabilities",
+            },
           ],
         },
         {

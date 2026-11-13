@@ -100,7 +100,7 @@ If the `[engine]` table is present, the `sentrie` field is required.
   ```
 
 - **Skipping the check.** Pass `--skip-engine-check` to `exec`, `serve`, `validate` or `bench` to load the pack anyway.
-- **Dev builds.** A binary with no version, or one built from a source checkout (its version is a Go pseudo-version, whether or not the checkout has a tag), passes with a warning and the constraint is not checked. A binary whose version is not valid semver also warns and passes.
+- **Dev builds.** A binary with no version, or one built from a source checkout (its version then ends in a commit timestamp and hash, such as `0.0.5-0.20261110120000-abcdef123456`, whether or not the checkout has a tag), passes with a warning and the constraint is not checked. A binary whose version is not valid semver also warns and passes.
 
 ```text
 warning: pack requires sentrie >=0.0.5; this is a dev or unversioned build, so the engine version is not checked

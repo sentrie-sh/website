@@ -61,15 +61,27 @@ let role = user.role is defined ? user.role : error("user role must be provided"
 
 ### `undefined` vs `error`
 
-When the `error` function is called, it immediately stops the evaluation of the current policy and returns an error result. This mechanism is intended for situations where continuing evaluation no longer makes sense due to invalid, unexpected, or strictly disallowed conditions, such as missing required input, encountering data corruption, or detecting an explicit policy violation.
+When the `error` function is called, it stops evaluating the **rule** it is in, and that rule fails. It does not stop the rest of the policy: when you run a whole policy, every other exported rule is still evaluated and returns its decision as usual. The failed rule has the decision state `unknown` and carries an `error` object with the message:
+
+```json
+"error": {
+  "title": "Evaluation Failed",
+  "status": 500,
+  "detail": "user role must be provided: runtime error"
+}
+```
+
+[`exec`](/cli-reference/exec) prints every decision and then exits with status 1 and `Error: <n> of <m> rules failed`. [`serve`](/cli-reference/serve) answers **207 Multi-Status** instead of 200, so a client must check each decision's `error`. See [When a Rule Fails](/running-sentrie/serving-policies#when-a-rule-fails).
+
+`error` is intended for situations where continuing to evaluate the rule no longer makes sense, such as missing required input, data corruption, or an explicitly disallowed condition.
 
 Deciding between returning `error` or `undefined` depends on intent:
-- Use `error` when the policy must explicitly fail and the issue should be surfaced.
-- Use `undefined` when a missing value or recoverable situation occurs that does not require global failure, so the policy can potentially continue or gracefully handle the absence.
+- Use `error` when the rule must explicitly fail and the issue should be surfaced to the caller.
+- Use `undefined` when a missing value or recoverable situation occurs, so the rule can fall back or handle the absence.
 
 In summary:  
-- `undefined` means “no value available” but may allow further evaluation or fallback via `elvis` or `ternary` operators.  
-- `error` signals a non-recoverable state where the policy cannot safely proceed and must abort immediately.
+- `undefined` means "no value available" but allows further evaluation, for example a fallback with a ternary and `is defined`.  
+- `error` signals that this rule cannot safely produce a decision. The rule fails, and the other rules are unaffected.
 
 ## `as_list(value) => list[any]`
 
@@ -329,7 +341,7 @@ let doubled: list[number] = collect(numbers, (num) => {
 
 let fruits: list[string] = ["apple", "banana", "cherry"]
 let indexed_fruits: list[string] = collect(fruits, (fruit, idx) => {
-  yield (idx + 1).toString() + ". " + fruit
+  yield (idx + 1) + ". " + fruit
 })
 
 shape User {
@@ -736,7 +748,7 @@ rule within_limit = default false {
 
 ### `parse_duration(value) => number`
 
-Parses a duration string into a number of **seconds**, the same unit that `now()` uses. The syntax is Go's duration syntax: a number with a unit of `ns`, `us` (or `µs`), `ms`, `s`, `m` (minutes) or `h`, optionally combined and optionally signed. Days and weeks are not units, so `"2d"` is an error.
+Parses a duration string into a number of **seconds**, the same unit that `now()` uses. The syntax is a number with a unit of `ns`, `us` (or `µs`), `ms`, `s`, `m` (minutes) or `h`, optionally combined and optionally signed. Days and weeks are not units, so `"2d"` is an error.
 
 **Examples:**
 
