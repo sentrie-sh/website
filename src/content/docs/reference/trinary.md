@@ -5,6 +5,8 @@ description: Trinary values are a type of value that can be true, false, or unkn
 
 Sentrie uses **trinary logic** (also known as three-valued logic), which extends traditional boolean logic with a third value: `unknown`. This is essential for handling cases where information may be incomplete or unavailable.
 
+`unknown` is only valid in a `trinary`. A value declared `boolean` is strictly `true` or `false`: it behaves like a `trinary` that rejects `unknown`, and an `unknown` value yielded by a `boolean` rule, `let`, fact or cast is an error. A `boolean` rule that produces no value at all still reports `unknown`: this happens when its `when` fails, it has no `default`, and no contribution yields `true`. Declare the value `trinary` when `unknown` is a legitimate outcome. The names `bool`, `int` and `float` are not types; see [Types and Values](/reference/types-and-values#primitive-types).
+
 ### Trinary Values
 
 Sentrie supports three trinary values:
@@ -132,7 +134,7 @@ let is_verified: trinary = user.email is defined and
 shape Account {
   username: string
   email?: string
-  verified: bool
+  verified: boolean
 }
 
 fact account: Account
@@ -187,11 +189,11 @@ For collections like `lists`, `maps`, `slices`, and `arrays`, truthiness depends
 
 Sentrie does not distinguish between trinary and boolean values:
 
-- `true` (bool) → `true` (trinary)
-- `false` (bool) → `false` (trinary)
+- `true` (boolean) → `true` (trinary)
+- `false` (boolean) → `false` (trinary)
 
 :::note
-A `bool` value is a special case of a `trinary` value which can never be `unknown`.
+A `boolean` value is a special case of a `trinary` value which can never be `unknown`: a `boolean` rejects `unknown`, so yielding or casting an `unknown` value to `boolean` is an error.
 :::
 
 ## Best Practices for Trinary Logic
