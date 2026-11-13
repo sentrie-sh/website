@@ -8,10 +8,10 @@ When you need to evaluate policies over HTTP (e.g. from a backend or API gateway
 Here is the basic syntax:
 
 ```bash
-sentrie serve [--pack-location <PATH>] [--http-port <INT>] [--http-listen <ADDR> ...] [--http-max-body-bytes <INT>]
+sentrie serve [--pack-location <PATH>] [--http-port <INT>] [--http-listen <ADDR> ...] [--http-max-body-bytes <INT>] [--capabilities <PATH>]
 ```
 
-All options are optional: pack directory defaults to the current directory, port to `7529`, listen address to localhost (`--http-listen local`), and the request body limit to 1 MiB.
+All options are optional: pack directory defaults to the current directory, port to `7529`, listen address to localhost (`--http-listen local`), the request body limit to 1 MiB, and capabilities to allow everything.
 
 ## Configuration & Arguments
 
@@ -23,6 +23,7 @@ You can customize where the pack is loaded from and how the server listens using
 | `--pack-location` | string   | `./`        | Directory containing policy files |
 | `--http-listen`   | []string | `["local"]` | Address(es) to listen on          |
 | `--http-max-body-bytes` | int | `1048576` | Largest request body to accept, in bytes; `0` means no limit |
+| `--capabilities` | path | -  | [Capabilities file](/reference/capabilities) limiting the builtins and modules the pack may use; default: allow everything |
 | `--skip-engine-check` | bool | `false`  | Do not check the pack's `[engine]` version constraint against this binary |
 
 **Returns:** Process runs until SIGINT/SIGTERM (graceful shutdown). Exit non-zero on startup failure (e.g. port in use, pack load or parse error). HTTP API base: `http://<listen>:<port>`; see [Running as a Service](/deployment-operations/running-as-service) for request/response format.
@@ -133,6 +134,24 @@ sentrie serve --http-max-body-bytes 4194304
 - The value is a plain integer number of bytes; suffixes such as `MiB` are not accepted.
 - `0` disables the limit. Use it only behind a proxy that enforces its own limit, because an unlimited body lets any caller make the server read as much as it is sent.
 - A negative value is rejected at startup: `invalid --http-max-body-bytes -1: must not be negative; use 0 for no limit`.
+
+### --capabilities
+
+Path to a [capabilities file](/reference/capabilities) that limits the builtins and `@sentrie/*` modules the pack may use, and whether it may load its own TypeScript files.
+
+```bash
+sentrie serve --pack-location ./policies --capabilities ./capabilities.json
+```
+
+**Default**: none (everything is allowed)
+
+The whole pack is checked against the file before the server starts listening. If the pack uses anything the file does not grant, including an `import` inside its own TypeScript, `serve` does not start, and the error names the source location:
+
+```text
+Error: policy.sentrie:4:3-41: module "@sentrie/time": not granted by the capabilities file
+```
+
+An invalid capabilities file also stops `serve` from starting.
 
 ## Environment Variables
 
