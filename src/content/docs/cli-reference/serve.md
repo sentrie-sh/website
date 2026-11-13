@@ -10,8 +10,10 @@ The `serve` command starts the Sentrie HTTP server to evaluate policies.
 ## Syntax
 
 ```bash
-sentrie serve [OPTIONS]
+sentrie serve [--pack-location <PATH>] [--http-port <INT>] [--http-listen <ADDR> ...] [--http-max-body-bytes <INT>] [--capabilities <PATH>] [--skip-engine-check]
 ```
+
+All options are optional: pack directory defaults to the current directory, port to `7529`, listen address to localhost (`--http-listen local`), the request body limit to 1 MiB, and capabilities to allow everything.
 
 ## Description
 
