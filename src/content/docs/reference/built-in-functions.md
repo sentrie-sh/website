@@ -341,7 +341,7 @@ let doubled: list[number] = collect(numbers, (num) => {
 
 let fruits: list[string] = ["apple", "banana", "cherry"]
 let indexed_fruits: list[string] = collect(fruits, (fruit, idx) => {
-  yield (idx + 1).toString() + ". " + fruit
+  yield (idx + 1) + ". " + fruit
 })
 
 shape User {
