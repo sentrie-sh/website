@@ -1,22 +1,22 @@
 ---
-title: "Policy Language Reference"
-description: "Complete reference for the Sentrie policy language syntax and features."
+title: Policy Language Reference
+description: "Reference for Sentrie language syntax, types, operators, and constructs."
 ---
 
-This is the complete reference for the Sentrie policy language. It covers all language features, syntax, and semantics.
+This section is a reference for the Sentrie policy language: syntax, types, operators, and constructs. Pages include syntax variants, options and arguments in tables, where each feature applies, edge cases, and examples. For conceptual overviews and “how it works,” see [Language Concepts](/language-concepts/type-system-shapes).
 
-## Table of Contents
+## Program structure
 
 - [Program Structure](#program-structure)
 - [Namespaces](#namespaces)
-- [Policies](#policies)
+- [Policies](/reference/policies)
 - [Rules](#rules)
 - [Expressions](#expressions)
-- [Lambdas](#lambdas) - Callable syntax (`=>`) for passing functions as values to builtins
+- [Lambdas](#lambdas) - Callable syntax (`=>`) for passing functions as values to builtins and for calling them by name
+- [Derives](/reference/derives) - Named pure functions (`derive`) and export rules
 - [Primitives, Collections, Shapes, and Aliases](#primitives-collections-shapes-and-aliases)
 - [Literals](#literals)
 - [Operators](#operators)
-- [Control Flow](#control-flow)
 - [Function chaining](/reference/function-chaining) - Pipeline operator (`|>`), desugaring, precedence, and memoization
 - [TypeScript Modules](#typescript-modules)
 - [Facts and Variables](#facts-and-variables)
@@ -28,7 +28,7 @@ This is the complete reference for the Sentrie policy language. It covers all la
 A Sentrie program consists of:
 
 1. **Namespace declaration** (required)
-2. **Top-level declarations** (policies, shapes)
+2. **Top-level declarations** (policies, shapes, derives, exports)
 3. **Comments** (anywhere)
 
 ```text
@@ -43,7 +43,12 @@ shape User {
   -- shape definition
 }
 
+derive helper = (x: number) => {
+  yield x + 1
+}
+
 export shape User -- export shapes to allow visibility to other namespaces
+export derive helper
 ```
 
 ## Namespaces
@@ -54,53 +59,65 @@ Namespaces organize your policies and shapes hierarchically and prevent naming c
 
 ```text
 namespace FQN
+policy IDENT { fact ... let ... use ... rule ... export decision of IDENT }
+shape IDENT { ... } | shape IDENT baseType @constraint
+derive IDENT = LAMBDA
+export shape IDENT
+export derive IDENT
 ```
 
-Where `FQN` (Fully Qualified Name) is a slash-separated identifier:
+## Reference Pages
 
-```text
-namespace com/example/auth
-namespace com/example/billing/v2
-namespace mycompany/policies/security
-```
+### Core
 
-### Namespace statements
+- **[Namespaces](/reference/namespaces):** One namespace per file, FQN syntax, placement, visibility of shapes and policies, cross-namespace reference.
+- **[Policies](/reference/policies):** Policy block, statement order (facts, let, use, rules, export), evaluation.
+- **[Rules](/reference/rules):** Rule syntax, when/default/body, outcome type, truthiness, cross-references.
+- **[Facts](/reference/facts):** Required/optional facts, type, alias, default, binding at evaluation, import binding.
+- **[Pack data](/reference/pack-data):** Static reference data from the pack's `[data]` table, `data` declarations, typing and errors.
+- **[Intermediate values (let)](/reference/let):** let syntax, scoping, immutability, type validation.
+- **[Derives](/reference/derives):** Named pure functions (`derive`), calling rules, and export.
+- **[Identifiers](/reference/identifiers):** What counts as a valid identifier (characters, reserved keywords).
 
-A namespace can contain:
+### Types
 
-- **policies**: `policy IDENT { ... }`
-- **shapes**: `shape IDENT { ... }`
-- **shape exports**: `export shape IDENT`
+- **[Types and values](/reference/types-and-values):** Primitives, collections, indexing, cast, validation.
+- **[Constraints](/reference/constraints):** Constraint syntax, full tables per type (number, string, list, trinary), when checked, collection and cast behavior.
+- **[Trinary](/reference/trinary):** true/false/unknown, truthiness, Kleene AND/OR/NOT, use in when and conditionals.
+- **[Shapes](/reference/shapes):** Data models, field modifiers (required/optional, nullable), composition, type aliases, export.
 
-### Rules
+### Operations
 
-- Namespaces must be declared at the top of the file (only comments can be placed before the namespace declaration)
-- Only one namespace per file
-- Namespace names must be valid identifiers
-- Use slash-separated (`/`) hierarchical names for organization
-- Multiple root namespaces are allowed in a policy pack
-- Namespace forms the visibility boundary for unexported shapes
+- **[Arithmetic](/reference/arithmetic-operations):** +, -, *, /, %, unary +/-, types, division by zero.
+- **[Boolean](/reference/boolean-operations):** and, or, xor, not, comparison, matches, ternary, Elvis.
+- **[Built-in Functions](/reference/built-in-functions):** List helpers (`any`, `all`, `filter`, …), `count`, `merge`, and related builtins.
+- **[Functions](/reference/functions):** Function calls, use (import), aliasing, memoization.
+- **[Precedence](/reference/precedence):** Operator precedence table, associativity, parentheses.
+- **[Membership](/reference/membership-operations):** in, contains (list, map, string).
 
-## Policies
+### Other
+
+- **[Security and permissions](/reference/security-and-permissions):** Pack permissions (fs_read, net, env), defaults, configuration.
 
 Policies are containers for rules, facts, and other declarations. See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`, and for the required **metadata → facts → uses → body** ordering.
 
-### Syntax
+### TypeScript
 
-```text
-policy IDENT {
-  policyStatement*
-}
-```
+- **[Built-in TypeScript modules](/reference/typescript_modules/):** Overview and per-module reference.
 
-### Policy Statements
+### Composition and extensibility
+
+- **[Policy composition](/language-concepts/policy-composition):** Export/import of rules and facts.
+- **[Writing custom TypeScript modules](/extensibility/writing-custom-typescript-modules):** Custom modules and use.
 
 A policy can contain (in grouped order; comments anywhere):
 
 - **Metadata** (optional): `title`, `description`, `version`, `tag "key" = "value"`
 - **Facts**: `fact IDENT ('?'?) : primitive/shape ('as' IDENT)? ('default' expr)?`
+- **Pack data**: `data IDENT (':' primitive/shape)? ('as' IDENT)?`
 - **Use statements**: `use { function1, function2 } from source as alias`
-- **Rules**: `rule IDENT = ...`
+- **Rules**: `rule IDENT (: type)? = ...`
+- **Contributions**: `contribute IDENT (when expr)? { ... }`, adding to a rule declared with a `list[T]`, `boolean` or `trinary` type
 - **Shapes**: `shape IDENT { ... }` (policy-local; body section)
 - **Variables**: `let IDENT : primitive/shape = expr`
 - **Exports**: `export decision of IDENT`
@@ -132,12 +149,12 @@ Rules are the core of Sentrie policies. They define what decisions to make based
 ### Syntax
 
 ```text
-rule IDENT = (default expr)? (when expr)? blockExpr
+rule IDENT (: type)? = (default expr)? (when expr)? blockExpr
 ```
 
 ### Components
 
-1. **Name**: `rule IDENT`
+1. **Name**: `rule IDENT`, with an optional declared type, `rule IDENT: type`
 2. **Default** (optional): `default expr` - value when `when` is false or rule body doesn't yield
 3. **When** (optional): `when expr` - condition that must be true
 4. **Body**: `blockExpr` - block expression that must contain a `yield` statement
@@ -168,6 +185,17 @@ rule calculateDiscount = default 0 {
   yield finalPrice
 }
 ```
+
+### Contributions
+
+A rule declared as `list[T]`, `boolean` or `trinary` can be added to with `contribute`. See [Rules](/reference/rules#contributing-to-a-rule).
+
+```text
+rule deny: list[string] = []
+contribute deny when user.disabled { yield "user disabled" }
+```
+
+`contribute` is a reserved keyword, so it cannot be used as a rule, fact, policy, shape or let name, or as the first segment of a namespace. It can still be a field name, as in `user.contribute`.
 
 ## Expressions
 
@@ -249,7 +277,7 @@ age >= 18 ? "adult" : "minor"
 
 ## Lambdas
 
-A **lambda** is an expression that evaluates to a **callable** value: a function with a fixed parameter list and a block body. Lambdas are how you pass predicates and mapping steps to builtins such as `filter`, `collect`, `reduce`, and `distinct` (with a key function).
+A **lambda** is an expression that evaluates to a **callable** value: a function with a fixed parameter list and a block body. Lambdas are how you pass predicates and mapping steps to builtins such as `filter`, `collect`, `reduce`, and `distinct` (with a key function). A lambda held by a `let` or a parameter can also be called by name, and may recurse.
 
 ### Syntax
 
@@ -303,6 +331,8 @@ let sum: number = reduce(nums, 0, (acc, n) => {
 })
 ```
 
+Single-parameter **derives** can also be passed by name to `any`, `all`, `filter`, `first`, `collect`, and the two-argument `distinct` form. See [Derives](/reference/derives#callbacks-for-higher-order-builtins).
+
 Which builtin you use determines how many parameters the lambda should take (its **arity**), for example:
 
 - **`any`**, **`all`**, **`filter`**, **`first`**, **`collect`**: arity **1** (element only) or **2** (element and index).
@@ -313,6 +343,186 @@ If arity does not match what the builtin expects, evaluation fails with an error
 
 For builtin names, signatures, and more examples, see [Built-in Functions](/reference/built-in-functions).
 
+### Calling a lambda by name
+
+A lambda held by a `let`, or received as a parameter, is called by writing its name followed by arguments, the same way you call a builtin:
+
+```sentrie
+namespace com/example/lambdas
+
+policy calls {
+  fact n: number
+
+  let double = (x) => { yield x * 2 }
+
+  -- call a let-bound lambda by name
+  rule doubled = { yield double(n) }
+
+  -- call a lambda received as a parameter
+  rule applied = {
+    let apply = (fn, v) => { yield fn(v) + 1 }
+    yield apply(double, n)
+  }
+
+  export decision of doubled
+  export decision of applied
+}
+```
+
+With `n` set to `5`, `doubled` yields `10` and `applied` yields `11`.
+
+A call through a name follows the same arity rules as a lambda passed to a builtin: optional parameters (`y?`) may be omitted, and too few or too many arguments are an error. A lambda is an ordinary value, so you can hand it to another lambda, as `apply(double, n)` does above.
+
+#### Which name a call uses
+
+A call resolves its name from the innermost scope outward:
+
+1. a **local value**: a `let`, a lambda parameter, a fact, or a rule
+2. a **derive**
+3. a **builtin**
+4. a **module function**, written `alias.fn(...)`
+
+A local value therefore shadows a derive or a builtin of the same name, exactly as it does when you refer to it without calling it:
+
+```sentrie
+namespace com/example/lambdas
+
+derive twice = (x) => { yield x * 2 }
+
+policy shadowing {
+  fact n: number
+
+  -- `count` is also a builtin; inside this policy the let wins
+  let count = (x) => { yield x + 100 }
+
+  rule shadowed = { yield count(n) }
+
+  -- `twice` is also a derive; inside this rule the let wins
+  rule inner = {
+    let twice = (x) => { yield x * 3 }
+    yield twice(n)
+  }
+
+  export decision of shadowed
+  export decision of inner
+}
+```
+
+With `n` set to `5`, `shadowed` yields `105` (the builtin `count` is not called) and `inner` yields `15`. A name that is not shadowed still reaches the derive or builtin, so `twice(n)` in a rule without that `let` yields `10`.
+
+:::caution[A let named like a builtin takes over calls to it]
+
+A `let` named like a builtin or derive takes over every call to that name in its scope, including the call in its own initializer. `let first = first(xs, (x) => { yield x > 0 })` refers to itself, and fails with `'first' references itself: infinite recursion`. Rename the `let` if you want the builtin.
+
+:::
+
+#### Errors for calls that cannot work
+
+`sentrie validate`, and any command that loads the pack, rejects these calls before anything runs:
+
+- A name that is not a let, parameter, fact, derive or builtin in scope: `unknown function "nope": it is not a let, parameter, fact, derive or builtin in scope`.
+- A name that holds a value that is not a function: `cannot call "v": it is a number value, not a function`.
+- A call to a let-bound lambda with the wrong number of arguments: `"double" takes at most 1 argument(s), got 2` or `"add" takes at least 2 argument(s), got 1`.
+- A memoized call through a local name, such as `double(n)!`: `"double" is a local value and cannot be memoized with '!'`. Memoization applies to derives, builtins and module functions.
+
+A lambda received as a parameter can hold anything, so its arity is checked when it runs, for example `failed to call function 'f': too many arguments: want at most 1, got 2`.
+
+#### Recursion
+
+A lambda held by a `let` can call itself, and two let lambdas can call each other. A recursive lambda needs a base case that stops it:
+
+```sentrie
+namespace com/example/lambdas
+
+policy recursion {
+  fact n: number
+
+  -- direct recursion with a base case
+  let factorial = (k) => {
+    yield k <= 1 ? 1 : k * factorial(k - 1)
+  }
+
+  -- mutual recursion
+  let isEven = (k) => { yield k == 0 ? true : isOdd(k - 1) }
+  let isOdd = (k) => { yield k == 0 ? false : isEven(k - 1) }
+
+  rule product = { yield factorial(n) }
+  rule even = { yield isEven(n) }
+
+  export decision of product
+  export decision of even
+}
+```
+
+With `n` set to `5`, `product` yields `120` and `even` yields `false`. With `n` set to `0`, `product` yields `1` and `even` yields `true`.
+
+A cycle through `let` values, such as `let x = y + 1` with `let y = x + 1`, is still rejected with `infinite recursion`, because each value needs the other to exist first. A lambda body is not run when its `let` is evaluated, so a lambda that names itself is not such a cycle.
+
+The engine cannot tell in advance whether a recursion ends. A lambda with no base case passes validation and is stopped at run time with an ordinary error:
+
+```sentrie
+namespace com/example/lambdas
+
+policy runaway {
+  fact n: number
+
+  let loop = (k) => { yield loop(k + 1) }
+
+  rule r = { yield loop(n) }
+  export decision of r
+}
+```
+
+Executing `r` fails with:
+
+```text
+Error: lambda call depth exceeded (limit 1000)
+```
+
+Two limits apply to every execution:
+
+- **Call depth**: at most **1000** lambda calls may be nested. Past that, the error is `lambda call depth exceeded (limit 1000)`.
+- **Evaluation depth**: at most **50000** expressions may be nested while evaluating. A recursion whose body is itself deeply nested can reach this first, with `evaluation depth exceeded (limit 50000 nested evaluations)`.
+
+A recursion with a base case that stays within these limits, such as `factorial` above, is not affected.
+
+### Lambdas in decision output
+
+A lambda cannot be written out as JSON, so Sentrie stands in for it. A lambda nested anywhere in a rule's value, in an attachment, or in the trace is encoded as `{"kind":"callable"}`:
+
+```sentrie
+namespace com/example/lambdas
+
+policy output {
+  fact items: list[number]
+
+  rule nested = { "f": (x) => { yield x }, "n": 1 }
+  rule positive = { yield filter(items, (x) => { yield x > 0 }) }
+
+  export decision of nested
+  export decision of positive
+}
+```
+
+`nested` has the decision value `{"f":{"kind":"callable"},"n":1}`. The trace of `positive` shows the lambda passed to `filter` as `"result": {"kind":"callable"}`, while its decision value is the filtered list. Table output prints a nested lambda as `<callable>`.
+
+A **reported** rule whose **whole value** is a lambda (`rule fn = { yield (x) => { yield x } }`) has no useful value to report, so it is that rule's error: `rule com/example/lambdas/output/fn: a rule's value cannot be a callable`. A rule is reported when it is exported and you run it with `sentrie exec` or `sentrie serve`, or when another rule imports it with `import decision`. `sentrie exec` prints the error and exits 1, also when you run the whole policy. `sentrie serve` answers `500` with an `application/problem+json` document titled `Evaluation Failed`. A rule that reaches such a rule with `import decision` fails with the same error.
+
+An unexported helper rule whose value is a lambda is not reported, so it works as a callback:
+
+```sentrie
+namespace com/example/lambdas
+
+policy helpers {
+  rule helper = (x) => { yield x > 1 }
+  rule picked = { yield filter([1, 2, 3], helper) }
+
+  export decision of picked
+}
+```
+
+`picked` has the decision value `[2, 3]`. Exporting `helper` would turn it into a reported rule and make it fail with the error above.
+
 ### Lexical environment
 
 Lambdas **capture** the surrounding execution context: names visible where the lambda is written remain visible when the callable runs (for example `user`, `let` bindings in the same block, and facts). In the current language version, that capture uses the **parent execution context by reference**, so later changes to captured bindings can affect a lambda that runs afterward.
@@ -321,23 +531,77 @@ Lambdas **capture** the surrounding execution context: names visible where the l
 
 Callable values are **not** ordinary JSON-like data. They cannot be passed through every runtime boundary that expects plain data (for example some module or interop paths that materialize `[]any` or JSON). Prefer keeping lambdas and callables inside policy evaluation; if you need to pass data out, convert to plain values first.
 
+In particular, a lambda cannot be passed to a TypeScript module function. Doing so fails at run time, for example with `cannot pass callable value to module function json.isValid`. Call the lambda in Sentrie and pass its result instead.
+
+### Typed parameters and return types
+
+You can annotate lambda parameters and the return value:
+
+```sentrie
+(a: number, b?: string): number => {
+  yield a + (count(b) as number)
+}
+```
+
+Optional parameters use `?` after the name (for example `b?`). A required parameter cannot follow an optional one; that ordering is rejected at parse time.
+
+A return value is checked against the declared return type, except that an undefined value passes through unchecked, as it does for an untyped lambda. A required parameter still rejects an undefined argument.
+
+```sentrie
+namespace docs/lambda
+
+policy P {
+  fact order: document
+
+  rule fromLambda = {
+    let f = (d: document): number => { yield d.amount }
+    yield f(order)
+  }
+
+  rule strict = {
+    let f = (x: number): number => { yield x }
+    yield f(order.amount)
+  }
+
+  export decision of fromLambda
+  export decision of strict
+}
+```
+
+With `{"order": {}}`, `fromLambda` is `unknown` and `strict` fails because the argument `x` is undefined, not a number.
+
+## Derives
+
+**Derives** are named pure functions at namespace or policy scope. They reuse lambda syntax and are documented in the dedicated [Derives](/reference/derives) page (calling rules, FQN slash callees, builtin whitelist, and exports).
+
 ## Primitives, Collections, Shapes, and Aliases
 
 Sentrie provides primitives, collections, shapes, and aliases for defining data structures.
 
 ### Primitives
 
-- `number` - Numeric values (backed by float64)
+- `number` - Numeric values: exact 64-bit integers and floats (see [Arithmetic Operations](/reference/arithmetic-operations))
 - `string` - Text strings
 - `trinary` - Trinary values (true/false/unknown)
-  - `bool` - Boolean values (true/false) - a special case of `trinary`
+- `boolean` - Strictly `true` or `false`; rejects `unknown`
 - `document` - JSON-like objects
+- `any` - every defined value, `null` included (see [Types and Values](/reference/types-and-values#the-any-type))
 
 ### Collections
 
 - `list[T]` - Lists of primitive T
 - `dict[T]` - Dicts with string keys and primitive T values
+- `set[T]` - Distinct values of type T, written out in sorted order
 - `record[T1, T2, ...]` - Tuples with specific primitives
+
+### Unions
+
+`T1 | T2 | ...` accepts a value that matches any member, in any type position (facts, `let`, shape fields, derive parameters and returns, casts, `is`). `?` and constraints bind to the member they follow: `string | number?` is `string | (number?)`. See [Union Types](/reference/types-and-values#union-types).
+
+```text
+let id: string | number = "u-42"
+let ids: list[string | number] = [1, "two", 3]
+```
 
 ### Shape Definitions
 
@@ -388,18 +652,33 @@ shape AdminUser with BaseUser {
 
 The composed shape includes all fields from the base shape plus any additional fields defined in the composed shape.
 
+An unqualified base is looked up in the enclosing policy, then in the shape's namespace. A base from another namespace must be qualified (`with com/base/BaseUser`) and exported there with `export shape BaseUser`; an unqualified or unexported cross-namespace base fails validation. See [Composition](/reference/shapes#composition-extending-a-base-shape).
+
 ### Constraints
 
 Constraints can be applied to primitives, collections, and shape fields:
 
-```text
+```sentrie
+namespace docs/reference
+
 shape User {
-  name: string @length(1, 100)
+  name: string @minlength(1) @maxlength(100)
   age: number @min(0) @max(150)
-  email: string @email
-  tags: list[string] @maxlength(10)
+  email: string @email()
+  tags: list[string] @not_empty()
 }
 
+policy users {
+  fact user: User
+
+  rule valid = true
+  export decision of valid
+}
+```
+
+Collection types take constraints on their elements:
+
+```text
 let numbers: list[number] = [1, 2, 3]
 let scores: dict[number @min(0) @max(100)] = {"alice": 95, "bob": 87}
 ```
@@ -424,16 +703,45 @@ let score: Positive100 = 50
 "line 1\nline 2"
 ```
 
+A string literal may span lines. A line break inside it is a newline (`\n`) whatever the file's line endings: in a file saved with Windows (CRLF) line endings the carriage return is dropped, so the same policy gives the same value on every platform. An escaped `\r` is kept.
+
+```text
+let s = "line 1
+line 2"   -- equal to "line 1\nline 2" in LF and CRLF files alike
+```
+
+### Heredoc Strings
+
+A heredoc writes a multi-line string without escapes. It opens with `<<<` and a tag, and ends at a line that holds only that tag:
+
+```text
+let query = <<<SQL
+select "name"
+  from users
+SQL
+```
+
+The value of `query` is `select "name"\n  from users\n`.
+
+- **Tag:** letters, digits and underscores, starting with a letter or underscore, written directly after `<<<`. Only whitespace may follow it on the opening line.
+- **Body:** every line between the opening line and the terminator, taken as written. Quotes and backslashes are not escapes, leading indentation is kept, and every body line ends with a newline.
+- **Terminator:** a line whose text is exactly the tag. Trailing spaces or tabs after the tag are allowed. Indenting the tag does not end the heredoc, and neither does a line that contains the tag along with other text.
+- **Line endings:** files with Windows (CRLF) line endings work the same as LF files. The `\r` at the end of each line is dropped, so the value always has LF line endings.
+- **Errors:** a heredoc with no terminator line is reported at its `<<<`, with the tag it was looking for.
+
 ### Numeric Literals
 
 ```text
-42          -- Number
+42          -- Number (an exact integer)
 -42         -- Negative number
+9007199254740993  -- Integers keep every digit up to 9223372036854775807
 3.14        -- Float
 -3.14       -- Negative float
 1e5         -- Scientific notation
 1.5e-3      -- Scientific notation with negative exponent
 ```
+
+See [Types and Values](/reference/types-and-values/#number-literals) for the exact number literal forms.
 
 ### Boolean and Trinary Literals
 
@@ -471,6 +779,14 @@ null        -- Null value
 
 ## Operators
 
+### Elvis operator (`?:`)
+
+```text
+a ?: b
+```
+
+If `a` is **`null`** or **`undefined`**, the expression evaluates to **`b`** (and `b` is evaluated). For any other value of `a` (including `0`, `""`, or `false`), the result is **`a`** and **`b` is not evaluated**. This matches common “default for missing” patterns for facts and optional parameters.
+
 ### Arithmetic Operators
 
 ```text
@@ -500,6 +816,8 @@ For complete rules and examples, see [Function chaining](/reference/function-cha
 >=          -- Greater than or equal
 ```
 
+`<`, `<=`, `>` and `>=` compare two numbers numerically or two strings by byte order. See [Ordering strings](/reference/boolean-operations#ordering-strings).
+
 ### Logical Operators
 
 ```text
@@ -528,7 +846,7 @@ is defined  -- Check if defined
 is not defined -- Check if not defined
 is empty    -- Check if empty
 is not empty -- Check if not empty
-is          -- Shape checking
+is T        -- Shape or type check, T may be a union or any (see Shapes)
 ```
 
 ### Collection builtins
@@ -547,17 +865,47 @@ reduce(list, initial, fn)  -- Left fold with an accumulator
 count(value)               -- Length of list, dict, or string
 ```
 
-### Casting
+### Set builtins
+
+These builtins build and combine [sets](/reference/types-and-values#sets). The two-operand builtins accept a set or a plain list for each operand.
 
 ```text
-cast        -- Casting between primitives
+set(list)                  -- Distinct elements of a list, sorted
+union(a, b)                -- Elements in either operand
+intersection(a, b)         -- Elements in both operands
+difference(a, b)           -- Elements of a that are not in b
+is_subset(a, b)            -- True if every element of a is in b
+is_superset(a, b)          -- True if every element of b is in a
+```
+
+### Glob, object and unit builtins
+
+```text
+glob_match(pattern, delimiters, value)  -- Glob match; * stays in a segment, ** crosses delimiters
+object_get(obj, path, default)          -- Nested lookup by path, or the default
+object_keys(obj)                        -- Sorted keys of a dict
+object_remove(obj, keys)                -- Copy of a dict without the listed keys
+object_filter(obj, keys)                -- Copy of a dict with only the listed keys
+object_union(a, b)                      -- Deep merge, second wins, lists replaced
+parse_quantity(string)                  -- "10Gi", "500m" to a number (exact)
+parse_duration(string)                  -- "2h", "1h30m" to seconds
+```
+
+See [Built-in Functions](/reference/built-in-functions) for details and examples.
+
+### Casting
+
+Postfix `expr as Type` converts a value and validates it against `Type` (including shape constraints).
+
+```text
+as          -- Postfix cast: expr as Type (see Types and values)
 ```
 
 Example:
 
 ```text
 let y = "99"
-let x: number = cast y as number
+let x: number = y as number
 ```
 
 The converted value is checked against the target type and constraints. Failure is an evaluation error, not a silent zero.

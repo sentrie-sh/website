@@ -27,6 +27,18 @@ export default defineConfig({
           label: "Getting Started",
           items: [
             {
+              label: "Overview",
+              slug: "getting-started",
+            },
+            {
+              label: "Quick Glance",
+              slug: "quick-glance",
+            },
+            {
+              label: "Introduction & Core Philosophy",
+              slug: "getting-started/introduction",
+            },
+            {
               label: "What is Sentrie?",
               slug: "getting-started/what-is-sentrie",
             },
@@ -38,10 +50,8 @@ export default defineConfig({
               label: "Why Sentrie?",
               slug: "getting-started/why-sentrie",
             },
-            {
-              label: "Installation",
-              slug: "getting-started/installation",
-            },
+            { label: "Quick Start", slug: "getting-started/quick-start" },
+            { label: "Installation", slug: "getting-started/installation" },
             {
               label: "Writing your first Policy",
               slug: "getting-started/writing-your-first-policy",
@@ -50,9 +60,37 @@ export default defineConfig({
               label: "Running your Policy",
               slug: "getting-started/running-your-policy",
             },
+            { label: "Enforcement", slug: "getting-started/enforcement" },
+          ],
+        },
+        {
+          label: "Guides",
+          items: [
+            { label: "Testing Policies", slug: "guides/testing-policies" },
             {
-              label: "Policy Enforcement",
-              slug: "getting-started/enforcement",
+              label: "Policy Design Best Practices",
+              slug: "guides/policy-design-best-practices",
+            },
+            {
+              label: "Deployment and Security",
+              slug: "guides/deployment-and-security",
+            },
+          ],
+        },
+        {
+          label: "Language Concepts",
+          items: [
+            {
+              label: "Type System & Shapes Overview",
+              slug: "language-concepts/type-system-shapes",
+            },
+            {
+              label: "Policy Composition",
+              slug: "language-concepts/policy-composition",
+            },
+            {
+              label: "Pattern Matching & Conditionals",
+              slug: "language-concepts/pattern-matching-conditionals",
             },
           ],
         },
@@ -102,6 +140,10 @@ export default defineConfig({
               slug: "reference",
             },
             {
+              label: "Identifiers",
+              slug: "reference/identifiers",
+            },
+            {
               label: "Types and Values",
               slug: "reference/types-and-values",
             },
@@ -134,8 +176,16 @@ export default defineConfig({
               slug: "reference/facts",
             },
             {
+              label: "Pack data",
+              slug: "reference/pack-data",
+            },
+            {
               label: "Rules",
               slug: "reference/rules",
+            },
+            {
+              label: "Derives",
+              slug: "reference/derives",
             },
             {
               label: "Exporting and Importing Rules",
@@ -152,6 +202,10 @@ export default defineConfig({
             {
               label: "Boolean Operations",
               slug: "reference/boolean-operations",
+            },
+            {
+              label: "Membership Operations",
+              slug: "reference/membership-operations",
             },
             {
               label: "Using Functions",
@@ -174,18 +228,23 @@ export default defineConfig({
               slug: "reference/precedence",
             },
             {
+              label: "Errors",
+              slug: "reference/errors",
+            },
+            {
               label: "Security and Permissions",
               slug: "reference/security-and-permissions",
+            },
+            {
+              label: "Capabilities",
+              slug: "reference/capabilities",
             },
           ],
         },
         {
           label: "TypeScript Modules",
           items: [
-            {
-              label: "Overview",
-              slug: "reference/typescript_modules",
-            },
+            { label: "Overview", slug: "reference/typescript_modules" },
             {
               label: "JavaScript Globals",
               slug: "reference/typescript_modules/sentrie/js",
@@ -210,14 +269,8 @@ export default defineConfig({
               label: "JSON",
               slug: "reference/typescript_modules/sentrie/json",
             },
-            {
-              label: "JWT",
-              slug: "reference/typescript_modules/sentrie/jwt",
-            },
-            {
-              label: "Net",
-              slug: "reference/typescript_modules/sentrie/net",
-            },
+            { label: "JWT", slug: "reference/typescript_modules/sentrie/jwt" },
+            { label: "Net", slug: "reference/typescript_modules/sentrie/net" },
             {
               label: "Regex",
               slug: "reference/typescript_modules/sentrie/regex",
@@ -230,10 +283,7 @@ export default defineConfig({
               label: "Time",
               slug: "reference/typescript_modules/sentrie/time",
             },
-            {
-              label: "URL",
-              slug: "reference/typescript_modules/sentrie/url",
-            },
+            { label: "URL", slug: "reference/typescript_modules/sentrie/url" },
             {
               label: "UUID",
               slug: "reference/typescript_modules/sentrie/uuid",
@@ -241,27 +291,39 @@ export default defineConfig({
           ],
         },
         {
-          label: "CLI Reference",
+          label: "Extensibility",
           items: [
             {
-              label: "Overview",
-              slug: "cli-reference",
+              label: "Writing Custom TypeScript Modules",
+              slug: "extensibility/writing-custom-typescript-modules",
             },
+          ],
+        },
+        {
+          label: "CLI Reference",
+          items: [
+            { label: "Overview", slug: "cli-reference" },
+            { label: "sentrie exec", slug: "cli-reference/exec" },
+            { label: "sentrie fmt", slug: "cli-reference/fmt" },
+            { label: "sentrie bench", slug: "cli-reference/bench" },
+            { label: "sentrie init", slug: "cli-reference/init" },
+            { label: "sentrie serve", slug: "cli-reference/serve" },
+            { label: "sentrie validate", slug: "cli-reference/validate" },
+          ],
+        },
+        {
+          label: "Troubleshooting",
+          items: [
+            { label: "Overview", slug: "troubleshooting" },
+            { label: "Common Errors", slug: "troubleshooting/common-errors" },
+          ],
+        },
+        {
+          label: "Deployment & Operations",
+          items: [
             {
-              label: "init",
-              slug: "cli-reference/init",
-            },
-            {
-              label: "exec",
-              slug: "cli-reference/exec",
-            },
-            {
-              label: "serve",
-              slug: "cli-reference/serve",
-            },
-            {
-              label: "validate",
-              slug: "cli-reference/validate",
+              label: "Running as a Service",
+              slug: "deployment-operations/running-as-service",
             },
           ],
         },

@@ -1,40 +1,90 @@
 ---
-title: "CLI Reference"
-description: "Complete reference for the Sentrie command-line interface."
+title: "Sentrie CLI"
+description: "Command-line reference: sub-commands, global options, and exit codes."
 ---
 
-# CLI Reference
+The Sentrie CLI runs policy evaluations, initializes packs, serves the HTTP API, and validates policy packs. All commands support the global options below.
 
-This document provides comprehensive reference for the Sentrie command-line interface.
+## Sub-Commands
 
-## Overview
-
-Sentrie provides a command-line interface for running policy servers and managing policy packs. The CLI is built on top of the `cling` framework and provides a consistent, user-friendly experience.
+| Command | Description |
+| :--- | :--- |
+| [sentrie exec](/cli-reference/exec) | Execute a policy or rule with facts. |
+| [sentrie bench](/cli-reference/bench) | Measure how long a policy or rule takes to evaluate. |
+| [sentrie init](/cli-reference/init) | Create a new policy pack in the current directory. |
+| [sentrie serve](/cli-reference/serve) | Start the HTTP server for policy evaluation. |
+| [sentrie validate](/cli-reference/validate) | Validate pack structure, syntax, and types. |
 
 ## Global Options
 
-All Sentrie commands support these global options:
+All commands support these options:
 
-| Option            | Description                              | Default |
-| ----------------- | ---------------------------------------- | ------- |
-| `--help`, `-h`    | Show help information                    | -       |
-| `--version`, `-v` | Show version information                 | -       |
-| `--debug`         | Enable debug logging                     | `false` |
-| `--log-level`     | Set log level (DEBUG, INFO, WARN, ERROR) | `INFO`  |
+| Option | Description | Default |
+| :--- | :--- | :--- |
+| `--help`, `-h` | Show help for the command. | None |
+| `--version`, `-v` | Show Sentrie version. | None |
+| `--debug` | Enable debug logging. | `false` |
+| `--log-level` | Log level: DEBUG, INFO, WARN, ERROR. | `INFO` |
 
-## Commands
+## Exit Codes
+
+| Value | Description |
+| :--- | :--- |
+| `0` | Success. |
+| Non-zero | Failure (e.g. parse error, missing fact, invalid target, port in use). |
+
+For `exec` and `validate`, exit 0 when evaluation or validation succeeds; non-zero on error. For `serve`, the process runs until SIGINT/SIGTERM; non-zero on startup failure (e.g. port in use, pack load error).
 
 ### `exec`
 
 Execute a policy or rule from a policy pack.
 
-See the [exec command documentation](./exec) for details.
+See the [exec command documentation](/cli-reference/exec) for details.
+
+### `bench`
+
+Measure how long it takes to evaluate a policy or rule.
+
+#### Syntax
+
+```bash
+sentrie bench <FQN> [OPTIONS]
+```
+
+#### Options
+
+| Option            | Type   | Default | Description                                                     |
+| ----------------- | ------ | ------- | --------------------------------------------------------------- |
+| `--pack-location` | string | `.`     | Directory containing policy files                               |
+| `--facts`         | string | `{}`    | Facts to evaluate the target with                               |
+| `--fact-file`     | string | -       | JSON file to load facts from                                    |
+| `--benchtime`     | string | `1s`    | Measure for a duration (`1s`) or an exact count (`200x`)        |
+| `--count`         | int    | `1`     | Repeat the measurement this many times, one line per run        |
+| `--eval-timeout`  | string | `10s`   | Deadline for evaluating one decision; `0` disables it           |
+| `--capabilities`  | string | -       | Capabilities file limiting builtins and modules                 |
+| `--skip-engine-check` | bool | `false` | Do not check the pack's `[engine]` version constraint against this binary |
+
+#### Examples
+
+```bash
+sentrie bench user_management/user_access/allow_admin \
+  --facts '{"user":{"role":"admin","status":"active"}}' \
+  --benchtime 200x --count 3
+```
+
+See the [bench command documentation](/cli-reference/bench) for details.
 
 ### `init`
 
 Initialize a new policy pack.
 
-See the [init command documentation](./init) for details.
+See the [init command documentation](/cli-reference/init) for details.
+
+### `fmt`
+
+Format `.sentrie` files in one canonical style.
+
+See the [fmt command documentation](/cli-reference/fmt) for details.
 
 ### `serve`
 
@@ -53,6 +103,7 @@ sentrie serve [OPTIONS]
 | `--http-port`     | int      | `7529`      | Port to listen on                 |
 | `--pack-location` | string   | `./`        | Directory containing policy files |
 | `--http-listen`   | []string | `["local"]` | Address(es) to listen on          |
+| `--skip-engine-check` | bool | `false` | Do not check the pack's `[engine]` version constraint against this binary |
 
 #### Examples
 
@@ -134,6 +185,7 @@ sentrie validate <FQN> [OPTIONS]
 | ----------------- | ------ | ------- | --------------------------------- |
 | `--pack-location` | string | `./`    | Directory containing policy files |
 | `--facts`         | string | `{}`    | Facts for type checking           |
+| `--skip-engine-check` | bool | `false` | Do not check the pack's `[engine]` version constraint against this binary |
 
 #### Examples
 
@@ -148,7 +200,7 @@ sentrie validate user_management/user_access --facts '{"user":{"role":"admin"}}'
 sentrie validate com/example/auth/access_control --pack-location ./policies
 ```
 
-See the [validate command documentation](./validate) for details.
+See the [validate command documentation](/cli-reference/validate) for details.
 
 ## HTTP API
 
@@ -503,24 +555,24 @@ For production deployment:
 3. **Set up monitoring** and logging
 4. **Configure load balancing** for high availability
 5. **Use environment variables** for configuration
-6. **Set up health checks** for the API
+6. **Set up health checks** for the API (`/health` for liveness, `/health/deep` for readiness)
 
 ### Docker Deployment
 
 ```dockerfile
-FROM golang:1.25-alpine AS builder
+FROM alpine:3.20
+ARG SENTRIE_VERSION=0.0.5
+ARG TARGETARCH
+RUN apk --no-cache add ca-certificates curl \
+ && curl -fsSL "https://github.com/sentrie-sh/sentrie/releases/download/v${SENTRIE_VERSION}/sentrie_${SENTRIE_VERSION}_linux_${TARGETARCH}.tar.gz" \
+    | tar -xz -C /usr/local/bin sentrie
 WORKDIR /app
-COPY . .
-RUN go build -o sentrie .
-
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-COPY --from=builder /app/sentrie .
-COPY --from=builder /app/policies ./policies
+COPY policies ./policies
 EXPOSE 7529
-CMD ["./sentrie", "serve", "--pack-location", "./policies"]
+CMD ["sentrie", "serve", "--pack-location", "./policies", "--http-listen", "0.0.0.0"]
 ```
+
+The image downloads the Linux release of Sentrie for the build platform's architecture (`amd64` or `arm64`) and copies in the pack from `./policies`. `--http-listen 0.0.0.0` makes the server reachable from outside the container, since it listens only on localhost by default.
 
 ## Best Practices
 
