@@ -26,7 +26,7 @@ sentrie bench <FQN> [OPTIONS]
 | `--benchtime` | string | No | Duration (`1s`) or exact count (`200x`). Default: `1s`. |
 | `--count` | int | No | Repeat the measurement this many times. Default: `1`. |
 | `--eval-timeout` | duration | No | Deadline for one decision; `0` disables it. Default: `10s`. |
-| `--capabilities` | path | No | Capabilities file limiting builtins and modules. Default: allow everything. |
+| `--capabilities` | path | No | [Capabilities file](/reference/capabilities) limiting the builtins and modules the pack may use. Default: allow everything. |
 | `--skip-engine-check` | bool | No | Do not check the pack's `[engine]` version constraint against this binary. Default: `false`. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional). |
 
 **Returns:** Results in Go benchmark format on stdout (see [Output](#output)); exit 0 on success, 1 on error.
@@ -115,7 +115,9 @@ sentrie bench user_management/user_access --eval-timeout 500ms
 
 ### `--capabilities`
 
-Path to a capabilities file that limits the builtins and modules the pack may use. When it is omitted, everything is allowed. This is the same option that [`exec`](/cli-reference/exec) and [`serve`](/cli-reference/serve) accept.
+Path to a [capabilities file](/reference/capabilities): a JSON file, written by whoever runs Sentrie, that lists the builtins and `@sentrie/*` modules the pack may use and whether it may load its own TypeScript files. A pack that uses anything the file does not grant fails to load, and nothing is measured. When the option is omitted, everything is allowed.
+
+`exec`, `serve` and `validate` take the same option, so you can measure a pack under the same grant it runs with.
 
 ```bash
 sentrie bench user_management/user_access --capabilities ./capabilities.json
