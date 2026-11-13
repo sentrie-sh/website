@@ -644,7 +644,7 @@ shape AdminUser with BaseUser {
 
 The composed shape includes all fields from the base shape plus any additional fields defined in the composed shape.
 
-An unqualified base is looked up in the enclosing policy, then in the shape's namespace. A base from another namespace must be qualified (`with com/base/BaseUser`) and exported there with `export shape BaseUser`; an unqualified or unexported cross-namespace base fails validation. See [Composition](/reference/shapes#composition-extending-a-base-shape).
+An unqualified base is looked up in the enclosing policy, then in the shape's namespace. A base from another namespace must be qualified (`with com/base/BaseUser`) and exported there with `export shape BaseUser`; an unqualified or unexported cross-namespace base fails validation. See [Composition](/reference/shapes#shape-composition).
 
 ### Constraints
 
@@ -1019,6 +1019,8 @@ Facts can have:
 - Only **optional facts** (`?`) can have default values
   :::
 
+Static reference data from the pack's `[data]` table is declared with `data` statements. See [Pack Data](/reference/pack-data).
+
 ### Variables
 
 Variables are local to a policy or rule:
@@ -1131,6 +1133,18 @@ rule invalid = default false {
   yield age > 0
 }
 ```
+
+### Evaluation Errors
+
+A rule can also fail while it runs. A failing rule reports its own `error` object with `title`, `status` and `detail`, its decision is `unknown`, and the other rules of the policy are still evaluated. `status` is `400` for an invalid invocation, `503` for an exceeded deadline and `500` otherwise. See [When a Rule Fails](/reference/rules#when-a-rule-fails). The CLI and the HTTP API report these failures as described in [Executing Policies](/running-sentrie/executing-policies) and [Serving Policies](/running-sentrie/serving-policies).
+
+Invalid operands are evaluation errors too:
+
+- A string or fractional list index fails with `list index must be an integer, got ...`.
+- `count` of something that is not a list, dict, set or string is an error.
+- `+` joining a string with a list or dict fails with `+ cannot join a string with a list`.
+
+A literal `default` of the wrong type, `default null` on a non-nullable fact, and two facts with the same declared name are index errors. `sentrie validate` reports them before any request. See [Defaults are type-checked](/reference/facts#defaults-are-type-checked).
 
 ### Undefined Values
 
@@ -1311,5 +1325,6 @@ policy pricing {
 - [Policies](/reference/policies) - Detailed information about policies
 - [Rules](/reference/rules) - Detailed information about rules
 - [Facts](/reference/facts) - Detailed information about facts
+- [Pack Data](/reference/pack-data) - Static reference data from the pack's `[data]` table
 - [Let Declarations](/reference/let) - Detailed information about let declarations
 - [Shapes](/reference/shapes) - Detailed information about shapes
