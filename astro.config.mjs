@@ -27,6 +27,14 @@ export default defineConfig({
           label: "Getting Started",
           items: [
             {
+              label: "Overview",
+              slug: "getting-started",
+            },
+            {
+              label: "Quick Glance",
+              slug: "quick-glance",
+            },
+            {
               label: "What is Sentrie?",
               slug: "getting-started/what-is-sentrie",
             },
@@ -100,6 +108,10 @@ export default defineConfig({
             {
               label: "Overview",
               slug: "reference",
+            },
+            {
+              label: "Identifiers",
+              slug: "reference/identifiers",
             },
             {
               label: "Types and Values",
@@ -270,6 +282,10 @@ export default defineConfig({
             {
               label: "fmt",
               slug: "cli-reference/fmt",
+            },
+            {
+              label: "bench",
+              slug: "cli-reference/bench",
             },
             {
               label: "serve",
