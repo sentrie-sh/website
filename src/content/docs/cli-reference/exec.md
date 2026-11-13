@@ -8,10 +8,10 @@ When you want to run a policy from the command line (to test a rule, debug a dec
 Here is the basic syntax:
 
 ```bash
-sentrie exec <TARGET> [ --pack-location <PATH> ] [ --facts <JSON> ] [ --fact-file <PATH> ] [ --output (table|json) ] [ --skip-engine-check ]
+sentrie exec <TARGET> [ --pack-location <PATH> ] [ --facts <JSON> ] [ --fact-file <PATH> ] [ --output (table|json) ] [ --capabilities <PATH> ] [ --skip-engine-check ]
 ```
 
-**TARGET** is required: `namespace/policy` or `namespace/policy/rule`. The rest are optional: pack directory, inline facts, fact file, and output format.
+**TARGET** is required: `namespace/policy` or `namespace/policy/rule`. The rest are optional: pack directory, inline facts, fact file, output format, and capabilities file.
 
 ## Configuration & Arguments
 
@@ -24,6 +24,7 @@ You can customize the run using the following options:
 | `--facts` | JSON string | No | Inline facts. Keys are the facts' declared names, not their `as` aliases. Merged over `--fact-file`; `--facts` wins. |
 | `--fact-file` | path | No | Path to JSON file; top-level object gives facts. Loaded first; `--facts` is merged over it. |
 | `--output` | enum | No | `table` or `json`. Default: `table`. |
+| `--capabilities` | path | No | [Capabilities file](/reference/capabilities) limiting the builtins and modules the pack may use. Default: allow everything. |
 | `--skip-engine-check` | bool | No | Do not check the pack's `[engine]` version constraint against this binary. Default: `false`. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional). |
 
 **Returns:** Exit 0 on success; non-zero on error. Output goes to stdout: table (human-readable) or JSON array of decision objects (namespace, policyName, ruleName, decision.state, decision.value, attachments). The `Error:` line goes to stderr. When a rule of a policy fails, `exec` still prints every rule (a failed rule has an `error` object in JSON and a line under `Errors:` in the table) and then exits 1 with `Error: <n> of <m> rules failed`.
@@ -86,6 +87,21 @@ Integers that fit in 64 bits are read exactly, in `--facts` and in `--fact-file`
 ```bash
 sentrie exec docs/ids/accounts/echo \
   --facts '{"id": 9007199254740993, "other": 9007199254740992}'
+```
+
+### Running under a capabilities file
+
+You run packs you did not write and want to limit what they may call. Pass a [capabilities file](/reference/capabilities) that grants only the builtins and modules you allow:
+
+```bash
+sentrie exec com/example/auth/access/allow --capabilities ./capabilities.json \
+  --facts '{"user":{"role":"admin"}}'
+```
+
+If the pack uses anything the file does not grant, nothing is evaluated and `exec` exits 1 with an error naming the source location:
+
+```text
+Error: policy.sentrie:16:11-16: builtin "count": not granted by the capabilities file
 ```
 
 ---
