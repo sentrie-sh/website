@@ -736,7 +736,7 @@ rule within_limit = default false {
 
 ### `parse_duration(value) => number`
 
-Parses a duration string into a number of **seconds**, the same unit that `now()` uses. The syntax is Go's duration syntax: a number with a unit of `ns`, `us` (or `µs`), `ms`, `s`, `m` (minutes) or `h`, optionally combined and optionally signed. Days and weeks are not units, so `"2d"` is an error.
+Parses a duration string into a number of **seconds**, the same unit that `now()` uses. The syntax is a number with a unit of `ns`, `us` (or `µs`), `ms`, `s`, `m` (minutes) or `h`, optionally combined and optionally signed. Days and weeks are not units, so `"2d"` is an error.
 
 **Examples:**
 

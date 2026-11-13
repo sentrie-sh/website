@@ -13,7 +13,7 @@ The `fmt` command rewrites `.sentrie` files in one canonical style. It keeps eve
 sentrie fmt <pattern> [--check] [--diff]
 ```
 
-The pattern is required and follows `go fmt`. Put the flags after it: `sentrie fmt ./... --check`.
+The pattern is required and is described under [Patterns](#patterns). Put the flags after it: `sentrie fmt ./... --check`.
 
 ## Patterns
 
