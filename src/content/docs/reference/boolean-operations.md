@@ -36,7 +36,7 @@ Boolean operations combine conditions, compare values, and branch on truthiness.
 | `==`, `is`           | expr, expr                       | Equality. Both sides must be comparable.                                                                                       | trinary                 |
 | `!=`, `is not`       | expr, expr                       | Inequality.                                                                                                                    | trinary                 |
 | `<`, `<=`, `>`, `>=` | expr, expr                       | Ordering. Both sides must be comparable (e.g. number, string).                                                                 | trinary                 |
-| `matches`            | string, string                   | Left: value; right: regex pattern (Go [regexp](https://pkg.go.dev/regexp)). Invalid pattern → error.                           | boolean                 |
+| `matches`            | string, string                   | Left: value; right: regex pattern ([RE2 syntax](https://github.com/google/re2/wiki/Syntax)). Invalid pattern → error.                           | boolean                 |
 | `? :`                | condition, trueValue, falseValue | Ternary: if condition is truthy, result is trueValue; else falseValue. Only the chosen branch is evaluated. Right-associative. | type of chosen branch   |
 | `?:`                 | expr, default                    | Elvis: if expr is undefined or `null`, result is default; otherwise result is expr, whatever its value (`false`, `0`, `""`, `unknown` and empty collections are kept). | type of expr or default |
 
@@ -77,7 +77,7 @@ let e: string = user.name ?: "Anonymous"
 let g: boolean = email matches `^[a-z]+@[a-z]+\\.com$`
 ```
 
-Left and right must be strings. The right is interpreted as a Go regexp. Invalid pattern causes an evaluation error.
+Left and right must be strings. The right is a regular expression in [RE2 syntax](https://github.com/google/re2/wiki/Syntax). Invalid pattern causes an evaluation error.
 
 ### Combining conditions
 
@@ -685,4 +685,4 @@ let can_read: boolean = "read" in user.permissions
 - **not / !:** Unary prefix; one operand. Converted to trinary then negated. `not unknown` yields `unknown`. You can write `not expr` or `! expr` (no space required after `!`).
 - **Short-circuit:** `and` and `or` evaluate left-to-right; the right side may be skipped. The ternary evaluates only the chosen branch.
 - **Comparison:** Both sides must be comparable; result is trinary. Equality with `unknown` yields `unknown`.
-- **matches:** Left and right must be strings. Right is a [Go regexp](https://pkg.go.dev/regexp) pattern. Invalid pattern causes an evaluation error. For membership in collections or substring checks, use [in](/reference/membership-operations) or [contains](/reference/membership-operations).
+- **matches:** Left and right must be strings. Right is a regular expression in [RE2 syntax](https://github.com/google/re2/wiki/Syntax). Invalid pattern causes an evaluation error. For membership in collections or substring checks, use [in](/reference/membership-operations) or [contains](/reference/membership-operations).

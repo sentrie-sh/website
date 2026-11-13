@@ -56,7 +56,7 @@ let timestamp = time.parse("2024-01-01T00:00:00Z")
 
 ### `format(timestamp: number, formatStr: string): string`
 
-Formats a Unix timestamp as a string using the specified format. Format uses Go's time format reference time: `Mon Jan 2 15:04:05 MST 2006`.
+Formats a Unix timestamp as a string using the specified format. The format is written as an example of one fixed reference time, `Mon Jan 2 15:04:05 MST 2006`, rather than with `%Y`-style codes (see [Format Reference](#format-reference)).
 
 **Parameters:**
 
@@ -235,7 +235,7 @@ policy mypolicy {
 
 ## Format Reference
 
-The `format` function uses Go's time format reference time: `Mon Jan 2 15:04:05 MST 2006`
+The `format` function takes a layout: the reference time `Mon Jan 2 15:04:05 MST 2006` written the way you want your timestamps to look. Each part of the reference time stands for that part of the timestamp: `2006` is the year, `01` the month, `02` the day, `15` the hour (24-hour clock), `04` the minute, `05` the second and `MST` the time zone.
 
 Common format patterns:
 
