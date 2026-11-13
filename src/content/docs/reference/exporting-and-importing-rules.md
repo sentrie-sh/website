@@ -61,7 +61,7 @@ policy userAccess {
 }
 ```
 
-Attachments are evaluated when the rule is executed and can contain any expression.
+Attachments are evaluated when the rule is executed and can contain any expression. An attachment name may be any identifier or keyword (`attach version as ...`).
 
 ## Importing Rules
 

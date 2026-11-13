@@ -134,6 +134,8 @@ fact config?: Config as settings default { "environment": "production" }
 Read more on facts [here](/reference/facts).
 :::
 
+Static reference data from the pack's `[data]` table is declared with `data` statements in the same block as the facts. A `data` statement may also appear among the `use` statements, but before the body. See [Pack data](/reference/pack-data/).
+
 ### Variable Declarations
 
 ```sentrie
@@ -174,6 +176,15 @@ rule canWrite = default false when (user.active) {
 -- Composite rule
 rule canAccess = canRead or canWrite
 ```
+
+A rule can declare a type and collect contributions:
+
+```sentrie
+rule deny: list[string] = []
+contribute deny when not user.active { yield "inactive" }
+```
+
+`contribute` is a reserved keyword, so it cannot be used as a rule, fact, policy, shape or let name, or as the first segment of a namespace. It can still be a field name, as in `user.contribute`. See [Rules](/reference/rules#contributing-to-a-rule).
 
 :::note
 Read more on rules [here](/reference/rules).
@@ -224,6 +235,8 @@ let accessLevel = authResult.level           -- Access the 'level' attachment
 let userPermissions = authResult.permissions -- Access the 'permissions' attachment
 ```
 
+The name on the left of `with` is the declared fact name of the target policy (`fact user: User as u` is bound as `user`), not its alias.
+
 :::note
 For detailed information on importing rules, fact injection, and accessing attachments, see [Exporting and Importing Rules](/reference/exporting-and-importing-rules).
 :::
@@ -250,6 +263,8 @@ export decision of canWrite
   attach level as user.role
   attach department as user.department
 ```
+
+An attachment name may be any identifier or keyword (`attach version as ...`).
 
 ### Importing and Accessing Decision Attachments
 
