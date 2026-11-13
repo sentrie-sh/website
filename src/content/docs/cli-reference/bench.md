@@ -5,7 +5,7 @@ description: "Measure how long Sentrie takes to evaluate a policy or rule."
 
 The `bench` command evaluates a policy or rule over and over and reports how long each evaluation takes, along with how much memory it allocates. Use it to measure the cost of a policy and to compare that cost before and after a change.
 
-The `bench` command loads a policy pack, checks that the target evaluates once, and then times repeated evaluations of it with the facts you provide. It prints results in the Go benchmark format, so the output can be compared with [`benchstat`](https://pkg.go.dev/golang.org/x/perf/cmd/benchstat).
+The `bench` command loads a policy pack, checks that the target evaluates once, and then times repeated evaluations of it with the facts you provide. It prints one line of results per measurement run, in the text format that [`benchstat`](https://pkg.go.dev/golang.org/x/perf/cmd/benchstat) reads, so you can compare runs with that tool.
 
 The pack is loaded, indexed and validated once, before any timing starts. The measurement is of a warm executor, the same long-lived executor [`serve`](/cli-reference/serve) uses to answer requests: before the timed loop, one untimed evaluation warms it up, and the call-memoization cache and loaded modules then stay in place across iterations. The numbers describe the cost of evaluating a decision in a running server, not the cost of starting the process or loading the pack.
 
@@ -29,7 +29,7 @@ sentrie bench <FQN> [OPTIONS]
 | `--capabilities` | path | No | [Capabilities file](/reference/capabilities) limiting the builtins and modules the pack may use. Default: allow everything. |
 | `--skip-engine-check` | bool | No | Do not check the pack's `[engine]` version constraint against this binary. Default: `false`. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional). |
 
-**Returns:** Results in Go benchmark format on stdout (see [Output](#output)); exit 0 on success, 1 on error.
+**Returns:** Benchmark results on stdout (see [Output](#output)); exit 0 on success, 1 on error.
 
 ### `FQN` (required)
 
@@ -75,7 +75,7 @@ Facts are merged the same way as for [`exec`](/cli-reference/exec): facts from `
 
 ### `--benchtime`
 
-Sets how long to measure, with the same meaning as `-benchtime` in `go test`.
+Sets how long to measure: either for a length of time, or for an exact number of evaluations.
 
 ```bash
 sentrie bench user_management/user_access/allow_admin --benchtime 3s
@@ -86,10 +86,10 @@ sentrie bench user_management/user_access/allow_admin --benchtime 200x
 
 **Valid values:**
 
-- A Go duration such as `500ms`, `1s` or `2m` - Keep evaluating, in larger and larger batches, until a run lasts at least that long. The reported line is the last of those runs.
+- A duration such as `500ms`, `1s` or `2m` - Keep evaluating, in larger and larger batches, until a run lasts at least that long. The reported line is the last of those runs.
 - A count followed by `x`, such as `200x` - Run exactly that many evaluations. This gives output that is cheap to produce and repeatable in size, and is the form to use in tests and scripts.
 
-A value that is neither a positive duration nor a positive count followed by `x` (for example `5`, `0x` or `-1s`) is an error.
+A duration is a number followed by a unit, `ns`, `us`, `ms`, `s`, `m` or `h`, and units can be combined, as in `1m30s`. There is no unit for days. A value that is neither a positive duration nor a positive count followed by `x` (for example `5`, `0x` or `-1s`) is an error.
 
 ### `--count`
 
@@ -105,7 +105,7 @@ Several lines for the same target are what `benchstat` needs to estimate the spr
 
 ### `--eval-timeout`
 
-Sets the deadline for evaluating one decision, as a Go duration. `0` disables the deadline.
+Sets the deadline for evaluating one decision, as a duration such as `500ms` or `10s` (see [`--benchtime`](#--benchtime) for the units). `0` disables the deadline.
 
 ```bash
 sentrie bench user_management/user_access --eval-timeout 500ms
@@ -161,7 +161,7 @@ Each result line has these fields, separated by tabs:
 
 | Field                        | Meaning                                                                                              |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `BenchmarkExec/<FQN>[-N]`    | The benchmark name: the target you passed, with a `-N` suffix giving the value of `GOMAXPROCS`. The suffix is omitted when `GOMAXPROCS` is 1, as in Go's own output. |
+| `BenchmarkExec/<FQN>[-N]`    | The benchmark name: the target you passed, with a `-N` suffix giving how many CPUs Sentrie can run on at once (by default, every CPU available to it). The suffix is omitted when that number is 1. |
 | iterations                   | How many evaluations the run performed.                                                              |
 | `ns/op`                      | Average time of one evaluation, in nanoseconds.                                                      |
 | `B/op`                       | Average heap memory allocated per evaluation, in bytes.                                              |
@@ -169,7 +169,7 @@ Each result line has these fields, separated by tabs:
 
 The numbers depend on your machine, so expect different values from the ones above. Evaluating a whole policy (`namespace/policy`) does more work per iteration than evaluating a single rule, so compare like with like.
 
-Timing covers only the evaluations. `B/op` and `allocs/op` are measured from the Go runtime across the whole process during the run, so they include anything else the process allocates at that time.
+Timing covers only the evaluations. `B/op` and `allocs/op` are measured across the whole Sentrie process during the run, so they include anything else the process allocates at that time.
 
 ---
 
