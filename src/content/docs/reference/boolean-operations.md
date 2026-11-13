@@ -19,7 +19,7 @@ Boolean operations in Sentrie include:
 
 ## Conditional Operators
 
-Sentrie provides two operators for conditional value selection: the ternary operator and the Elvis operator. The Elvis operator is a shorthand for a common pattern using the ternary operator.
+Sentrie provides two operators for conditional value selection: the ternary operator and the Elvis operator. The ternary operator chooses a value based on whether a condition is truthy; only `true` is truthy. The Elvis operator is different: it falls back to its default only when the left side is undefined or `null`.
 
 ### Ternary Operator (`? :`)
 
@@ -33,7 +33,7 @@ condition ? trueValue : falseValue
 
 #### Examples
 
-```sentrie
+```text
 let age: number = 25
 let status: string = age >= 18 ? "adult" : "minor"
 -- Result: "adult"
@@ -43,18 +43,18 @@ let grade: string = score >= 90 ? "A" : score >= 80 ? "B" : score >= 70 ? "C" : 
 -- Result: "B"
 
 let user_role: string = "admin"
-let can_access: bool = user_role == "admin" ? true : false
+let can_access: boolean = user_role == "admin" ? true : false
 -- Result: true
 ```
 
 #### Complex Ternary Logic
 
-```sentrie
+```text
 shape Product {
   name: string
   price: number
   category: string
-  in_stock: bool
+  in_stock: boolean
 }
 
 fact product: Product
@@ -74,20 +74,14 @@ let status_message: string = product.in_stock ?
 
 ### Elvis Operator (`?:`)
 
-The Elvis operator (`?:`) provides a shorthand way to provide a default value when the left-hand expression is not truthy. It is equivalent to using the ternary operator with the same expression on both sides of the `?`.
+The Elvis operator (`?:`) provides a shorthand way to provide a default value when the left-hand expression is undefined or `null`.
 
-When the left-hand expression evaluates to a non-truthy value (including `false`, `null`, `undefined` → `unknown`, `0`, `""`, or empty collections), the default value is used.
+When the left-hand expression is undefined or `null`, the default value is used. Any other value is returned as it is, whatever it is: `false`, `0`, `""`, `unknown` and empty collections are all kept. So `false ?: true` is `false`, `0 ?: 9` is `0`, `"" ?: "x"` is `""` and `unknown ?: true` is `unknown`. To fall back on other values, test them explicitly, for example with a ternary.
 
 #### Syntax
 
 ```sentrie
 expression ?: defaultValue
-```
-
-This is equivalent to:
-
-```sentrie
-expression ? expression : defaultValue
 ```
 
 #### Examples
@@ -322,7 +316,7 @@ If either operand is `undefined`, the comparison is `undefined`, as for numbers;
 
 ### Regular Expression Matching (`matches`)
 
-The `matches` operator checks if a string matches a regular expression pattern.
+The `matches` operator checks if a string matches a regular expression pattern. Left and right must be strings. The right is a regular expression in [RE2 syntax](https://github.com/google/re2/wiki/Syntax), which has no backreferences or lookaround. An invalid pattern causes an evaluation error.
 
 #### Syntax
 

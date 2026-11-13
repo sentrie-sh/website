@@ -213,6 +213,10 @@ Functions for generating UUIDs (Universally Unique Identifiers).
 | [@sentrie/url](/reference/typescript_modules/sentrie/url)               | URL parsing and manipulation                                 | Network            |
 | [@sentrie/uuid](/reference/typescript_modules/sentrie/uuid)             | UUID generation (v4, v6, v7)                                 | Identifiers        |
 
+## Numbers and module calls
+
+A Sentrie `number` can be an exact 64-bit integer, but JavaScript numbers are floats. An integer beyond `Number.MAX_SAFE_INTEGER` (2^53-1) in magnitude cannot be passed to a module function: it raises an error instead of being rounded. See [Numbers Passed to TypeScript Modules](/reference/using-typescript#numbers-passed-to-typescript-modules).
+
 ## Common Use Cases
 
 ### Authentication & Authorization

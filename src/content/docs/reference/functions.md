@@ -21,6 +21,8 @@ Functions are called using the standard function call syntax with parentheses:
 let name = functionName(argument1, argument2, ...)
 ```
 
+`functionName` can be a builtin, a [derive](/reference/derives), or a lambda held by a `let` or a parameter. A local value shadows a derive or builtin of the same name. See [Calling a lambda by name](/reference#calling-a-lambda-by-name) for the full order and for recursion.
+
 ### Module Functions
 
 Functions imported from TypeScript modules are called using the module alias followed by a dot:
@@ -112,6 +114,8 @@ policy processing {
   export decision of validateUser
 }
 ```
+
+A relative path such as `"./utils.ts"` is resolved relative to the policy file or the pack root. Local modules must stay inside the pack root, and they see only the environment variables listed in `env`. The `fs_read` and `net` permissions are not enforced (see [security and permissions](/reference/security-and-permissions)).
 
 For detailed information about available TypeScript modules and their functions, see [Using TypeScript](/reference/using-typescript) and [Built-in TypeScript Modules](/reference/typescript_modules).
 

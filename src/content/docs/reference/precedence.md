@@ -32,16 +32,16 @@ let calculation: number = 10 / 2 + 3 -- Result: 8.0 (not 1.25)
 
 ### Comparison vs Arithmetic
 
-```sentrie
-let is_valid: bool = 5 + 3 > 7     -- Result: true
-let check: bool = 10 * 2 == 20     -- Result: true
+```text
+let is_valid: boolean = 5 + 3 > 7     -- Result: true
+let check: boolean = 10 * 2 == 20     -- Result: true
 ```
 
 ### Logical Precedence
 
-```sentrie
-let complex: bool = true and false or true  -- Result: true
-let mixed: bool = 5 > 3 and 2 < 4           -- Result: true
+```text
+let complex: boolean = true and false or true  -- Result: true
+let mixed: boolean = 5 > 3 and 2 < 4           -- Result: true
 ```
 
 ### Ternary Precedence
@@ -82,9 +82,9 @@ let result2: number = (2 + 3) * 4      -- Result: 20
 
 ### Complex Expressions
 
-```sentrie
+```text
 -- Clear grouping for readability
-let access: bool = (user.age >= 18 and user.verified) or
+let access: boolean = (user.age >= 18 and user.verified) or
                   (user.role == "admin" and user.active)
 
 -- Mixed operations
@@ -99,22 +99,22 @@ let calculation: number = (10 + 5) * (5 - 2) / 2  -- Result: 22.5 (15 * 3 / 2)
 
 ### Use Parentheses for Clarity
 
-```sentrie
+```text
 -- Good: Clear intent
-let result: bool = (a and b) or (c and d)
+let result: boolean = (a and b) or (c and d)
 
 -- Avoid: Relying on precedence knowledge
-let result: bool = a and b or c and d
+let result: boolean = a and b or c and d
 ```
 
 ### Group Related Operations
 
-```sentrie
+```text
 -- Good: Logical grouping
 let price: number = (base_price + tax) * discount_rate
 
 -- Good: Comparison grouping
-let valid: bool = (age >= 18) and (income > 50000)
+let valid: boolean = (age >= 18) and (income > 50000)
 ```
 
 ### Break Complex Expressions
