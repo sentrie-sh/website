@@ -3,6 +3,8 @@ title: "JavaScript Modules"
 description: "Integration with JavaScript modules for complex business logic."
 ---
 
+# JavaScript Modules
+
 > **Note**: This feature is currently under development and will be available in a future release.
 
 ## Overview

@@ -1,15 +1,15 @@
 ---
-title: Policy Language Reference
-description: "Reference for Sentrie language syntax, types, operators, and constructs."
+title: "Policy Language Reference"
+description: "Complete reference for the Sentrie policy language syntax and features."
 ---
 
-This section is a reference for the Sentrie policy language: syntax, types, operators, and constructs. Pages include syntax variants, options and arguments in tables, where each feature applies, edge cases, and examples. For conceptual overviews and “how it works,” see [Language Concepts](/language-concepts/type-system-shapes).
+This is the complete reference for the Sentrie policy language. It covers all language features, syntax, and semantics.
 
-## Program structure
+## Table of Contents
 
 - [Program Structure](#program-structure)
 - [Namespaces](#namespaces)
-- [Policies](/reference/policies)
+- [Policies](#policies)
 - [Rules](#rules)
 - [Expressions](#expressions)
 - [Lambdas](#lambdas) - Callable syntax (`=>`) for passing functions as values to builtins and for calling them by name
@@ -59,56 +59,48 @@ Namespaces organize your policies and shapes hierarchically and prevent naming c
 
 ```text
 namespace FQN
-policy IDENT { fact ... let ... use ... rule ... export decision of IDENT }
-shape IDENT { ... } | shape IDENT baseType @constraint
-derive IDENT = LAMBDA
-export shape IDENT
-export derive IDENT
 ```
 
-## Reference Pages
+Where `FQN` (Fully Qualified Name) is a slash-separated identifier:
 
-### Core
+```text
+namespace com/example/auth
+namespace com/example/billing/v2
+namespace mycompany/policies/security
+```
 
-- **[Namespaces](/reference/namespaces):** One namespace per file, FQN syntax, placement, visibility of shapes and policies, cross-namespace reference.
-- **[Policies](/reference/policies):** Policy block, statement order (facts, let, use, rules, export), evaluation.
-- **[Rules](/reference/rules):** Rule syntax, when/default/body, outcome type, truthiness, cross-references.
-- **[Facts](/reference/facts):** Required/optional facts, type, alias, default, binding at evaluation, import binding.
-- **[Pack data](/reference/pack-data):** Static reference data from the pack's `[data]` table, `data` declarations, typing and errors.
-- **[Intermediate values (let)](/reference/let):** let syntax, scoping, immutability, type validation.
-- **[Derives](/reference/derives):** Named pure functions (`derive`), calling rules, and export.
-- **[Identifiers](/reference/identifiers):** What counts as a valid identifier (characters, reserved keywords).
+### Namespace statements
 
-### Types
+A namespace can contain:
 
-- **[Types and values](/reference/types-and-values):** Primitives, collections, indexing, cast, validation.
-- **[Constraints](/reference/constraints):** Constraint syntax, full tables per type (number, string, list, trinary), when checked, collection and cast behavior.
-- **[Trinary](/reference/trinary):** true/false/unknown, truthiness, Kleene AND/OR/NOT, use in when and conditionals.
-- **[Shapes](/reference/shapes):** Data models, field modifiers (required/optional, nullable), composition, type aliases, export.
+- **policies**: `policy IDENT { ... }`
+- **shapes**: `shape IDENT { ... }`
+- **derives**: `derive IDENT = LAMBDA`
+- **shape exports**: `export shape IDENT`
+- **derive exports**: `export derive IDENT`
 
-### Operations
+### Rules
 
-- **[Arithmetic](/reference/arithmetic-operations):** +, -, *, /, %, unary +/-, types, division by zero.
-- **[Boolean](/reference/boolean-operations):** and, or, xor, not, comparison, matches, ternary, Elvis.
-- **[Built-in Functions](/reference/built-in-functions):** List helpers (`any`, `all`, `filter`, …), `count`, `merge`, and related builtins.
-- **[Functions](/reference/functions):** Function calls, use (import), aliasing, memoization.
-- **[Precedence](/reference/precedence):** Operator precedence table, associativity, parentheses.
-- **[Membership](/reference/membership-operations):** in, contains (list, map, string).
+- Namespaces must be declared at the top of the file (only comments can be placed before the namespace declaration)
+- Only one namespace per file
+- Namespace names must be valid identifiers
+- Use slash-separated (`/`) hierarchical names for organization
+- Multiple root namespaces are allowed in a policy pack
+- Namespace forms the visibility boundary for unexported shapes
 
-### Other
-
-- **[Security and permissions](/reference/security-and-permissions):** Pack permissions (fs_read, net, env), defaults, configuration.
+## Policies
 
 Policies are containers for rules, facts, and other declarations. See [Policy metadata](/reference/policy-metadata/) for `title`, `description`, `version`, and `tag`, and for the required **metadata → facts → uses → body** ordering.
 
-### TypeScript
+### Syntax
 
-- **[Built-in TypeScript modules](/reference/typescript_modules/):** Overview and per-module reference.
+```text
+policy IDENT {
+  policyStatement*
+}
+```
 
-### Composition and extensibility
-
-- **[Policy composition](/language-concepts/policy-composition):** Export/import of rules and facts.
-- **[Writing custom TypeScript modules](/extensibility/writing-custom-typescript-modules):** Custom modules and use.
+### Policy Statements
 
 A policy can contain (in grouped order; comments anywhere):
 
@@ -652,7 +644,7 @@ shape AdminUser with BaseUser {
 
 The composed shape includes all fields from the base shape plus any additional fields defined in the composed shape.
 
-An unqualified base is looked up in the enclosing policy, then in the shape's namespace. A base from another namespace must be qualified (`with com/base/BaseUser`) and exported there with `export shape BaseUser`; an unqualified or unexported cross-namespace base fails validation. See [Composition](/reference/shapes#composition-extending-a-base-shape).
+An unqualified base is looked up in the enclosing policy, then in the shape's namespace. A base from another namespace must be qualified (`with com/base/BaseUser`) and exported there with `export shape BaseUser`; an unqualified or unexported cross-namespace base fails validation. See [Composition](/reference/shapes#shape-composition).
 
 ### Constraints
 
@@ -1027,6 +1019,8 @@ Facts can have:
 - Only **optional facts** (`?`) can have default values
   :::
 
+Static reference data from the pack's `[data]` table is declared with `data` statements. See [Pack Data](/reference/pack-data).
+
 ### Variables
 
 Variables are local to a policy or rule:
@@ -1139,6 +1133,18 @@ rule invalid = default false {
   yield age > 0
 }
 ```
+
+### Evaluation Errors
+
+A rule can also fail while it runs. A failing rule reports its own `error` object with `title`, `status` and `detail`, its decision is `unknown`, and the other rules of the policy are still evaluated. `status` is `400` for an invalid invocation, `503` for an exceeded deadline and `500` otherwise. See [When a Rule Fails](/reference/rules#when-a-rule-fails). The CLI and the HTTP API report these failures as described in [Executing Policies](/running-sentrie/executing-policies) and [Serving Policies](/running-sentrie/serving-policies).
+
+Invalid operands are evaluation errors too:
+
+- A string or fractional list index fails with `list index must be an integer, got ...`.
+- `count` of something that is not a list, dict, set or string is an error.
+- `+` joining a string with a list or dict fails with `+ cannot join a string with a list`.
+
+A literal `default` of the wrong type, `default null` on a non-nullable fact, and two facts with the same declared name are index errors. `sentrie validate` reports them before any request. See [Defaults are type-checked](/reference/facts#defaults-are-type-checked).
 
 ### Undefined Values
 
@@ -1319,5 +1325,6 @@ policy pricing {
 - [Policies](/reference/policies) - Detailed information about policies
 - [Rules](/reference/rules) - Detailed information about rules
 - [Facts](/reference/facts) - Detailed information about facts
+- [Pack Data](/reference/pack-data) - Static reference data from the pack's `[data]` table
 - [Let Declarations](/reference/let) - Detailed information about let declarations
 - [Shapes](/reference/shapes) - Detailed information about shapes

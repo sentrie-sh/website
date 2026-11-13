@@ -1,46 +1,20 @@
 ---
 title: Arithmetic Operations
-description: "Arithmetic operators (+, -, *, /, %), unary +/-, operand types, string concatenation with +, and edge cases including division by zero."
+description: Arithmetic operations provide mathematical calculations on numeric values in Sentrie.
 ---
 
 Arithmetic operators operate on `number`. A `number` holds either an **exact integer** (a whole number that fits in a signed 64-bit integer, from `-9223372036854775808` to `9223372036854775807`) or a **float** (a 64-bit floating-point number). You never declare which one you want: whole numbers you write, or receive in facts, stay exact integers, and anything with a fractional part or an exponent is a float. The result of every arithmetic operation is `number`. Division by zero and modulo by zero abort evaluation with an error.
 
-## Syntax
+## Basic Operations
 
-**Binary:** `expr + expr` | `expr - expr` | `expr * expr` | `expr / expr` | `expr % expr`
-
-**Unary:** `+ expr` | `- expr`
-
-## Configuration & Arguments
-
-| Operator | Description | Operands | Result | Edge case |
-| :------- | :---------- | :------- | :----- | :-------- |
-| `+` | Addition, or string concatenation | number, number (or a string with a scalar) | number (or string) | Integer overflow → error. See [String concatenation](#string-concatenation). |
-| `-` | Subtraction | number, number | number | Integer overflow → error. |
-| `*` | Multiplication | number, number | number | Integer overflow → error. |
-| `/` | Division | number, number | number | Divisor zero → error; evaluation aborts. Integer with integer is an integer only when exact, otherwise a float. |
-| `%` | Modulo (remainder) | number, number | number | Divisor zero → error; evaluation aborts. The result takes the sign of the left operand. |
-| unary `+` | Unary plus | number | number | None |
-| unary `-` | Unary minus (negation) | number | number | Negating `-9223372036854775808` overflows → error. |
-
-**Returns:** `number`. Division or modulo by zero aborts evaluation.
-
-## Operand types and conversion
-
-All operands are interpreted as `number`. Integers are exact: they keep every digit from the literal or the JSON fact, through arithmetic and comparison, to the output. In particular they are not rounded at 2^53 (`9007199254740992`), where a float can no longer tell neighbouring integers apart.
+### Addition (`+`)
 
 ```sentrie
-let id: number = 9007199254740993    -- Stays 9007199254740993
-let next: number = id + 1            -- Result: 9007199254740994
+let sum: number = 5 + 3        -- Result: 8
+let total: number = 2.5 + 1.5  -- Result: 4.0
 ```
 
-The rules are:
-
-- **Integer with integer** is exact. If the result does not fit in 64 bits, evaluation stops with an [overflow error](#overflow).
-- **Integer with float** is calculated as a float. The integer is converted to the nearest float first, so digits beyond 2^53 can be lost. Whole results print without a fractional part, so `2 + 1.5 + 0.5` prints as `4`.
-- **Equality and ordering are exact** across both forms. [Comparing numbers](#comparing-numbers) covers the details.
-- An integer literal too large for 64 bits, such as `18446744073709551616`, is read as a float.
-- A JSON fact written as `5.0` or `1e3` is a float, even though its value is whole.
+If both operands are integers and the exact result does not fit in 64 bits, evaluation stops with an [overflow error](#overflow). `-`, `*` and unary minus behave the same way.
 
 ### String concatenation
 
@@ -70,6 +44,36 @@ Two cases behave differently:
 - **Undefined or unknown beside a string gives unknown**, in either order. `"a" + x` is `unknown` when `x` is undefined (for example a missing optional fact or a missing dict key) or `unknown`. Without a string in the expression, undefined still propagates as undefined: `1 + x` is undefined.
 
 **Breaking change (v0.0.5):** a list or dict joined to a string used to produce text; it is now an error. Packs that relied on that must convert the value first.
+
+### Subtraction (`-`)
+
+```sentrie
+let difference: number = 10 - 7    -- Result: 3
+let result: number = 5.5 - 2.5     -- Result: 3.0
+```
+
+### Multiplication (`*`)
+
+```sentrie
+let product: number = 4 * 6     -- Result: 24
+let area: number = 3.75 * 2.0   -- Result: 7.5
+```
+
+### Division (`/`)
+
+```sentrie
+let quotient: number = 15 / 3    -- Result: 5 (exact)
+let precise: number = 7 / 2      -- Result: 3.5
+```
+
+### Modulo (`%`)
+
+```sentrie
+let remainder: number = 10 % 3    -- Result: 1
+let even_check: number = 8 % 2    -- Result: 0
+```
+
+## Division and Precision
 
 ### Division
 
@@ -129,54 +133,47 @@ A JSON number written outside the float range, such as `1e400`, is rejected with
 
 Integers beyond 2^53 can be compared, added and printed, but they cannot be passed into a [TypeScript module](/reference/using-typescript#numbers-passed-to-typescript-modules).
 
-## Examples in Action
-
-### Basic arithmetic
+### Zero Division
 
 ```sentrie
-let sum: number = 5 + 3
-let diff: number = 10 - 7
-let prod: number = 4 * 6
-let quot: number = 15 / 3   -- 5
-let rem: number = 10 % 3    -- 1
-let negative: number = -7 % 3   -- -1
+-- This will cause an error
+let invalid: number = 5 / 0     -- Error: division by zero
 ```
 
-### Division and float result
+## Mixed Mode Arithmetic
+
+### Mixed Numeric Operations
 
 ```sentrie
-let half: number = 7 / 2   -- 3.5
-let whole: number = 10 / 2   -- 5 (exact integer)
-let third: number = 8 / 3    -- 2.6666666666666665
+let mixed_add: number = 5 + 2.5      -- Result: 7.5
+let mixed_multiply: number = 3 * 1.5 -- Result: 4.5
+let result: number = 10 - 7.2        -- Result: 2.8
 ```
 
-### Unary minus
+All of these are `number` values. The rules for mixing integers and floats are:
+
+- **Integer with integer** is exact. If the result does not fit in 64 bits, evaluation stops with an [overflow error](#overflow).
+- **Integer with float** is calculated as a float. The integer is converted to the nearest float first, so digits beyond 2^53 can be lost. Whole results print without a fractional part, so `2 + 1.5 + 0.5` prints as `4`.
+- **Equality and ordering are exact** across both forms. [Comparing numbers](#comparing-numbers) covers the details.
+- An integer literal too large for 64 bits, such as `18446744073709551616`, is read as a float.
+- A JSON fact written as `5.0` or `1e3` is a float, even though its value is whole.
+
+## Practical Examples
+
+### Shape Calculations
 
 ```sentrie
-let neg: number = -x
-let pos: number = +y
-```
+shape Rectangle {
+  width: number
+  height: number
+}
 
-### Guarding against division by zero
+fact rect: Rectangle
 
-```sentrie
-let safe: number = divisor != 0 ? 10 / divisor : 0.0
-```
-
-### Using arithmetic in expressions
-
-```sentrie
 let area: number = rect.width * rect.height
+let perimeter: number = 2 * (rect.width + rect.height)
+let aspect_ratio: number = rect.width / rect.height
 ```
-
-## Good to Know
-
-Before you implement this, keep a few boundaries in mind:
-
-- **Operands:** Apart from [string concatenation](#string-concatenation), all operands are `number`, which is an exact 64-bit integer or a float. An operation on an integer and a float is a float operation.
-- **Division:** Two integers divide to an integer only when exact (`10 / 2` is `5`); otherwise the result is a float (`7 / 2` is `3.5`). Division by zero aborts evaluation. Use a guard (e.g. ternary or `when`) to avoid dividing by zero.
-- **Modulo:** Truncated remainder, taking the sign of the left operand (`-7 % 3` is `-1`). Divisor zero aborts evaluation.
-- **Overflow:** An integer result outside the signed 64-bit range is an error, never a wrap-around.
 
 ### Statistical Operations
 

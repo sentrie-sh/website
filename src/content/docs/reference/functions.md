@@ -5,73 +5,73 @@ description: How to call functions in Sentrie, import TypeScript modules, and us
 
 Functions are a fundamental part of Sentrie that allow you to perform operations, transform data, and extend functionality. Sentrie supports **built-in functions** (see [Built-in Functions](/reference/built-in-functions)) that are always available without imports, and **TypeScript module functions** that you import using the `use` statement.
 
-## Syntax
+Functions in Sentrie enable you to:
 
-**Call (direct):** `functionName(arg1, arg2, ...)`
+- Perform common operations using built-in reusable utilities
+- Extend functionality by importing functions from TypeScript modules
+- Optimize performance with function **memoization**
+
+## Function Call Syntax
+
+### Basic Syntax
+
+Functions are called using the standard function call syntax with parentheses:
+
+```sentrie
+let name = functionName(argument1, argument2, ...)
+```
 
 `functionName` can be a builtin, a [derive](/reference/derives), or a lambda held by a `let` or a parameter. A local value shadows a derive or builtin of the same name. See [Calling a lambda by name](/reference#calling-a-lambda-by-name) for the full order and for recursion.
 
-**Call (via alias):** `alias.functionName(arg1, arg2, ...)`
+### Module Functions
 
-**Import:** `use { fn1, fn2, ... } from source [ as alias ]`
-
-- **source:** Either a built-in module reference (e.g. `@sentrie/hash`, no quotes) or a relative path string (e.g. `"./utils.ts"`, in quotes).
-- **as alias:** Optional. Identifier used as the namespace for the imported functions. If omitted, the default alias is typically the last path segment of the source (e.g. `hash` for `@sentrie/hash`).
-
-## Configuration & Arguments
-
-| Element | Type | Required | Description |
-| :------ | :--- | :------- | :---------- |
-| `source` | `@sentrie/module` or `"./path.ts"` | Yes | Built-in: `@sentrie/name` (no quotes). Relative: quoted string path from the policy file (or pack root). |
-| `as alias` | identifier | No | Namespace for the imported functions. Omitted: default alias is last segment of source (e.g. `hash` for `@sentrie/hash`). |
-| Function args | expressions | Per function | Typed and documented per module. See [Built-in TypeScript modules](/reference/typescript_modules/) and [Writing custom TypeScript modules](/extensibility/writing-custom-typescript-modules). |
-
-**Returns:** Per function; see the module’s documentation. Invalid arguments or runtime errors in the function abort evaluation.
-
-## Where use is allowed
-
-`use` is a policy-level statement. It must appear inside a [policy](/reference/policies) block, after [facts](/reference/facts) and before or alongside [let](/reference/let) and [rules](/reference/rules), per the policy statement order. The imported functions are visible to all rules and let bindings in that policy. They are not visible in other policies unless those policies declare their own `use`.
-
-## Resolution of source
-
-- **Built-in:** `@sentrie/name` refers to a built-in module (e.g. `@sentrie/hash`, `@sentrie/time`). The runtime resolves these to the provided implementations.
-- **Relative:** A string path (e.g. `"./utils.ts"`) is resolved relative to the policy file or the pack root, per tooling. Local modules must stay inside the pack root (see [security and permissions](/reference/security-and-permissions)).
-
-### Example
+Functions imported from TypeScript modules are called using the module alias followed by a dot:
 
 ```sentrie
+namespace com/example/auth
+
 policy mypolicy {
   fact data: string
 
   use { sha256, now } from @sentrie/hash as hash
-  use { parse } from @sentrie/js as json
+  use { parse } from @sentrie/json as json
 
   rule processData = default false {
     let hashValue = hash.sha256(data)
     let currentTime = hash.now()
     let parsed = json.parse(data)
-    yield hashValue != "" and currentTime > 0 and parsed is defined
+    yield hashValue != "" and currentTime > 0
   }
+
+  export decision of processData
 }
 ```
 
-## Examples in Action
-
-### Import and call (no alias, default alias)
+:::note
+If no alias is specified, the default alias is the last part of the module path:
 
 ```sentrie
 use { sha256 } from @sentrie/hash
-let h = sha256(data)
+-- Default alias is "hash", so you call: hash.sha256(data)
 ```
 
-### Import with alias
+:::
+
+## TypeScript Module Functions
+
+Sentrie allows you to import and use functions from TypeScript modules, including built-in `@sentrie/*` modules and your own local TypeScript files. This provides extensive functionality for cryptography, data manipulation, time operations, and more.
+
+### Importing Functions
+
+Functions are imported using the `use` statement:
 
 ```sentrie
-use { now } from @sentrie/time as time
-let t = time.now()
+use { function1, function2 } from @sentrie/module as alias
 ```
 
-### Multiple functions and custom module
+### Built-in Modules
+
+Sentrie provides comprehensive built-in TypeScript modules under the `@sentrie/*` namespace:
 
 ```sentrie
 namespace com/example/crypto
@@ -81,7 +81,8 @@ policy security {
   fact timestamp: number
 
   use { sha256, md5 } from @sentrie/hash
-  use { now } from @sentrie/time as time
+  use { now, parse } from @sentrie/time as time
+  use { isValid } from @sentrie/json as json
 
   rule validatePassword = default false {
     let hash = hash.sha256(password)
@@ -93,7 +94,9 @@ policy security {
 }
 ```
 
-### Local TypeScript modules
+### Local TypeScript Modules
+
+You can also import functions from your own TypeScript files:
 
 ```sentrie
 namespace com/example/utils
@@ -111,6 +114,8 @@ policy processing {
   export decision of validateUser
 }
 ```
+
+A relative path such as `"./utils.ts"` is resolved relative to the policy file or the pack root. Local modules must stay inside the pack root, and they see only the environment variables listed in `env`. The `fs_read` and `net` permissions are not enforced (see [security and permissions](/reference/security-and-permissions)).
 
 For detailed information about available TypeScript modules and their functions, see [Using TypeScript](/reference/using-typescript) and [Built-in TypeScript Modules](/reference/typescript_modules).
 
@@ -209,7 +214,7 @@ Functions can be used anywhere expressions are allowed, including in `let` decla
 namespace com/example/complex
 
 policy example {
-  fact userData: dict[string]
+  fact userData: map[string]any
   fact items: list[string]
 
   use { sha256 } from @sentrie/hash
@@ -242,12 +247,3 @@ Sentrie provides builtins such as `count`, `merge`, list helpers (`any`, `all`, 
 - [Built-in TypeScript Modules](/reference/typescript_modules) - Complete reference for all built-in modules
 - [Intermediate Values](/reference/let) - Learn about `let` declarations where functions are commonly used
 - [Rules](/reference/rules) - Learn how to use functions in rule bodies
-
-## Good to Know
-
-Before you implement this, keep a few boundaries in mind:
-
-- **Memoization:** Functions may be memoized per (function, arguments) when applicable; repeated calls with the same arguments may return a cached result. This is implementation-defined.
-- **Scope:** `use` is per policy. The alias (or default) is used only in that policy. Other policies must declare their own `use` to call the same or other modules.
-- **Errors:** Missing or wrong-type arguments, or runtime errors inside the function, can cause evaluation to abort. See [Built-in TypeScript modules](/reference/typescript_modules/) and [Writing custom TypeScript modules](/extensibility/writing-custom-typescript-modules) for function contracts and types.
-- **Permissions:** Custom modules (e.g. `"./file.ts"`) are confined to the pack root, and see only the environment variables listed in `env` (see [security and permissions](/reference/security-and-permissions)). Built-in modules run with the same permissions as the pack.
