@@ -231,7 +231,7 @@ Before you rely on this in scripts or CI, keep a few boundaries in mind:
 
 ### Exit status
 
-`bench` exits with status `0` when every run completes, and with status `1` after printing a message starting with `Error:` otherwise. When the failure happens before the first measurement, no result lines are printed, not even `goos:` and `goarch:`, so the only output is the error message.
+`bench` exits with status `0` when every run completes, and with status `1` after printing a message starting with `Error:` otherwise. When the failure happens before the first measurement, nothing is written to stdout, not even the `goos:` and `goarch:` lines, and the error message is the only output.
 
 These cases exit non-zero:
 
@@ -252,7 +252,7 @@ Error: benchmark target "user_management/user_access/allow_admin" failed to eval
 
 ### Output destination
 
-Results and error messages are both written to **stdout**, as for [`exec`](/cli-reference/exec). If you redirect output to a file, a failed command leaves its error message in that file, so check the exit status in scripts before comparing results.
+Results are written to **stdout** and error messages to **stderr**, as for [`exec`](/cli-reference/exec). Redirecting stdout to a file, as in `sentrie bench ... > old.txt`, keeps the error out of that file, so a failed run can leave the file empty or partly written. Check the exit status in scripts before comparing results.
 
 ## See Also
 
