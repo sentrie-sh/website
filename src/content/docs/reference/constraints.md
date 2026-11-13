@@ -81,7 +81,7 @@ A `number` can be an exact integer or a float; floats can represent ±∞ and Na
 | `@length(value)`                | 1 (number)   | String length must equal the specified value. Length counts Unicode code points, not bytes.      |
 | `@minlength(value)`             | 1 (number)   | String length must be at least the specified value (in code points).                             |
 | `@maxlength(value)`             | 1 (number)   | String length must be at most the specified value (in code points).                              |
-| `@regexp(pattern)`              | 1 (string)   | String must match the specified regular expression (Go regexp). Invalid pattern causes an error. |
+| `@regexp(pattern)`              | 1 (string)   | String must match the specified regular expression (RE2 syntax). Invalid pattern causes an error. |
 | `@starts_with(substring)`       | 1 (string)   | String must start with the specified substring.                                                  |
 | `@ends_with(substring)`         | 1 (string)   | String must end with the specified substring.                                                    |
 | `@has_substring(substring)`     | 1 (string)   | String must contain the specified substring.                                                     |
@@ -299,5 +299,5 @@ Before you implement this, keep a few boundaries in mind:
 - A constraint name after `@` can be any word, including words that are keywords in the language; the name must still be one of the constraints listed above.
 - Numeric constraints compare exact values. Integers that fit in 64 bits use integer arithmetic (including `@even`, `@odd` and `@multiple_of`); floats use float64 comparisons, and `@multiple_of` uses a small epsilon for floating-point remainder checks.
 - **Infinity and NaN:** The language has no infinity or NaN literal, and division by zero aborts (it does not produce `±∞`). So `@infinite()` and `@nan()` only apply when a number comes from TypeScript or external input (e.g. a JS function returning `Infinity`).
-- String `@regexp` uses Go’s [regexp](https://pkg.go.dev/regexp) semantics. An invalid pattern is rejected when the pack is loaded (see [Constraint Arguments](#constraint-arguments)).
+- String `@regexp` patterns use [RE2 syntax](https://github.com/google/re2/wiki/Syntax), which has no backreferences or lookaround. An invalid pattern is rejected when the pack is loaded (see [Constraint Arguments](#constraint-arguments)).
 - Map types currently have no built-in constraints; only list and element types (e.g. `list[T]` with constrained `T`) are covered above.
