@@ -142,8 +142,8 @@ Error: pack requires sentrie >=0.0.5, running 0.0.4 (use --skip-engine-check to 
 The output starts with two configuration lines naming the operating system and architecture, followed by one result line per measurement run:
 
 ```text
-goos: darwin
-goarch: arm64
+os: darwin
+arch: arm64
 BenchmarkExec/user_management/user_access/allow_admin-12	     200	     3302.09 ns/op	      6144 B/op	        69 allocs/op
 BenchmarkExec/user_management/user_access/allow_admin-12	     200	     2839.17 ns/op	      6144 B/op	        69 allocs/op
 BenchmarkExec/user_management/user_access/allow_admin-12	     200	     2832.92 ns/op	      6144 B/op	        69 allocs/op
@@ -231,7 +231,7 @@ Before you rely on this in scripts or CI, keep a few boundaries in mind:
 
 ### Exit status
 
-`bench` exits with status `0` when every run completes, and with status `1` after printing a message starting with `Error:` otherwise. When the failure happens before the first measurement, nothing is written to stdout, not even the `goos:` and `goarch:` lines, and the error message is the only output.
+`bench` exits with status `0` when every run completes, and with status `1` after printing a message starting with `Error:` otherwise. When the failure happens before the first measurement, nothing is written to stdout, not even the `os:` and `arch:` lines, and the error message is the only output.
 
 These cases exit non-zero:
 
