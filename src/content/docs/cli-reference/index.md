@@ -560,19 +560,19 @@ For production deployment:
 ### Docker Deployment
 
 ```dockerfile
-FROM golang:1.25-alpine AS builder
+FROM alpine:3.20
+ARG SENTRIE_VERSION=0.0.5
+ARG TARGETARCH
+RUN apk --no-cache add ca-certificates curl \
+ && curl -fsSL "https://github.com/sentrie-sh/sentrie/releases/download/v${SENTRIE_VERSION}/sentrie_${SENTRIE_VERSION}_linux_${TARGETARCH}.tar.gz" \
+    | tar -xz -C /usr/local/bin sentrie
 WORKDIR /app
-COPY . .
-RUN go build -o sentrie .
-
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-COPY --from=builder /app/sentrie .
-COPY --from=builder /app/policies ./policies
+COPY policies ./policies
 EXPOSE 7529
-CMD ["./sentrie", "serve", "--pack-location", "./policies"]
+CMD ["sentrie", "serve", "--pack-location", "./policies", "--http-listen", "0.0.0.0"]
 ```
+
+The image downloads the Linux release of Sentrie for the build platform's architecture (`amd64` or `arm64`) and copies in the pack from `./policies`. `--http-listen 0.0.0.0` makes the server reachable from outside the container, since it listens only on localhost by default.
 
 ## Best Practices
 
