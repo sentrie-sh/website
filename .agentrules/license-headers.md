@@ -1,13 +1,10 @@
----
-description: New licensed files use SPDX-FileCopyrightText (© + year + git user.name / optional user.email) and SPDX-License-Identifier; do not change existing headers on ordinary edits.
-alwaysApply: true
----
+# License Headers and Copyright Year
 
-# SPDX file headers and copyright year
+New licensed files use `SPDX-FileCopyrightText` (© + year + git `user.name` / optional `user.email`) and `SPDX-License-Identifier`. Do not change existing headers on ordinary edits.
 
 ## New files and first-time headers
 
-When you **create** a new source file that must carry a license header, use this **two-line SPDX shape** (with the file’s normal comment syntax), in order:
+When you **create** a new source file that must carry a license header, use this **two-line SPDX shape** (with the file's normal comment syntax), in order:
 
 ```text
 SPDX-FileCopyrightText: © 2026 Binaek Sarkar <binaek89@gmail.com>
@@ -23,14 +20,14 @@ Example in a `//` comment language:
 // SPDX-License-Identifier: Apache-2.0
 ```
 
-**Holder and email:** Prefer the values from **`git config user.name`** and **`git config user.email`** (local/repo override if set, else global). The example above matches this repository’s typical Git identity; if yours differs, substitute accordingly. If **`user.email`** is unset, omit the space and bracketed email after the name.
+**Holder and email:** Prefer the values from **`git config user.name`** and **`git config user.email`** (local/repo override if set, else global). The example above matches this repository's typical Git identity; if yours differs, substitute accordingly. If **`user.email`** is unset, omit the space and bracketed email after the name.
 
 If Git identity is **not** available or the repo standard differs (e.g. corporate copyright line), use the **copyright holder** style in **sibling source files** in this repository instead.
 
-## Which year is “current”
+## Which year is "current"
 
 - Prefer the **actual current year** for the session: use **`Today's date`** from the user or workspace context when it is provided (authoritative for the run).
-- If no date is available, use a **reasonable default** for “now” (do **not** assume a fixed past year such as 2025).
+- If no date is available, use a **reasonable default** for "now" (do **not** assume a fixed past year such as 2025).
 
 ## Existing files
 
