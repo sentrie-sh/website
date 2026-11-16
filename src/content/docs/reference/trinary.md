@@ -1,233 +1,102 @@
 ---
 title: Trinary Values
-description: Trinary values are a type of value that can be true, false, or unknown.
+description: "Three-valued logic (true, false, unknown), truthiness, Kleene AND/OR/NOT tables, and use in when and ternary."
 ---
 
-Sentrie uses **trinary logic** (also known as three-valued logic), which extends traditional boolean logic with a third value: `unknown`. This is essential for handling cases where information may be incomplete or unavailable.
+Sentrie uses three values for logic and conditions: `true`, `false`, and `unknown`. `unknown` represents an indeterminate result (e.g. an optional field that is not present, or a comparison involving `unknown`). [Rule](/reference/rules) `when` guards and the [ternary](/reference/boolean-operations) operator (`? :`) use **truthiness**: only `true` is truthy; `false` and `unknown` are non-truthy. The Elvis operator (`?:`) does not: it falls back only when its left side is undefined or `null`. Logical operators (`and`, `or`, `xor`, `not`/`!`) follow **Kleene** three-valued logic so `unknown` propagates in defined ways.
 
-### Trinary Values
+`unknown` is only valid in a `trinary`. A value declared `boolean` is strictly `true` or `false`: it behaves like a `trinary` that rejects `unknown`, and an `unknown` value yielded by a `boolean` rule, `let`, fact or cast is an error. A `boolean` rule that produces no value at all still reports `unknown`: this happens when its `when` fails, it has no `default`, and no contribution yields `true`. Declare the value `trinary` when `unknown` is a legitimate outcome. The names `bool`, `int` and `float` are not types; see [Types and Values](/reference/types-and-values#primitive-types).
 
-Sentrie supports three trinary values:
+## Syntax
 
-- **`true`** - The condition is definitely true
-- **`false`** - The condition is definitely false
-- **`unknown`** - The condition's truth value cannot be determined
+**Literals:** `true` | `false` | `unknown`
 
-### Kleene Truth Tables
+**Logical operators (binary):** `and` | `or` | `xor`
 
-Sentrie implements **Kleene's three-valued logic**, which provides a consistent way to handle `unknown` values in logical operations.
+**Logical negation (unary):** `not expr` | `! expr`
 
-#### Logical AND (`and`)
+## Configuration & Arguments
 
-The `and` operator follows Kleene's AND truth table:
+### Truthiness
 
-| **AND**     | **true**  | **false** | **unknown** |
-| ----------- | --------- | --------- | ----------- |
-| **true**    | `true`    | `false`   | `unknown`   |
-| **false**   | `false`   | `false`   | `false`     |
-| **unknown** | `unknown` | `false`   | `unknown`   |
+Used by `when` and ternary (`? :`) (not by Elvis, which only checks for undefined or `null`):
 
-**Key behaviors:**
+| Value     | Truthy? |
+| :-------- | :------ |
+| `true`    | Yes     |
+| `false`   | No      |
+| `unknown` | No      |
 
-- `true and x` = `x` (true is the identity element)
-- `false and x` = `false` (false dominates)
-- `unknown and true` = `unknown` (cannot determine if both are true)
-- `unknown and false` = `false` (false dominates)
-- `unknown and unknown` = `unknown` (cannot determine)
+So a rule with `when cond` runs its body only if `cond` evaluates to `true`; if `cond` is `false` or `unknown`, the rule uses its default (or `unknown`).
 
-#### Logical OR (`or`)
+### NOT (unary)
 
-The `or` operator follows Kleene's OR truth table:
+One operand. The operand is interpreted as trinary; the result is trinary.
 
-| **OR**      | **true** | **false** | **unknown** |
-| ----------- | -------- | --------- | ----------- |
-| **true**    | `true`   | `true`    | `true`      |
-| **false**   | `true`   | `false`   | `unknown`   |
-| **unknown** | `true`   | `unknown` | `unknown`   |
+| Input     | Output   |
+| :-------- | :------- |
+| `true`    | `false`  |
+| `false`   | `true`   |
+| `unknown` | `unknown` |
 
-**Key behaviors:**
+### Kleene AND (binary)
 
-- `true or x` = `true` (true dominates)
-- `false or x` = `x` (false is the identity element)
-- `unknown or true` = `true` (true dominates)
-- `unknown or false` = `unknown` (cannot determine if either is true)
-- `unknown or unknown` = `unknown` (cannot determine)
+| AND       | true    | false   | unknown |
+| :-------- | :------ | :------ | :------ |
+| **true**  | true    | false   | unknown |
+| **false** | false   | false   | false   |
+| **unknown** | unknown | false | unknown |
 
-#### Logical NOT (`not` or `!`)
+### Kleene OR (binary)
 
-The `not` operator follows this truth table:
+| OR        | true    | false   | unknown |
+| :-------- | :------ | :------ | :------ |
+| **true**  | true    | true    | true    |
+| **false** | true    | false   | unknown |
+| **unknown** | true  | unknown | unknown |
 
-| **Input**   | **Output** |
-| ----------- | ---------- |
-| **true**    | `false`    |
-| **false**   | `true`     |
-| **unknown** | `unknown`  |
+### XOR (binary)
 
-**Key behavior:**
+XOR is defined so that exactly one of the two operands is truthy for the result to be true. When either operand is `unknown`, the result is typically `unknown` (implementation-defined). See the runtime for the exact table.
 
-- `not unknown` = `unknown` (cannot determine the opposite of unknown)
+**Returns:** Trinary. For `when` and conditionals, only `true` is truthy.
 
-### Trinary Logic Examples
+## When unknown arises
 
-#### Basic Trinary Operations
+- **Optional or missing field:** Accessing a field that is not present (e.g. on an optional shape field) may yield `unknown` or a type-specific default depending on context.
+- **Comparisons:** Equality or ordering with `unknown` often yields `unknown` (e.g. `unknown == true` → `unknown`).
+- **Logical propagation:** As in the Kleene tables, `and`/`or`/`not` propagate `unknown` instead of treating it as true or false.
+
+## Examples in Action
+
+### Propagating unknown
 
 ```sentrie
--- Unknown from undefined field access
-let value = user.nonexistent.field
-let result = value == "test"  -- unknown (operation on unknown)
-
--- AND with unknown
-let a = true
-let b = unknown
-let result1 = a and b  -- unknown
-
-let c = false
-let d = unknown
-let result2 = c and d  -- false (false dominates)
-
--- OR with unknown
-let e = true
-let f = unknown
-let result3 = e or f  -- true (true dominates)
-
-let g = false
-let h = unknown
-let result4 = g or h  -- unknown
+let a = true and unknown   -- unknown
+let b = false or unknown   -- unknown
+let c = not unknown        -- unknown
 ```
 
-#### Practical Use Cases
+### When guard and unknown
+
+If a `when` expression evaluates to `unknown` (e.g. optional field missing), the rule does not run its body; it uses its default or returns `unknown`:
 
 ```sentrie
-shape User {
-  name: string
-  email?: string
-  age?: number
-}
-
-fact user: User
-
--- Check if user has email (handles unknown gracefully)
-let has_email: trinary = user.email is defined and user.email is not empty
--- Result: true if email exists and is not empty
---         false if email is defined but empty
---         unknown if email is not defined
-
--- Age verification with unknown handling
-let can_vote: trinary = user.age is defined ? (user.age >= 18) : unknown
--- Result: true if age >= 18
---         false if age < 18
---         unknown if age is not defined
-
--- Complex logic with unknown propagation
-let is_verified: trinary = user.email is defined and
-                          user.email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
--- Result: true if email is defined and valid
---         false if email is defined but invalid
---         unknown if email is not defined
-```
-
-#### Handling Unknown in Rules
-
-```sentrie
-shape Account {
-  username: string
-  email?: string
-  verified: bool
-}
-
-fact account: Account
-
--- Rule that handles unknown gracefully
-rule can_access = default false when account.email is defined {
-  let email_valid = account.email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-  yield account.verified and email_valid
-}
-
--- If email is not defined, the 'when' clause prevents evaluation
--- If email is defined, the rule evaluates normally
-```
-
-#### Unknown Propagation
-
-```sentrie
--- Unknown propagates through operations
-let a = user.nonexistent.field  -- undefined
-let b = a + 1                   -- undefined (operation on undefined)
-let c = b > 10                  -- undefined (comparison with undefined)
-let d = c and true              -- unknown (AND with undefined)
-let e = d or false              -- unknown (OR with unknown)
-```
-
-## Non-Trinary Value Interpretation
-
-Sentrie can work with various data types, and when a value that isn't explicitly `true`, `false`, or `unknown` is used in a context that requires a `trinary` value, the system infers the `trinary` value based on the following rules:
-
-- `null` / `undefined` → `unknown`
-- Numeric primitives (`int`, `float`, `uint`, etc.) evaluate to `false` when zero, `true` otherwise.
-- `string` values are checked for textual keywords first (see table below), otherwise `true` when they are non-empty.
-- Structs, channels, functions, and any other non-`nil` value evaluate to `true`
-
-### String coercion
-
-Before falling back to the "non-empty string" rule, strings are normalized to lowercase and matched against the following keywords:
-
-| Input                                                        | Result    |
-| ------------------------------------------------------------ | --------- |
-| `"true"`, `"1"`, `"t"`                                       | `true`    |
-| `"false"`, `"0"`, `"f"`                                      | `false`   |
-| `"unknown"`, `"-1"`, `"n"`, `"nil"`, `"null"`, `"undefined"` | `unknown` |
-| Any other non-empty string                                   | `true`    |
-| Empty string (`""`)                                          | `false`   |
-
-### Collections
-
-For collections like `lists`, `maps`, `slices`, and `arrays`, truthiness depends on whether they contain elements. Empty collections are `false`; non-empty collections are `true`.
-
-## Trinary vs Boolean
-
-Sentrie does not distinguish between trinary and boolean values:
-
-- `true` (bool) → `true` (trinary)
-- `false` (bool) → `false` (trinary)
-
-:::note
-A `bool` value is a special case of a `trinary` value which can never be `unknown`.
-:::
-
-## Best Practices for Trinary Logic
-
-1. **Check for definedness before operations:**
-
-```sentrie
--- Good: Check if value is defined first
-let result = user.email is defined ? str.length(user.email) > 0 : false
-
--- Avoid: Operations on potentially undefined values
-let result = str.length(user.email) > 0  -- unknown if email is undefined
-```
-
-2. **Use `is defined` to handle unknown:**
-
-```sentrie
--- Explicitly handle unknown cases
-let can_proceed = user.age is defined and user.age >= 18
-```
-
-3. **Understand unknown propagation:**
-
-```sentrie
--- Unknown propagates through all operations
-let value = user.missing.field  -- unknown
-let result = value + 1           -- unknown
-let comparison = result > 10     -- unknown
-```
-
-4. **Use default values in rules:**
-
-```sentrie
--- Provide defaults for unknown cases
-rule can_access = default false when user.role is defined {
+rule allow = default false when user.role is defined {
   yield user.role == "admin"
 }
--- Returns false if role is not defined (unknown case)
 ```
+
+Here `user.role is defined` is false or unknown when the field is missing; the outcome is then `default false` (or `unknown` if no default).
+
+### Trinary constraints
+
+For runtime validation of trinary values (e.g. require `true` or forbid `unknown`), use [Constraints](/reference/constraints): trinary supports `@not_unknown()`, `@eq`, `@neq`, `@is_true()`, and `@is_false()`.
+
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
+
+- **Constraint:** Undefined or missing field access can yield `unknown`. Operations on `unknown` propagate according to the Kleene tables. Rule `when` and ternary use truthiness: only `true` is truthy. Elvis (`?:`) returns `unknown` as it is and falls back only for undefined or `null`.
+- **Edge case:** If a `when` evaluates to `unknown`, the rule uses its default or returns `unknown`. `not unknown` is `unknown`, so it is still non-truthy.
+- **Trinary constraints:** See [Constraints](/reference/constraints) for `@not_unknown()`, `@eq`, `@neq`, `@is_true()`, `@is_false()` on `trinary` and `boolean` types.

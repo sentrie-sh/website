@@ -1,0 +1,52 @@
+name: Link check
+
+# Builds the site and fails when an internal link or #fragment points nowhere.
+# Drafts run nothing; marking a PR ready for review runs the check.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "astro.config.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/check-links.mjs"
+      - ".github/workflows/link-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: link-check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  link-check:
+    name: Check internal links
+    if: github.event_name == 'workflow_dispatch' || !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # package-lock.json is out of sync with package.json, so `npm ci` fails;
+      # install the same way the preview workflow does.
+      - name: Install dependencies
+        run: |
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
+
+      - name: Build site
+        run: npm run build
+
+      - name: Check internal links
+        run: node scripts/check-links.mjs dist

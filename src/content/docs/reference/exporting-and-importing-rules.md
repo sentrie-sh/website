@@ -3,9 +3,8 @@ title: "Exporting and Importing Rules"
 description: "Learn how to export rules from policies and import them into other policies for code reuse and composition."
 ---
 
-# Exporting and Importing Rules
 
-Sentrie allows you to export rules from one policy and import them into another, enabling code reuse and policy composition. This guide covers how to export rules, import them, and work with attachments.
+Sentrie allows you to export rules from one policy and import them into another, enabling code reuse and policy composition. This guide focuses on patterns, best practices, and troubleshooting. For the core syntax and evaluation semantics of export/import, see [Policy Composition](/language-concepts/policy-composition).
 
 ## Why Export and Import?
 
@@ -407,10 +406,10 @@ rule canProceed = default false {
 
 ### Fact Not Found / Required Fact Missing
 
-**Error**: `required fact not found: <alias>` (or a similar invalid-invocation detail)
+**Error**: `required fact not found: <name>` (or a similar invalid-invocation detail)
 
 **Solutions:**
-- Verify the fact name in the `with` clause matches the target policy's **alias**, not its declared name
+- Verify the fact name in the `with` clause matches the target policy's **declared name**, not its `as` alias
 - Check that the fact is declared in the target policy
 - Supply the fact, or give it a default on the target policy; omitting a required fact fails the import as an error
 

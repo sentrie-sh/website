@@ -1,6 +1,6 @@
 ---
 title: Function chaining
-description: Chain calls with the `|>` pipeline operator—readable top-to-bottom flows, with rules for targets, desugaring, precedence, and memoization.
+description: Chain calls with the `|>` pipeline operator for readable top-to-bottom flows, with rules for targets, desugaring, precedence, and memoization.
 ---
 
 When nested function calls pile up, it gets harder to see the data flow. You can always expand `g(f(x))` into separate `let` bindings, but that adds noise when the intermediate names are not the point.

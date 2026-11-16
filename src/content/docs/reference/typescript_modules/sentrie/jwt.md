@@ -150,3 +150,12 @@ header.payload.signature
 - **Header** - Contains metadata about the token (algorithm, type)
 - **Payload** - Contains the claims (data)
 - **Signature** - Used to verify the token hasn't been tampered with
+
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
+
+- Decode and verify only; does not create tokens. Supported algorithms: HS256, HS384, HS512. Always verify signature before trusting payload.
+
+
+- Invalid token format, bad signature, or unsupported algorithm throws. Use verify() or decode() with secret; do not rely on getPayload() alone.

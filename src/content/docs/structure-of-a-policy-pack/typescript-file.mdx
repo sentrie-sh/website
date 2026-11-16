@@ -13,7 +13,7 @@ TypeScript files in Sentrie policy packs:
 
 - **Compile to JavaScript** - Automatically transpiled using Sentrie's built-in TypeScript compiler
 - **Module system** - Support ES6 `import`/`export` syntax
-- **Type safety** - Full TypeScript type checking and IntelliSense support
+- **Types are not checked** - Sentrie strips type annotations when it transpiles a file and does not type-check it, so `sentrie validate` accepts code with type errors. Your editor still uses the types, and you can run a separate check such as `tsc --noEmit` before you ship the pack
 - **Flexible organization** - Can be placed anywhere within the policy pack directory structure
 
 ## File Organization
@@ -81,7 +81,7 @@ namespace com/example/auth
 policy userAccess {
   fact user: User
 
-  use { calculateAge } from "@local/utils/helpers" as helpers
+  use { calculateAge } from @local/utils/helpers as helpers
 
   rule checkAccess = {
     yield helpers.calculateAge(user.birthDate) >= 18
@@ -259,7 +259,7 @@ export interface User {
 
 export function calculateAge(birthDate: string): number {
   const birth = new Date(birthDate);
-  const today = new Date(now());
+  const today = new Date(now() * 1000); // now() returns Unix seconds
   let age = today.getFullYear() - birth.getFullYear();
   const monthDiff = today.getMonth() - birth.getMonth();
 

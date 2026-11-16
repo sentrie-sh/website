@@ -473,3 +473,12 @@ policy mypolicy {
   export decision of processData
 }
 ```
+
+## Good to Know
+
+Before you implement this, keep a few boundaries in mind:
+
+- Exposes Math, String, Number, Date, JSON, Array as individual functions. Behavior matches JavaScript; angles in radians for trig.
+
+
+- Invalid input (e.g. NaN, invalid date) may produce NaN or throw per JS semantics. random() is not cryptographically secure.

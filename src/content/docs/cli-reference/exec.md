@@ -1,246 +1,117 @@
 ---
-title: "exec Command"
-description: "Execute a policy or rule with Sentrie."
+title: "sentrie exec"
+description: "Execute a policy or rule with facts; output decisions to stdout."
 ---
 
-# exec Command
+When you want to run a policy from the command line (to test a rule, debug a decision, or script a one-off check), you use `sentrie exec`. It loads a policy pack, runs the rule(s) you specify with the facts you supply, and prints the decision output. Perfect for local development and CI.
 
-The `exec` command executes a policy or rule from a policy pack. This is the primary way to test and run your policies locally.
-
-## Syntax
+Here is the basic syntax:
 
 ```bash
-sentrie exec <FQN> [OPTIONS]
+sentrie exec <TARGET> [ --pack-location <PATH> ] [ --facts <JSON> ] [ --fact-file <PATH> ] [ --output (table|json) ] [ --capabilities <PATH> ] [ --skip-engine-check ]
 ```
 
-## Description
+**TARGET** is required: `namespace/policy` or `namespace/policy/rule`. The rest are optional: pack directory, inline facts, fact file, output format, and capabilities file.
 
-The `exec` command loads a policy pack, executes a specific rule or all exported rules in a policy, and displays the results. You can provide facts (input data) via command-line flags or from a JSON file.
+## Configuration & Arguments
 
-## Arguments
+You can customize the run using the following options:
 
-### `FQN` (required)
+| Argument | Type | Required | What it does |
+| :------- | :--- | :------- | :----------- |
+| TARGET | string | Yes | `namespace/policy` (all exported rules) or `namespace/policy/rule` (single rule). Slashes separate namespace, policy, and optional rule. |
+| `--pack-location` | path | No | Directory containing the policy pack. Default: `./`. |
+| `--facts` | JSON string | No | Inline facts. Keys are the facts' declared names, not their `as` aliases. Merged over `--fact-file`; `--facts` wins. |
+| `--fact-file` | path | No | Path to JSON file; top-level object gives facts. Loaded first; `--facts` is merged over it. |
+| `--output` | enum | No | `table` or `json`. Default: `table`. |
+| `--capabilities` | path | No | [Capabilities file](/reference/capabilities) limiting the builtins and modules the pack may use. Default: allow everything. |
+| `--skip-engine-check` | bool | No | Do not check the pack's `[engine]` version constraint against this binary. Default: `false`. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional). |
 
-The Fully Qualified Name (FQN) that identifies the namespace, policy, and optionally the rule to execute.
+**Returns:** Exit 0 on success; non-zero on error. Output goes to stdout: table (human-readable) or JSON array of decision objects (namespace, policyName, ruleName, decision.state, decision.value, attachments). The `Error:` line goes to stderr. When a rule of a policy fails, `exec` still prints every rule (a failed rule has an `error` object in JSON and a line under `Errors:` in the table) and then exits 1 with `Error: <n> of <m> rules failed`.
 
-**Format:** `namespace/policy/rule` or `namespace/policy`
+---
 
-- **`namespace/policy`** - Execute all exported rules in the policy
-- **`namespace/policy/rule`** - Execute only the specific rule
+## Examples in Action
 
-**Examples:**
-- `user_management/user_access` - Execute all exported rules in the `user_access` policy
-- `user_management/user_access/allow_user` - Execute only the `allow_user` rule
-- `com/example/auth/access_control/check_permission` - Execute a specific rule in a nested namespace
+### Running a single rule or all rules with inline facts
 
-## Options
-
-### `--pack-location`
-
-Specifies the directory containing the policy pack to load.
+You are testing one rule or the whole policy and your facts are small enough to pass on the command line.
 
 ```bash
-sentrie exec user_management/user_access --pack-location ./my-policy-pack
+sentrie exec com/example/user_management/user_access/allow_user --facts '{"user":{"role":"user","status":"active"}}'
 ```
-
-**Default:** `./` (current directory)
-
-**Examples:**
-- `--pack-location ./policies` - Load policies from `./policies` directory
-- `--pack-location /path/to/policy-pack` - Load policies from absolute path
-
-### `--output`
-
-Specifies the output format for the results.
 
 ```bash
-sentrie exec user_management/user_access --output json
+sentrie exec com/example/user_management/user_access --facts '{"user":{"role":"admin","status":"active"}}'
 ```
 
-**Default:** `table`
+### Overriding a fact file from the command line and getting JSON
 
-**Valid values:**
-- `table` - Human-readable table format (default)
-- `json` - JSON format for programmatic consumption
-
-**Table Format Example:**
-```
-Namespace: user_management
-Policy:    user_access
-
-Rules:
-  ✓ allow_admin: ✓ True
-  ✓ allow_user: ✓ True
-
-Values:
-  ✓ allow_admin: true
-  ✓ allow_user: true
-
-Attachments:
-  ✓ allow_user:
-     reason: User has admin role
-```
-
-**JSON Format Example:**
-```json
-[
-  {
-    "namespace": "user_management",
-    "policyName": "user_access",
-    "ruleName": "allow_admin",
-    "decision": {
-      "state": "TRUE",
-      "value": true
-    },
-    "attachments": {}
-  },
-  {
-    "namespace": "user_management",
-    "policyName": "user_access",
-    "ruleName": "allow_user",
-    "decision": {
-      "state": "TRUE",
-      "value": true
-    },
-    "attachments": {
-      "reason": "User has admin role"
-    }
-  }
-]
-```
-
-### `--fact-file`
-
-Specifies a JSON file containing facts to use for policy execution.
+You have a base fact file but want to override a few keys (e.g. role) for a quick test and pipe the result to another tool.
 
 ```bash
-sentrie exec user_management/user_access --fact-file ./facts.json
-```
-
-**Default:** (empty - no file)
-
-**File Format:**
-The file must contain valid JSON with a top-level object:
-
-```json
-{
-  "user": {
-    "role": "admin",
-    "status": "active"
-  },
-  "context": {
-    "environment": "production"
-  }
-}
-```
-
-**Note:** Facts from `--fact-file` are loaded first, then facts from `--facts` flag override any conflicting keys.
-
-### `--facts`
-
-Provides facts directly as a JSON string.
-
-```bash
-sentrie exec user_management/user_access --facts '{"user":{"role":"admin","status":"active"}}'
-```
-
-**Default:** `{}` (empty object)
-
-**Fact Merging:**
-If both `--fact-file` and `--facts` are provided, the facts from `--facts` will override any conflicting keys from the file. This allows you to use a base fact file and override specific values on the command line.
-
-**Example:**
-```bash
-# facts.json contains: {"user": {"role": "user", "status": "active"}}
-# Command line overrides the role
-sentrie exec user_management/user_access \
-  --fact-file ./facts.json \
-  --facts '{"user":{"role":"admin"}}'
-# Result: user.role = "admin", user.status = "active"
-```
-
-## Examples
-
-### Execute a specific rule with inline facts
-
-```bash
-sentrie exec user_management/user_access/allow_user \
-  --facts '{"user":{"role":"admin","status":"active"}}'
-```
-
-### Execute all exported rules in a policy
-
-```bash
-sentrie exec user_management/user_access \
-  --facts '{"user":{"role":"admin","status":"active"}}'
-```
-
-### Execute with facts from a file
-
-```bash
-sentrie exec user_management/user_access \
-  --fact-file ./user-facts.json
-```
-
-### Execute with facts from file and override specific values
-
-```bash
-sentrie exec user_management/user_access \
+sentrie exec com/example/user_management/user_access \
   --fact-file ./base-facts.json \
+  --facts '{"user":{"role":"admin"}}' \
+  --output json
+```
+
+### Merging a fact file and inline facts
+
+Facts are merged deeply. With `base-facts.json`:
+
+```json
+{"user": {"id": "1", "role": "user"}, "level": 5}
+```
+
+this command keeps `user.id` and `level` from the file and takes `user.role` from the command line:
+
+```bash
+sentrie exec docs/facts/access --fact-file ./base-facts.json --facts '{"user":{"role":"admin"}}'
+```
+
+A list is not merged: `--facts '{"tags":["b"]}'` over a file with `"tags":["a"]` gives `["b"]`.
+
+### Running from a different pack directory and piping JSON
+
+Your policy pack lives in another directory and you want JSON output for scripting.
+
+```bash
+sentrie exec com/example/auth/access/allow --pack-location ./policy-pack --facts '{"user":{"role":"admin"}}' --output json
+```
+
+### Passing large integer IDs in facts
+
+Integers that fit in 64 bits are read exactly, in `--facts` and in `--fact-file`, so a large ID keeps every digit.
+
+```bash
+sentrie exec docs/ids/accounts/echo \
+  --facts '{"id": 9007199254740993, "other": 9007199254740992}'
+```
+
+### Running under a capabilities file
+
+You run packs you did not write and want to limit what they may call. Pass a [capabilities file](/reference/capabilities) that grants only the builtins and modules you allow:
+
+```bash
+sentrie exec com/example/auth/access/allow --capabilities ./capabilities.json \
   --facts '{"user":{"role":"admin"}}'
 ```
 
-### Execute and output as JSON
+If the pack uses anything the file does not grant, nothing is evaluated and `exec` exits 1 with an error naming the source location:
 
-```bash
-sentrie exec user_management/user_access \
-  --facts '{"user":{"role":"admin"}}' \
-  --output json
+```text
+Error: policy.sentrie:16:11-16: builtin "count": not granted by the capabilities file
 ```
 
-### Execute from a different pack location
+---
 
-```bash
-sentrie exec com/example/auth/access_control/check_permission \
-  --pack-location ./policy-pack \
-  --fact-file ./user-facts.json \
-  --output json
-```
+## Good to Know
 
-### Pipe JSON output to another tool
+Before you rely on this in scripts or CI, keep a few boundaries in mind:
 
-```bash
-sentrie exec user_management/user_access \
-  --facts '{"user":{"role":"admin"}}' \
-  --output json | jq '.[0].decision.value'
-```
-
-## Decision States
-
-The command output includes decision states:
-
-- **`TRUE`** (✓ True) - The rule evaluated to true
-- **`FALSE`** (⨯ False) - The rule evaluated to false
-- **`UNKNOWN`** (• Unknown) - The rule evaluated to unknown (e.g., when `when` condition is false and no default is provided)
-
-## Error Handling
-
-If the command encounters errors:
-
-- **Invalid FQN**: Returns an error if the namespace, policy, or rule is not found
-- **Invalid facts**: Returns an error if facts don't match expected types or shapes
-- **Policy errors**: Returns an error if policy evaluation fails
-- **File errors**: Returns an error if `--fact-file` cannot be read or parsed
-
-## Output Destination
-
-All output is written to **stdout**, making it easy to:
-- Pipe results to other commands
-- Redirect to files
-- Process programmatically (with JSON output)
-
-## See Also
-
-- [Executing Policies](/running-sentrie/executing-policies) - Detailed guide on executing policies
-- [CLI Reference](/cli-reference) - Complete CLI documentation
-- [Policy Language Reference](/reference) - Learn about writing policies
+- **Constraint:** Required facts must be present (in `--facts` and/or `--fact-file`). Optional facts may be omitted if they have defaults. Keys must be the declared fact names: for `fact user: User as u`, pass `user`, not `u` (a change from earlier versions, which keyed facts by alias). Types must satisfy declared shapes; a wrongly typed fact fails the run before any rule is evaluated. Facts from `--fact-file` are loaded first and `--facts` is **deep-merged** over them: objects are merged key by key, `--facts` wins on a conflict, and lists and other values are replaced whole. Table output lists namespace, policy, rules, values, attachments; JSON is an array of decision objects. Decision states are `true`, `false` or `unknown` in JSON, shown as `True`, `False` or `Unknown` in the table.
+- **Constraint:** The pack's `[engine]` version constraint is checked against the running binary before anything runs. A mismatch is an error ending `(use --skip-engine-check to load it anyway)`; a dev or unversioned build passes with a warning. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional).
+- **Edge case:** Invalid or missing TARGET (unknown namespace/policy/rule) → error; rule must be exported. Missing required fact → evaluation error. A wrongly typed `with` fact that an import passes to another policy fails `exec` with the same error as a wrongly typed caller fact (`imported policy ns/target: fact 'n': value x is not a number: invalid invocation`), with no per-rule output, and so does a required `with` fact the import leaves out (`imported policy ns/target: required fact not found: n`). Other failures inside the imported rule stay per-rule errors. A rule that fails while the policy runs does not stop the others: all rules are printed, then the command exits 1 with `<n> of <m> rules failed` (see [Executing Policies](/running-sentrie/executing-policies#when-a-rule-fails)). The order of the rules in the output is not guaranteed. Invalid JSON in `--facts` or `--fact-file` → error. `--fact-file` path must exist and be readable. Pack directory must contain loadable `*.sentrie`. For the full HTTP API, see [Running as a Service](/deployment-operations/running-as-service).
+- **Lambdas in output:** A lambda nested in a rule's value, an attachment or the trace is encoded as `{"kind":"callable"}` in JSON output and printed as `<callable>` in the table. A rule whose whole value is a lambda is that rule's error (`rule <path>: a rule's value cannot be a callable`): `exec` prints it and exits 1, also when you run the whole policy. Any other failure to encode `--output json` is reported as an error and exits non-zero. See [Lambdas in decision output](/reference#lambdas-in-decision-output).
+- **Large integers:** Integers that fit in 64 bits are read exactly, so a large ID keeps every digit. A number outside the float range, such as `1e400`, fails with `facts: number 1e400 is out of range` (`fact file: ...` for `--fact-file`). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).

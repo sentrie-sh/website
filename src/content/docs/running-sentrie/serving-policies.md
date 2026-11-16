@@ -7,22 +7,34 @@ description: "How to serve policies with Sentrie via HTTP API."
 
 Policies can be served via an HTTP API using the `sentrie serve` command. This allows you to evaluate policies and rules over HTTP, making Sentrie policies accessible to other services and applications.
 
-## Starting the Server
+At a high level:
 
-The `sentrie serve` command starts an HTTP server that exposes your policy pack for evaluation:
+- **You run** `sentrie serve` to load a policy pack and start an HTTP server.
+- **Callers send** JSON facts to the `/decision/{namespace}/{policy}[/{rule}]` endpoint.
+- **Sentrie returns** decisions and attachments; your system enforces based on those decisions.
 
-```bash
-sentrie serve <policy-pack>
-```
+## Where to find full details
 
-### Command Options
+This page is a conceptual overview. For the complete HTTP API reference, including flags, endpoints, request/response schema, and error formats, see:
+
+- [CLI Reference: `sentrie serve`](/cli-reference/serve)
+- [Deployment & Operations: Running as a Service](/deployment-operations/running-as-service)
+
+The following sections summarize default flags and typical API usage.
 
 - `--http-port` (default: `7529`): Port number to listen on
 - `--pack-location` (default: `./`): Directory containing the policy pack to serve
-- `--http-listen` (default: `["local"]`): Address(es) to listen on. Can be specified multiple times. Accepts:
-  - `local` - Listen on localhost (127.0.0.1)
-  - `all` - Listen on all interfaces (0.0.0.0)
-  - Comma-separated list of specific IP addresses or hostnames
+- `--http-listen` (default: `["local"]`): Address(es) to listen on. Can be specified multiple times. Accepts one of the predefined values below, or one or more comma-separated IP addresses or hostnames:
+  - `local` - Listen on `localhost`
+  - `local4` - Listen on the IPv4 loopback address (127.0.0.1)
+  - `local6` - Listen on the IPv6 loopback address (`::1`)
+  - `network` - Listen on all network interfaces, IPv4 and IPv6
+  - `network4` - Listen on `0.0.0.0`
+  - `network6` - Listen on `::`
+
+  A predefined value must be the only `--http-listen` value. `local6` binds `[::1]:<port>` and `network6` binds `[::]:<port>`. On dual-stack hosts either wildcard also accepts the other address family, same as `network`. If an address cannot be bound, the port is invalid, or an address is empty (`--http-listen=`), `serve` exits with `invalid or unusable --http-listen/--http-port: <cause>`.
+
+- `--http-max-body-bytes` (default: `1048576`): Largest request body to accept, in bytes. A plain integer; `0` removes the limit and a negative value is rejected at startup. A request over the limit is answered with `413`.
 
 ### Examples
 
@@ -34,13 +46,16 @@ sentrie serve .
 sentrie serve --http-port 8080 /path/to/policy-pack
 
 # Listen on all interfaces
-sentrie serve --http-listen all --http-port 8080 .
+sentrie serve --http-listen network --http-port 8080 .
 
-# Listen on localhost only
+# Listen on localhost only (the default)
 sentrie serve --http-listen local --http-port 8080 .
 
 # Listen on multiple interfaces
 sentrie serve --http-listen 192.168.1.100,192.168.100.101 --http-port 8080 .
+
+# Listen on the IPv6 loopback address only
+sentrie serve --http-listen local6 --http-port 8080 .
 ```
 
 ## API Endpoints
@@ -49,16 +64,135 @@ sentrie serve --http-listen 192.168.1.100,192.168.100.101 --http-port 8080 .
 
 **GET** `/health`
 
-Returns the health status of the server.
+A liveness probe. It answers `200 OK` whenever the server can handle a request, and does not inspect the pack, the index or the executor.
 
 **Response:**
 
 ```json
 {
+  "check_id": "DGCLX53IVFPHMGJKCA65FXONN5",
   "status": "healthy",
-  "time": "2024-01-15T10:30:00Z"
+  "time": "2026-10-31T09:15:57Z"
 }
 ```
+
+- `check_id`: A fresh random value on every call, so a caller can tell a live answer from a cached one.
+- `status`: Always `healthy`.
+- `time`: The server time in RFC 3339 format (UTC).
+
+### Deep Health Check
+
+**GET** `/health/deep`
+
+A readiness probe. It checks the components the server depends on and reports a status for each one.
+
+| Component    | What it reports                                                                                                              |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `index`      | Whether the pack was validated and committed, any failure, and the number of namespaces, policies, programs, rules and shapes |
+| `executor`   | Whether the executor was initialized                                                                                         |
+| `js_runtime` | Whether the JavaScript registry was initialized and which built-in `@sentrie/*` modules are registered                       |
+| `pack`       | The pack `name` and `version`, and whether the pack directory can still be read                                              |
+
+The top-level `status` is `healthy` when every component is healthy and `unhealthy` otherwise. The HTTP status code follows it: `200 OK` when healthy, `503 Service Unavailable` when any component is unhealthy. Each unhealthy component also adds an entry to `errors`, which is an empty array when everything is healthy.
+
+**Healthy response (200):**
+
+```json
+{
+  "status": "healthy",
+  "time": "2026-10-31T09:15:57Z",
+  "components": {
+    "index": {
+      "status": "healthy",
+      "validated": true,
+      "committed": true,
+      "validation_error": null,
+      "commit_error": null,
+      "statistics": {
+        "namespaces": 1,
+        "policies": 1,
+        "programs": 1,
+        "rules": 1,
+        "shapes": 0
+      }
+    },
+    "executor": {
+      "status": "healthy",
+      "initialized": true
+    },
+    "js_runtime": {
+      "status": "healthy",
+      "registry_initialized": true,
+      "builtin_modules": {
+        "registered": 15,
+        "modules": ["@sentrie/collection", "@sentrie/crypto", "@sentrie/encoding", "@sentrie/hash", "@sentrie/js", "@sentrie/json", "@sentrie/jwt", "@sentrie/math", "@sentrie/net", "@sentrie/regex", "@sentrie/semver", "@sentrie/string", "@sentrie/time", "@sentrie/url", "@sentrie/uuid"]
+      }
+    },
+    "pack": {
+      "status": "healthy",
+      "loaded": true,
+      "name": "example-pack",
+      "version": "1.2.3",
+      "accessible": true
+    }
+  },
+  "errors": []
+}
+```
+
+**Unhealthy response (503):**
+
+This is the response when the pack directory is removed while the server is running. The `index`, `executor` and `js_runtime` components are the same as above and are left out here.
+
+```json
+{
+  "status": "unhealthy",
+  "time": "2026-10-31T09:16:05Z",
+  "components": {
+    "pack": {
+      "status": "unhealthy",
+      "loaded": true,
+      "name": "example-pack",
+      "version": "1.2.3",
+      "accessible": false,
+      "error": "pack directory is not accessible"
+    }
+  },
+  "errors": [
+    {
+      "component": "pack",
+      "message": "pack directory is not accessible"
+    }
+  ]
+}
+```
+
+Notes on both endpoints:
+
+- Only `GET` (and `HEAD`) is accepted. Other methods return `405 Method Not Allowed`.
+- Responses carry `Cache-Control: no-store`.
+- Like the rest of the server, they are unauthenticated.
+- When the index fails validation or commit, the response contains only a fixed message (`index validation failed` or `index commit failed`). The details are written to the server's debug log, and the response never includes a filesystem path.
+- The checks read the server's live state. They never validate or commit the index themselves.
+
+Because `/health` does not depend on the pack and `/health/deep` returns `503` when a component is unhealthy, they map onto container probes. For example, in Kubernetes:
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 7529
+readinessProbe:
+  httpGet:
+    path: /health/deep
+    port: 7529
+```
+
+Start the server with `--http-listen network` (or `network4`) so the probes can reach it from outside the container.
+
+:::caution
+The API has no authentication (see [sentrie-sh/sentrie#115](https://github.com/sentrie-sh/sentrie/issues/115)). Keep it behind a cluster-internal Service or a NetworkPolicy, and never expose it publicly.
+:::
 
 ### Decision Evaluation
 
@@ -101,6 +235,12 @@ The `{target...}` parameter is the full path after `/decision/`:
 }
 ```
 
+Each key in `facts` is a fact's **declared name**, the name written after `fact`, not its `as` alias. For `fact user: User as u`, send `user`; `u` is only the local name inside the policy. This is a breaking change from earlier versions, which keyed facts by alias, and there is no fallback: a request that sends `u` gets a `400` with `required fact not found: user`. A fact of the wrong type, such as a string for a `number`, also gets a `400` (`fact 'level': value x is not a number: invalid invocation`); it is the caller's mistake, so it is not reported per rule. See [Facts](/reference/facts).
+
+Integers in `facts` that fit in 64 bits are read exactly, so an ID such as `9007199254740993` is evaluated, compared and returned with every digit. A number outside the float range, such as `1e400`, is rejected with a `400` problem response ("Invalid JSON"). See [Large Integers in Facts](/reference/arithmetic-operations#large-integers-in-facts).
+
+A request body may be at most 1 MiB unless the server was started with a different `--http-max-body-bytes`. A larger body is answered with `413` and a [problem response](#error-responses) titled "Request Body Too Large" without evaluating anything.
+
 **Query Parameters:**
 
 - Query parameters are parsed and passed as run configuration (currently parsed but not used in execution)
@@ -115,7 +255,7 @@ The `{target...}` parameter is the full path after `/decision/`:
       "namespace": "com/example/auth",
       "rule": "isAdmin",
       "decision": {
-        "state": "TRUE",
+        "state": "true",
         "value": true
       },
       "attachments": {
@@ -127,7 +267,7 @@ The `{target...}` parameter is the full path after `/decision/`:
 }
 ```
 
-A successful evaluation is HTTP **200** with a `decisions` array and **no** `error` field. Failures do not return 200 with an error string - they use [Problem Details](#error-responses) below.
+A policy request in which every rule evaluated is HTTP **200** with a `decisions` array. If any rule failed, the response is **207 Multi-Status** instead; see [When a Rule Fails](#when-a-rule-fails) below. Request errors do not return 200 with an error string - they use [Problem Details](#error-responses) below.
 
 **Response Fields:**
 
@@ -136,18 +276,19 @@ A successful evaluation is HTTP **200** with a `decisions` array and **no** `err
   - `namespace`: The namespace (string)
   - `rule`: The rule name (string)
   - `decision`: The decision result object containing:
-    - `state`: The decision state as a string: `"TRUE"`, `"FALSE"`, or `"UNKNOWN"`
+    - `state`: The decision state as a string: `"true"`, `"false"`, or `"unknown"`
     - `value`: The actual value of the decision (any JSON-serializable type)
-  - `attachments`: Any attachments exported by the rule (dict of string to any)
+  - `attachments`: Any attachments exported by the rule (dict of string to any); `null` when the rule failed
   - `trace`: Execution trace information (object, optional)
+  - `error`: Present only when this rule failed; see [When a Rule Fails](#when-a-rule-fails)
 
 **Decision States:**
 
 The `state` field in the decision object can be one of:
 
-- `"TRUE"`: The rule evaluated to true
-- `"FALSE"`: The rule evaluated to false
-- `"UNKNOWN"`: The rule evaluated to unknown (e.g., when `when` condition is false and no default is provided)
+- `"true"`: The rule evaluated to true
+- `"false"`: The rule evaluated to false
+- `"unknown"`: The rule evaluated to unknown (e.g., when `when` condition is false and no default is provided)
 
 **Example Requests:**
 
@@ -177,6 +318,55 @@ curl -X POST http://localhost:7529/decision/com/example/auth/user \
   }'
 ```
 
+### When a Rule Fails
+
+A rule can fail while it is evaluated (a division by zero, a value of the wrong type, an exceeded deadline). On a request for a whole policy, the failure is reported for that rule only and the other rules are still evaluated:
+
+- The response is **207 Multi-Status** when any rule failed, including when every rule failed, and **200 OK** otherwise.
+- The body is the same `{"decisions": [...]}`, with one entry per exported rule. A failed rule has an `unknown` decision, `null` attachments (even when only an attachment failed) and an `error` object; a rule that succeeded has no `error` field.
+- A failed rule's `trace` shows where it failed in its `err` fields, but it can keep values computed before the failure. Read `decision` and `error`, not the trace.
+- `error.status` is the HTTP status that failure would have had on its own: `400` for an invalid invocation, `503` for a deadline, `500` otherwise.
+
+```json
+{
+  "decisions": [
+    {
+      "policy": "access",
+      "namespace": "docs/checks",
+      "rule": "ratio",
+      "decision": { "state": "unknown", "value": "unknown" },
+      "attachments": null,
+      "trace": { ... },
+      "error": {
+        "title": "Evaluation Failed",
+        "status": 500,
+        "detail": "divide by zero"
+      }
+    },
+    {
+      "policy": "access",
+      "namespace": "docs/checks",
+      "rule": "is_admin",
+      "decision": { "state": "true", "value": true },
+      "attachments": {},
+      "trace": { ... }
+    }
+  ]
+}
+```
+
+Treat `207` as a success of the request that contains failures: read each decision, and check its `error` before you trust its `decision`.
+
+Three things are not per-rule errors and answer with a [Problem Details](#error-responses) document:
+
+- A fact error: a required fact is missing, a supplied fact has the wrong type, or an imported policy gets a wrongly typed or missing `with` fact (`400`).
+- A request for a single rule (`/decision/{namespace}/{policy}/{rule}`) whose rule fails. The status follows the failure (`400`, `503` or `500`).
+- A policy that cannot be resolved (`404`).
+
+:::note
+The order of the entries in `decisions` is not guaranteed and can differ between requests. Match results by `namespace`, `policy` and `rule`, not by position.
+:::
+
 ## Error Responses
 
 The API uses RFC 9457 Problem Details format for error responses.
@@ -201,11 +391,15 @@ Additional fields may be included in the `ext` object (shown as top-level fields
 
 **Common HTTP Status Codes:**
 
-- `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` only.
-- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact (`InvalidInvocation`)
+- `200 OK`: Evaluation succeeded. Body is `{"decisions": [...]}` and no rule has an `error`.
+- `207 Multi-Status`: A policy request in which at least one rule failed. Body is `{"decisions": [...]}`; see [When a Rule Fails](#when-a-rule-fails). This is not a Problem Details response.
+- `400 Bad Request`: Invalid request - malformed JSON, missing path, or a **caller** evaluation problem such as a missing required fact or a supplied fact of the wrong type (`InvalidInvocation`). This includes a wrongly typed or missing `with` fact that an imported policy receives from the importing policy: the whole request fails with one `400` and no decisions, and the message names the imported policy
 - `404 Not Found`: Policy, namespace, or rule not found
 - `405 Method Not Allowed`: HTTP method not supported (only POST is allowed for the decision endpoint)
-- `500 Internal Server Error`: Evaluation failed for an internal reason
+- `413 Request Entity Too Large`: The request body is larger than the server's `--http-max-body-bytes` limit (1 MiB by default). The problem document has the title `Request Body Too Large` and its `detail` names the limit in bytes
+- `500 Internal Server Error`: Evaluation failed for an internal reason (on a single-rule request)
+
+A `500` also covers two output problems. A rule whose whole value is a lambda fails with `Evaluation Failed` and the detail `rule <namespace>/<policy>/<rule>: a rule's value cannot be a callable`. Any other failure to encode the response body as JSON returns a `500` problem document too; the server never sends a half-written `200`. A lambda nested inside a value, an attachment or the trace is not an error: it is encoded as `{"kind":"callable"}`. See [Lambdas in decision output](/reference#lambdas-in-decision-output).
 
 A failed single-rule evaluation does not include a `null` entry in `decisions`; the handler returns Problem Details instead.
 
@@ -236,6 +430,6 @@ Please refer to the latest codebase for the most current implementation details.
 
 1. **Use Specific Rules**: When possible, evaluate specific rules rather than entire policies for better performance and clearer results
 2. **Validate Facts**: Ensure facts match the expected types and shapes defined in your policies
-3. **Handle Errors**: Treat non-200 responses as failures and parse the Problem Details body. A 200 response has no `error` field.
-4. **Use Health Checks**: Monitor the `/health` endpoint to ensure the server is running
+3. **Handle Errors**: Parse the Problem Details body of a 4xx or 5xx response. Accept both 200 and 207 for a policy request, and check each decision's `error` field on a 207.
+4. **Use Health Checks**: Monitor `/health` to ensure the server is running, and `/health/deep` to ensure it is ready to evaluate policies
 5. **Secure Connections**: In production, use HTTPS and implement proper authentication/authorization

@@ -1,40 +1,41 @@
 ---
 title: "@sentrie/uuid"
-description: UUID generation
+description: UUID generation (v4, v6, v7).
 ---
 
-The `@sentrie/uuid` module provides functions for generating UUIDs (Universally Unique Identifiers).
 
-## Usage
+Generates UUIDs. v4: random; v6/v7: time-ordered. Use when you need unique identifiers or time-ordered IDs for indexing.
 
-```text
-use { v4, v6, v7 } from @sentrie/uuid
-```
-
-## Functions
-
-### `v4(): string`
-
-Generates a version 4 UUID (random UUID). Version 4 UUIDs are randomly generated and provide strong uniqueness guarantees.
-
-**Returns:** A UUID string in standard format (e.g., `"550e8400-e29b-41d4-a716-446655440000"`)
-
-**Example:**
+## Syntax
 
 ```text
-use { v4 } from @sentrie/uuid
-let uuid = uuid.v4()  // "550e8400-e29b-41d4-a716-446655440000"
+use { v4, v6, v7 } from @sentrie/uuid [ as alias ]
+alias.v4()
+alias.v6()
+alias.v7()
 ```
 
-### `v6(): string`
+## Configuration & Arguments
 
-Generates a version 6 UUID (time-ordered UUID). Version 6 UUIDs are time-ordered and provide better database indexing performance.
+| Function | Parameters | Required | Description                                        |
+| :------- | :--------- | :------- | :------------------------------------------------- |
+| `v4()`   | none       | -        | Random UUID (version 4).                           |
+| `v6()`   | none       | -        | Time-ordered UUID (version 6).                     |
+| `v7()`   | none       | -        | Time-ordered UUID with Unix timestamp (version 7). |
 
-**Returns:** A UUID string in standard format (e.g., `"1b21dd213814000-8000-6000-0000-000000000000"`)
+**Returns:** `string` - UUID in form `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. Throws on generation failure.
 
-**Throws:** Error if UUID generation fails
+## Examples in Action
 
-**Example:**
+### Typical use
+
+```text
+use { v4, v7 } from @sentrie/uuid
+let id = uuid.v4()
+let timeId = uuid.v7()
+```
+
+### Going further
 
 ```text
 use { v6 } from @sentrie/uuid
@@ -96,40 +97,11 @@ policy mypolicy {
 }
 ```
 
-## When to Use Each Version
+## Good to Know
 
-### Use Version 4 (v4) when:
+Before you implement this, keep a few boundaries in mind:
 
-- You need general-purpose unique identifiers
-- Ordering doesn't matter
-- You want maximum randomness
+- v4: random; no ordering. v6/v7: time-ordered for better DB indexing/sorting. v7 includes Unix timestamp.
 
-### Use Version 6 (v6) when:
 
-- You need time-ordered UUIDs
-- Database indexing performance is important
-- You want UUIDs that are roughly ordered by creation time
-
-### Use Version 7 (v7) when:
-
-- You need time-ordered UUIDs with Unix timestamp
-- Sorting by creation time is important
-- You want the best database indexing performance
-- You need to extract timestamp information from the UUID
-
-## UUID Format
-
-All UUID versions follow the standard format:
-
-```
-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-```
-
-Where each `x` is a hexadecimal digit (0-9, a-f).
-
-## Security Considerations
-
-- UUIDs are not cryptographically secure random numbers
-- For security-sensitive applications, use proper cryptographic random number generators
-- UUIDs are designed for uniqueness, not security
-- Version 4 UUIDs provide good randomness but are not suitable for cryptographic purposes
+- UUIDs are not cryptographically secure; use proper CSPRNG for security-sensitive randomness. Generation failure throws.

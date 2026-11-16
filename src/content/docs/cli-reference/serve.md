@@ -1,36 +1,45 @@
 ---
-title: "serve Command"
-description: "Start the Sentrie HTTP server to evaluate policies."
+title: "sentrie serve"
+description: "Start the HTTP server for policy evaluation; load pack from a directory."
 ---
 
-# serve Command
+When you need to evaluate policies over HTTP (e.g. from a backend or API gateway), you run `sentrie serve`. It loads a policy pack from a directory and exposes a REST API so callers can POST facts and get decisions. Use it for local development or as the process behind a reverse proxy in production.
 
-The `serve` command starts the Sentrie HTTP server to evaluate policies.
-
-## Syntax
+Here is the basic syntax:
 
 ```bash
-sentrie serve [OPTIONS]
+sentrie serve [--pack-location <PATH>] [--http-port <INT>] [--http-listen <ADDR> ...] [--http-max-body-bytes <INT>] [--capabilities <PATH>]
 ```
 
-## Description
+All options are optional: pack directory defaults to the current directory, port to `7529`, listen address to localhost (`--http-listen local`), the request body limit to 1 MiB, and capabilities to allow everything.
 
-The `serve` command starts an HTTP server that provides a REST API for evaluating Sentrie policies. The server loads policy files from a specified directory, creates an index of available policies and rules, and starts listening for HTTP requests.
+## Configuration & Arguments
 
-## Options
+You can customize where the pack is loaded from and how the server listens using the following options:
 
 | Option            | Type     | Default     | Description                       |
 | ----------------- | -------- | ----------- | --------------------------------- |
 | `--http-port`     | int      | `7529`      | Port to listen on                 |
 | `--pack-location` | string   | `./`        | Directory containing policy files |
 | `--http-listen`   | []string | `["local"]` | Address(es) to listen on          |
+| `--http-max-body-bytes` | int | `1048576` | Largest request body to accept, in bytes; `0` means no limit |
+| `--capabilities` | path | -  | [Capabilities file](/reference/capabilities) limiting the builtins and modules the pack may use; default: allow everything |
+| `--skip-engine-check` | bool | `false`  | Do not check the pack's `[engine]` version constraint against this binary |
+
+**Returns:** Process runs until SIGINT/SIGTERM (graceful shutdown). Exit non-zero on startup failure (e.g. port in use, pack load or parse error). HTTP API base: `http://<listen>:<port>`; see [Running as a Service](/deployment-operations/running-as-service) for request/response format.
 
 ### --http-port
 
-Specifies the port number for the HTTP server to listen on.
+---
+
+## Examples in Action
+
+### Starting the server with defaults
+
+You want to run the server on localhost with the current directory as the pack and default port.
 
 ```bash
-sentrie serve --http-port 8080
+sentrie serve
 ```
 
 **Default**: `7529` (PLCY on a phone keypad)
@@ -78,7 +87,71 @@ sentrie serve --http-listen 0.0.0.0 --http-listen 127.0.0.1
 - `--http-listen 127.0.0.1` - Listen on localhost
 - `--http-listen 192.168.1.100` - Listen on specific IP
 
+**Predefined values**: `local`, `local4`, `local6`, `network`, `network4` and `network6` are shorthands for common addresses. A predefined value must be the only `--http-listen` value.
+
+| Value      | Binds                                    |
+| ---------- | ---------------------------------------- |
+| `local`    | `localhost:<port>`                       |
+| `local4`   | `127.0.0.1:<port>`                       |
+| `local6`   | `[::1]:<port>` (IPv6 loopback)           |
+| `network`  | all interfaces, IPv4 and IPv6            |
+| `network4` | `0.0.0.0:<port>`                         |
+| `network6` | `[::]:<port>`                            |
+
+On dual-stack hosts, either wildcard (`0.0.0.0` or `[::]`) also accepts connections from the other address family, the same as `network`; `network4` and `network6` do not restrict the family.
+
+```bash
+# IPv6 loopback only; reachable at http://[::1]:8080
+sentrie serve --http-listen local6 --http-port 8080 .
+```
+
+To listen on a literal IPv6 address, pass it without brackets (for example `--http-listen ::1`); Sentrie adds the brackets when it joins the address and port.
+
+**Errors**: If a listen address cannot be bound (for example the port is already in use) or the port is invalid, `serve` exits non-zero with `invalid or unusable --http-listen/--http-port: <cause>`. An empty address, such as `--http-listen=`, is rejected the same way, with `invalid or unusable --http-listen/--http-port: listen address must not be empty; use network to listen on all interfaces`; it never binds every interface by accident.
+
+> `local6` and `network6` previously produced a malformed `[[::1]]` and `[[::]]` address and failed to bind. They now work as documented. This is a bug fix, not a behaviour change for working setups.
+
 **Security Note**: Listening on `0.0.0.0` makes the server accessible from any network interface. Use with caution in production environments.
+
+### --http-max-body-bytes
+
+Sets the largest request body, in bytes, that the server accepts. A request with a larger body is answered with `413 Request Entity Too Large` and a [problem document](#request-body-too-large) before any facts are evaluated.
+
+```bash
+sentrie serve --http-max-body-bytes 4194304
+```
+
+**Default**: `1048576` (1 MiB)
+
+**Examples**:
+
+- `--http-max-body-bytes 65536` - Accept bodies up to 64 KiB
+- `--http-max-body-bytes 4194304` - Accept bodies up to 4 MiB
+- `--http-max-body-bytes 0` - Remove the limit
+
+**Requirements**:
+
+- The value is a plain integer number of bytes; suffixes such as `MiB` are not accepted.
+- `0` disables the limit. Use it only behind a proxy that enforces its own limit, because an unlimited body lets any caller make the server read as much as it is sent.
+- A negative value is rejected at startup: `invalid --http-max-body-bytes -1: must not be negative; use 0 for no limit`.
+
+### --capabilities
+
+Path to a [capabilities file](/reference/capabilities) that limits the builtins and `@sentrie/*` modules the pack may use, and whether it may load its own TypeScript files.
+
+```bash
+sentrie serve --pack-location ./policies --capabilities ./capabilities.json
+```
+
+**Default**: none (everything is allowed)
+
+The whole pack is checked against the file before the server starts listening. If the pack uses anything the file does not grant, including an `import` inside its own TypeScript, `serve` does not start, and the error names the source location:
+
+```text
+Error: policy.sentrie:4:3-41: module "@sentrie/time": not granted by the capabilities file
+```
+
+An invalid capabilities file also stops `serve` from starting.
 
 ## Environment Variables
 
@@ -105,41 +178,45 @@ sentrie serve --http-port 8080
 sentrie serve --pack-location ./my-policies
 ```
 
-### Production Configuration
+### Using a custom port and pack path
+
+You are developing with policies in a separate folder and want the server on a different port.
 
 ```bash
+sentrie serve --http-port 8080 --pack-location ./my-policies
+
 # Production setup with environment variables
 export SENTRIE_LOG_LEVEL=WARN
 export SENTRIE_PORT=8080
 sentrie serve --pack-location /etc/sentrie/policies --http-listen 0.0.0.0
 ```
 
-### Development Setup
+### Binding to all interfaces for production-style access
+
+You are running behind a reverse proxy or need the server reachable from other machines; you point it at a fixed pack path and listen on all interfaces.
 
 ```bash
-# Development setup with debug logging
-sentrie serve --debug --log-level DEBUG --pack-location ./policies
+sentrie serve --pack-location /etc/sentrie/policies --http-listen 0.0.0.0 --http-port 8080
 ```
 
-### Multiple Listen Addresses
+### Listening on multiple addresses with debug logging
+
+You want the server on specific IPs and more verbose logs for troubleshooting.
 
 ```bash
-# Listen on multiple addresses
-sentrie serve --http-listen 127.0.0.1 --http-listen 192.168.1.100 --http-port 8080
+# Listen on multiple addresses with debug logging
+sentrie serve --http-listen 127.0.0.1 --http-listen 192.168.1.100 --http-port 8080 --debug --log-level DEBUG
 ```
 
-## Server Behavior
+---
 
-### Startup Process
+## Good to Know
 
-1. **Load Pack**: Load policy pack from specified directory
-2. **Parse Policies**: Parse all `.sentrie` files
-3. **Validate Policies**: Check syntax and semantics
-4. **Create Index**: Build index of policies and rules
-5. **Start Server**: Begin listening for HTTP requests
-6. **Log Status**: Log startup information and any errors
+Before you run this in production, keep a few boundaries in mind:
 
 ### Pack Loading
+
+The pack's `[engine]` version constraint is checked against the running binary at startup; a mismatch stops the server with an error. Pass `--skip-engine-check` to start anyway. See [`[engine]`](/structure-of-a-policy-pack/packfile#engine-optional).
 
 The server looks for the following files in the pack directory:
 
@@ -185,6 +262,38 @@ curl -X POST "http://localhost:7529/decision/com/example/auth/user/allow" \
   -H "Content-Type: application/json" \
   -d '{"user": {"role": "admin"}}'
 ```
+
+A request for a whole policy (`/decision/{namespace}/{policy}`) answers `200` when every rule evaluated and `207 Multi-Status` when any rule failed; each failed rule carries an `error` object and the others are still returned, in no guaranteed order. See [Serving Policies](/running-sentrie/serving-policies#when-a-rule-fails).
+
+#### Request Body Too Large
+
+The body of a decision request may not exceed `--http-max-body-bytes` (1 MiB by default). A larger body gets `413` with `Content-Type: application/problem+json`, whether its size is declared in `Content-Length` or only discovered while reading (chunked requests):
+
+```json
+{
+  "type": "https://sentrie.sh/problems/413",
+  "title": "Request Body Too Large",
+  "status": 413,
+  "detail": "The request body is larger than this server's limit of 100 bytes",
+  "instance": "8faf997e-e224-46ce-9f97-006beec24ac9"
+}
+```
+
+The `detail` names the limit in effect and `instance` is the request ID. A caller should treat a `413` as permanent for that payload and send fewer facts, or ask the operator to raise the limit. Data after the first JSON value is still ignored, as before, provided the whole body is within the limit.
+
+### Health Endpoints
+
+**GET** `/health` is a liveness probe and always returns `200 OK`:
+
+```bash
+curl http://localhost:7529/health
+```
+
+```json
+{"check_id":"DGCLX53IVFPHMGJKCA65FXONN5","status":"healthy","time":"2026-10-31T09:15:57Z"}
+```
+
+**GET** `/health/deep` is a readiness probe. It reports the status of the `index`, `executor`, `js_runtime` and `pack` components and an `errors` array, and returns `503 Service Unavailable` when any component is unhealthy (`200 OK` otherwise). Both endpoints are unauthenticated, like the rest of the API. See [Serving Policies](/running-sentrie/serving-policies#deep-health-check) for the full response format.
 
 ## Troubleshooting
 
@@ -287,6 +396,7 @@ The server includes several caching mechanisms:
 - **Read-Only**: Policy files should be read-only
 - **Permissions**: Restrict access to policy directories
 - **Validation**: Validate all input data
+- **Request size**: Request bodies are capped at 1 MiB by default (`--http-max-body-bytes`), so a caller cannot make the server buffer an arbitrarily large body
 
 ## Best Practices
 
@@ -412,3 +522,8 @@ sentrie serve \
   --pack-location ./policies \
   --http-port 3000
 ```
+
+### Runtime behavior
+
+- **Constraint:** Startup loads the pack from `--pack-location`, parses `*.sentrie`, validates, builds the index, then listens. Policy or pack errors prevent startup. SIGINT (Ctrl+C) and SIGTERM trigger graceful shutdown; SIGKILL does not. Environment variables `SENTRIE_DEBUG`, `SENTRIE_LOG_LEVEL`, `SENTRIE_PORT` can override when not set via flags. All output goes to stdout/stderr; no file logging by default.
+- **Edge case:** Port already in use → startup fails; use another `--http-port`. Invalid or missing pack directory or pack load/parse failure → startup fails. Listening on `0.0.0.0` exposes the server on all interfaces; secure with firewall, reverse proxy, and/or auth. HTTPS and auth are not provided by `serve`; use a reverse proxy. Full HTTP API schema and deployment details: [Running as a Service](/deployment-operations/running-as-service).

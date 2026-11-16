@@ -35,6 +35,7 @@ The PackFile (`sentrie.pack.toml`) file serves as the manifest and metadata conf
 
 - Pack name and version
 - Dependencies and configuration settings (engines, authors, permissions, metadata)
+- Static reference data files (`[data]`) that policies can read
 - Metadata for the entire pack
 
 **Key features:**
