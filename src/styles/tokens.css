@@ -29,8 +29,6 @@
 
 	/* Code (the syntax colors live in src/code-theme.ts) */
 	--code-text: #dce0e5;
-	--color-frame-dot: #4a505c;
-	--surface-code-result: #23272e;
 
 	/* Font families */
 	--font-sans: "Montserrat Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,

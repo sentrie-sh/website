@@ -62,6 +62,27 @@
 	--sl-color-text-invert: var(--color-pure-white);
 }
 
+/* Starlight's print.css sets light colors for print but loads before this file,
+   so the dark values above would override it; print gets the light values here. */
+@media print {
+	:root {
+		--sl-color-white: #1f2226;
+		--sl-color-gray-1: #2b2e33;
+		--sl-color-gray-2: var(--color-graphite);
+		--sl-color-gray-3: var(--color-slate);
+		--sl-color-gray-4: var(--color-ash);
+		--sl-color-gray-5: var(--color-fog);
+		--sl-color-gray-6: var(--color-silver-mist);
+		--sl-color-gray-7: var(--color-off-white);
+		--sl-color-black: var(--color-pure-white);
+
+		--sl-color-accent-low: var(--color-ice-wash);
+		--sl-color-accent: var(--color-ink-blue);
+		--sl-color-accent-high: var(--color-deep-cobalt);
+		--sl-color-text-invert: var(--color-pure-white);
+	}
+}
+
 @media (min-width: 50em) {
 	:root {
 		--sl-text-h1: 2.25rem;
