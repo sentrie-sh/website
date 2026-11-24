@@ -14,7 +14,8 @@ const { command } = Astro.props;
 	<span class="sx-chip-prompt" aria-hidden="true">$</span>
 	<code class="sx-chip-command">{command}</code>
 	<button class="sx-chip-copy" type="button" data-copy={command}>
-		Copy<span class="sr-only"> command</span>
+		<span class="sx-chip-label" aria-hidden="true">Copy</span>
+		<span class="sr-only">Copy command</span>
 	</button>
 	<span class="sx-chip-status sr-only" aria-live="polite"></span>
 </div>
@@ -22,7 +23,7 @@ const { command } = Astro.props;
 <script>
 	for (const button of document.querySelectorAll<HTMLButtonElement>(".sx-chip-copy")) {
 		const status = button.parentElement?.querySelector<HTMLElement>(".sx-chip-status");
-		const label = button.firstChild;
+		const label = button.querySelector<HTMLElement>(".sx-chip-label");
 		let reset: ReturnType<typeof setTimeout> | undefined;
 		button.addEventListener("click", async () => {
 			let message = "Copied";
