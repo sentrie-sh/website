@@ -68,7 +68,7 @@ export const sentrieGrammar = {
     {
       name: 'string.unquoted.heredoc.sentrie',
       begin: String.raw`<<<([A-Za-z_][A-Za-z0-9_]*)\s*$`,
-      end: String.raw`^\s*\1\s*$`
+      end: String.raw`^\1[ \t]*\r?$`
     },
 
     // Strings - Double quoted
