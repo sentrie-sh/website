@@ -351,7 +351,7 @@ export default defineConfig({
             shadowColor: "transparent",
             editorTabBarBackground: "#2f343e",
             editorActiveTabBackground: "#282c33",
-            editorActiveTabIndicatorTopColor: "#2b7fff",
+            editorActiveTabIndicatorTopColor: "#1a6ae0",
             editorActiveTabIndicatorBottomColor: "transparent",
             editorTabBarBorderBottomColor: "#2f343e",
             terminalTitlebarBackground: "#2f343e",

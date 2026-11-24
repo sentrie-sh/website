@@ -2,17 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Code block theme for sentrie.sh. Code sits on Onyx in light and dark mode,
-// with the syntax colors listed in DESIGN.md.
+// with the syntax colors listed in DESIGN.md. Every syntax color is at least
+// 4.5:1 against Onyx.
 
 const onyx = "#282c33";
 const midnight = "#2f343e";
 const text = "#dce0e5";
-const comment = "#878a98";
+const comment = "#9396a3";
 const string = "#a1c181";
-const keyword = "#d07277";
+const keyword = "#d87c81";
 const type = "#dec184";
 const fn = "#6eb4bf";
-const variable = "#b477cf";
+const variable = "#bc80d6";
 const constant = "#bf956a";
 const operator = "#a3a9b5";
 
@@ -28,7 +29,7 @@ export const sentrieCodeTheme = {
 		"tab.activeBackground": onyx,
 		"tab.activeForeground": text,
 		"tab.inactiveBackground": midnight,
-		"tab.activeBorderTop": "#2b7fff",
+		"tab.activeBorderTop": "#1a6ae0",
 		"titleBar.activeBackground": midnight,
 		"terminal.background": onyx,
 		"terminal.foreground": text,
@@ -58,6 +59,7 @@ export const sentrieCodeTheme = {
 		{
 			scope: [
 				"keyword.operator.boolean",
+				"keyword.operator.comparison",
 				"keyword.operator.state",
 				"keyword.operator.lambda",
 				"keyword.operator.new",

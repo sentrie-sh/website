@@ -77,11 +77,7 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 }
 
-/* Header */
-header.header {
-	border-bottom: 1px solid var(--hairline);
-}
-
+/* Header (Starlight draws its border in --sl-color-hairline-shade, mapped above) */
 .site-title {
 	font-family: var(--font-sans);
 	font-size: 1rem;
@@ -102,7 +98,7 @@ site-search button[data-open-modal] {
 	box-shadow: none;
 }
 
-site-search kbd {
+site-search button > kbd {
 	font-family: var(--font-mono);
 	letter-spacing: var(--tracking-label);
 	border-radius: var(--radius-sm);
@@ -110,11 +106,6 @@ site-search kbd {
 }
 
 /* Sidebar */
-.sidebar-pane {
-	border-inline-end: 1px solid var(--hairline);
-}
-
-#starlight__sidebar .top-level > li > details > summary .group-label > span,
 #starlight__sidebar .top-level > li > details > summary .large {
 	font-family: var(--font-mono);
 	font-size: 0.6875rem;
@@ -177,22 +168,13 @@ h1#_top {
 }
 
 /* Inline code */
-.sl-markdown-content :not(pre) > code {
+.sl-markdown-content :not(pre) > code:not(:where(.not-content *)) {
 	font-size: 0.875em;
 	padding: 0.1em 0.35em;
 	border: 1px solid var(--hairline);
 	border-radius: var(--radius-sm);
 	background: var(--surface-warm);
 	letter-spacing: 0;
-}
-
-/* Code blocks: expressive-code frames */
-.expressive-code {
-	--ec-brdRad: var(--radius-md);
-}
-
-.expressive-code .frame {
-	box-shadow: none;
 }
 
 /* Tables */
@@ -258,6 +240,12 @@ h1#_top {
 	border-color: var(--color-signal-blue);
 	color: var(--color-pure-white);
 	box-shadow: var(--shadow-raised);
+}
+
+.sl-link-button.primary:hover {
+	background: var(--color-signal-blue-hover);
+	border-color: var(--color-signal-blue-hover);
+	color: var(--color-pure-white);
 }
 
 .sl-link-button.secondary {

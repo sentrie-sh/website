@@ -13,7 +13,7 @@ Sentrie reads as an open-source engineering notebook: a near-white grid canvas, 
 | Name | Value | Token | Role |
 |------|-------|-------|------|
 | Ink Blue | `#1348dc` | `--color-ink-blue` | Headlines, primary text links, the wordmark. The single chromatic anchor that carries identity across the site |
-| Signal Blue | `#2b7fff` | `--color-signal-blue` | Fill of the primary call to action, and nothing else |
+| Signal Blue | `#1a6ae0` | `--color-signal-blue` | Fill of the primary call to action, and nothing else. White text on it is 5:1; `#1559c4` (`--color-signal-blue-hover`) on hover |
 | Sky Tint | `#8ec5ff` | `--color-sky-tint` | Headlines and links in dark mode, low-frequency decorative accents in light mode |
 | Frost | `#bedbff` | `--color-frost` | Hairline blue borders and tag outlines that should read as on-brand rather than neutral |
 | Slate Blue | `#74ade8` | `--color-slate-blue` | Icon strokes, secondary blue text, active markers |
@@ -25,7 +25,7 @@ Sentrie reads as an open-source engineering notebook: a near-white grid canvas, 
 | Graphite | `#3a3d43` | `--color-graphite` | Primary body text, the wordmark in neutral contexts |
 | Charcoal | `#464b57` | `--color-charcoal` | Strong body text, button text on light fills |
 | Slate | `#5d636f` | `--color-slate` | Secondary text, nav labels, supporting copy |
-| Pewter | `#6a7282` | `--color-pewter` | Tertiary text, helper copy, footer links |
+| Pewter | `#626a78` | `--color-pewter` | Tertiary text, helper copy, footer links |
 | Ash | `#878a98` | `--color-ash` | Muted icons, placeholder strokes |
 | Steel | `#b2b5bb` | `--color-steel` | Very low-emphasis labels and icon outlines |
 | Fog | `#cccfd3` | `--color-fog` | Ghost button and input borders at rest |
@@ -40,13 +40,15 @@ Code sits on Onyx in both light and dark mode, which makes it the one dark objec
 | Role | Value |
 |------|-------|
 | Strings | `#a1c181` |
-| Keywords | `#d07277` |
+| Keywords | `#d87c81` |
 | Types | `#dec184` |
 | Functions | `#6eb4bf` |
-| Variables | `#b477cf` |
+| Variables | `#bc80d6` |
 | Constants and numbers | `#bf956a` |
-| Comments | `#878a98` |
+| Comments | `#9396a3` |
 | Plain text | `#dce0e5` |
+
+Every syntax color is at least 4.5:1 against Onyx at code sizes. Check a new color against `#282c33` before adding it.
 
 ### Dark mode
 
@@ -63,7 +65,8 @@ Dark mode keeps the same structure and swaps the neutrals. The blue hierarchy mo
 | Headline and link | `#1348dc` | `#8ec5ff` |
 | Link hover | `#053794` | `#bedbff` |
 | Selected wash | `#e6effe` | `#1b2a45` |
-| Primary call to action | `#2b7fff` | `#2b7fff` |
+| Text, tertiary | `#626a78` | `#8e91a0` |
+| Primary call to action | `#1a6ae0` | `#1a6ae0` |
 
 ## Tokens - Typography
 
@@ -170,7 +173,7 @@ Mono 12px Graphite text, 0.05em tracking, 1px Fog border, Off-White background, 
 
 ### Docs Page
 
-Pure White content surface, Off-White sidebar separated by a 1px hairline. Page titles in the display face at 36px weight 340, Ink Blue. In-content headings at 26px and 20px weight 500, Graphite. Body in the sans at 16px. Links in Ink Blue, underlined on hover. Inline code in mono on Off-White with a 1px Mist border and 2px radius. The selected sidebar entry gets an Ice Wash background, Ink Blue text and a 2px Ink Blue line on its left edge. Asides use a 2px left border in their semantic color over a faint tint, with 2px radius.
+Pure White content surface, Off-White sidebar separated by a 1px hairline. Page titles in the display face at 36px weight 340, Ink Blue. In-content headings at 26px and 20px weight 500, in the strongest text color (`#1f2226` light, `#f3f4f6` dark). Body in the sans at 16px. Links in Ink Blue, underlined on hover. Inline code in mono on Off-White with a 1px Silver Mist border and 2px radius. The selected sidebar entry gets an Ice Wash background, Ink Blue text and a 2px Ink Blue line on its left edge. Asides use a 2px left border in their semantic color over a faint tint, with 2px radius.
 
 ### Footer
 
@@ -229,7 +232,8 @@ At phone widths every multi-column row collapses to one column, the hero headlin
 :root {
   /* Colors */
   --color-ink-blue: #1348dc;
-  --color-signal-blue: #2b7fff;
+  --color-signal-blue: #1a6ae0;
+  --color-signal-blue-hover: #1559c4;
   --color-sky-tint: #8ec5ff;
   --color-frost: #bedbff;
   --color-slate-blue: #74ade8;
@@ -241,7 +245,7 @@ At phone widths every multi-column row collapses to one column, the hero headlin
   --color-graphite: #3a3d43;
   --color-charcoal: #464b57;
   --color-slate: #5d636f;
-  --color-pewter: #6a7282;
+  --color-pewter: #626a78;
   --color-ash: #878a98;
   --color-steel: #b2b5bb;
   --color-fog: #cccfd3;
