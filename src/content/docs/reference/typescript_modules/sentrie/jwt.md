@@ -7,7 +7,7 @@ The `@sentrie/jwt` module provides JSON Web Token decoding and verification util
 
 ## Usage
 
-```text
+```sentrie
 use { decode, verify, getPayload, getHeader } from @sentrie/jwt
 ```
 
@@ -30,7 +30,7 @@ Decodes a JWT token and optionally verifies its signature.
 
 **Example:**
 
-```text
+```sentrie
 use { decode } from @sentrie/jwt
 let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 let payload = jwt.decode(token, "secret-key")
@@ -50,7 +50,7 @@ Verifies a JWT token's signature.
 
 **Example:**
 
-```text
+```sentrie
 use { verify } from @sentrie/jwt
 let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 let isValid = jwt.verify(token, "secret-key", "HS256")
@@ -72,7 +72,7 @@ Extracts the payload from a JWT token without verification.
 
 **Example:**
 
-```text
+```sentrie
 use { getPayload } from @sentrie/jwt
 let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 let payload = jwt.getPayload(token)  // No verification - use with caution!
@@ -92,7 +92,7 @@ Extracts the header from a JWT token without verification.
 
 **Example:**
 
-```text
+```sentrie
 use { getHeader } from @sentrie/jwt
 let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 let header = jwt.getHeader(token)
@@ -100,7 +100,7 @@ let header = jwt.getHeader(token)
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/auth
 
 policy mypolicy {

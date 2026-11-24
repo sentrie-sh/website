@@ -52,14 +52,14 @@ Parentheses override precedence. Any subexpression can be wrapped in `( ... )` t
 
 ### Precedence in arithmetic
 
-```text
+```sentrie
 let result: number = 2 + 3 * 4         -- 14 (multiplication before addition)
 let valid: boolean = 5 + 3 > 7            -- true (arithmetic before comparison)
 ```
 
 ### Logical precedence
 
-```text
+```sentrie
 let complex: boolean = true and false or true   -- true (and before or; (true and false) or true)
 ```
 
@@ -74,7 +74,7 @@ Without parentheses, `a ? b : c ? d : e` is parsed as `a ? b : (c ? d : e)`.
 
 ### Using parentheses to clarify
 
-```text
+```sentrie
 let safe: boolean = (user.role == "admin") and (age >= 18)
 let sum: number = (a + b) * (c + d)
 ```

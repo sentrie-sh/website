@@ -9,7 +9,7 @@ Policies export rules so they can be executed via CLI/API or imported by other p
 ## Syntax
 
 **Export:**
-```text
+```sentrie
 export decision of ruleName
 export decision of ruleName
   attach name as expression
@@ -17,7 +17,7 @@ export decision of ruleName
 ```
 
 **Import:**
-```text
+```sentrie
 rule localName = import decision of ruleName
   from namespace/policy
   with targetFact as expression

@@ -7,7 +7,7 @@ The `@sentrie/semver` module provides semantic version comparison and validation
 
 ## Usage
 
-```text
+```sentrie
 use { compare, isValid, satisfies, major, minor, patch } from @sentrie/semver
 ```
 
@@ -28,7 +28,7 @@ Compares two semantic version strings. Supports the "v" prefix - `"v1.2.3"` and 
 
 **Example:**
 
-```text
+```sentrie
 use { compare } from @sentrie/semver
 let result = semver.compare("1.2.3", "1.2.4")  // -1
 let result2 = semver.compare("v1.2.3", "1.2.3")  // 0
@@ -46,7 +46,7 @@ Validates whether a string is a valid semantic version. Supports the "v" prefix 
 
 **Example:**
 
-```text
+```sentrie
 use { isValid } from @sentrie/semver
 let valid = semver.isValid("1.2.3")  // true
 let valid2 = semver.isValid("v1.2.3")  // true
@@ -65,7 +65,7 @@ Strips the "v" or "V" prefix from a version string if present.
 
 **Example:**
 
-```text
+```sentrie
 use { stripPrefix } from @sentrie/semver
 let stripped = semver.stripPrefix("v1.2.3")  // "1.2.3"
 let noChange = semver.stripPrefix("1.2.3")  // "1.2.3"
@@ -86,7 +86,7 @@ Checks if a version satisfies a constraint. Supports constraint ranges like `">=
 
 **Example:**
 
-```text
+```sentrie
 use { satisfies } from @sentrie/semver
 let satisfies1 = semver.satisfies("1.2.3", ">=1.0.0 <2.0.0")  // true
 let satisfies2 = semver.satisfies("2.0.0", "^1.2.0")  // false
@@ -106,7 +106,7 @@ Gets the major version number from a version string.
 
 **Example:**
 
-```text
+```sentrie
 use { major } from @sentrie/semver
 let maj = semver.major("1.2.3")  // 1
 let maj2 = semver.major("2.0.0-alpha")  // 2
@@ -126,7 +126,7 @@ Gets the minor version number from a version string.
 
 **Example:**
 
-```text
+```sentrie
 use { minor } from @sentrie/semver
 let min = semver.minor("1.2.3")  // 2
 let min2 = semver.minor("1.0.0")  // 0
@@ -146,7 +146,7 @@ Gets the patch version number from a version string.
 
 **Example:**
 
-```text
+```sentrie
 use { patch } from @sentrie/semver
 let pat = semver.patch("1.2.3")  // 3
 let pat2 = semver.patch("1.2.0")  // 0
@@ -166,7 +166,7 @@ Gets the prerelease identifier from a version string.
 
 **Example:**
 
-```text
+```sentrie
 use { prerelease } from @sentrie/semver
 let pre = semver.prerelease("1.2.3-alpha.1")  // "alpha.1"
 let noPre = semver.prerelease("1.2.3")  // null
@@ -186,7 +186,7 @@ Gets the build metadata from a version string.
 
 **Example:**
 
-```text
+```sentrie
 use { metadata } from @sentrie/semver
 let meta = semver.metadata("1.2.3+001")  // "001"
 let noMeta = semver.metadata("1.2.3")  // null
@@ -194,7 +194,7 @@ let noMeta = semver.metadata("1.2.3")  // null
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/version
 
 policy mypolicy {

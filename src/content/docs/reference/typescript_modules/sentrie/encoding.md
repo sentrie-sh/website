@@ -7,7 +7,7 @@ The `@sentrie/encoding` module provides various encoding and decoding utilities.
 
 ## Usage
 
-```text
+```sentrie
 use { base64Encode, base64Decode, hexEncode, urlEncode } from @sentrie/encoding
 ```
 
@@ -27,7 +27,7 @@ Encodes a string using standard Base64 encoding.
 
 **Example:**
 
-```text
+```sentrie
 use { base64Encode } from @sentrie/encoding
 let encoded = encoding.base64Encode("Hello, World!")  // "SGVsbG8sIFdvcmxkIQ=="
 ```
@@ -46,7 +46,7 @@ Decodes a Base64-encoded string.
 
 **Example:**
 
-```text
+```sentrie
 use { base64Decode } from @sentrie/encoding
 let decoded = encoding.base64Decode("SGVsbG8sIFdvcmxkIQ==")  // "Hello, World!"
 ```
@@ -65,7 +65,7 @@ Encodes a string using URL-safe Base64 encoding. Uses `-` and `_` instead of `+`
 
 **Example:**
 
-```text
+```sentrie
 use { base64UrlEncode } from @sentrie/encoding
 let encoded = encoding.base64UrlEncode("Hello, World!")
 ```
@@ -96,7 +96,7 @@ Encodes a string to hexadecimal representation.
 
 **Example:**
 
-```text
+```sentrie
 use { hexEncode } from @sentrie/encoding
 let encoded = encoding.hexEncode("Hello")  // "48656c6c6f"
 ```
@@ -115,7 +115,7 @@ Decodes a hexadecimal string.
 
 **Example:**
 
-```text
+```sentrie
 use { hexDecode } from @sentrie/encoding
 let decoded = encoding.hexDecode("48656c6c6f")  // "Hello"
 ```
@@ -134,7 +134,7 @@ URL-encodes a string using percent encoding (query string encoding). Encodes spe
 
 **Example:**
 
-```text
+```sentrie
 use { urlEncode } from @sentrie/encoding
 let encoded = encoding.urlEncode("Hello, World!")  // "Hello%2C%20World%21"
 ```
@@ -153,14 +153,14 @@ Decodes a URL-encoded string.
 
 **Example:**
 
-```text
+```sentrie
 use { urlDecode } from @sentrie/encoding
 let decoded = encoding.urlDecode("Hello%2C%20World%21")  // "Hello, World!"
 ```
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/mypolicy
 
 policy mypolicy {

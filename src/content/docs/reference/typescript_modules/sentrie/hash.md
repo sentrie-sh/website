@@ -7,7 +7,7 @@ The `@sentrie/hash` module provides various cryptographic hash functions. All ha
 
 ## Usage
 
-```text
+```sentrie
 use { md5, sha256, sha512, hmac } from @sentrie/hash
 ```
 
@@ -27,7 +27,7 @@ Computes the MD5 hash of a string.
 
 **Example:**
 
-```text
+```sentrie
 use { md5 } from @sentrie/hash
 let hash = md5("Hello, World!")  // "65a8e27d8879283831b664bd8b7f0ad4"
 ```
@@ -46,7 +46,7 @@ Computes the SHA-1 hash of a string.
 
 **Example:**
 
-```text
+```sentrie
 use { sha1 } from @sentrie/hash
 let hash = hash.sha1("Hello, World!")
 ```
@@ -63,7 +63,7 @@ Computes the SHA-256 hash of a string.
 
 **Example:**
 
-```text
+```sentrie
 use { sha256 } from @sentrie/hash
 let hash = hash.sha256("Hello, World!")
 ```
@@ -80,7 +80,7 @@ Computes the SHA-512 hash of a string.
 
 **Example:**
 
-```text
+```sentrie
 use { sha512 } from @sentrie/hash
 let hash = hash.sha512("Hello, World!")
 ```
@@ -103,14 +103,14 @@ Computes HMAC (Hash-based Message Authentication Code) for data using a secret k
 
 **Example:**
 
-```text
+```sentrie
 use { hmac } from @sentrie/hash
 let mac = hmac("sha256", "Hello, World!", "secret-key")
 ```
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/auth
 
 policy mypolicy {

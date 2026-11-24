@@ -33,7 +33,7 @@ Sentrie uses trinary logic (`true`, `false`, `unknown`) and provides the ternary
 
 ### Typical use
 
-```text
+```sentrie
 let status: string = age >= 18 ? "adult" : "minor"
 let displayName: string = user.name ?: "Anonymous"
 let valid: boolean = email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"

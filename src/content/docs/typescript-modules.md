@@ -36,7 +36,7 @@ Sentrie will support integration with JavaScript modules, allowing you to use ex
 
 ## Example Usage (Planned)
 
-```text
+```sentrie
 namespace com/example/advanced
 
 policy user {

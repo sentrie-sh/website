@@ -25,7 +25,7 @@ Evaluation is **deterministic**: same inputs and policy pack produce the same ou
 
 Program structure (conceptual):
 
-```text
+```sentrie
 namespace <FQN>
 
 shape <Name> { ... }

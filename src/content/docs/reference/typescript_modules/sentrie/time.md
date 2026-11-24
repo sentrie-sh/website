@@ -7,7 +7,7 @@ The `@sentrie/time` module provides date and time manipulation utilities. All ti
 
 ## Usage
 
-```text
+```sentrie
 use { now, parse, format, addDuration, subtractDuration } from @sentrie/time
 ```
 
@@ -30,7 +30,7 @@ Returns the current timestamp as a Unix timestamp. Within a single execution con
 
 **Example:**
 
-```text
+```sentrie
 use { now } from @sentrie/time
 let currentTime = time.now()  // Current Unix timestamp
 ```
@@ -49,7 +49,7 @@ Parses a date string and returns a Unix timestamp. Supports RFC3339 and RFC3339N
 
 **Example:**
 
-```text
+```sentrie
 use { parse } from @sentrie/time
 let timestamp = time.parse("2024-01-01T00:00:00Z")
 ```
@@ -67,7 +67,7 @@ Formats a Unix timestamp as a string using the specified format. The format is w
 
 **Example:**
 
-```text
+```sentrie
 use { format, now } from @sentrie/time
 let timestamp = time.now()
 let formatted = time.format(timestamp, "2006-01-02 15:04:05")
@@ -86,7 +86,7 @@ Checks if the first timestamp is before the second timestamp.
 
 **Example:**
 
-```text
+```sentrie
 use { isBefore, now } from @sentrie/time
 let now = time.now()
 let past = now - 3600
@@ -106,7 +106,7 @@ Checks if the first timestamp is after the second timestamp.
 
 **Example:**
 
-```text
+```sentrie
 use { isAfter, now } from @sentrie/time
 let now = time.now()
 let future = now + 3600
@@ -127,7 +127,7 @@ Checks if a timestamp is between two other timestamps (inclusive).
 
 **Example:**
 
-```text
+```sentrie
 use { isBetween, now } from @sentrie/time
 let now = time.now()
 let start = now - 3600
@@ -150,7 +150,7 @@ Adds a duration to a timestamp. Duration string format: `"1h30m"` (1 hour 30 min
 
 **Example:**
 
-```text
+```sentrie
 use { addDuration, now } from @sentrie/time
 let now = time.now()
 let future = time.addDuration(now, "2h30m")  // 2 hours 30 minutes later
@@ -171,7 +171,7 @@ Subtracts a duration from a timestamp. Duration string format: `"1h30m"` (1 hour
 
 **Example:**
 
-```text
+```sentrie
 use { subtractDuration, now } from @sentrie/time
 let now = time.now()
 let past = time.subtractDuration(now, "1h")  // 1 hour earlier
@@ -207,7 +207,7 @@ Examples:
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/access
 
 policy mypolicy {

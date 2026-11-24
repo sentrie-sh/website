@@ -7,7 +7,7 @@ A rule defines a single named decision: an optional `when` guard, an optional `d
 
 ## Syntax
 
-```text
+```sentrie
 rule IDENT [ : type ] = [ default expr ] [ when expr ] { stmt* yield expr }
 
 contribute IDENT [ when expr ] { stmt* yield expr }
@@ -119,7 +119,7 @@ A declared type is optional for most rules, but a rule must declare one before o
 
 Most rules compute their result in one place. Sometimes a result is easier to build from several independent conditions, such as a list of reasons for a denial. The `contribute` statement adds to a rule that was declared earlier in the same policy:
 
-```text
+```sentrie
 contribute <rule> (when <expr>)? <block>
 ```
 

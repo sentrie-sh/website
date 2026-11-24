@@ -502,8 +502,8 @@ cd my-policy-pack
 
 2. **Create a policy file**:
 
-```text
-# auth.sentrie
+```sentrie
+-- auth.sentrie
 namespace com/example/auth
 
 policy user {

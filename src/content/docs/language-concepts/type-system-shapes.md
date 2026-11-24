@@ -14,7 +14,7 @@ The type system defines values (primitives, collections, documents) and structur
 
 **Shape (data model):**
 
-```text
+```sentrie
 shape Name {
   field: type
   field?: type

@@ -7,7 +7,7 @@ The `in` and `contains` operators test containment: whether a value appears in a
 
 ## Syntax
 
-```text
+```sentrie
 needle in haystack
 haystack contains needle
 ```
@@ -50,7 +50,7 @@ haystack contains needle
 
 ### Substring and list membership
 
-```text
+```sentrie
 let in_str: boolean = "foo" in "xfoobar"
 let has_role: boolean = "admin" in user.roles
 let has_guest: boolean = roles contains "guest"
@@ -58,7 +58,7 @@ let has_guest: boolean = roles contains "guest"
 
 ### Map key presence and subset
 
-```text
+```sentrie
 let key_exists: boolean = "plan" in subscription
 let subset: boolean = {"a": 1, "b": 2} contains subscription
 ```

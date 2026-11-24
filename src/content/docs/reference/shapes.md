@@ -11,7 +11,7 @@ Shapes define structured data (field-based models) or type aliases (a base type 
 
 A shape with a body of named, typed fields:
 
-```text
+```sentrie
 shape Name {
   fieldName: type
   fieldName?: type
@@ -26,7 +26,7 @@ Each field has a name, an optional `?` suffix on the name, a colon, and a type (
 
 A shape is **closed** by default: a value that carries a field the body does not declare is rejected. To accept undeclared fields, end the body with the open-shape marker `...` (see [Closed and Open Shapes](#closed-and-open-shapes)):
 
-```text
+```sentrie
 shape Name {
   fieldName: type
   ...
@@ -37,7 +37,7 @@ shape Name {
 
 A shape that is an alias for a single type, optionally with constraints:
 
-```text
+```sentrie
 shape Name baseType
 shape Name baseType @constraint1 @constraint2
 ```
@@ -48,7 +48,7 @@ Examples: `shape ID string @uuid()`, `shape Score number @min(0) @max(100)`.
 
 A complex shape can extend exactly one other shape with `with BaseName` before the opening `{`. The base is written either unqualified (`with Base`) or qualified with a namespace (`with com/base/Base`); see [How a base is resolved](#how-a-base-is-resolved).
 
-```text
+```sentrie
 shape Child with Base {
   field: type
 }
@@ -100,7 +100,7 @@ Earlier versions let an unqualified `with A` match a shape that another namespac
 
 To make a shape visible to other namespaces (for use in [policy composition](/language-concepts/policy-composition) or as a fact type), declare:
 
-```text
+```sentrie
 export shape ShapeName
 ```
 
@@ -444,7 +444,7 @@ let bad2: Person = {
 :::note[Checking Optional Fields]
 You can check if optional fields are defined using the `is defined` operator:
 
-```text
+```sentrie
 let user: User = {
   name: "Alice",
   age: 25,

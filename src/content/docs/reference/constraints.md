@@ -7,7 +7,7 @@ Constraints validate values at runtime using the `@` syntax on types. They apply
 
 ## Syntax
 
-```text
+```sentrie
 type @constraint1(args) @constraint2
 ```
 
@@ -15,7 +15,7 @@ Examples: `number @min(0) @max(100)`, `string @email()`, `list[string @one_of("a
 
 A number argument to a constraint can use [exponent notation](/reference/types-and-values/#number-literals):
 
-```text
+```sentrie
 let rate: number @min(1e-3) @max(1.5E+3) = 0.5
 ```
 
@@ -215,7 +215,7 @@ Constraint arguments are literals, and they are checked when the pack is loaded,
 
 The check covers every place a type can be written: facts, `let`s, shape fields and aliases, derive and lambda parameter and return types, casts, `is` checks, and element types inside `list`, `dict` and `record`. `sentrie validate` reports a broken argument at the constraint's position, and `sentrie exec` fails with the same error before it evaluates anything:
 
-```text
+```sentrie
 let v: string @regexp("[") = "a"
 ```
 
@@ -229,14 +229,14 @@ At runtime, a constraint's arguments are also checked before the value's kind. A
 
 Constraints can be applied to the **element type** of a list so that each element is validated:
 
-```text
+```sentrie
 list[string @one_of("read", "write", "delete")]
 list[number @min(0) @max(100)]
 ```
 
 For readability and reuse, define a [shape](/reference/shapes) and use it as the element type:
 
-```text
+```sentrie
 shape Permission string @one_of("read", "write", "delete")
 let permissions: list[Permission] = ["read", "write"]
 ```
@@ -245,11 +245,11 @@ let permissions: list[Permission] = ["read", "write"]
 
 When converting with a postfix cast (`expr as type`), the result is validated against the target type and **all constraints** on that type. If validation fails, evaluation errors; it does not yield an unchecked value.
 
-```text
+```sentrie
 let u: number @min(0) @max(100) = "50" as number
 ```
 
-```text
+```sentrie
 let u: string @email = "user@example.com" as string
 ```
 
@@ -259,7 +259,7 @@ Casting to a constrained type is equivalent to assigning the cast result to a va
 
 ### Typical use
 
-```text
+```sentrie
 let u: number @min(0) @max(100) = 50
 shape Permission string @one_of("read", "write", "delete")
 ```
@@ -268,13 +268,13 @@ Validation runs at assignment. For example, `let u: number @min(0) @max(100) = 1
 
 ### Collection and shapes
 
-```text
+```sentrie
 let permissions: list[string @one_of("read", "write", "delete")] = ["read", "write"]
 ```
 
 Using a shape for the element type:
 
-```text
+```sentrie
 shape Positive100 number @min(0) @max(100)
 let y = 50
 let c: Positive100 = y
@@ -284,7 +284,7 @@ Here `y` is validated against `Positive100` (and thus `@min(0) @max(100)`) befor
 
 ### Trinary constraints
 
-```text
+```sentrie
 let flag: trinary @is_true = true
 let known: trinary @not_unknown = some_expression
 ```

@@ -46,7 +46,7 @@ let slug = str.replaceAll(
 
 The parser lowers pipeline syntax to ordinary calls:
 
-```text
+```sentrie
 lhs |> ident()          => ident(lhs)
 lhs |> alias.fn()       => alias.fn(lhs)
 lhs |> ident(a, b)      => ident(lhs, a, b)

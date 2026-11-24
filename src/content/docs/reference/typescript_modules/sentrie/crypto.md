@@ -7,7 +7,7 @@ The `@sentrie/crypto` module provides basic cryptographic utilities. For additio
 
 ## Usage
 
-```text
+```sentrie
 use { sha256 } from @sentrie/crypto
 ```
 
@@ -27,7 +27,7 @@ Computes the SHA-256 hash of a string. This function uses a streaming hash imple
 
 **Example:**
 
-```text
+```sentrie
 namespace com/example/auth
 
 policy mypolicy {

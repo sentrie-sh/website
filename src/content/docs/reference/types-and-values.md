@@ -45,7 +45,7 @@ A `number` already holds either an exact integer or a float (see [Integers and f
 
 A number literal is a run of digits, optionally followed by a fraction and an exponent:
 
-```text
+```sentrie
 42          -- Integer (exact)
 9007199254740993  -- Integers keep every digit up to 9223372036854775807
 3.14        -- Decimal
@@ -57,7 +57,7 @@ A number literal is a run of digits, optionally followed by a fraction and an ex
 
 An exponent is `e` or `E`, an optional `+` or `-`, and at least one digit. A literal with an exponent is a float. Exponent literals work everywhere a number literal does, including [constraint](/reference/constraints/) arguments:
 
-```text
+```sentrie
 shape Reading {
   value: number @min(1e-3) @max(1.5E+3)
 }
@@ -81,7 +81,7 @@ A `number` is either an **exact integer** or a **float**:
 - A number with a fractional part or an exponent is a 64-bit float.
 - An integer literal too large for 64 bits is read as a float.
 
-```text
+```sentrie
 let id: number = 9007199254740993
 let same: boolean = id == 9007199254740992    -- false: one apart, and still told apart
 let equal: boolean = 5 == 5.0                 -- true: equal values compare equal in either form
@@ -269,7 +269,7 @@ The postfix cast `expr as type` converts the value of `expr` to the given type. 
 
 ### Primitives and collections
 
-```text
+```sentrie
 let u: number = 50
 let s: string = "hello"
 let b: boolean = true
@@ -280,7 +280,7 @@ let r: record[string, number, boolean] = ["one", 1, true]
 
 ### Indexing
 
-```text
+```sentrie
 let first: number = arr[0]
 let one: number = m["one"]
 let oneAlt: number = m.one
@@ -288,7 +288,7 @@ let oneAlt: number = m.one
 
 ### Index errors
 
-```text
+```sentrie
 let xs: list[number] = [10, 20, 30]
 let ok: number = xs[2.0]        -- 30
 let none: number = xs[5]        -- undefined (out of range)
@@ -300,7 +300,7 @@ let frac = xs[1.7]              -- Error: list index must be an integer, got 1.7
 
 ### Cast
 
-```text
+```sentrie
 let x: number = "50" as number
 let y: string = 50 as string
 let z: boolean = "true" as boolean
@@ -413,7 +413,7 @@ With `{"admin": true}`, `untyped` yields `{"count": 2, "has_true": false}` and `
 
 If a value matches none of the members, the check fails and reports why. The error names the **closest member**: the first member, in source order, whose outer kind accepts the value (string, number, boolean, list, record, dict, document or a shape, read through shape aliases).
 
-```text
+```sentrie
 let v: number @min(10) | string = 5
 -- Error: invalid value for let declaration v: value 5 does not match number | string
 --   at <location>: closest member number: constraint failed: 'min' ...
@@ -421,7 +421,7 @@ let v: number @min(10) | string = 5
 
 Here `5` is a number, so `number` is the closest member and its failed `@min` constraint is the reported reason. If no member's kind accepts the value, the error names the whole union instead:
 
-```text
+```sentrie
 let v: string | number = true
 -- Error: invalid value for let declaration v: value true is not string | number
 --   at <location> - expected one of its members
@@ -453,11 +453,11 @@ Collections allow you to work with groups of related values:
 
 ### Declaring a Collection Type
 
-```text
+```sentrie
 let u: list[number] = [1, 2, 3]
 ```
 
-```text
+```sentrie
 let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 ```
 
@@ -498,11 +498,11 @@ The check includes the constraints on `T`: with `dict[number @min(0) @max(100)]`
 
 A dict literal with a repeated key is not an error: the last value wins and nothing is reported (`{ "k": 1, "k": 2 }` has `k` equal to `2`).
 
-```text
+```sentrie
 let u: record[string, number, boolean] = ["one", 1, true]
 ```
 
-```text
+```sentrie
 let u: set[string] = ["read", "write"]
 ```
 
@@ -515,7 +515,7 @@ Sentrie supports type-level nullability with a `?` suffix on type references.
 - `dict[string?]` -> dict values may be `null`
 - `Person?` -> shape value may be `null`
 
-```text
+```sentrie
 let middleName: string? = null
 let tags: list[string]? = null
 let attrs: dict[string?] = {"nickname": null}
@@ -536,19 +536,19 @@ However, it is recommended to declare the type for better readability and to avo
 
 You can access collection elements using the `[index]` syntax. The index must be a `string` for maps and a `number` for lists and records.
 
-```text
+```sentrie
 let u: list[number] = [1, 2, 3]
 let first: number = u[0]
 ```
 
-```text
+```sentrie
 let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 let first: number = u["one"]
 ```
 
 For maps, you can also access elements using the `.` syntax.
 
-```text
+```sentrie
 let u: dict[number] = { "one": 1, "two": 2, "three": 3 }
 let first: number = u.one
 ```
@@ -559,7 +559,7 @@ You can convert between types with a **cast expression**: `expr as Type`. The re
 
 The `as` operator binds to the expression on its left, similar to unary operators in other languages. It does **not** apply to a whole arithmetic expression unless you add parentheses:
 
-```text
+```sentrie
 -- `as` applies to `b`, not to `a + b`
 let x = a + b as number
 -- same as: a + (b as number)
@@ -568,18 +568,18 @@ let x = a + b as number
 let y = (a + b) as number
 ```
 
-```text
+```sentrie
 let u: number = "50" as number
 ```
 
-```text
+```sentrie
 let u: string = 50 as string
 ```
 
-```text
+```sentrie
 let u: boolean = "true" as boolean
 ```
 
-```text
+```sentrie
 let u: document = { "name": "John", "age": 30 } as document
 ```

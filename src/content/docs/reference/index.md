@@ -31,7 +31,7 @@ A Sentrie program consists of:
 2. **Top-level declarations** (policies, shapes, derives, exports)
 3. **Comments** (anywhere)
 
-```text
+```sentrie
 namespace com/example/myapp
 
 -- This is a comment
@@ -57,7 +57,7 @@ Namespaces organize your policies and shapes hierarchically and prevent naming c
 
 ### Syntax
 
-```text
+```sentrie
 namespace FQN
 policy IDENT { fact ... let ... use ... rule ... export decision of IDENT }
 shape IDENT { ... } | shape IDENT baseType @constraint
@@ -125,7 +125,7 @@ A policy can contain (in grouped order; comments anywhere):
 
 ### Example
 
-```text
+```sentrie
 namespace com/example/auth
 
 policy user {
@@ -148,7 +148,7 @@ Rules are the core of Sentrie policies. They define what decisions to make based
 
 ### Syntax
 
-```text
+```sentrie
 rule IDENT (: type)? = (default expr)? (when expr)? blockExpr
 ```
 
@@ -161,7 +161,7 @@ rule IDENT (: type)? = (default expr)? (when expr)? blockExpr
 
 ### Examples
 
-```text
+```sentrie
 -- Simple rule
 rule allow = default false {
   yield true
@@ -190,7 +190,7 @@ rule calculateDiscount = default 0 {
 
 A rule declared as `list[T]`, `boolean` or `trinary` can be added to with `contribute`. See [Rules](/reference/rules#contributing-to-a-rule).
 
-```text
+```sentrie
 rule deny: list[string] = []
 contribute deny when user.disabled { yield "user disabled" }
 ```
@@ -217,7 +217,7 @@ Sentrie has a rich expression language with multiple operator types and preceden
 
 ### Primary Expressions
 
-```text
+```sentrie
 -- Literals
 42
 3.14
@@ -257,7 +257,7 @@ product.price
 
 ### Ternary Expressions
 
-```text
+```sentrie
 condition ? trueValue : falseValue
 
 -- Examples
@@ -267,7 +267,7 @@ age >= 18 ? "adult" : "minor"
 
 ### Block Expressions
 
-```text
+```sentrie
 {
   let variable = expression
   -- other statements
@@ -598,7 +598,7 @@ Sentrie provides primitives, collections, shapes, and aliases for defining data 
 
 `T1 | T2 | ...` accepts a value that matches any member, in any type position (facts, `let`, shape fields, derive parameters and returns, casts, `is`). `?` and constraints bind to the member they follow: `string | number?` is `string | (number?)`. See [Union Types](/reference/types-and-values#union-types).
 
-```text
+```sentrie
 let id: string | number = "u-42"
 let ids: list[string | number] = [1, "two", 3]
 ```
@@ -614,7 +614,7 @@ Shapes define structured data with fields and constraints.
 - `field: T?` - required, nullable
 - `field?: T?` - optional, nullable
 
-```text
+```sentrie
 shape User {
   id: string
   name: string
@@ -638,7 +638,7 @@ shape Product {
 
 Shapes can be composed from other shapes using the `with` keyword:
 
-```text
+```sentrie
 shape BaseUser {
   id: string
   name: string
@@ -678,7 +678,7 @@ policy users {
 
 Collection types take constraints on their elements:
 
-```text
+```sentrie
 let numbers: list[number] = [1, 2, 3]
 let scores: dict[number @min(0) @max(100)] = {"alice": 95, "bob": 87}
 ```
@@ -687,7 +687,7 @@ let scores: dict[number @min(0) @max(100)] = {"alice": 95, "bob": 87}
 
 You can create aliases using shapes:
 
-```text
+```sentrie
 shape Positive100 number @min(0) @max(100)
 
 let score: Positive100 = 50
@@ -697,7 +697,7 @@ let score: Positive100 = 50
 
 ### String Literals
 
-```text
+```sentrie
 "hello world"
 "escaped \"quotes\""
 "line 1\nline 2"
@@ -705,7 +705,7 @@ let score: Positive100 = 50
 
 A string literal may span lines. A line break inside it is a newline (`\n`) whatever the file's line endings: in a file saved with Windows (CRLF) line endings the carriage return is dropped, so the same policy gives the same value on every platform. An escaped `\r` is kept.
 
-```text
+```sentrie
 let s = "line 1
 line 2"   -- equal to "line 1\nline 2" in LF and CRLF files alike
 ```
@@ -714,7 +714,7 @@ line 2"   -- equal to "line 1\nline 2" in LF and CRLF files alike
 
 A heredoc writes a multi-line string without escapes. It opens with `<<<` and a tag, and ends at a line that holds only that tag:
 
-```text
+```sentrie
 let query = <<<SQL
 select "name"
   from users
@@ -731,7 +731,7 @@ The value of `query` is `select "name"\n  from users\n`.
 
 ### Numeric Literals
 
-```text
+```sentrie
 42          -- Number (an exact integer)
 -42         -- Negative number
 9007199254740993  -- Integers keep every digit up to 9223372036854775807
@@ -745,7 +745,7 @@ See [Types and Values](/reference/types-and-values/#number-literals) for the exa
 
 ### Boolean and Trinary Literals
 
-```text
+```sentrie
 true        -- Boolean true
 false       -- Boolean false
 unknown     -- Trinary unknown (neither true nor false)
@@ -753,7 +753,7 @@ unknown     -- Trinary unknown (neither true nor false)
 
 ### Collection Literals
 
-```text
+```sentrie
 -- Lists
 [1, 2, 3]
 ["hello", "world"]
@@ -773,7 +773,7 @@ unknown     -- Trinary unknown (neither true nor false)
 
 ### Null Literal
 
-```text
+```sentrie
 null        -- Null value
 ```
 
@@ -781,7 +781,7 @@ null        -- Null value
 
 ### Elvis operator (`?:`)
 
-```text
+```sentrie
 a ?: b
 ```
 
@@ -789,7 +789,7 @@ If `a` is **`null`** or **`undefined`**, the expression evaluates to **`b`** (an
 
 ### Arithmetic Operators
 
-```text
+```sentrie
 +           -- Addition
 -           -- Subtraction
 *           -- Multiplication
@@ -799,7 +799,7 @@ If `a` is **`null`** or **`undefined`**, the expression evaluates to **`b`** (an
 
 ### Pipeline Operator
 
-```text
+```sentrie
 |>          -- Pipe left expression into callable target on the right
 ```
 
@@ -807,7 +807,7 @@ For complete rules and examples, see [Function chaining](/reference/function-cha
 
 ### Comparison Operators
 
-```text
+```sentrie
 ==          -- Equality
 !=          -- Inequality
 <           -- Less than
@@ -820,7 +820,7 @@ For complete rules and examples, see [Function chaining](/reference/function-cha
 
 ### Logical Operators
 
-```text
+```sentrie
 and         -- Logical AND
 or          -- Logical OR
 xor         -- Logical XOR
@@ -830,7 +830,7 @@ not         -- Logical NOT
 
 ### Collection Operators
 
-```text
+```sentrie
 in          -- Membership
 not in      -- Non-membership
 contains    -- Contains
@@ -841,7 +841,7 @@ not matches -- Pattern non-matching
 
 ### Shape Checking Operators
 
-```text
+```sentrie
 is defined  -- Check if defined
 is not defined -- Check if not defined
 is empty    -- Check if empty
@@ -853,7 +853,7 @@ is T        -- Shape or type check, T may be a union or any (see Shapes)
 
 These builtins operate on lists. Predicate and mapping steps use inline lambdas: `(param) => { ... }` or `(param, index) => { ... }`.
 
-```text
+```sentrie
 any(list, predicate)       -- True if any element satisfies the predicate
 all(list, predicate)       -- True if every element satisfies the predicate
 filter(list, predicate)    -- New list of elements where the predicate is truthy
@@ -869,7 +869,7 @@ count(value)               -- Length of list, dict, or string
 
 These builtins build and combine [sets](/reference/types-and-values#sets). The two-operand builtins accept a set or a plain list for each operand.
 
-```text
+```sentrie
 set(list)                  -- Distinct elements of a list, sorted
 union(a, b)                -- Elements in either operand
 intersection(a, b)         -- Elements in both operands
@@ -880,7 +880,7 @@ is_superset(a, b)          -- True if every element of b is in a
 
 ### Glob, object and unit builtins
 
-```text
+```sentrie
 glob_match(pattern, delimiters, value)  -- Glob match; * stays in a segment, ** crosses delimiters
 object_get(obj, path, default)          -- Nested lookup by path, or the default
 object_keys(obj)                        -- Sorted keys of a dict
@@ -897,13 +897,13 @@ See [Built-in Functions](/reference/built-in-functions) for details and examples
 
 Postfix `expr as Type` converts a value and validates it against `Type` (including shape constraints).
 
-```text
+```sentrie
 as          -- Postfix cast: expr as Type (see Types and values)
 ```
 
 Example:
 
-```text
+```sentrie
 let y = "99"
 let x: number = y as number
 ```
@@ -918,7 +918,7 @@ Sentrie supports importing functions from TypeScript modules, including built-in
 
 The `use` statement allows you to import functions from TypeScript modules:
 
-```text
+```sentrie
 use { function1, function2 } from @sentrie/module as alias
 ```
 
@@ -932,7 +932,7 @@ The `as` clause is optional. If omitted, the default alias is the last part of t
 
 Built-in modules are prefixed with `@sentrie/`:
 
-```text
+```sentrie
 namespace com/example/auth
 
 policy mypolicy {
@@ -957,7 +957,7 @@ policy mypolicy {
 
 You can import TypeScript files from your policy pack using relative paths:
 
-```text
+```sentrie
 namespace com/example/auth
 
 policy mypolicy {
@@ -1000,7 +1000,7 @@ See the [Built-in TypeScript Modules](/reference/typescript_modules/) documentat
 
 Facts are named values that can be injected into policy evaluation:
 
-```text
+```sentrie
 -- Required facts (must be provided)
 fact userId: string as id
 fact user: User as currentUser
@@ -1031,7 +1031,7 @@ Facts can have:
 
 Variables are local to a policy or rule:
 
-```text
+```sentrie
 let maxRetries = 3
 let adminRoles = ["admin", "super_admin"]
 let userAge = user.birthDate ? calculateAge(user.birthDate) : 0
@@ -1059,7 +1059,7 @@ Read more on let declarations [here](/reference/let).
 
 Variables can be computed with the `reduce` builtin and a reducer lambda:
 
-```text
+```sentrie
 let numbers: list[number] = [1, 2, 3, 4, 5]
 
 let sum: number = reduce(numbers, 0, (acc, num, idx) => {
@@ -1077,7 +1077,7 @@ let max: number = reduce(numbers, numbers[0], (acc, num, idx) => {
 
 Export rules to make them available for external evaluation:
 
-```text
+```sentrie
 export decision of ruleName
 export decision of ruleName
   attach attachmentName as expression
@@ -1086,7 +1086,7 @@ export decision of ruleName
 
 Exports can include attachments that provide additional data:
 
-```text
+```sentrie
 export decision of allow_admin
   attach the_float as (10 + 5) * (5 - 2) / 2
   attach the_number as 8 / 6
@@ -1101,7 +1101,7 @@ export decision of allow_admin
 
 Import rules from other policies:
 
-```text
+```sentrie
 rule importedRule = import decision ruleName from com/example/other/policy
 rule importedRule = import decision ruleName from com/example/other/policy with param as value
 ```
@@ -1110,7 +1110,7 @@ rule importedRule = import decision ruleName from com/example/other/policy with 
 
 Comments start with `--` and continue to the end of the line:
 
-```text
+```sentrie
 -- This is a comment
 rule allow = default false {  -- Inline comment
   yield true
@@ -1123,7 +1123,7 @@ Sentrie provides comprehensive error handling and validation:
 
 ### Validation Errors
 
-```text
+```sentrie
 -- This will cause a validation error
 rule invalid = default false {
   yield "string" + 42  -- Cannot add string and number
@@ -1132,7 +1132,7 @@ rule invalid = default false {
 
 ### Constraint Violations
 
-```text
+```sentrie
 -- This will cause a constraint violation
 rule invalid = default false {
   let age: number @min(0) @max(150) = -5  -- Age constraint violation
@@ -1144,7 +1144,7 @@ rule invalid = default false {
 
 Accessing non-existent fields returns `undefined` rather than causing an error:
 
-```text
+```sentrie
 rule example = default false {
   let value = user.nonexistent.field  -- Returns undefined
   yield value  -- undefined
@@ -1153,7 +1153,7 @@ rule example = default false {
 
 Any operation on `undefined` will also yield `undefined`:
 
-```text
+```sentrie
 rule example = default false {
   let value = user.nonexistent.field  -- undefined
   let result = value + 1              -- undefined (operation on undefined)
@@ -1164,7 +1164,7 @@ rule example = default false {
 
 Use the `is defined` operator to check if a value is defined before using it:
 
-```text
+```sentrie
 rule example = default false when user.nonexistent.field is defined {
   yield user.nonexistent.field
 }
@@ -1174,7 +1174,7 @@ rule example = default false when user.nonexistent.field is defined {
 
 ### 1. Use Clear Names
 
-```text
+```sentrie
 -- Good
 rule canUserEditPost = default false when user.role == "admin" {
   yield true
@@ -1188,7 +1188,7 @@ rule x = default false when a == "b" {
 
 ### 2. Organize by Namespace
 
-```text
+```sentrie
 namespace com/example/auth
 namespace com/example/billing
 namespace com/example/analytics
@@ -1196,7 +1196,7 @@ namespace com/example/analytics
 
 ### 3. Use Facts for Configuration
 
-```text
+```sentrie
 -- Required facts (must be provided)
 fact maxLoginAttempts: number as limit
 
@@ -1207,7 +1207,7 @@ fact retryCount?: number as retries default 3
 
 ### 4. Validate Inputs
 
-```text
+```sentrie
 rule validateUser = default false when user is defined {
   yield user.id is defined and user.id != ""
 }
@@ -1215,7 +1215,7 @@ rule validateUser = default false when user is defined {
 
 ### 5. Use Shapes for Validation
 
-```text
+```sentrie
 shape User {
   id: string
   name: string
@@ -1229,7 +1229,7 @@ rule processUser = default false when user is User {
 
 ### 6. Leverage TypeScript Modules
 
-```text
+```sentrie
 -- Use built-in modules for common operations
 use { sha256 } from @sentrie/hash
 use { now } from @sentrie/time as time
@@ -1240,7 +1240,7 @@ use { parse } from @sentrie/json as json
 
 ### Simple Authorization
 
-```text
+```sentrie
 namespace com/example/auth
 
 policy user {
@@ -1261,7 +1261,7 @@ policy user {
 
 ### Resource-Based Access Control
 
-```text
+```sentrie
 namespace com/example/resources
 
 policy document {
@@ -1288,7 +1288,7 @@ policy document {
 
 ### Complex Business Logic with TypeScript
 
-```text
+```sentrie
 namespace com/example/billing
 
 policy pricing {

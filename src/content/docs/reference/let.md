@@ -7,7 +7,7 @@ description: "let declaration syntax, scoping, immutability, and type validation
 
 ## Syntax
 
-```text
+```sentrie
 let name = expr
 let name : type = expr
 ```
@@ -304,7 +304,7 @@ policy inferred {
 
 ### With Type Annotation
 
-```text
+```sentrie
 -- Explicit type annotations
 let count: number = 10
 let name: string = "example"

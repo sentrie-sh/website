@@ -13,14 +13,14 @@ Derives let you name reusable pure logic (predicates, mappers, small transforms)
 
 At namespace scope (alongside policies and shapes):
 
-```text
+```sentrie
 derive NAME = LAMBDA
 export derive NAME
 ```
 
 Inside a policy body. A derive starts the body like `let`, `rule` and `shape` do, so it can be the first body statement, and the policy's metadata, `fact` and `use` statements must come before it:
 
-```text
+```sentrie
 derive NAME = LAMBDA
 ```
 
