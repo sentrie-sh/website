@@ -1,0 +1,44 @@
+---
+// SPDX-FileCopyrightText: © 2026 Binaek Sarkar <binaek89@gmail.com>
+// SPDX-License-Identifier: Apache-2.0
+
+// A command shown as a label, with a copy button. DESIGN.md, "Command Chip".
+interface Props {
+	command: string;
+}
+
+const { command } = Astro.props;
+---
+
+<div class="sx-chip">
+	<span class="sx-chip-prompt" aria-hidden="true">$</span>
+	<code class="sx-chip-command">{command}</code>
+	<button class="sx-chip-copy" type="button" data-copy={command}>
+		<span class="sx-chip-label" aria-hidden="true">Copy</span>
+		<span class="sr-only">Copy command</span>
+	</button>
+	<span class="sx-chip-status sr-only" aria-live="polite"></span>
+</div>
+
+<script>
+	for (const button of document.querySelectorAll<HTMLButtonElement>(".sx-chip-copy")) {
+		const status = button.parentElement?.querySelector<HTMLElement>(".sx-chip-status");
+		const label = button.querySelector<HTMLElement>(".sx-chip-label");
+		let reset: ReturnType<typeof setTimeout> | undefined;
+		button.addEventListener("click", async () => {
+			let message = "Copied";
+			try {
+				await navigator.clipboard.writeText(button.dataset.copy ?? "");
+			} catch {
+				message = "Copy failed, select the command to copy it";
+			}
+			if (label) label.textContent = message === "Copied" ? "Copied" : "Select it";
+			if (status) status.textContent = message;
+			clearTimeout(reset);
+			reset = setTimeout(() => {
+				if (label) label.textContent = "Copy";
+				if (status) status.textContent = "";
+			}, 1600);
+		});
+	}
+</script>

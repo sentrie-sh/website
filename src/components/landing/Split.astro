@@ -1,0 +1,24 @@
+---
+// SPDX-FileCopyrightText: © 2026 Binaek Sarkar <binaek89@gmail.com>
+// SPDX-License-Identifier: Apache-2.0
+
+// Text on the left, a visual on the right. DESIGN.md, "Two-Column Feature Section".
+interface Props {
+	heading: string;
+	href: string;
+	linkText: string;
+}
+
+const { heading, href, linkText } = Astro.props;
+---
+
+<section class="sx-split not-content">
+	<div class="sx-split-text">
+		<h2 class="sx-section-title">{heading}</h2>
+		<slot name="text" />
+		<a class="sx-split-link" href={href}>{linkText} <span aria-hidden="true">→</span></a>
+	</div>
+	<div class="sx-split-visual">
+		<slot />
+	</div>
+</section>
