@@ -15,7 +15,7 @@ html[data-has-hero] body {
 	background-size: 16px 16px;
 }
 
-html[data-has-hero] .header {
+html[data-has-hero] header.header {
 	background: var(--surface);
 }
 
