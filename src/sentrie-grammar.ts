@@ -13,7 +13,7 @@ export const sentrieGrammar = {
     // Keywords - Program Structure
     {
       name: 'keyword.control.sentrie',
-      match: String.raw`\b(namespace|policy|rule|fact|let|export|import|use|from|as|default|when|yield|shape|attach|decision|of|with|contribute)\b`
+      match: String.raw`\b(namespace|policy|rule|fact|let|export|import|use|from|as|default|when|yield|shape|attach|decision|of|with|contribute|derive|transform|title|description|version|tag|data)\b`
     },
 
     // Keywords - State checking
@@ -49,7 +49,7 @@ export const sentrieGrammar = {
     // Types - Primitive types
     {
       name: 'storage.type.primitive.sentrie',
-      match: String.raw`\b(int|float|string|bool|document)\b`
+      match: String.raw`\b(string|number|boolean|trinary|document)\b`
     },
 
     // Types - Collection types
@@ -87,6 +87,12 @@ export const sentrieGrammar = {
     {
       name: 'keyword.operator.lambda.sentrie',
       match: String.raw`=>`
+    },
+
+    // Operators - Pipeline, spread and union
+    {
+      name: 'keyword.operator.pipeline.sentrie',
+      match: String.raw`\|>|\.\.\.|\||#`
     },
 
     // Operators - Comparison
