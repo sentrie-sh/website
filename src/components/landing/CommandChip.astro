@@ -1,0 +1,33 @@
+---
+// SPDX-FileCopyrightText: © 2026 Binaek Sarkar <binaek89@gmail.com>
+// SPDX-License-Identifier: Apache-2.0
+
+// A command shown as a label, with a copy button. DESIGN.md, "Command Chip".
+interface Props {
+	command: string;
+}
+
+const { command } = Astro.props;
+---
+
+<div class="sx-chip">
+	<span class="sx-chip-prompt" aria-hidden="true">$</span>
+	<code class="sx-chip-command">{command}</code>
+	<button class="sx-chip-copy" type="button" data-copy={command} aria-label="Copy command">
+		Copy
+	</button>
+</div>
+
+<script>
+	for (const button of document.querySelectorAll<HTMLButtonElement>(".sx-chip-copy")) {
+		button.addEventListener("click", async () => {
+			try {
+				await navigator.clipboard.writeText(button.dataset.copy ?? "");
+				button.textContent = "Copied";
+			} catch {
+				button.textContent = "Select and copy";
+			}
+			setTimeout(() => (button.textContent = "Copy"), 1600);
+		});
+	}
+</script>

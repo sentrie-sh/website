@@ -22,7 +22,10 @@ export default defineConfig({
         light: "./src/assets/logo-light.svg",
         dark: "./src/assets/logo-dark.svg",
       },
-      customCss: ["./src/styles/theme.css"],
+      customCss: ["./src/styles/theme.css", "./src/styles/landing.css"],
+      components: {
+        Hero: "./src/components/Hero.astro",
+      },
       credits: true,
       social: [
         {
