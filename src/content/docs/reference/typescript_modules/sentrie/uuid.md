@@ -29,7 +29,7 @@ alias.v7()
 
 ### Typical use
 
-```text
+```sentrie
 use { v4, v7 } from @sentrie/uuid
 let id = uuid.v4()
 let timeId = uuid.v7()
@@ -37,7 +37,7 @@ let timeId = uuid.v7()
 
 ### Going further
 
-```text
+```sentrie
 use { v6 } from @sentrie/uuid
 let uuid = uuid.v6()  // Time-ordered UUID
 ```
@@ -52,7 +52,7 @@ Generates a version 7 UUID (time-ordered UUID with Unix timestamp). Version 7 UU
 
 **Example:**
 
-```text
+```sentrie
 use { v7 } from @sentrie/uuid
 let uuid = uuid.v7()  // Time-ordered UUID with Unix timestamp
 ```
@@ -79,7 +79,7 @@ let uuid = uuid.v7()  // Time-ordered UUID with Unix timestamp
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/resources
 
 policy mypolicy {

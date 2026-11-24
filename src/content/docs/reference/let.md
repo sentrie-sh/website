@@ -304,7 +304,7 @@ policy inferred {
 
 ### With Type Annotation
 
-```text
+```sentrie
 -- Explicit type annotations
 let count: number = 10
 let name: string = "example"

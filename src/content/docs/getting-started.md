@@ -38,7 +38,7 @@ cd my-first-policy
 
 Create a file called `auth.sentrie`:
 
-```text
+```sentrie
 namespace com/example/auth
 
 policy user {
@@ -113,7 +113,7 @@ Response:
 
 Namespaces organize your policies hierarchically:
 
-```text
+```sentrie
 namespace com/example/auth
 namespace com/example/billing
 namespace com/example/analytics
@@ -123,7 +123,7 @@ namespace com/example/analytics
 
 Policies contain rules and define the context for evaluation:
 
-```text
+```sentrie
 policy user {
   // rules go here
 }
@@ -142,7 +142,7 @@ Rules are the core of Sentrie policies. They have three parts:
 
 Export rules to make them available for external evaluation:
 
-```text
+```sentrie
 export decision of allow
 ```
 
@@ -159,7 +159,7 @@ Now that you have a basic understanding, explore:
 
 ### Simple Authorization
 
-```text
+```sentrie
 policy access {
   rule allow = default false when user.role in ["admin", "editor"] {
     yield true
@@ -171,7 +171,7 @@ policy access {
 
 ### Resource-Based Access
 
-```text
+```sentrie
 policy resource {
   rule canRead = default false when user.role == "admin" or resource.owner == user.id {
     yield true
@@ -188,7 +188,7 @@ policy resource {
 
 ### Conditional Logic
 
-```text
+```sentrie
 policy pricing {
   rule calculatePrice = default 0 {
     let basePrice = product.price
@@ -206,13 +206,13 @@ policy pricing {
 
 Use the pipeline operator when you want top-to-bottom transformation flow:
 
-```text
+```sentrie
 let normalized = input
   |> str.trim
   |> str.toLower
 ```
 
-This is equivalent to nested calls such as `str.toLower(str.trim(input))`. See [Function chaining](/reference/function-chaining), the [Policy Language Reference](/reference), and [Precedence](/reference/precedence) for full rules and constraints.
+This is equivalent to nested calls such as `str.toLower(str.trim(input))`. See [Pipelining](/reference/pipelining), the [Policy Language Reference](/reference), and [Precedence](/reference/precedence) for full rules and constraints.
 
 ## Troubleshooting
 

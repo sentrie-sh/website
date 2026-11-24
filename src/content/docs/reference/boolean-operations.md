@@ -58,7 +58,7 @@ Elvis does not use truthiness. `expr ?: default` yields `default` only when `exp
 
 ### Logical and comparison
 
-```text
+```sentrie
 let a: boolean = true and false
 let b: boolean = age >= 18
 let c: boolean = not (user.role in allowed_roles)
@@ -73,7 +73,7 @@ let e: string = user.name ?: "Anonymous"
 
 ### Pattern matching (regex)
 
-```text
+```sentrie
 let g: boolean = email matches `^[a-z]+@[a-z]+\\.com$`
 ```
 
@@ -81,7 +81,7 @@ Left and right must be strings. The right is a regular expression in [RE2 syntax
 
 ### Combining conditions
 
-```text
+```sentrie
 let f: boolean = user.role == "admin" or (user.role == "user" and user.status == "active")
 let h: boolean = not (role in ["guest"]) and status == "active"
 ```
@@ -128,7 +128,7 @@ value1 is value2
 
 #### Basic Examples
 
-```text
+```sentrie
 let age: number = 25
 let is_adult: boolean = age == 18
 -- Result: false
@@ -158,7 +158,7 @@ value1 is not value2
 
 #### Examples
 
-```text
+```sentrie
 let age: number = 25
 let is_minor: boolean = age != 18
 -- Result: true
@@ -184,7 +184,7 @@ value1 > value2
 
 #### Examples
 
-```text
+```sentrie
 let age: number = 25
 let is_adult: boolean = age > 17
 -- Result: true
@@ -210,7 +210,7 @@ value1 >= value2
 
 #### Examples
 
-```text
+```sentrie
 let age: number = 18
 let can_vote: boolean = age >= 18
 -- Result: true
@@ -236,7 +236,7 @@ value1 < value2
 
 #### Examples
 
-```text
+```sentrie
 let age: number = 16
 let is_minor: boolean = age < 18
 -- Result: true
@@ -262,7 +262,7 @@ value1 <= value2
 
 #### Examples
 
-```text
+```sentrie
 let age: number = 18
 let is_minor: boolean = age <= 17
 -- Result: false
@@ -282,7 +282,7 @@ The ordering operators `<`, `<=`, `>`, and `>=` also work on two strings. String
 
 #### Examples
 
-```text
+```sentrie
 let upper_first: boolean = "Z" < "a"
 -- Result: true (uppercase letters sort before lowercase)
 
@@ -332,7 +332,7 @@ string matches pattern
 
 #### Examples
 
-```text
+```sentrie
 let email: string = "user@example.com"
 let is_valid_email: boolean = email matches "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
 -- Result: true
@@ -368,7 +368,7 @@ collection contains value
 
 #### Examples
 
-```text
+```sentrie
 let numbers: list[number] = [1, 2, 3, 4, 5]
 let has_three: boolean = 3 in numbers
 -- Result: true
@@ -386,7 +386,7 @@ let can_read: boolean = "read" in permissions
 
 For dicts, if the `needle` is a string, it will be used as the key to check if the key exists in the `haystack`. If the `needle` is another dict, then it will be used to check if the `needle` dict is a subset of the `haystack` dict.
 
-```text
+```sentrie
 let user_permissions: dict[string] = {
   "read": true,
   "write": false,
@@ -427,7 +427,7 @@ value is not empty
 
 #### Basic Examples
 
-```text
+```sentrie
 let empty_string: string = ""
 let is_empty: boolean = empty_string is empty
 -- Result: true
@@ -447,7 +447,7 @@ let list_is_not_empty: boolean = non_empty_list is not empty
 
 #### Working with Shapes
 
-```text
+```sentrie
 shape User {
   name: string
   email?: string
@@ -481,7 +481,7 @@ value is not defined
 
 #### Basic Examples
 
-```text
+```sentrie
 shape User {
   name: string
   email?: string
@@ -508,7 +508,7 @@ let display_email: string = user.email is defined ? user.email : "No email provi
 
 #### Complex Definedness Logic
 
-```text
+```sentrie
 shape Order {
   id: string
   customer_name: string
@@ -545,7 +545,7 @@ let contact_method: string = order.customer_email is defined ?
 
 ### Access Control System
 
-```text
+```sentrie
 shape User {
   id: string
   username: string
@@ -595,7 +595,7 @@ let can_access: boolean = user.active and
 
 ### Data Validation System
 
-```text
+```sentrie
 use {length} from @sentrie/js as str
 
 shape RegistrationData {
@@ -638,7 +638,7 @@ let is_valid_registration: boolean =
 
 ### Use Clear Variable Names
 
-```text
+```sentrie
 -- Good
 let is_valid_user: boolean = user.age >= 18 and user.email is defined
 
@@ -648,7 +648,7 @@ let flag: boolean = user.age >= 18 and user.email is defined
 
 ### Combine Operations Readably
 
-```text
+```sentrie
 -- Good: Clear grouping with parentheses
 let can_access: boolean = (user.active and user.verified) or
                        (user.role == "admin" and user.age >= 18)
@@ -659,7 +659,7 @@ let can_access: boolean = user.active and user.verified or user.role == "admin" 
 
 ### Handle Edge Cases
 
-```text
+```sentrie
 -- Check for empty values before operations
 let is_valid: boolean = user.name is not empty and
                     str.length(user.name) >= 2 and
@@ -669,7 +669,7 @@ let is_valid: boolean = user.name is not empty and
 
 ### Use Appropriate Operators
 
-```text
+```sentrie
 -- Use 'is' for readability with null checks
 let has_email: boolean = user.email is defined
 

@@ -20,7 +20,7 @@ TypeScript support in Sentrie allows you to:
 
 The `use` statement allows you to import functions from TypeScript modules:
 
-```text
+```sentrie
 use { function1, function2 } from @sentrie/module
 ```
 
@@ -30,7 +30,7 @@ use { function1, function2 } from @sentrie/module
 
 Built-in libraries are prefixed with `@sentrie/`:
 
-```text
+```sentrie
 namespace com/example/auth
 
 shape User {
@@ -58,7 +58,7 @@ policy mypolicy {
 
 You can import TypeScript files from your policy pack using relative paths. These paths are automatically normalized to `@local` paths [as described below](#path-resolution):
 
-```text
+```sentrie
 namespace com/example/auth
 
 shape User {
@@ -85,7 +85,7 @@ policy mypolicy {
 
 Here's a complete example showing various usage patterns:
 
-```text
+```sentrie
 namespace com/example/auth
 
 shape User {
@@ -174,7 +174,7 @@ See the [Built-in TypeScript Modules](/reference/typescript_modules/) documentat
 
 When importing from a module, you can optionally specify an alias using the `as` keyword:
 
-```text
+```sentrie
 use { now, parse } from @sentrie/time as time
 use { md5 } from @sentrie/hash as crypto
 ```

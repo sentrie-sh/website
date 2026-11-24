@@ -51,7 +51,7 @@ Writes nothing. Prints a unified diff for each file that would change. On its ow
 
 Take a policy that is formatted inconsistently and has comments in several places:
 
-```text
+```sentrie
 namespace   com/example/auth
 policy   user {
 fact role:   string
@@ -134,7 +134,7 @@ sentrie fmt ./...
 
 This rewrites `access.sentrie` as:
 
-```text
+```sentrie
 namespace com/example/auth
 
 policy user {

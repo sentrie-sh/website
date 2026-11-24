@@ -244,7 +244,7 @@ fact config?: document as settings default { "env": "production" }
 
 ### Multiple facts, mix of required and optional
 
-```text
+```sentrie
 fact user: User as currentUser
 fact request: Request as req
 fact options?: Options as opts default {}
