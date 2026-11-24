@@ -49,7 +49,11 @@ Policy:    user_access
 
 Rules:
   ✓ allow_user: ✓ True
-  ✓ allow_admin: ⨯ False`;
+  ✓ allow_admin: ⨯ False
+
+Values:
+  ✓ allow_user: true
+  ✓ allow_admin: false`;
 
 export const request = `curl -X POST http://localhost:7529/decision/com/example/user_management/user_access/allow_user \\
   -H "Content-Type: application/json" \\
@@ -95,23 +99,23 @@ export const response = `{
     },
     {
       title: "Deterministic by design",
-      body: "Derives stay pure, and a capabilities file decides which builtins and modules a pack may use.",
+      body: "Derives stay pure. A capabilities file decides which builtins and modules a pack may use, and can pin JavaScript's clock and random source.",
       href: "/reference/capabilities",
     },
     {
       title: "One binary, many commands",
-      body: "Evaluate with exec, serve over HTTP, and check packs with validate, fmt and bench.",
+      body: "Evaluate with exec and serve over HTTP. Check packs with validate and fmt, and time them with bench.",
       href: "/cli-reference",
     },
   ]}
 />
 
 <Split heading="Serve decisions over HTTP" href="/running-sentrie/serving-policies" linkText="Serving policies">
-  <p slot="text">
+  <div slot="text">
     Run <code>sentrie serve</code> next to your application and post facts to
     a policy. Each response carries the decision, its trinary state and the
     rule that made it, as plain JSON.
-  </p>
+  </div>
   <CodeFrame file="request.sh" lang="bash" code={request} output={response} outputLang="json" size="narrow" />
 </Split>
 
