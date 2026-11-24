@@ -8,7 +8,7 @@ Generates UUIDs. v4: random; v6/v7: time-ordered. Use when you need unique ident
 
 ## Syntax
 
-```sentrie
+```text
 use { v4, v6, v7 } from @sentrie/uuid [ as alias ]
 alias.v4()
 alias.v6()

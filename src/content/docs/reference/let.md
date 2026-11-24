@@ -7,7 +7,7 @@ description: "let declaration syntax, scoping, immutability, and type validation
 
 ## Syntax
 
-```sentrie
+```text
 let name = expr
 let name : type = expr
 ```

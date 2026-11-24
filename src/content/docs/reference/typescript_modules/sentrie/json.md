@@ -8,7 +8,7 @@ Provides `isValid` to check if a string is valid JSON. For parsing and stringify
 
 ## Syntax
 
-```sentrie
+```text
 use { isValid } from @sentrie/json [ as alias ]
 alias.isValid(str)
 ```

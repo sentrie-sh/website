@@ -8,7 +8,7 @@ You can add TypeScript files to your policy pack and import them in policies wit
 
 ## Syntax
 
-```sentrie
+```text
 use { fn1, fn2 } from "./path/to/file.ts" [ as alias ]
 use { fn1 } from @local/path/to/module [ as alias ]
 ```

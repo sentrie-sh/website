@@ -57,7 +57,7 @@ Namespaces organize your policies and shapes hierarchically and prevent naming c
 
 ### Syntax
 
-```sentrie
+```text
 namespace FQN
 policy IDENT { fact ... let ... use ... rule ... export decision of IDENT }
 shape IDENT { ... } | shape IDENT baseType @constraint
@@ -148,7 +148,7 @@ Rules are the core of Sentrie policies. They define what decisions to make based
 
 ### Syntax
 
-```sentrie
+```text
 rule IDENT (: type)? = (default expr)? (when expr)? blockExpr
 ```
 

@@ -7,7 +7,7 @@ When you need to define who can do what (or any decision your app will enforce),
 
 Here is the basic syntax:
 
-```sentrie
+```text
 namespace SLUG
 
 shape ShapeName { field: type  field?: type }

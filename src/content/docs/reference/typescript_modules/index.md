@@ -8,7 +8,7 @@ Built-in modules provide functions for hashing, encoding, time, JSON, regex, and
 
 ## Syntax
 
-```sentrie
+```text
 use { fn1, fn2 } from @sentrie/module [ as alias ]
 ```
 

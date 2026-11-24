@@ -15,7 +15,7 @@ Facts live in the **facts** section of a policy: after optional [metadata](/refe
 
 ## Syntax
 
-```sentrie
+```text
 fact name : type [ as alias ] [ default expr ]    -- required
 fact name? : type [ as alias ] [ default expr ]  -- optional
 ```
