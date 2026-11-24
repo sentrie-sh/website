@@ -78,7 +78,7 @@ body {
 }
 
 /* Header */
-.header {
+header.header {
 	border-bottom: 1px solid var(--hairline);
 }
 
