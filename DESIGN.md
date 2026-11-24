@@ -149,7 +149,7 @@ Signal Blue fill, white text in the sans at 14px weight 500, 2px radius, 10px 16
 
 ### Ghost Button
 
-Transparent background, 1px Fog border, sans 14px Graphite text, 2px radius, 10px 16px padding, 6px gap to a leading icon. Sits 8px to the right of the primary button, never alone in a row. On the landing page it reads "Read the docs".
+Surface background (white, or the dark surface in dark mode) so it stays solid on the grid, 1px Fog border, sans 14px Graphite text, 2px radius, 10px 16px padding, 6px gap to a leading icon. Sits 8px to the right of the primary button, never alone in a row. On the landing page it reads "Read the docs".
 
 ### Hero Section
 
@@ -157,7 +157,7 @@ Full-width canvas with the dotted grid (1px dots every 16px, in Silver Mist). Ce
 
 ### Code Preview Frame
 
-The landing page's main visual: a real Sentrie policy, highlighted with the code syntax colors. Onyx surface, 6px radius, the frame shadow lifting it off the grid. A 32px Midnight title bar with three muted dots on the left and a file tab in mono 12px with label tracking (`policy.sentrie`). Below the code, a result strip shows the command and its decision, for example `sentrie exec` followed by the rule's output. Centered, up to 960px wide.
+The landing page's main visual: a real Sentrie policy, highlighted with the code syntax colors. Onyx surface, 6px radius, the frame shadow lifting it off the grid. A 36px Midnight title bar with three muted dots on the left and a file tab in mono 12px with label tracking (`policy.sentrie`). Below the code, a result strip shows the command and its decision, for example `sentrie exec` followed by the rule's output. Centered, up to 960px wide.
 
 ### Three-Column Feature Row
 

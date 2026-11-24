@@ -1,33 +1,31 @@
 /* SPDX-FileCopyrightText: © 2026 Binaek Sarkar <binaek89@gmail.com>
    SPDX-License-Identifier: Apache-2.0 */
 
-/* Landing page. Only the landing page sets `hero`, so Starlight marks it with
-   html[data-has-hero]. DESIGN.md describes each component. */
+/* Landing page. Page-level rules are scoped to :root:has(.sx-hero), which only
+   the landing page's Hero renders; component rules are namespaced .sx-*.
+   DESIGN.md describes each component. */
 
-html[data-has-hero] {
+/* (0,2,0) beats Starlight's html:not([data-has-sidebar]) width (0,1,1) */
+:root:has(.sx-hero) {
 	--sl-content-width: 75rem;
 }
 
 /* The gridded canvas */
-html[data-has-hero] body {
+:root:has(.sx-hero) body {
 	background-color: var(--surface-canvas);
 	background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
 	background-size: 16px 16px;
 }
 
-html[data-has-hero] header.header {
+:root:has(.sx-hero) header.header {
 	background: var(--surface);
 }
 
-html[data-has-hero] .content-panel {
+:root:has(.sx-hero) .content-panel {
 	padding-block: 0;
 }
 
-html[data-has-hero] .content-panel + .content-panel {
-	border-top: 0;
-}
-
-html[data-has-hero] .sl-container > * + * {
+:root:has(.sx-hero) .sl-container > * + * {
 	margin-top: 0;
 }
 
@@ -50,15 +48,11 @@ html[data-has-hero] .sl-container > * + * {
 	color: var(--text-tertiary);
 }
 
+/* Family, weight, tracking and colour come from theme.css h1#_top */
 .sx-hero-title {
 	max-width: 15em;
 	margin: 0;
-	font-family: var(--font-display);
 	font-size: clamp(2.25rem, 5vw, var(--text-heading));
-	font-weight: 340;
-	line-height: 1.1;
-	letter-spacing: var(--tracking-display);
-	color: var(--ink);
 	text-wrap: balance;
 }
 
@@ -106,7 +100,7 @@ html[data-has-hero] .sl-container > * + * {
 }
 
 .sx-button--primary:hover {
-	background: #1a6ff0;
+	background: var(--color-signal-blue-hover);
 	color: var(--color-pure-white);
 }
 
@@ -201,7 +195,7 @@ html[data-has-hero] .sl-container > * + * {
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	background: #4a505c;
+	background: var(--color-frame-dot);
 }
 
 .sx-frame-tab {
@@ -231,7 +225,7 @@ html[data-has-hero] .sl-container > * + * {
 
 .sx-frame-result {
 	border-top: 1px solid var(--color-midnight);
-	background: #23272e;
+	background: var(--surface-code-result);
 }
 
 .sx-frame-result .expressive-code + .expressive-code {
@@ -239,7 +233,8 @@ html[data-has-hero] .sl-container > * + * {
 	border-top: 1px dashed var(--color-midnight);
 }
 
-.sx-frame .copy {
+/* Keep copy on the command and the request, not on the long policy sample */
+.sx-frame--wide .sx-frame-code .copy {
 	display: none;
 }
 
@@ -345,7 +340,7 @@ html[data-has-hero] .sl-container > * + * {
 }
 
 /* Footer on the canvas */
-html[data-has-hero] footer {
+:root:has(.sx-hero) footer {
 	padding-block: 2rem 3rem;
 }
 
