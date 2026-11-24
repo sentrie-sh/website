@@ -94,7 +94,7 @@ let c = cond ? x : y |> len
 -- Equivalent to: len(cond ? x : y)
 ```
 
-For pipeline syntax, valid targets, and memoization, see [Function chaining](/reference/function-chaining).
+For pipeline syntax, valid targets, and memoization, see [Pipelining](/reference/pipelining).
 
 ## Good to Know
 

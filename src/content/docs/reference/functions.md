@@ -188,7 +188,7 @@ Avoid memoization for functions that:
 - Have side effects that must execute each time
   :::
 
-## Function chaining (`|>`)
+## Pipelining (`|>`)
 
 The pipeline operator `|>` passes the left value into the next function call, allowing clear, top-to-bottom transformation chains:
 
@@ -199,7 +199,7 @@ let slug = input
   |> str.replaceAll(" ", "-")
 ```
 
-Use `#` in the right-hand call to put the piped value anywhere in the argument list. See [Function chaining](/reference/function-chaining) for all details.
+Use `#` in the right-hand call to put the piped value anywhere in the argument list. See [Pipelining](/reference/pipelining) for all details.
 
 ## Using Functions in Rules and Let Declarations
 

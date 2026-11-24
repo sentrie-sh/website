@@ -17,7 +17,7 @@ This section is a reference for the Sentrie policy language: syntax, types, oper
 - [Primitives, Collections, Shapes, and Aliases](#primitives-collections-shapes-and-aliases)
 - [Literals](#literals)
 - [Operators](#operators)
-- [Function chaining](/reference/function-chaining) - Pipeline operator (`|>`), desugaring, precedence, and memoization
+- [Pipelining](/reference/pipelining) - Pipeline operator (`|>`), desugaring, precedence, and memoization
 - [TypeScript Modules](#typescript-modules)
 - [Facts and Variables](#facts-and-variables)
 - [Exports and Imports](#exports-and-imports)
@@ -803,7 +803,7 @@ If `a` is **`null`** or **`undefined`**, the expression evaluates to **`b`** (an
 |>          -- Pipe left expression into callable target on the right
 ```
 
-For complete rules and examples, see [Function chaining](/reference/function-chaining).
+For complete rules and examples, see [Pipelining](/reference/pipelining).
 
 ### Comparison Operators
 

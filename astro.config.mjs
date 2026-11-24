@@ -8,6 +8,9 @@ import { sentrieCodeTheme } from "./src/code-theme.ts";
 export default defineConfig({
   site: process.env.ASTRO_SITE_URL || "https://sentrie.sh",
   trailingSlash: "ignore",
+  redirects: {
+    "/reference/function-chaining": "/reference/pipelining",
+  },
   prefetch: {
     defaultStrategy: "viewport",
     prefetchAll: true,
@@ -222,8 +225,8 @@ export default defineConfig({
               slug: "reference/built-in-functions",
             },
             {
-              label: "Function chaining",
-              slug: "reference/function-chaining",
+              label: "Pipelining",
+              slug: "reference/pipelining",
             },
             {
               label: "Using TypeScript",
