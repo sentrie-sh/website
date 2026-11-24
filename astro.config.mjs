@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import { sentrieGrammar } from "./src/sentrie-grammar.ts";
+import { sentrieCodeTheme } from "./src/code-theme.ts";
 
 // https://astro.build/config
 export default defineConfig({
@@ -14,6 +15,11 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Sentrie",
+      logo: {
+        light: "./src/assets/logo-light.svg",
+        dark: "./src/assets/logo-dark.svg",
+      },
+      customCss: ["./src/styles/theme.css"],
       credits: true,
       social: [
         {
@@ -329,7 +335,28 @@ export default defineConfig({
         },
       ],
       expressiveCode: {
-        themes: ["github-dark", "github-light"],
+        themes: [sentrieCodeTheme],
+        useStarlightUiThemeColors: false,
+        styleOverrides: {
+          borderRadius: "6px",
+          borderColor: "#2f343e",
+          codeFontFamily: "var(--font-mono)",
+          codeFontSize: "0.8125rem",
+          codeLineHeight: "1.67",
+          uiFontFamily: "var(--font-sans)",
+          frames: {
+            shadowColor: "transparent",
+            editorTabBarBackground: "#2f343e",
+            editorActiveTabBackground: "#282c33",
+            editorActiveTabIndicatorTopColor: "#2b7fff",
+            editorActiveTabIndicatorBottomColor: "transparent",
+            editorTabBarBorderBottomColor: "#2f343e",
+            terminalTitlebarBackground: "#2f343e",
+            terminalTitlebarBorderBottomColor: "#2f343e",
+            terminalBackground: "#282c33",
+            frameBoxShadowCssValue: "none",
+          },
+        },
         shiki: {
           langs: [sentrieGrammar],
         },

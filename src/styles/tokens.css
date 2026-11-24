@@ -1,0 +1,97 @@
+/* SPDX-FileCopyrightText: © 2026 Binaek Sarkar <binaek89@gmail.com>
+   SPDX-License-Identifier: Apache-2.0 */
+
+/* Design tokens for sentrie.sh. DESIGN.md at the repo root documents them. */
+
+:root {
+	/* Palette */
+	--color-ink-blue: #1348dc;
+	--color-signal-blue: #2b7fff;
+	--color-sky-tint: #8ec5ff;
+	--color-frost: #bedbff;
+	--color-slate-blue: #74ade8;
+	--color-ice-wash: #e6effe;
+	--color-deep-cobalt: #053794;
+	--color-silver-mist: #e5e7eb;
+	--color-pure-white: #ffffff;
+	--color-off-white: #f4f4f2;
+	--color-graphite: #3a3d43;
+	--color-charcoal: #464b57;
+	--color-slate: #5d636f;
+	--color-pewter: #6a7282;
+	--color-ash: #878a98;
+	--color-steel: #b2b5bb;
+	--color-fog: #cccfd3;
+	--color-mist: #dadde2;
+	--color-onyx: #282c33;
+	--color-midnight: #2f343e;
+
+	/* Code syntax */
+	--code-string: #a1c181;
+	--code-keyword: #d07277;
+	--code-type: #dec184;
+	--code-function: #6eb4bf;
+	--code-variable: #b477cf;
+	--code-constant: #bf956a;
+	--code-comment: #878a98;
+	--code-text: #dce0e5;
+
+	/* Font families */
+	--font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+		sans-serif;
+	--font-serif: "Source Serif 4 Variable", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+	--font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas,
+		monospace;
+
+	/* Type */
+	--text-caption: 0.75rem;
+	--text-body: 0.875rem;
+	--text-heading-sm: 1.625rem;
+	--text-heading: 3rem;
+	--tracking-sans: -0.025em;
+	--tracking-serif: -0.02em;
+	--tracking-label: 0.05em;
+
+	/* Radius */
+	--radius-sm: 2px;
+	--radius-md: 6px;
+
+	/* Shadows */
+	--shadow-inset-line: rgba(111, 123, 144, 0.1) 0px -2px 0px 0px inset;
+	--shadow-active-nav: rgb(5, 55, 148) 0px 2px 0px 0px inset;
+	--shadow-raised: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+	--shadow-frame: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
+
+	/* Layout */
+	--page-max-width: 1200px;
+
+	/* Semantic roles (dark mode, Starlight's default scheme) */
+	--surface-canvas: #16181d;
+	--surface: #1c1f25;
+	--surface-warm: #21252b;
+	--surface-wash: #1b2a45;
+	--surface-code: var(--color-onyx);
+	--text-primary: #dce0e5;
+	--text-secondary: #a3a9b5;
+	--text-tertiary: #878a98;
+	--hairline: var(--color-midnight);
+	--hairline-strong: #3b414d;
+	--ink: var(--color-sky-tint);
+	--ink-hover: var(--color-frost);
+	--grid-dot: rgba(255, 255, 255, 0.07);
+}
+
+:root[data-theme="light"] {
+	--surface-canvas: #f8f9fa;
+	--surface: var(--color-pure-white);
+	--surface-warm: var(--color-off-white);
+	--surface-wash: var(--color-ice-wash);
+	--text-primary: var(--color-graphite);
+	--text-secondary: var(--color-slate);
+	--text-tertiary: var(--color-pewter);
+	--hairline: var(--color-silver-mist);
+	--hairline-strong: var(--color-fog);
+	--ink: var(--color-ink-blue);
+	--ink-hover: var(--color-deep-cobalt);
+	--grid-dot: var(--color-silver-mist);
+}
