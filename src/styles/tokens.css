@@ -37,9 +37,9 @@
 	--code-text: #dce0e5;
 
 	/* Font families */
-	--font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+	--font-sans: "Montserrat Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
 		sans-serif;
-	--font-serif: "Source Serif 4 Variable", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+	--font-display: var(--font-sans);
 	--font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas,
 		monospace;
 
@@ -48,8 +48,8 @@
 	--text-body: 0.875rem;
 	--text-heading-sm: 1.625rem;
 	--text-heading: 3rem;
-	--tracking-sans: -0.025em;
-	--tracking-serif: -0.02em;
+	--tracking-sans: -0.01em;
+	--tracking-display: -0.02em;
 	--tracking-label: 0.05em;
 
 	/* Radius */

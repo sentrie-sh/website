@@ -1,12 +1,12 @@
 # Sentrie - Style Reference
 
-> A technical manual on blueprint paper. A near-white gridded page, held together by one deep ink blue and a light humanist serif, so every page reads like a chapter in a well-printed reference.
+> A technical manual on blueprint paper. A near-white gridded page, held together by one deep ink blue and a light geometric sans, so every page reads like a chapter in a well-printed reference.
 
 **Theme:** light first, with a matching dark mode
 
 This is the design system for sentrie.sh: the landing page and the docs. The tokens live in `src/styles/tokens.css`, and `src/styles/theme.css` maps them onto Starlight's variables. Change a value here and there together.
 
-Sentrie reads as an open-source engineering notebook: a near-white grid canvas, a single ink blue that carries headings and links, and chrome that stays almost entirely text and hairline borders. Typography is the personality. A humanist serif at a light weight sets the headlines, a calm sans carries UI and body copy, and a wide-tracked mono marks commands and labels. Components are sharp-cornered (2px radius), compact (6px gaps) and almost shadowless. Structure comes from 1px borders, 2px inset lines and the faint dotted grid beneath the landing page. The primary call to action is the only saturated fill on a page, and everything around it stays quiet and typographic, closer to a technical whitepaper than a SaaS landing page.
+Sentrie reads as an open-source engineering notebook: a near-white grid canvas, a single ink blue that carries headings and links, and chrome that stays almost entirely text and hairline borders. Typography is the personality. One geometric sans sets the headlines at a light weight and carries UI and body copy at a regular one, and a wide-tracked mono marks commands and labels. Components are sharp-cornered (2px radius), compact (6px gaps) and almost shadowless. Structure comes from 1px borders, 2px inset lines and the faint dotted grid beneath the landing page. The primary call to action is the only saturated fill on a page, and everything around it stays quiet and typographic, closer to a technical whitepaper than a SaaS landing page.
 
 ## Tokens - Colors
 
@@ -67,25 +67,16 @@ Dark mode keeps the same structure and swaps the neutrals. The blue hierarchy mo
 
 ## Tokens - Typography
 
-All three families are open source (SIL Open Font License 1.1) and self-hosted from `@fontsource-variable` packages, so the site makes no third-party font requests.
+Both families are open source (SIL Open Font License 1.1) and self-hosted from `@fontsource-variable` packages, so the site makes no third-party font requests.
 
-### Inter - UI and body
+### Montserrat - UI, body and headlines
 
-`--font-sans`. The calm sans that carries every label, button, nav item and paragraph. Slight negative tracking (-0.025em) tightens the page into a dense, confident reading rhythm. At 11-12px it is micro-copy and tag text; at 14-16px it carries body paragraphs.
+`--font-sans` for UI and body copy, and `--font-display` (the same family) for headlines. One geometric sans carries the whole page, and weight and color do the work of hierarchy.
 
-- **Weights:** 400, 500 for emphasis in UI only
-- **Sizes:** 11px, 12px, 13px, 14px, 16px
-- **Line height:** 1.33, 1.43, 1.50, 1.71
-- **Letter spacing:** -0.025em
-
-### Source Serif 4 - Headlines and display
-
-`--font-serif`. The signature is weight 340 for large display (48px on the landing page), an unusually light cut that whispers rather than shouts, with tight -0.02em tracking. This is what makes the site read editorial rather than promotional. Used at 26px for section headlines and docs page titles, 17-20px for sub-headings. Source Serif 4 is a variable font, so 340 is a real weight, not a rounding.
-
-- **Weights:** 340, 400
-- **Sizes:** 15px, 17px, 20px, 26px, 36px, 48px
-- **Line height:** 1.10, 1.20, 1.25, 1.43
-- **Letter spacing:** -0.02em
+- **Body and UI:** weight 400, 500 for emphasis in UI only. Sizes 11-16px, with slight negative tracking (-0.01em). At 11-12px it is micro-copy and tag text; at 14-16px it carries body paragraphs.
+- **Display:** weight 340 for the landing page headline (48px) and docs page titles (36px), an unusually light cut that whispers rather than shouts, with tight -0.02em tracking. This is what keeps the site editorial rather than promotional. Montserrat is a variable font, so 340 is a real weight, not a rounding.
+- **Headings:** weight 500 at 26px for in-content and section headings, 17-20px for sub-headings, so they separate from 400 body text.
+- **Line height:** 1.10 for display, 1.25 for headings, 1.50-1.71 for body.
 
 ### JetBrains Mono - Code, commands and labels
 
@@ -102,8 +93,8 @@ All three families are open source (SIL Open Font License 1.1) and self-hosted f
 |------|--------|--------|------|-------------|----------------|-------|
 | caption | sans | 400 | 12px | 1.5 | -0.3px | `--text-caption` |
 | body | sans | 400 | 14px (landing), 16px (docs) | 1.5 / 1.71 | -0.35px | `--text-body` |
-| heading-sm | serif | 400 | 26px | 1.25 | -0.52px | `--text-heading-sm` |
-| heading | serif | 340 | 48px | 1.1 | -0.96px | `--text-heading` |
+| heading-sm | display | 500 | 26px | 1.25 | -0.52px | `--text-heading-sm` |
+| heading | display | 340 | 48px | 1.1 | -0.96px | `--text-heading` |
 
 Docs body copy runs at 16px with a 1.71 line height, because long-form reading needs more room than landing page copy.
 
@@ -159,7 +150,7 @@ Transparent background, 1px Fog border, sans 14px Graphite text, 2px radius, 10p
 
 ### Hero Section
 
-Full-width canvas with the dotted grid (1px dots every 16px, in Silver Mist). Centered stack: a mono eyebrow label, the serif display headline at 48px weight 340 in Ink Blue with -0.96px tracking, sans 16px Slate subtext, the primary and ghost buttons 8px apart, then a command chip showing the install command. 16-24px gaps between elements. No card and no panel: the grid paper is the hero.
+Full-width canvas with the dotted grid (1px dots every 16px, in Silver Mist). Centered stack: a mono eyebrow label, the display headline at 48px weight 340 in Ink Blue with -0.96px tracking, sans 16px Slate subtext, the primary and ghost buttons 8px apart, then a command chip showing the install command. 16-24px gaps between elements. No card and no panel: the grid paper is the hero.
 
 ### Code Preview Frame
 
@@ -167,11 +158,11 @@ The landing page's main visual: a real Sentrie policy, highlighted with the code
 
 ### Three-Column Feature Row
 
-Three equal columns on the canvas, 32px gap, about 80px vertical padding. Each column: a serif 17px weight 400 Ink Blue title, sans 14px Slate description at 1.5 line height, then a sans 14px Ink Blue "Learn more" link with a trailing arrow. No cards, borders or icons: pure typographic separation. Two rows of three cover the six features.
+Three equal columns on the canvas, 32px gap, about 80px vertical padding. Each column: a display 17px weight 500 Ink Blue title, sans 14px Slate description at 1.5 line height, then a sans 14px Ink Blue "Learn more" link with a trailing arrow. No cards, borders or icons: pure typographic separation. Two rows of three cover the six features.
 
 ### Two-Column Feature Section
 
-1200px content. Left column (about 40%): serif 26px Ink Blue heading, sans 16px Slate description, sans 14px Ink Blue link. Right column (about 60%): a code preview frame showing a second example, such as a TypeScript module call or `sentrie serve` with an HTTP request. 80px above and below.
+1200px content. Left column (about 40%): display 26px Ink Blue heading, sans 16px Slate description, sans 14px Ink Blue link. Right column (about 60%): a code preview frame showing a second example, such as a TypeScript module call or `sentrie serve` with an HTTP request. 80px above and below.
 
 ### Command Chip
 
@@ -179,7 +170,7 @@ Mono 12px Graphite text, 0.05em tracking, 1px Fog border, Off-White background, 
 
 ### Docs Page
 
-Pure White content surface, Off-White sidebar separated by a 1px hairline. Page titles in the serif at 36px weight 340, Ink Blue. In-content headings in the serif at 26px and 20px weight 400, Graphite. Body in the sans at 16px. Links in Ink Blue, underlined on hover. Inline code in mono on Off-White with a 1px Mist border and 2px radius. The selected sidebar entry gets an Ice Wash background, Ink Blue text and a 2px Ink Blue line on its left edge. Asides use a 2px left border in their semantic color over a faint tint, with 2px radius.
+Pure White content surface, Off-White sidebar separated by a 1px hairline. Page titles in the display face at 36px weight 340, Ink Blue. In-content headings at 26px and 20px weight 500, Graphite. Body in the sans at 16px. Links in Ink Blue, underlined on hover. Inline code in mono on Off-White with a 1px Mist border and 2px radius. The selected sidebar entry gets an Ice Wash background, Ink Blue text and a 2px Ink Blue line on its left edge. Asides use a 2px left border in their semantic color over a faint tint, with 2px radius.
 
 ### Footer
 
@@ -189,7 +180,7 @@ Canvas continuing from the page, 1px hairline top border, 48px vertical padding.
 
 ### Do
 
-- Set display headlines in the serif at weight 340 with -0.02em tracking. The light serif is the signature.
+- Set display headlines at weight 340 with -0.02em tracking. The light display weight is the signature.
 - Use Signal Blue fill for the primary call to action, and keep it the only saturated fill on the screen.
 - Build cards, buttons, tags and inputs with a 2px radius. Sharp corners are part of the editorial feel.
 - Use 6px as the default element gap and 64-80px between landing page sections.
@@ -200,7 +191,7 @@ Canvas continuing from the page, 1px hairline top border, 48px vertical padding.
 
 ### Don't
 
-- Don't set serif headlines above weight 400. The lightness is the point.
+- Don't set display headlines (the hero and page titles) above weight 400. The lightness is the point.
 - Don't introduce a second saturated color for buttons, tags or accents. Ink Blue and Signal Blue are the only chromatic UI colors, apart from the semantic colors of asides.
 - Don't put drop shadows on cards, the header or text blocks. Only the primary button and the code preview frame cast one.
 - Don't round any corner beyond 6px.
@@ -226,7 +217,7 @@ Imagery is one element: real Sentrie code in a code preview frame, with a title 
 
 Landing page content is centered in a 1200px column on a full-width gridded canvas, with no alternating colored bands. The hero is a centered typographic stack. Sections below follow a rhythm of centered headlines over content: the code preview frame, two rows of the three-column feature row, a two-column feature section, and a closing call to action. 64-80px between sections, 6-16px within them.
 
-The docs keep Starlight's three-part layout (sidebar, content, table of contents) and take the tokens: Pure White content, Off-White sidebar, hairline separators, serif headings, Onyx code.
+The docs keep Starlight's three-part layout (sidebar, content, table of contents) and take the tokens: Pure White content, Off-White sidebar, hairline separators, light display titles, Onyx code.
 
 At phone widths every multi-column row collapses to one column, the hero headline drops to 36px, and the code preview frame scrolls horizontally inside itself rather than widening the page.
 
@@ -259,8 +250,8 @@ At phone widths every multi-column row collapses to one column, the hero headlin
   --color-midnight: #2f343e;
 
   /* Font families */
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-serif: "Source Serif 4 Variable", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-sans: "Montserrat Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-sans);
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Type scale */
@@ -268,8 +259,8 @@ At phone widths every multi-column row collapses to one column, the hero headlin
   --text-body: 14px;
   --text-heading-sm: 26px;
   --text-heading: 48px;
-  --tracking-sans: -0.025em;
-  --tracking-serif: -0.02em;
+  --tracking-sans: -0.01em;
+  --tracking-display: -0.02em;
   --tracking-label: 0.05em;
 
   /* Radius */

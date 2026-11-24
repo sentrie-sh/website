@@ -3,8 +3,7 @@
 
 /* Maps the tokens in tokens.css onto Starlight. DESIGN.md describes the system. */
 
-@import "@fontsource-variable/inter/wght.css";
-@import "@fontsource-variable/source-serif-4/wght.css";
+@import "@fontsource-variable/montserrat/wght.css";
 @import "@fontsource-variable/jetbrains-mono/wght.css";
 @import "./tokens.css";
 
@@ -146,17 +145,17 @@ site-search kbd {
 
 /* Page title and headings */
 h1#_top {
-	font-family: var(--font-serif);
+	font-family: var(--font-display);
 	font-weight: 340;
-	letter-spacing: var(--tracking-serif);
+	letter-spacing: var(--tracking-display);
 	color: var(--ink);
 	line-height: 1.15;
 }
 
 .sl-markdown-content :is(h1, h2, h3, h4, h5) {
-	font-family: var(--font-serif);
-	font-weight: 400;
-	letter-spacing: var(--tracking-serif);
+	font-family: var(--font-display);
+	font-weight: 500;
+	letter-spacing: var(--tracking-display);
 	color: var(--sl-color-white);
 }
 
@@ -237,9 +236,9 @@ h1#_top {
 
 .card .title,
 .sl-link-card .title {
-	font-family: var(--font-serif);
-	font-weight: 400;
-	letter-spacing: var(--tracking-serif);
+	font-family: var(--font-display);
+	font-weight: 500;
+	letter-spacing: var(--tracking-display);
 	color: var(--ink);
 }
 
@@ -306,7 +305,7 @@ starlight-toc a[aria-current="true"]:hover {
 }
 
 .pagination-links .link-title {
-	font-family: var(--font-serif);
-	font-weight: 400;
+	font-family: var(--font-display);
+	font-weight: 500;
 	color: var(--ink);
 }
