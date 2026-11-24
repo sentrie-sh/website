@@ -29,7 +29,7 @@ Built-in: `use { fn1 } from @sentrie/module` (no quotes). Local: a quoted relati
 
 ### Typical use
 
-```text
+```sentrie
 use { calculateAge, validateEmail } from "./utils.ts" as utils
 rule myrule = default false {
   yield utils.calculateAge(user.birthDate) >= 18 and utils.validateEmail(user.email)
@@ -38,7 +38,7 @@ rule myrule = default false {
 
 ### Going further
 
-```text
+```sentrie
 use { calculateAge, validateEmail } from "../helpers/validation.ts"
 fact user: utils.User
 yield utils.calculateAge(user.birthDate) >= 18

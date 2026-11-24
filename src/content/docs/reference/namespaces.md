@@ -7,7 +7,7 @@ Namespaces group [policies](/reference/policies) and [shapes](/reference/shapes)
 
 ## Syntax
 
-```text
+```sentrie
 namespace fully/qualified/name
 ```
 
@@ -45,7 +45,7 @@ The exception is a keyword that can start an expression: `not`, `true`, `false`,
 
 ### Single-segment and multi-segment namespaces
 
-```text
+```sentrie
 namespace auth
 namespace com/example/auth
 namespace mycompany/policies/billing/v2
@@ -53,15 +53,15 @@ namespace mycompany/policies/billing/v2
 
 ### Keyword as a later segment
 
-```text
+```sentrie
 namespace constraints/in
 namespace text/string
 ```
 
 ### Comments before namespace (allowed)
 
-```text
-// This file defines the auth policies.
+```sentrie
+-- This file defines the auth policies.
 namespace com/example/auth
 
 policy allow { ... }
@@ -71,14 +71,14 @@ policy allow { ... }
 
 File `auth.sentrie`:
 
-```text
+```sentrie
 namespace com/example/auth
 policy P { ... }
 ```
 
 File `billing.sentrie`:
 
-```text
+```sentrie
 namespace com/example/billing
 policy Q { ... }
 ```

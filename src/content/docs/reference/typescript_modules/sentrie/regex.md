@@ -7,7 +7,7 @@ The `@sentrie/regex` module provides regular expression pattern matching and man
 
 ## Usage
 
-```text
+```sentrie
 use { match, find, findAll, replace, replaceAll, split } from @sentrie/regex
 ```
 
@@ -28,7 +28,7 @@ Tests if a string matches a regular expression pattern.
 
 **Example:**
 
-```text
+```sentrie
 use { match } from @sentrie/regex
 let matches = regex.match("^[a-z]+$", "hello")  // true
 let noMatch = regex.match("^[0-9]+$", "hello")  // false
@@ -49,7 +49,7 @@ Finds the first match of a pattern in a string.
 
 **Example:**
 
-```text
+```sentrie
 use { find } from @sentrie/regex
 let match = regex.find("[0-9]+", "abc123def")  // "123"
 let noMatch = regex.find("[0-9]+", "abcdef")  // null
@@ -70,7 +70,7 @@ Finds all matches of a pattern in a string.
 
 **Example:**
 
-```text
+```sentrie
 use { findAll } from @sentrie/regex
 let matches = regex.findAll("[0-9]+", "abc123def456ghi")  // ["123", "456"]
 ```
@@ -91,7 +91,7 @@ Replaces the first occurrence of a pattern in a string.
 
 **Example:**
 
-```text
+```sentrie
 use { replace } from @sentrie/regex
 let result = regex.replace("[0-9]+", "abc123def", "XXX")  // "abcXXXdef"
 ```
@@ -112,7 +112,7 @@ Replaces all occurrences of a pattern in a string.
 
 **Example:**
 
-```text
+```sentrie
 use { replaceAll } from @sentrie/regex
 let result = regex.replaceAll("[0-9]+", "abc123def456", "XXX")  // "abcXXXdefXXX"
 ```
@@ -132,14 +132,14 @@ Splits a string by a regular expression pattern.
 
 **Example:**
 
-```text
+```sentrie
 use { split } from @sentrie/regex
 let parts = regex.split("\\s+", "hello   world  test")  // ["hello", "world", "test"]
 ```
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/validation
 
 policy mypolicy {
@@ -173,25 +173,25 @@ policy mypolicy {
 
 ### Email Validation
 
-```text
+```sentrie
 let emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
 ```
 
 ### Phone Number (E.164)
 
-```text
+```sentrie
 let phonePattern = "^\\+?[1-9]\\d{1,14}$"
 ```
 
 ### URL Pattern
 
-```text
+```sentrie
 let urlPattern = "^https?://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(/.*)?$"
 ```
 
 ### Alphanumeric with Underscores
 
-```text
+```sentrie
 let alnumPattern = "^[a-zA-Z0-9_]+$"
 ```
 

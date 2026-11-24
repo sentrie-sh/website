@@ -1,0 +1,36 @@
+---
+// SPDX-FileCopyrightText: © 2026 Binaek Sarkar <binaek89@gmail.com>
+// SPDX-License-Identifier: Apache-2.0
+
+// Typographic feature grid: three columns, no cards or icons.
+// DESIGN.md, "Three-Column Feature Row".
+interface Feature {
+	title: string;
+	body: string;
+	href: string;
+}
+
+interface Props {
+	heading: string;
+	items: Feature[];
+}
+
+const { heading, items } = Astro.props;
+---
+
+<section class="sx-section not-content">
+	<h2 class="sx-section-title">{heading}</h2>
+	<div class="sx-features">
+		{
+			items.map((item) => (
+				<article class="sx-feature">
+					<h3>{item.title}</h3>
+					<p>{item.body}</p>
+					<a href={item.href}>
+						Learn more<span class="sr-only"> about {item.title}</span> <span aria-hidden="true">→</span>
+					</a>
+				</article>
+			))
+		}
+	</div>
+</section>

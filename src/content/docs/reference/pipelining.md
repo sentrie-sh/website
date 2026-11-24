@@ -1,11 +1,11 @@
 ---
-title: Function chaining
+title: Pipelining
 description: Chain calls with the `|>` pipeline operator for readable top-to-bottom flows, with rules for targets, desugaring, precedence, and memoization.
 ---
 
 When nested function calls pile up, it gets harder to see the data flow. You can always expand `g(f(x))` into separate `let` bindings, but that adds noise when the intermediate names are not the point.
 
-**Function chaining** in Sentrie uses the pipeline operator (`|>`) so the computation reads top-to-bottom: each step takes the value from the line above and passes it into the next call.
+**Pipelining** in Sentrie uses the pipeline operator (`|>`) so the computation reads top-to-bottom: each step takes the value from the line above and passes it into the next call.
 
 ### Nested calls
 
@@ -46,7 +46,7 @@ let slug = str.replaceAll(
 
 The parser lowers pipeline syntax to ordinary calls:
 
-```text
+```sentrie
 lhs |> ident()          => ident(lhs)
 lhs |> alias.fn()       => alias.fn(lhs)
 lhs |> ident(a, b)      => ident(lhs, a, b)

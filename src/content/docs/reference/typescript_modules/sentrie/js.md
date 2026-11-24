@@ -7,7 +7,7 @@ The `@sentrie/js` module provides access to JavaScript globals (Math, String, Nu
 
 ## Usage
 
-```text
+```sentrie
 use { round, floor, ceil } from @sentrie/js as math
 use { length, fromCharCode } from @sentrie/js as str
 use { parse, stringify } from @sentrie/js as json
@@ -23,7 +23,7 @@ Returns the value of a number rounded to the nearest integer.
 
 **Example:**
 
-```text
+```sentrie
 use { round } from @sentrie/js as math
 let value = math.round(4.5)  // 5
 ```
@@ -34,7 +34,7 @@ Returns the largest integer less than or equal to a number.
 
 **Example:**
 
-```text
+```sentrie
 use { floor } from @sentrie/js as math
 let value = math.floor(4.7)  // 4
 ```
@@ -45,7 +45,7 @@ Returns the smallest integer greater than or equal to a number.
 
 **Example:**
 
-```text
+```sentrie
 use { ceil } from @sentrie/js as math
 let value = math.ceil(4.3)  // 5
 ```
@@ -56,7 +56,7 @@ Returns the maximum value from a list of numbers.
 
 **Example:**
 
-```text
+```sentrie
 use { max } from @sentrie/js as math
 let value = math.max(1, 5, 3, 9, 2)  // 9
 ```
@@ -67,7 +67,7 @@ Returns the minimum value from a list of numbers.
 
 **Example:**
 
-```text
+```sentrie
 use { min } from @sentrie/js as math
 let value = math.min(1, 5, 3, 9, 2)  // 1
 ```
@@ -78,7 +78,7 @@ Returns the absolute value of a number.
 
 **Example:**
 
-```text
+```sentrie
 use { abs } from @sentrie/js as math
 let value = math.abs(-5)  // 5
 ```
@@ -91,7 +91,7 @@ Returns the square root of a number.
 
 **Example:**
 
-```text
+```sentrie
 use { sqrt } from @sentrie/js as math
 let value = math.sqrt(16)  // 4
 ```
@@ -102,7 +102,7 @@ Returns the value of base raised to the power of exponent.
 
 **Example:**
 
-```text
+```sentrie
 use { pow } from @sentrie/js as math
 let value = math.pow(2, 3)  // 8
 ```
@@ -113,7 +113,7 @@ Returns e raised to the power of x (eˣ).
 
 **Example:**
 
-```text
+```sentrie
 use { exp } from @sentrie/js as math
 let value = math.exp(1)  // ≈ 2.718
 ```
@@ -124,7 +124,7 @@ Returns the natural logarithm (base e) of a number.
 
 **Example:**
 
-```text
+```sentrie
 use { log, E } from @sentrie/js as math
 let value = math.log(math.E)  // 1
 ```
@@ -135,7 +135,7 @@ Returns the base-10 logarithm of a number.
 
 **Example:**
 
-```text
+```sentrie
 use { log10 } from @sentrie/js as math
 let value = math.log10(100)  // 2
 ```
@@ -146,7 +146,7 @@ Returns the base-2 logarithm of a number.
 
 **Example:**
 
-```text
+```sentrie
 use { log2 } from @sentrie/js as math
 let value = math.log2(8)  // 3
 ```
@@ -161,7 +161,7 @@ Returns the sine of an angle in radians.
 
 **Example:**
 
-```text
+```sentrie
 use { sin, PI } from @sentrie/js as math
 let value = math.sin(math.PI / 2)  // 1
 ```
@@ -172,7 +172,7 @@ Returns the cosine of an angle in radians.
 
 **Example:**
 
-```text
+```sentrie
 use { cos } from @sentrie/js as math
 let value = math.cos(0)  // 1
 ```
@@ -183,7 +183,7 @@ Returns the tangent of an angle in radians.
 
 **Example:**
 
-```text
+```sentrie
 use { tan, PI } from @sentrie/js as math
 let value = math.tan(math.PI / 4)  // ≈ 1
 ```
@@ -194,7 +194,7 @@ Returns the arcsine (inverse sine) of a number in radians.
 
 **Example:**
 
-```text
+```sentrie
 use { asin } from @sentrie/js as math
 let value = math.asin(1)  // ≈ 1.5708 (π/2)
 ```
@@ -205,7 +205,7 @@ Returns the arccosine (inverse cosine) of a number in radians.
 
 **Example:**
 
-```text
+```sentrie
 use { acos } from @sentrie/js as math
 let value = math.acos(1)  // 0
 ```
@@ -216,7 +216,7 @@ Returns the arctangent (inverse tangent) of a number in radians.
 
 **Example:**
 
-```text
+```sentrie
 use { atan } from @sentrie/js as math
 let value = math.atan(1)  // ≈ 0.7854 (π/4)
 ```
@@ -227,7 +227,7 @@ Returns the arctangent of the quotient of its arguments.
 
 **Example:**
 
-```text
+```sentrie
 use { atan2, PI } from @sentrie/js as math
 let value = math.atan2(1, 0)  // ≈ 1.5708 (π/2)
 ```
@@ -254,7 +254,7 @@ Returns a random number between 0 (inclusive) and 1 (exclusive).
 
 **Example:**
 
-```text
+```sentrie
 use { random } from @sentrie/js as math
 let value = math.random()  // 0.0 to 1.0
 ```
@@ -280,7 +280,7 @@ Returns the length of a string.
 
 **Example:**
 
-```text
+```sentrie
 use { length } from @sentrie/js as str
 let len = str.length("hello")  // 5
 ```
@@ -291,7 +291,7 @@ Returns a string created from the specified sequence of UTF-16 code units.
 
 **Example:**
 
-```text
+```sentrie
 use { fromCharCode } from @sentrie/js as str
 let str = str.fromCharCode(72, 101, 108, 108, 111)  // "Hello"
 ```
@@ -304,7 +304,7 @@ Determines whether a value is NaN (Not-a-Number).
 
 **Example:**
 
-```text
+```sentrie
 use { isNaN } from @sentrie/js as num
 let result = num.isNaN(NaN)  // true
 ```
@@ -315,7 +315,7 @@ Parses a string and returns an integer.
 
 **Example:**
 
-```text
+```sentrie
 use { parseInt } from @sentrie/js as num
 let value = num.parseInt("123")  // 123
 ```
@@ -326,7 +326,7 @@ Parses a string and returns a floating point number.
 
 **Example:**
 
-```text
+```sentrie
 use { parseFloat } from @sentrie/js as num
 let value = num.parseFloat("123.45")  // 123.45
 ```
@@ -337,7 +337,7 @@ Determines whether a value is a finite number.
 
 **Example:**
 
-```text
+```sentrie
 use { isFinite } from @sentrie/js as num
 let result = num.isFinite(123)  // true
 ```
@@ -348,7 +348,7 @@ Determines whether a value is an integer.
 
 **Example:**
 
-```text
+```sentrie
 use { isInteger } from @sentrie/js as num
 let result = num.isInteger(123)  // true
 ```
@@ -361,7 +361,7 @@ Returns the number of milliseconds elapsed since January 1, 1970 UTC.
 
 **Example:**
 
-```text
+```sentrie
 use { now } from @sentrie/js as date
 let timestamp = date.now()  // 1234567890123
 ```
@@ -372,7 +372,7 @@ Parses a date string and returns the number of milliseconds since January 1, 197
 
 **Example:**
 
-```text
+```sentrie
 use { dateParse } from @sentrie/js as date
 let timestamp = date.dateParse("2023-01-01")  // 1672531200000
 ```
@@ -383,7 +383,7 @@ Returns the number of milliseconds in a Date object since January 1, 1970 UTC.
 
 **Example:**
 
-```text
+```sentrie
 use { UTC } from @sentrie/js as date
 let timestamp = date.UTC(2023, 0, 1)  // 1672531200000
 ```
@@ -396,7 +396,7 @@ Parses a JSON string and returns the corresponding value.
 
 **Example:**
 
-```text
+```sentrie
 use { parse } from @sentrie/js as json
 let obj = json.parse('{"name": "John", "age": 30}')
 ```
@@ -407,7 +407,7 @@ Converts a value to a JSON string.
 
 **Example:**
 
-```text
+```sentrie
 use { stringify } from @sentrie/js as json
 let str = json.stringify({"name": "John", "age": 30})  // '{"name":"John","age":30}'
 ```
@@ -420,7 +420,7 @@ Determines whether a value is an array.
 
 **Example:**
 
-```text
+```sentrie
 use { isArray } from @sentrie/js as arr
 let result = arr.isArray([1, 2, 3])  // true
 ```
@@ -431,7 +431,7 @@ Creates a new array from an array-like or iterable object.
 
 **Example:**
 
-```text
+```sentrie
 use { from } from @sentrie/js as arr
 let newArray = arr.from("hello")  // ["h", "e", "l", "l", "o"]
 ```
@@ -442,14 +442,14 @@ Creates a new array with the given elements.
 
 **Example:**
 
-```text
+```sentrie
 use { of } from @sentrie/js as arr
 let newArray = arr.of(1, 2, 3)  // [1, 2, 3]
 ```
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/mypolicy
 
 policy mypolicy {

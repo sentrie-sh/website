@@ -232,7 +232,7 @@ Functions for generating UUIDs (Universally Unique Identifiers).
 
 ### Authentication & Authorization
 
-```text
+```sentrie
 namespace com/example/auth
 
 policy authentication {
@@ -262,7 +262,7 @@ policy authentication {
 
 ### Data Validation
 
-```text
+```sentrie
 namespace com/example/validation
 
 policy validation {
@@ -290,7 +290,7 @@ policy validation {
 
 ### Network Access Control
 
-```text
+```sentrie
 namespace com/example/network
 
 policy network {
@@ -321,7 +321,7 @@ policy network {
 
 ### Time-Based Policies
 
-```text
+```sentrie
 namespace com/example/time
 
 policy time {
@@ -352,7 +352,7 @@ policy time {
 
 All modules use the same import syntax:
 
-```text
+```sentrie
 use { function1, function2 } from @sentrie/module
 ```
 
@@ -362,7 +362,7 @@ Built-in `@sentrie/*` modules do not use quotes. Local TypeScript files use quot
 
 You can optionally use an alias:
 
-```text
+```sentrie
 use { function1, function2 } from @sentrie/module
 ```
 
@@ -372,7 +372,7 @@ If no alias is specified, the default alias is the last part of the module path.
 
 When importing from a module, the default alias is the last part of the module path:
 
-```text
+```sentrie
 use { now } from @sentrie/time
 use { sha256 } from @sentrie/hash
 use { isValid } from @sentrie/json as jsonUtil
@@ -380,7 +380,7 @@ use { isValid } from @sentrie/json as jsonUtil
 
 ### Going further
 
-```text
+```sentrie
 use { now } from @sentrie/time
 use { sha256 } from @sentrie/hash
 use { parse } from @sentrie/js as json

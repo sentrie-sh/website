@@ -7,156 +7,165 @@ export const sentrieGrammar = {
     // Comments
     {
       name: 'comment.line.sentrie',
-      match: /^--.*$/gm
+      match: String.raw`--.*$`
     },
 
     // Keywords - Program Structure
     {
       name: 'keyword.control.sentrie',
-      match: /\b(namespace|policy|rule|fact|let|export|import|use|from|as|default|when|yield|shape|attach|decision|of|with|contribute)\b/
+      match: String.raw`\b(namespace|policy|rule|fact|let|export|import|use|from|as|default|when|yield|shape|attach|decision|of|with|contribute|derive|transform|title|description|version|tag)\b`
     },
 
-    // Keywords - Boolean operators
+    // Keywords - contextual: `data` declares pack data only at the start of a statement
     {
-      name: 'keyword.operator.boolean.sentrie',
-      match: /\b(and|or|xor|not)\b/
-    },
-
-    // Keywords - Comparison operators
-    {
-      name: 'keyword.operator.comparison.sentrie',
-      match: /\b(is|in|contains|matches|defined|empty)\b/
+      match: String.raw`^\s*(data)\b`,
+      captures: { 1: { name: 'keyword.control.sentrie' } }
     },
 
     // Keywords - State checking
     {
       name: 'keyword.operator.state.sentrie',
-      match: /\b(not\s+in|not\s+contains|not\s+matches|not\s+defined|not\s+empty)\b/
+      match: String.raw`\b(not\s+in|not\s+contains|not\s+matches|not\s+defined|not\s+empty)\b`
+    },
+
+    // Keywords - Boolean operators
+    {
+      name: 'keyword.operator.boolean.sentrie',
+      match: String.raw`\b(and|or|xor|not)\b`
+    },
+
+    // Keywords - Comparison operators
+    {
+      name: 'keyword.operator.comparison.sentrie',
+      match: String.raw`\b(is|in|contains|matches|defined|empty)\b`
     },
 
     // Literals - Trinary values
     {
       name: 'constant.language.trinary.sentrie',
-      match: /\b(true|false|unknown)\b/
+      match: String.raw`\b(true|false|unknown)\b`
     },
 
     // Literals - Null
     {
       name: 'constant.language.null.sentrie',
-      match: /\bnull\b/
+      match: String.raw`\bnull\b`
     },
 
     // Types - Primitive types
     {
       name: 'storage.type.primitive.sentrie',
-      match: /\b(int|float|string|bool|document)\b/
+      match: String.raw`\b(string|number|boolean|trinary|document)\b`
     },
 
     // Types - Collection types
     {
       name: 'storage.type.collection.sentrie',
-      match: /\b(list|dict|record)\b/
+      match: String.raw`\b(list|dict|record)\b`
+    },
+
+    // Strings - Heredoc: <<<TAG on its own line, ended by a line holding only TAG
+    {
+      name: 'string.unquoted.heredoc.sentrie',
+      begin: String.raw`<<<([A-Za-z_][A-Za-z0-9_]*)\s*$`,
+      end: String.raw`^\1[ \t]*\r?$`
     },
 
     // Strings - Double quoted
     {
       name: 'string.quoted.double.sentrie',
-      begin: /"/,
-      end: /"/,
+      begin: String.raw`"`,
+      end: String.raw`"`,
       patterns: [
         {
           name: 'constant.character.escape.sentrie',
-          match: /\\./
+          match: String.raw`\\.`
         }
       ]
     },
 
-    // Numbers - Integers
+    // Numbers - integers, decimals and exponents
     {
-      name: 'constant.numeric.integer.sentrie',
-      match: /\b\d+\b/
+      name: 'constant.numeric.sentrie',
+      match: String.raw`\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b`
     },
 
-    // Numbers - Floats
+    // Operators - Lambda arrow
     {
-      name: 'constant.numeric.float.sentrie',
-      match: /\b\d+\.\d+\b/
+      name: 'keyword.operator.lambda.sentrie',
+      match: String.raw`=>`
+    },
+
+    // Operators - Pipeline, spread and union
+    {
+      name: 'keyword.operator.pipeline.sentrie',
+      match: String.raw`\|>|\.\.\.|\||#`
     },
 
     // Operators - Comparison
     {
-      name: 'operator.comparison.sentrie',
-      match: /(==|!=|<=|>=|<|>)/
+      name: 'keyword.operator.relational.sentrie',
+      match: String.raw`(==|!=|<=|>=|<|>)`
     },
 
     // Operators - Arithmetic
     {
-      name: 'operator.arithmetic.sentrie',
-      match: /(\+|\-|\*|\/|%)/
-    },
-
-    // Operators - Logical
-    {
-      name: 'operator.logical.sentrie',
-      match: /(\?|:)/
-    },
-
-    // Operators - Unary and lambda arrow
-    {
-      name: 'operator.unary.sentrie',
-      match: /(!)/
-    },
-    {
-      name: 'keyword.operator.lambda.sentrie',
-      match: /=>/
+      name: 'keyword.operator.arithmetic.sentrie',
+      match: String.raw`(\+|\-|\*|\/|%)`
     },
 
     // Punctuation - Separators
     {
       name: 'punctuation.separator.sentrie',
-      match: /[,;:]/
+      match: String.raw`[,;:]`
     },
 
     // Punctuation - Brackets and braces
     {
       name: 'punctuation.definition.sentrie',
-      match: /[{}[\]()]/
+      match: String.raw`[{}\[\]()]`
     },
 
     // Punctuation - Accessor
     {
       name: 'punctuation.accessor.sentrie',
-      match: /\./
+      match: String.raw`\.`
     },
 
     // Punctuation - Required/Optional markers
     {
       name: 'punctuation.markup.sentrie',
-      match: /[!?]/
+      match: String.raw`[!?]`
     },
 
     // Type constraints
     {
       name: 'entity.name.tag.constraint.sentrie',
-      match: /@[a-zA-Z_][a-zA-Z0-9_]*/
-    },
-
-    // Identifiers - Type names (PascalCase)
-    {
-      name: 'entity.name.type.sentrie',
-      match: /\b[A-Z][a-zA-Z0-9_]*\b/
-    },
-
-    // Identifiers - Variables and functions (camelCase/snake_case)
-    {
-      name: 'variable.other.sentrie',
-      match: /\b[a-zA-Z_][a-zA-Z0-9_]*\b/
+      match: String.raw`@[a-zA-Z_][a-zA-Z0-9_]*`
     },
 
     // FQN (Fully Qualified Names) - namespace paths
     {
       name: 'entity.name.namespace.sentrie',
-      match: /\b[a-zA-Z_][a-zA-Z0-9_]*(?:\/[a-zA-Z_][a-zA-Z0-9_]*)+/
+      match: String.raw`\b[a-zA-Z_][a-zA-Z0-9_]*(?:\/[a-zA-Z_][a-zA-Z0-9_]*)+`
+    },
+
+    // Function calls
+    {
+      name: 'entity.name.function.sentrie',
+      match: String.raw`\b[a-zA-Z_][a-zA-Z0-9_]*(?=\s*\()`
+    },
+
+    // Identifiers - Type names (PascalCase)
+    {
+      name: 'entity.name.type.sentrie',
+      match: String.raw`\b[A-Z][a-zA-Z0-9_]*\b`
+    },
+
+    // Identifiers - Variables and functions (camelCase/snake_case)
+    {
+      name: 'variable.other.sentrie',
+      match: String.raw`\b[a-zA-Z_][a-zA-Z0-9_]*\b`
     }
   ]
 }

@@ -1,0 +1,48 @@
+---
+// SPDX-FileCopyrightText: © 2026 Binaek Sarkar <binaek89@gmail.com>
+// SPDX-License-Identifier: Apache-2.0
+
+// A code sample in a window frame: title bar, file tab, highlighted code and an
+// optional result strip. DESIGN.md, "Code Preview Frame".
+import { Code } from "@astrojs/starlight/components";
+
+interface Props {
+	file: string;
+	lang: string;
+	code: string;
+	command?: string;
+	commandLang?: string;
+	output?: string;
+	outputLang?: string;
+	size?: "wide" | "narrow";
+}
+
+const {
+	file,
+	lang,
+	code,
+	command,
+	commandLang = "bash",
+	output,
+	outputLang = "text",
+	size = "wide",
+} = Astro.props;
+---
+
+<figure class:list={["sx-frame", `sx-frame--${size}`, "not-content"]}>
+	<div class="sx-frame-bar">
+		<span class="sx-frame-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+		<span class="sx-frame-tab">{file}</span>
+	</div>
+	<div class="sx-frame-code">
+		<Code code={code} lang={lang} frame="none" />
+	</div>
+	{
+		(command || output) && (
+			<div class="sx-frame-result">
+				{command && <Code code={command} lang={commandLang} frame="none" />}
+				{output && <Code code={output} lang={outputLang} frame="none" />}
+			</div>
+		)
+	}
+</figure>

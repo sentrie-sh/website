@@ -7,7 +7,7 @@ The `@sentrie/net` module provides network and IP address utilities for network-
 
 ## Usage
 
-```text
+```sentrie
 use { cidrContains, parseIP, isIPv4, isPrivate } from @sentrie/net
 ```
 
@@ -28,7 +28,7 @@ Checks if a CIDR block or IP address is contained within another CIDR block. Sup
 
 **Example:**
 
-```text
+```sentrie
 use { cidrContains } from @sentrie/net
 let contains = net.cidrContains("192.168.1.0/24", "192.168.1.5")  // true
 let contains2 = net.cidrContains("10.0.0.0/8", "192.168.1.5")  // false
@@ -49,7 +49,7 @@ Checks if two CIDR blocks intersect or overlap. Supports both IPv4 and IPv6.
 
 **Example:**
 
-```text
+```sentrie
 use { cidrIntersects } from @sentrie/net
 let intersects = net.cidrIntersects("192.168.1.0/24", "192.168.1.0/28")  // true
 ```
@@ -66,7 +66,7 @@ Validates whether a string is a valid CIDR notation.
 
 **Example:**
 
-```text
+```sentrie
 use { cidrIsValid } from @sentrie/net
 let isValid = net.cidrIsValid("192.168.1.0/24")  // true
 let invalid = net.cidrIsValid("192.168.1.0")  // false
@@ -86,7 +86,7 @@ Expands a CIDR block to a list of all host IP addresses within that block.
 
 **Example:**
 
-```text
+```sentrie
 use { cidrExpand } from @sentrie/net
 let ips = net.cidrExpand("192.168.1.0/30")  // ["192.168.1.1", "192.168.1.2"]
 ```
@@ -105,7 +105,7 @@ Merges a list of IP addresses and subnets into the smallest possible list of CID
 
 **Example:**
 
-```text
+```sentrie
 use { cidrMerge } from @sentrie/net
 let merged = net.cidrMerge(["192.168.1.1", "192.168.1.2", "192.168.1.3"])
 ```
@@ -124,7 +124,7 @@ Parses an IP address string (IPv4 or IPv6).
 
 **Example:**
 
-```text
+```sentrie
 use { parseIP } from @sentrie/net
 let ip = net.parseIP("192.168.1.1")  // "192.168.1.1"
 let invalid = net.parseIP("invalid")  // null
@@ -142,7 +142,7 @@ Checks if an IP address is IPv4.
 
 **Example:**
 
-```text
+```sentrie
 use { isIPv4 } from @sentrie/net
 let isV4 = net.isIPv4("192.168.1.1")  // true
 let isV4_2 = net.isIPv4("::1")  // false
@@ -160,7 +160,7 @@ Checks if an IP address is IPv6.
 
 **Example:**
 
-```text
+```sentrie
 use { isIPv6 } from @sentrie/net
 let isV6 = net.isIPv6("::1")  // true
 let isV6_2 = net.isIPv6("192.168.1.1")  // false
@@ -178,7 +178,7 @@ Checks if an IP address is in a private address range. Private ranges include: `
 
 **Example:**
 
-```text
+```sentrie
 use { isPrivate } from @sentrie/net
 let isPriv = net.isPrivate("192.168.1.1")  // true
 let isPriv2 = net.isPrivate("8.8.8.8")  // false
@@ -196,7 +196,7 @@ Checks if an IP address is a public (globally routable) address. Public addresse
 
 **Example:**
 
-```text
+```sentrie
 use { isPublic } from @sentrie/net
 let isPub = net.isPublic("8.8.8.8")  // true
 let isPub2 = net.isPublic("192.168.1.1")  // false
@@ -214,7 +214,7 @@ Checks if an IP address is a loopback address. Loopback addresses include `127.0
 
 **Example:**
 
-```text
+```sentrie
 use { isLoopback } from @sentrie/net
 let isLoop = net.isLoopback("127.0.0.1")  // true
 let isLoop2 = net.isLoopback("::1")  // true
@@ -232,14 +232,14 @@ Checks if an IP address is a multicast address.
 
 **Example:**
 
-```text
+```sentrie
 use { isMulticast } from @sentrie/net
 let isMulti = net.isMulticast("224.0.0.1")  // true
 ```
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/network
 
 policy mypolicy {

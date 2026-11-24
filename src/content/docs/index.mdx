@@ -1,64 +1,128 @@
 ---
 title: Sentrie
-icon: sentrie
 editUrl: false
-description: Sentrie is an open-source policy evaluation engine with a `Rich Expression Language` and built in support for JavaScript.
+description: Sentrie is an open-source policy engine with a typed expression language, TypeScript modules and deterministic evaluation. Run policies from the CLI or serve decisions over HTTP.
 template: splash
 pagefind: false
+tableOfContents: false
 hero:
-  tagline: Sentrie is a modern policy engine built for today’s applications, with a clean expression language, a powerful type system, first-class Typescript module support, and deterministic evaluation.
-  image:
-    file: ../../assets/freeze.svg
+  title: Policy as code your whole team can read.
+  tagline: Sentrie is a policy engine with a clean expression language, a real type system, TypeScript modules and deterministic evaluation. Run a policy from the command line, or serve its decisions over HTTP.
   actions:
-    - text: Quick Start
+    - text: Get started
       link: /getting-started/installation
-      icon: right-arrow
-    - text: Documentation
-      link: getting-started/what-is-sentrie
-      icon: external
-      variant: minimal
+    - text: Read the docs
+      link: /getting-started
 ---
 
-import { Card, CardGrid } from "@astrojs/starlight/components";
+import CodeFrame from "../../components/landing/CodeFrame.astro";
+import Features from "../../components/landing/Features.astro";
+import Split from "../../components/landing/Split.astro";
 
-## Features
+export const policy = `namespace com/example/user_management
 
-<CardGrid stagger>
-  <Card title="Rich Expression Language" icon="document">
-    Powerful expressions with arithmetic, logical, comparison, and collection
-    operations. Support for quantifiers, pattern matching, and conditional
-    expressions.
-    <br />
-    <a href="/reference">Learn more</a>
-  </Card>
-  <Card title="Composable Policies" icon="setting">
-    Build complex policies from simpler policies by exporting decisions that can
-    be used by other policies.
-    <br />
-    <a href="/reference/exporting-and-importing-rules">Learn more</a>
-  </Card>
-  <Card title="JavaScript Integration" icon="setting">
-    Seamlessly integrate TypeScript modules for complex logic. Built-in modules
-    for data manipulation, cryptography, and more.
-    <br />
-    <a href="/reference/using-typescript">Learn more</a>
-  </Card>
-  <Card title="Run as a Service" icon="setting">
-    Run Sentrie as a service to evaluate policies using a well-defined and
-    minimal HTTP API.
-    <br />
-    <a href="/running-sentrie/serving-policies">Learn more</a>
-  </Card>
-  <Card title="CLI Reference" icon="open-book">
-    The Sentrie CLI provides a powerful set of tools for managing your policies
-    and JavaScript modules.
-    <br />
-    <a href="/cli-reference">Learn more</a>
-  </Card>
-  <Card title="Type-Safe Inputs" icon="pencil">
-    Comprehensive type system with shapes, constraints, and built-in
-    validations.
-    <br />
-    <a href="/reference/types-and-values">Learn more</a>
-  </Card>
-</CardGrid>
+shape User {
+  role: string
+  status: string
+}
+
+policy user_access {
+  fact user: User as currentUser
+
+  rule allow_admin = default false {
+    yield currentUser.role == "admin"
+  }
+
+  rule allow_user = default false {
+    yield allow_admin or (currentUser.role == "user" and currentUser.status == "active")
+  }
+
+  export decision of allow_admin
+  export decision of allow_user
+}`;
+
+export const execCommand = `sentrie exec com/example/user_management/user_access \\
+  --facts '{"user": {"role": "user", "status": "active"}}'`;
+
+export const execOutput = `Namespace: com/example/user_management
+Policy:    user_access
+
+Rules:
+  ✓ allow_user: ✓ True
+  ✓ allow_admin: ⨯ False
+
+Values:
+  ✓ allow_user: true
+  ✓ allow_admin: false`;
+
+export const request = `curl -X POST http://localhost:7529/decision/com/example/user_management/user_access/allow_user \\
+  -H "Content-Type: application/json" \\
+  -d '{"facts": {"user": {"role": "user", "status": "active"}}}'`;
+
+export const response = `{
+  "decisions": [
+    {
+      "policy": "user_access",
+      "namespace": "com/example/user_management",
+      "rule": "allow_user",
+      "decision": { "state": "true", "value": true },
+      "attachments": {},
+      "trace": { ... }
+    }
+  ]
+}`;
+
+<CodeFrame file="policy.sentrie" lang="sentrie" code={policy} command={execCommand} output={execOutput} />
+
+<Features
+  heading="Built for rules that have to be right"
+  items={[
+    {
+      title: "Typed facts and shapes",
+      body: "Declare the shape of every input. Facts are checked against their shapes and constraints before a rule reads them.",
+      href: "/reference/shapes",
+    },
+    {
+      title: "True, false or unknown",
+      body: "Trinary logic keeps missing data visible. A rule that cannot decide says unknown instead of quietly passing.",
+      href: "/reference/trinary",
+    },
+    {
+      title: "Composable policies",
+      body: "Export a decision from one policy and import it into another, so shared checks are written once.",
+      href: "/language-concepts/policy-composition",
+    },
+    {
+      title: "TypeScript when you need it",
+      body: "Call built-in @sentrie modules for hashing, JWTs, time and more, or bring your own TypeScript files.",
+      href: "/reference/using-typescript",
+    },
+    {
+      title: "Deterministic by design",
+      body: "Derives stay pure. A capabilities file decides which builtins and modules a pack may use, and can pin JavaScript's clock and random source.",
+      href: "/reference/capabilities",
+    },
+    {
+      title: "One binary, many commands",
+      body: "Evaluate with exec and serve over HTTP. Check packs with validate and fmt, and time them with bench.",
+      href: "/cli-reference",
+    },
+  ]}
+/>
+
+<Split heading="Serve decisions over HTTP" href="/running-sentrie/serving-policies" linkText="Serving policies">
+  <div slot="text">
+    Run <code>sentrie serve</code> next to your application and post facts to
+    a policy. Each response carries the decision, its trinary state and the
+    rule that made it, as plain JSON.
+  </div>
+  <CodeFrame file="request.sh" lang="bash" code={request} output={response} outputLang="json" size="narrow" />
+</Split>
+
+<section class="sx-cta not-content">
+  <h2 class="sx-section-title">Write your first policy.</h2>
+  <div class="sx-actions">
+    <a class="sx-button sx-button--primary" href="/getting-started/writing-your-first-policy">Start the guide <span aria-hidden="true">→</span></a>
+    <a class="sx-button sx-button--ghost" href="/reference">Browse the reference</a>
+  </div>
+</section>

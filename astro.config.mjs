@@ -2,11 +2,15 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import { sentrieGrammar } from "./src/sentrie-grammar.ts";
+import { sentrieCodeTheme } from "./src/code-theme.ts";
 
 // https://astro.build/config
 export default defineConfig({
   site: process.env.ASTRO_SITE_URL || "https://sentrie.sh",
   trailingSlash: "ignore",
+  redirects: {
+    "/reference/function-chaining": "/reference/pipelining",
+  },
   prefetch: {
     defaultStrategy: "viewport",
     prefetchAll: true,
@@ -14,6 +18,14 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Sentrie",
+      logo: {
+        light: "./src/assets/logo-light.svg",
+        dark: "./src/assets/logo-dark.svg",
+      },
+      customCss: ["./src/styles/theme.css", "./src/styles/landing.css"],
+      components: {
+        Hero: "./src/components/Hero.astro",
+      },
       credits: true,
       social: [
         {
@@ -216,8 +228,8 @@ export default defineConfig({
               slug: "reference/built-in-functions",
             },
             {
-              label: "Function chaining",
-              slug: "reference/function-chaining",
+              label: "Pipelining",
+              slug: "reference/pipelining",
             },
             {
               label: "Using TypeScript",
@@ -329,7 +341,28 @@ export default defineConfig({
         },
       ],
       expressiveCode: {
-        themes: ["github-dark", "github-light"],
+        themes: [sentrieCodeTheme],
+        useStarlightUiThemeColors: false,
+        styleOverrides: {
+          borderRadius: "6px",
+          borderColor: "#2f343e",
+          codeFontFamily: "var(--font-mono)",
+          codeFontSize: "0.8125rem",
+          codeLineHeight: "1.67",
+          uiFontFamily: "var(--font-sans)",
+          frames: {
+            shadowColor: "transparent",
+            editorTabBarBackground: "#2f343e",
+            editorActiveTabBackground: "#282c33",
+            editorActiveTabIndicatorTopColor: "#1a6ae0",
+            editorActiveTabIndicatorBottomColor: "transparent",
+            editorTabBarBorderBottomColor: "#2f343e",
+            terminalTitlebarBackground: "#2f343e",
+            terminalTitlebarBorderBottomColor: "#2f343e",
+            terminalBackground: "#282c33",
+            frameBoxShadowCssValue: "none",
+          },
+        },
         shiki: {
           langs: [sentrieGrammar],
         },

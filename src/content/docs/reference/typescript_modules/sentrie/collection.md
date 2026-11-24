@@ -7,7 +7,7 @@ The `@sentrie/collection` module provides utilities for both list/array and dict
 
 ## Usage
 
-```text
+```sentrie
 use { list_includes, map_keys, map_get } from @sentrie/collection
 ```
 
@@ -26,7 +26,7 @@ Checks if an array includes a specific item. Uses deep equality comparison.
 
 **Example:**
 
-```text
+```sentrie
 use { list_includes } from @sentrie/collection
 let numbers = [1, 2, 3, 4, 5]
 let hasThree = collection.list_includes(numbers, 3)  // true
@@ -45,7 +45,7 @@ Finds the first index of an item in an array. Uses deep equality comparison.
 
 **Example:**
 
-```text
+```sentrie
 use { list_indexOf } from @sentrie/collection
 let numbers = [1, 2, 3, 4, 5]
 let idx = collection.list_indexOf(numbers, 3)  // 2
@@ -76,7 +76,7 @@ Sorts an array in ascending order. Sorts numbers numerically and strings lexicog
 
 **Example:**
 
-```text
+```sentrie
 use { list_sort } from @sentrie/collection
 let numbers = [3, 1, 4, 1, 5]
 let sorted = collection.list_sort(numbers)  // [1, 1, 3, 4, 5]
@@ -96,7 +96,7 @@ Removes duplicate values from an array. Uses equality comparison to detect dupli
 
 **Example:**
 
-```text
+```sentrie
 use { list_unique } from @sentrie/collection
 let numbers = [1, 2, 2, 3, 3, 3]
 let unique = collection.list_unique(numbers)  // [1, 2, 3]
@@ -117,7 +117,7 @@ Splits an array into chunks of a specified size.
 
 **Example:**
 
-```text
+```sentrie
 use { list_chunk } from @sentrie/collection
 let numbers = [1, 2, 3, 4, 5, 6]
 let chunks = collection.list_chunk(numbers, 2)  // [[1, 2], [3, 4], [5, 6]]
@@ -137,7 +137,7 @@ Flattens a nested array structure by one level or recursively.
 
 **Example:**
 
-```text
+```sentrie
 use { list_flatten } from @sentrie/collection
 let nested = [[1, 2], [3, 4], [5, 6]]
 let flat = collection.list_flatten(nested)  // [1, 2, 3, 4, 5, 6]
@@ -159,7 +159,7 @@ Gets all keys from a map/object.
 
 **Example:**
 
-```text
+```sentrie
 use { map_keys } from @sentrie/collection
 let user = {"name": "John", "age": 30, "role": "admin"}
 let keys = collection.map_keys(user)  // ["name", "age", "role"]
@@ -179,7 +179,7 @@ Gets all values from a map/object.
 
 **Example:**
 
-```text
+```sentrie
 use { map_values } from @sentrie/collection
 let user = {"name": "John", "age": 30, "role": "admin"}
 let values = collection.map_values(user)  // ["John", 30, "admin"]
@@ -199,7 +199,7 @@ Gets all key-value pairs from a map/object as an array of `[key, value]` tuples.
 
 **Example:**
 
-```text
+```sentrie
 use { map_entries } from @sentrie/collection
 let user = {"name": "John", "age": 30}
 let entries = collection.map_entries(user)  // [["name", "John"], ["age", 30]]
@@ -218,7 +218,7 @@ Checks if a map/object contains a specific key.
 
 **Example:**
 
-```text
+```sentrie
 use { map_has } from @sentrie/collection
 let user = {"name": "John", "age": 30}
 let hasName = collection.map_has(user, "name")  // true
@@ -239,7 +239,7 @@ Gets a value from a map/object by key, with an optional default value.
 
 **Example:**
 
-```text
+```sentrie
 use { map_get } from @sentrie/collection
 let user = {"name": "John", "age": 30}
 let name = collection.map_get(user, "name")  // "John"
@@ -260,7 +260,7 @@ Gets the number of key-value pairs in a map/object.
 
 **Example:**
 
-```text
+```sentrie
 use { map_size } from @sentrie/collection
 let user = {"name": "John", "age": 30, "role": "admin"}
 let size = collection.map_size(user)  // 3
@@ -280,7 +280,7 @@ Checks if a map/object is empty (has no entries).
 
 **Example:**
 
-```text
+```sentrie
 use { map_isEmpty } from @sentrie/collection
 let empty = {}
 let notEmpty = {"name": "John"}
@@ -304,7 +304,7 @@ Merges multiple maps/objects into a single map. Later maps override earlier maps
 
 **Example:**
 
-```text
+```sentrie
 use { map_merge } from @sentrie/collection
 let user1 = {"name": "John", "age": 30}
 let user2 = {"age": 31, "role": "admin"}
@@ -313,7 +313,7 @@ let merged = collection.map_merge(user1, user2)  // {"name": "John", "age": 31, 
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/mypolicy
 
 policy mypolicy {

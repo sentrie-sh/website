@@ -25,7 +25,7 @@ alias.isValid(str)
 
 ### Typical use
 
-```text
+```sentrie
 use { isValid } from @sentrie/json as jsonUtil
 let ok = jsonUtil.isValid('{"name": "John", "age": 30}')
 let bad = jsonUtil.isValid('{"name": "John", "age":}')
@@ -33,7 +33,7 @@ let bad = jsonUtil.isValid('{"name": "John", "age":}')
 
 ### Going further
 
-```text
+```sentrie
 use { isValid } from @sentrie/json as jsonUtil
 use { parse, stringify } from @sentrie/js as json
 
@@ -45,7 +45,7 @@ See the [@sentrie/js](/reference/typescript_modules/sentrie/js) documentation fo
 
 ## Complete Example
 
-```text
+```sentrie
 namespace com/example/mypolicy
 
 policy mypolicy {
