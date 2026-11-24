@@ -13,7 +13,13 @@ export const sentrieGrammar = {
     // Keywords - Program Structure
     {
       name: 'keyword.control.sentrie',
-      match: String.raw`\b(namespace|policy|rule|fact|let|export|import|use|from|as|default|when|yield|shape|attach|decision|of|with|contribute|derive|transform|title|description|version|tag|data)\b`
+      match: String.raw`\b(namespace|policy|rule|fact|let|export|import|use|from|as|default|when|yield|shape|attach|decision|of|with|contribute|derive|transform|title|description|version|tag)\b`
+    },
+
+    // Keywords - contextual: `data` declares pack data only at the start of a statement
+    {
+      match: String.raw`^\s*(data)\b`,
+      captures: { 1: { name: 'keyword.control.sentrie' } }
     },
 
     // Keywords - State checking
@@ -58,6 +64,13 @@ export const sentrieGrammar = {
       match: String.raw`\b(list|dict|record)\b`
     },
 
+    // Strings - Heredoc: <<<TAG on its own line, ended by a line holding only TAG
+    {
+      name: 'string.unquoted.heredoc.sentrie',
+      begin: String.raw`<<<([A-Za-z_][A-Za-z0-9_]*)\s*$`,
+      end: String.raw`^\s*\1\s*$`
+    },
+
     // Strings - Double quoted
     {
       name: 'string.quoted.double.sentrie',
@@ -71,16 +84,10 @@ export const sentrieGrammar = {
       ]
     },
 
-    // Numbers - Floats
+    // Numbers - integers, decimals and exponents
     {
-      name: 'constant.numeric.float.sentrie',
-      match: String.raw`\b\d+\.\d+\b`
-    },
-
-    // Numbers - Integers
-    {
-      name: 'constant.numeric.integer.sentrie',
-      match: String.raw`\b\d+\b`
+      name: 'constant.numeric.sentrie',
+      match: String.raw`\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b`
     },
 
     // Operators - Lambda arrow
@@ -97,26 +104,14 @@ export const sentrieGrammar = {
 
     // Operators - Comparison
     {
-      name: 'operator.comparison.sentrie',
+      name: 'keyword.operator.relational.sentrie',
       match: String.raw`(==|!=|<=|>=|<|>)`
     },
 
     // Operators - Arithmetic
     {
-      name: 'operator.arithmetic.sentrie',
+      name: 'keyword.operator.arithmetic.sentrie',
       match: String.raw`(\+|\-|\*|\/|%)`
-    },
-
-    // Operators - Logical
-    {
-      name: 'operator.logical.sentrie',
-      match: String.raw`(\?|:)`
-    },
-
-    // Operators - Unary
-    {
-      name: 'operator.unary.sentrie',
-      match: String.raw`(!)`
     },
 
     // Punctuation - Separators
