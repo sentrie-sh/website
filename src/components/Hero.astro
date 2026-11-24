@@ -2,40 +2,45 @@
 // SPDX-FileCopyrightText: © 2026 Binaek Sarkar <binaek89@gmail.com>
 // SPDX-License-Identifier: Apache-2.0
 
-// Replaces Starlight's Hero. Only the landing page sets `hero` in its
-// frontmatter, so this renders there and nowhere else. DESIGN.md, "Hero Section".
+// Replaces Starlight's Hero on the landing page only. Other pages that set
+// `hero`, such as Starlight's built-in 404, keep the default Hero.
+// DESIGN.md, "Hero Section".
 import { Icon } from "@astrojs/starlight/components";
+import DefaultHero from "@astrojs/starlight/components/Hero.astro";
 import CommandChip from "./landing/CommandChip.astro";
 
-const { data } = Astro.locals.starlightRoute.entry;
-const { title = data.title, tagline, actions = [] } = data.hero || {};
+const route = Astro.locals.starlightRoute;
+const isLanding = route.id === "";
+const { title = route.entry.data.title, tagline, actions = [] } = route.entry.data.hero || {};
 const [primary, ...rest] = actions;
 // Starlight's page title id, which its skip link and table of contents target.
 const PAGE_TITLE_ID = "_top";
 ---
 
-<section class="sx-hero">
-	<p class="sx-eyebrow">Open-source policy engine</p>
-	<h1 id={PAGE_TITLE_ID} class="sx-hero-title" set:html={title} />
-	{tagline && <p class="sx-hero-tagline" set:html={tagline} />}
-	<div class="sx-actions">
-		{
-			primary && (
-				<a class="sx-button sx-button--primary" href={primary.link}>
-					{primary.text}
-					<Icon name="right-arrow" size="1rem" />
-				</a>
-			)
-		}
-		{
-			rest.map((action) => (
-				<a class="sx-button sx-button--ghost" href={action.link}>
-					<Icon name="open-book" size="1rem" />
-					{action.text}
-				</a>
-			))
-		}
-	</div>
-	<CommandChip command="curl -fsSL https://sentrie.sh/install.sh | bash" />
-	<p class="sx-hero-note">macOS, Linux and WSL2. Windows and pinned versions are in the installation guide.</p>
-</section>
+{
+	isLanding ? (
+		<section class="sx-hero">
+			<p class="sx-eyebrow">Open-source policy engine</p>
+			<h1 id={PAGE_TITLE_ID} class="sx-hero-title" set:html={title} />
+			{tagline && <p class="sx-hero-tagline" set:html={tagline} />}
+			{primary && (
+				<div class="sx-actions">
+					<a class="sx-button sx-button--primary" href={primary.link}>
+						{primary.text}
+						<Icon name="right-arrow" size="1rem" />
+					</a>
+					{rest.map((action) => (
+						<a class="sx-button sx-button--ghost" href={action.link}>
+							<Icon name="open-book" size="1rem" />
+							{action.text}
+						</a>
+					))}
+				</div>
+			)}
+			<CommandChip command="curl -fsSL https://sentrie.sh/install.sh | bash" />
+			<p class="sx-hero-note">macOS, Linux and WSL2. Windows and pinned versions are in the installation guide.</p>
+		</section>
+	) : (
+		<DefaultHero />
+	)
+}

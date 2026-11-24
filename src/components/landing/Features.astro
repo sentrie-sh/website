@@ -27,7 +27,7 @@ const { heading, items } = Astro.props;
 					<h3>{item.title}</h3>
 					<p>{item.body}</p>
 					<a href={item.href}>
-						Learn more <span aria-hidden="true">→</span>
+						Learn more<span class="sr-only"> about {item.title.toLowerCase()}</span> <span aria-hidden="true">→</span>
 					</a>
 				</article>
 			))
